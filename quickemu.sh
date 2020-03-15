@@ -121,8 +121,14 @@ VM=""
 
 while [ $# -gt 0 ]; do
   case "${1}" in
+    -efi|--efi)
+      BIOS="-bios /usr/share/qemu/OVMF.fd"
+      shift;;
     -delete|--delete)
       DELETE=1
+      shift;;
+    -legacy|--legacy)
+      BIOS=""
       shift;;
     -restore|--restore)
       SNAPSHOT=1
