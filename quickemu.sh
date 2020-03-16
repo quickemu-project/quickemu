@@ -131,7 +131,7 @@ while [ $# -gt 0 ]; do
       BIOS=""
       shift;;
     -restore|--restore)
-      SNAPSHOT=1
+      RESTORE=1
       shift;;
     -snapshot|--snapshot)
       SNAPSHOT=1
