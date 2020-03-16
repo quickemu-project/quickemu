@@ -105,6 +105,8 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
+  echo "  --efi      : Enable EFI BIOS (default)."
+  echo "  --legacy   : Enable legacy BIOS."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
