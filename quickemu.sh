@@ -108,6 +108,7 @@ function usage() {
   echo "  --efi      : Enable EFI BIOS (default)."
   echo "  --legacy   : Enable legacy BIOS."
   echo "  --restore  : Restore the snapshot."
+  echo "  --samba    : Share your home directory to the guest."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
   exit 1
@@ -117,7 +118,7 @@ BIOS="-bios /usr/share/qemu/OVMF.fd"
 DELETE=0
 ENGINE="system-x86_64"
 RESTORE=0
-SAMBA=",smb=${HOME}"
+SAMBA=""
 SNAPSHOT=0
 VM=""
 
@@ -134,6 +135,15 @@ while [ $# -gt 0 ]; do
       shift;;
     -restore|--restore)
       RESTORE=1
+      shift;;
+    -samba|--samba)
+      TEST_SMBD=$(which smbd)
+      if [ $? -eq 0 ]; then
+        SAMBA=",smb=${HOME}"
+        echo "NOTE! ${HOME} will be available on the guest via smb://10.0.2.4/qemu"
+      else
+        echo "WARNING! Requested sharing %{HOME} via samba. 'smbd' not found."
+      fi
       shift;;
     -snapshot|--snapshot)
       SNAPSHOT=1
