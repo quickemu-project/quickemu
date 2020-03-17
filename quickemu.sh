@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#  - sudo apt install qemu qemu-kvm libvirt-clients libvirt-daemon bridge-utils samba ovmf
-#  - sudo apt install libvirt-bin # on 18.04
-#  - sudo adduser ${SUDO_USER} kvm
-#  - Download an ISO image
-#  - Your home directory on the host will be available via samba on the guest VM via smb://10.0.2.4/qemu
-
 LAUNCHER=$(basename $0 .sh)
 allcores=$(nproc --all)
 if [ ${allcores} -ge 8 ]; then
