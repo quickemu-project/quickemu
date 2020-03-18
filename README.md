@@ -41,7 +41,7 @@ Install the `qemu-virgil` snap *(optional)*
 
 ```bash
 snap install qemu-virgil
-snap connect qemu-virgil:removable-media
+snap connect qemu-virgil:kvm
 ```
 
 ## Usage
