@@ -19,7 +19,7 @@ else
   ram="2G"
 fi
 
-disk="64G"
+disk="64G" # Default unless "--size" is given.
 xres="1440"
 yres="900"
 ver=$(qemu-system-x86_64 -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
@@ -70,6 +70,7 @@ function vm_boot() {
   fi
 
   # Boot the iso image
+  echo "Launching VM."
   qemu-${ENGINE} \
     -cdrom "${iso}" \
     -drive "file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on" \
@@ -102,6 +103,7 @@ function usage() {
   echo "  --legacy   : Enable legacy BIOS."
   echo "  --restore  : Restore the snapshot."
   echo "  --samba    : Share your home directory to the guest."
+  echo "  --size     : Set vm disk size in GB."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
   exit 1
@@ -137,6 +139,15 @@ while [ $# -gt 0 ]; do
       else
         echo "WARNING! Requested sharing %{HOME} via samba. 'smbd' not found."
       fi
+      shift;;
+    -size|--size)
+      if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+        echo "ERROR! Size must be given in numbers only."
+        exit 1
+      fi
+      echo "Setting disk size to $2GB."
+      disk="$2"
+      shift
       shift;;
     -snapshot|--snapshot)
       SNAPSHOT=1
