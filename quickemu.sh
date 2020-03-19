@@ -178,12 +178,12 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --delete   : Delete the disk image."
-  echo "  --efi      : Enable EFI BIOS (experimental)."
-  echo "  --restore  : Restore the snapshot."
-  echo "  --snapshot : Create a disk snapshot."
-  echo "  --virgil   : Use virgil, if available."
-  echo "  --ssh      : Enable SSH to the machine (disabled by default)."
+  echo "  --delete       : Delete the disk image."
+  echo "  --efi          : Enable EFI BIOS (experimental)."
+  echo "  --restore      : Restore the snapshot."
+  echo "  --snapshot     : Create a disk snapshot."
+  echo "  --virgil       : Use virgil, if available."
+  echo "  --ssh [<PORT>] : Enable SSH to the machine, default port 2222."
   exit 1
 }
 
