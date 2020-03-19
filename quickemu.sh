@@ -169,9 +169,6 @@ while [ $# -gt 0 ]; do
     -delete|--delete)
       DELETE=1
       shift;;
-    -legacy|--legacy)
-      BIOS=""
-      shift;;
     -restore|--restore)
       RESTORE=1
       shift;;
@@ -180,7 +177,6 @@ while [ $# -gt 0 ]; do
       shift;;
     -virgil|--virgil)
       ENGINE="virgil"
-      SAMBA=""
       shift;;
     -vm|--vm)
       VM="$2"
