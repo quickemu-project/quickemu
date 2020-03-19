@@ -56,6 +56,10 @@ function vm_boot() {
   if [ ! -f "${disk_img}" ]; then
     # If there is no disk image, create a new image.
     qemu-img create -q -f qcow2 "${disk_img}" "${disk}"
+    if [ $? -ne 0 ]; then
+      echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
+      exit 1
+    fi
     echo " - ISO:      ${iso}"
   else
     # If there is a disk image, do not boot from the iso
