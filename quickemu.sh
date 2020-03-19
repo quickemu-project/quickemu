@@ -1,25 +1,5 @@
 #!/usr/bin/env bash
 
-allcores=$(nproc --all)
-if [ ${allcores} -ge 8 ]; then
-  cores="4"
-elif [ ${allcores} -ge 4 ]; then
-  cores="2"
-else
-  cores="1"
-fi
-
-allram=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
-if [ ${allram} -ge 64 ]; then
-  ram="4G"
-elif [ ${allram} -ge 16 ]; then
-  ram="3G"
-else
-  ram="2G"
-fi
-
-disk="64G"
-
 function vm_delete() {
   if [ -f "${disk_img}" ]; then
     rm "${disk_img}"
@@ -50,6 +30,23 @@ function vm_snapshot() {
 }
 
 function vm_boot() {
+  local cores="1"
+  local allcores=$(nproc --all)
+  if [ ${allcores} -ge 8 ]; then
+    cores="4"
+  elif [ ${allcores} -ge 4 ]; then
+    cores="2"
+  fi
+
+  local ram="2G"
+  local allram=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+  if [ ${allram} -ge 64 ]; then
+    ram="4G"
+  elif [ ${allram} -ge 16 ]; then
+    ram="3G"
+  fi
+
+
   if [ ! -f "${disk_img}" ]; then
     # If there is no disk image, create a new image.
     qemu-img create -f qcow2 "${disk_img}" "${disk}"
@@ -59,20 +56,24 @@ function vm_boot() {
   fi
 
   # Determine what display to use
-  ver=$(qemu-${ENGINE} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+  local display="-display gtk,grab-on-hover=on"
+
+  local ver=$(qemu-${ENGINE} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   if [ "${ENGINE}" == "virgil" ]; then
     display="-display sdl,gl=on"
   elif [ "${ver}" == "2.11.1" ]; then
     display="-display sdl"
     # Fix stuttering mouse pointer when SDL backend is used.
     export SDL_VIDEO_X11_DGAMOUSE=0
-  else
-    display="-display gtk,grab-on-hover=on"
   fi
 
+  # TODO: Detect Wayland here and "do the right thing".
   # Determine the most suitable 16:9 resolution of for VM based
   # on the lowest resolution connected monitor.
-  LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+  local xres=800
+  local yres=600
+
+  local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
   if [ ${LOWEST_WIDTH} -ge 3840 ]; then
     xres=3200
     yres=1800
@@ -85,27 +86,27 @@ function vm_boot() {
   elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
     xres=1152
     yres=648
-  else
-    xres=800
-    yres=600
   fi
 
+  local BIOS=""
   if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ "${ENGINE}" == "virgil" ]; then
+    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/OVMF.fd ] ; then
       BIOS="-bios /snap/qemu-virgil/current/usr/share/qemu/OVMF.fd"
-    else
+    elif [ -e /usr/share/qemu/OVMF.fd ]; then
       BIOS="-bios /usr/share/qemu/OVMF.fd"
+    else
+      echo "WARNING! EFI booting requested but no EFI firmware found."
+      echo "         Booting from Legacy BIOS."
     fi
     echo "${BIOS}"
   fi
 
+  local SAMBA=""
   # If smbd is available, export $HOME to the guest via samba
   if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
       SAMBA=",smb=${HOME}"
   elif [ "${ENGINE}" == "system-x86_64" ] && [ -e /usr/sbin/smbd ]; then
       SAMBA=",smb=${HOME}"
-  else
-      SAMBA=""
   fi
 
   if [ -n "${SAMBA}" ]; then
@@ -151,6 +152,7 @@ function usage() {
   exit 1
 }
 
+disk="64G"
 BIOS=""
 DELETE=0
 ENABLE_EFI=0
