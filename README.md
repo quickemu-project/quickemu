@@ -80,7 +80,9 @@ You can also pass optional parameters
 
 ### SSH Access
 
-SSH access to the QEMU virtual machine can be enabled by using the `--ssh` flag. This will portforward `TCP2222` on the host machine to `TCP22` on the QEMU guest machine. This does not install or start an SSH server within the guest itself, so you will stil need to enable this on a per-guest basis. For Ubuntu guests, you can enable this by installing `openssh-server`.
+SSH access to the QEMU virtual machine can be enabled by using the `--ssh` flag. This will portforward `TCP2222` on the host machine to `TCP22` on the QEMU guest machine. 
+
+This does not install or start an SSH server within the guest itself, so you may need to enable this on a per-guest basis. For Ubuntu guests, you can enable this by installing `openssh-server`.
 
 If the default port overlaps with another service on your host, you can override this with `--ssh-port $PORT`. This will still forward to port `TCP22` on the guest machine.
 
