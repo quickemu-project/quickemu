@@ -69,6 +69,15 @@ function vm_boot() {
     iso=""
   fi
 
+  if [ ${ENABLE_EFI} -eq 1 ]; then
+    if [ "${ENGINE}" == "virgil" ]; then
+      BIOS="-bios /snap/qemu-virgil/current/usr/share/qemu/OVMF.fd"
+    else
+      BIOS="-bios /usr/share/qemu/OVMF.fd"
+    fi
+    echo "${BIOS}"
+  fi
+
   # If smbd is available, export $HOME to the guest via samba
   if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
       SAMBA=",smb=${HOME}"
@@ -85,7 +94,7 @@ function vm_boot() {
   fi
 
   # Boot the iso image
-  qemu-${ENGINE} \
+  qemu-${ENGINE} ${BIOS} \
     -cdrom "${iso}" \
     -drive "file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on" \
     -enable-kvm \
@@ -102,7 +111,7 @@ function vm_boot() {
     -device virtio-rng-pci,rng=rng0 \
     -device qemu-xhci \
     -device virtio-vga,virgl=on,edid=on,xres=${xres},yres=${yres} \
-    ${display} ${BIOS} \
+    ${display} \
     "$@"
 }
 
@@ -113,16 +122,17 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
-  echo "  --efi      : Enable EFI BIOS (default)."
-  echo "  --legacy   : Enable legacy BIOS."
+  echo "  --efi      : Enable EFI BIOS (experimental)."
+  echo "  --legacy   : Enable legacy BIOS (default)."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
   exit 1
 }
 
-BIOS="-bios /usr/share/qemu/OVMF.fd"
+BIOS=""
 DELETE=0
+ENABLE_EFI=0
 ENGINE="system-x86_64"
 RESTORE=0
 SNAPSHOT=0
@@ -131,7 +141,7 @@ VM=""
 while [ $# -gt 0 ]; do
   case "${1}" in
     -efi|--efi)
-      BIOS="-bios /usr/share/qemu/OVMF.fd"
+      ENABLE_EFI=1
       shift;;
     -delete|--delete)
       DELETE=1
@@ -146,7 +156,6 @@ while [ $# -gt 0 ]; do
       SNAPSHOT=1
       shift;;
     -virgil|--virgil)
-      BIOS=""
       ENGINE="virgil"
       SAMBA=""
       shift;;
