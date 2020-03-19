@@ -121,8 +121,7 @@ function vm_boot() {
 
   # Determine what display to use
   local display="-display ${UI},gl=${GL}"
-  local ver=$(qemu-${ENGINE} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  if [ "${ver}" == "2.11.1" ]; then
+  if [ "${QEMU_VER}" == "2.11.1" ]; then
     display="-display sdl"
     # Fix stuttering mouse pointer when SDL backend is used.
     export SDL_VIDEO_X11_DGAMOUSE=0
