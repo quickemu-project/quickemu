@@ -74,6 +74,49 @@ You can also pass optional parameters
   --restore  : Restore the snapshot.
   --snapshot : Create a disk snapshot.
   --virgil   : Use virgil, if available.
+  --ssh      : Enable SSH to the machine (disabled by default).
+  --ssh-port : Local port to forward to the machine (default 2222).
+```
+
+### SSH Access
+
+SSH access to the QEMU virtual machine can be enabled by using the `--ssh` flag. This will portforward `TCP2222` on the host machine to `TCP22` on the QEMU guest machine. This does not install or start an SSH server within the guest itself, so you will stil need to enable this on a per-guest basis. For Ubuntu guests, you can enable this by installing `openssh-server`.
+
+If the default port overlaps with another service on your host, you can override this with `--ssh-port $PORT`. This will still forward to port `TCP22` on the guest machine.
+
+Example of usage: -
+
+```
+$ ./quickemu.sh --vm mate.conf --ssh --ssh-port 1111
+Starting mate.conf
+ - BIOS:     Legacy
+ - Disk:     /home/$USER/Applications/quickemu/ubuntu-mate/focal-desktop-amd64.qcow2
+ - Size:     20G
+ - ISO:      /home/$USER/Applications/quickemu/ubuntu-mate/focal-desktop-amd64.iso
+ - CPU:      2 Core(s)
+ - RAM:      2G
+ - UI:       sdl
+ - GL:       on
+ - smbd:     /home/stuh84 will be exported to the guest via smb://10.0.2.4/qemu
+
+$ ssh quickemu@localhost -p 1111
+quickemu@localhost's password: 
+Welcome to Ubuntu Focal Fossa (development branch) (GNU/Linux 5.4.0-18-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+quickemu@ubuntu-mate:~$
 ```
 
 ## TODO

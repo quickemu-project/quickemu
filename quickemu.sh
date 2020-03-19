@@ -133,6 +133,19 @@ function vm_boot() {
     echo " - smbd:     %{HOME} will not be exported to the guest. 'smbd' not found."
   fi
 
+  # Creates a port-forward from the host machine to the QEMU guest
+  # By default, if not port is specified (with --ssh-port $SSH_PORT), TCP port 2222 is used
+  # Access to the QEMU machine is then available via: -
+  # 
+  #  ssh $USER@localhost -p $SSH_PORT
+  #
+  if [ ${SSH} -eq 1 ]; then
+      SSH_FWD=",hostfwd=tcp::${SSH_PORT}-:22"
+  else
+      SSH_FWD=""
+  fi
+
+
   #echo " - QEMU:     qemu-${ENGINE}"
   # Boot the iso image
   qemu-${ENGINE} ${BIOS} \
@@ -144,7 +157,7 @@ function vm_boot() {
     -m ${ram} \
     -smp ${cores} \
     -net nic,model=virtio \
-    -net user"${SAMBA}" \
+    -net user"${SAMBA}""${SSH_FWD}" \
     -rtc base=localtime,clock=host \
     -soundhw hda \
     -usb -device usb-kbd -device usb-tablet \
@@ -168,6 +181,8 @@ function usage() {
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
+  echo "  --ssh      : Enable SSH to the machine (disabled by default)."
+  echo "  --ssh-port : Local port to forward to the machine (default 2222)."
   exit 1
 }
 
@@ -178,6 +193,8 @@ ENABLE_EFI=0
 ENGINE="system-x86_64"
 RESTORE=0
 SNAPSHOT=0
+SSH=0
+SSH_PORT=2222
 VM=""
 
 while [ $# -gt 0 ]; do
@@ -196,6 +213,13 @@ while [ $# -gt 0 ]; do
       shift;;
     -virgil|--virgil)
       ENGINE="virgil"
+      shift;;
+    -ssh|--ssh)
+      SSH=1
+      shift;;
+    -ssh-port|--ssh-port)
+      SSH_PORT=$2
+      shift
       shift;;
     -vm|--vm)
       VM="$2"
