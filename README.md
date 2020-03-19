@@ -79,6 +79,6 @@ You can also pass optional parameters
 ## TODO
 
   - [x] Make display configuration more robust
-  - [ ] Improve stdout presentation
+  - [x] Improve stdout presentation
   - [x] Make disk image optionally size configurable
   - [ ] Improve snapshot management

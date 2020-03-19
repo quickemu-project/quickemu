@@ -3,7 +3,7 @@
 function vm_delete() {
   if [ -f "${disk_img}" ]; then
     rm "${disk_img}"
-    echo "Deleted ${disk_img}"
+    echo "SUCCESS! Deleted ${disk_img}"
   fi
   exit 0
 }
@@ -12,7 +12,7 @@ function vm_restore() {
   if [ -f "${disk_img_snapshot}" ]; then
     mv "${disk_img_snapshot}" "${disk_img}"
   fi
-  echo "Restored ${disk_img_snapshot}"
+  echo "SUCCESS! Restored ${disk_img_snapshot}"
   exit 0
 }
 
@@ -20,16 +20,45 @@ function vm_snapshot() {
   if [ -f "${disk_img_snapshot}" ]; then
     mv "${disk_img_snapshot}" "${disk_img_snapshot}.old"
   fi
-  qemu-img create -b "${disk_img}" -f qcow2 "${disk_img_snapshot}"
+  qemu-img create -b "${disk_img}" -f qcow2 "${disk_img_snapshot}" -q
   if [ $? -eq 0 ]; then
-    echo "Created ${disk_img_snapshot}"
+    echo "SUCCESS! Created ${disk_img_snapshot}"
   else
-    echo "Failed to create ${disk_img_snapshot}"
+    echo "ERROR! Failed to create ${disk_img_snapshot}"
   fi
   exit 0
 }
 
 function vm_boot() {
+  local BIOS=""
+  if [ ${ENABLE_EFI} -eq 1 ]; then
+    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
+      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
+    elif [ -e /usr/share/qemu/OVMF.fd ]; then
+      BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
+    else
+      echo " - EFI:      Booting requested but no EFI firmware found."
+      echo "             Booting from Legacy BIOS."
+    fi
+    echo " - BIOS:     ${BIOS}"
+  else
+    echo " - BIOS:     Legacy"
+  fi
+
+  echo " - Disk:     ${disk_img}"
+  echo " - Size:     ${disk}"
+  if [ ! -f "${disk_img}" ]; then
+    # If there is no disk image, create a new image.
+    qemu-img create -q -f qcow2 "${disk_img}" "${disk}"
+    echo " - ISO:      ${iso}"
+  else
+    # If there is a disk image, do not boot from the iso
+    iso=""
+  fi
+  if [ -e ${disk_img_snapshot} ]; then
+    echo " - Snapshot: ${disk_img_snapshot}"
+  fi
+
   local cores="1"
   local allcores=$(nproc --all)
   if [ ${allcores} -ge 8 ]; then
@@ -37,6 +66,7 @@ function vm_boot() {
   elif [ ${allcores} -ge 4 ]; then
     cores="2"
   fi
+  echo " - CPU:      ${cores} Core(s)"
 
   local ram="2G"
   local allram=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
@@ -45,15 +75,7 @@ function vm_boot() {
   elif [ ${allram} -ge 16 ]; then
     ram="3G"
   fi
-
-
-  if [ ! -f "${disk_img}" ]; then
-    # If there is no disk image, create a new image.
-    qemu-img create -f qcow2 "${disk_img}" "${disk}"
-  else
-    # If there is a disk image, do not boot from the iso
-    iso=""
-  fi
+  echo " - RAM:      ${ram}"
 
   # Determine what display to use
   local display="-display gtk,grab-on-hover=on"
@@ -88,17 +110,8 @@ function vm_boot() {
     yres=648
   fi
 
-  local BIOS=""
-  if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
-      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
-    elif [ -e /usr/share/qemu/OVMF.fd ]; then
-      BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
-    else
-      echo "WARNING! EFI booting requested but no EFI firmware found."
-      echo "         Booting from Legacy BIOS."
-    fi
-    echo "${BIOS}"
+  if [ "${ENGINE}" == "virgil" ]; then
+    echo " - Monitor:  ${xres}x${yres}"
   fi
 
   local SAMBA=""
@@ -110,11 +123,12 @@ function vm_boot() {
   fi
 
   if [ -n "${SAMBA}" ]; then
-    echo "NOTE! ${HOME} will be available on the guest via smb://10.0.2.4/qemu"
+    echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
   else
-    echo "NOTE! %{HOME} will not be available in the guest. 'smbd' not found."
+    echo " - smbd:     %{HOME} will not be exported to the guest. 'smbd' not found."
   fi
 
+  #echo " - QEMU:     qemu-${ENGINE}"
   # Boot the iso image
   qemu-${ENGINE} ${BIOS} \
     -cdrom "${iso}" \
@@ -134,7 +148,7 @@ function vm_boot() {
     -device qemu-xhci \
     -device virtio-vga,virgl=on,xres=${xres},yres=${yres} \
     ${display} \
-    "$@"
+    "$@" 2>/dev/null
 }
 
 function usage() {
@@ -190,19 +204,19 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "${VM}" ] || [ ! -e "${VM}" ]; then
-  echo "ERROR! VM not found."
-  exit 1
-else
+if [ -n "${VM}" ] || [ -e "${VM}" ]; then
   source "${VM}"
+  echo Starting "${VM}"
   if [ -n "${disk_img}" ]; then
     disk_img_snapshot="${disk_img}.snapshot"
-    echo "${disk_img}"
-    echo "${disk_img_snapshot}"
   else
     echo "ERROR! No disk_img defined."
     exit 1
   fi
+else
+  echo "ERROR! VM not found."
+  exit 1
+
 fi
 
 if [ ${DELETE} -eq 1 ]; then
