@@ -152,6 +152,7 @@ function vm_boot() {
     -net nic,model=virtio \
     -net user"${SAMBA}" \
     -rtc base=localtime,clock=host \
+    -serial mon:stdio \
     -soundhw hda \
     -usb -device usb-kbd -device usb-tablet \
     -object rng-random,id=rng0,filename=/dev/urandom \
