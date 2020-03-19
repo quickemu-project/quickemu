@@ -48,8 +48,27 @@ function vm_boot() {
   local GL="on"
   local VIRGL="on"
   local UI="sdl"
+
+  # If QEMU has not already been selected, pick one
+  if [ -z "${QEMU}" ]; then
+    if [ -e /snap/bin/qemu-virgil ]; then
+      QEMU="/snap/bin/qemu-virgil"
+      QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
+      #QEMU_IMG="/usr/bin/qemu-img"
+    elif [ -e /usr/bin/qemu-system-x86_64 ]; then
+      QEMU="/usr/bin/qemu-system-x86_64"
+      QEMU_IMG="/usr/bin/qemu-img"
+    else
+      echo "ERROR! Could not find QEMU. Quitting."
+      exit 1
+    fi
+  fi
+  local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+  local QEMU_BIN=$(basename ${QEMU})
+  echo " - QEMU:     ${QEMU} v${QEMU_VER}"
+
   if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
+    if [ "${QEMU_BIN}" == "qemu-virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
       VIRGL="off"
     elif [ -e /usr/share/qemu/OVMF.fd ]; then
@@ -133,15 +152,15 @@ function vm_boot() {
     yres=648
   fi
 
-  if [ "${ENGINE}" == "virgil" ]; then
+  if [ "${QEMU_BIN}" == "qemu-virgil" ]; then
     echo " - Monitor:  ${xres}x${yres}"
   fi
 
   local NET=""
   # If smbd is available, export $HOME to the guest via samba
-  if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
+  if [ "${QEMU_BIN}" == "qemu-virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
       NET=",smb=${HOME}"
-  elif [ "${ENGINE}" == "system-x86_64" ] && [ -e /usr/sbin/smbd ]; then
+  elif [ "${QEMU_BIN}" == "qemu-system-x86_64" ] && [ -e /usr/sbin/smbd ]; then
       NET=",smb=${HOME}"
   fi
 
@@ -162,7 +181,7 @@ function vm_boot() {
 
   #echo " - QEMU:     qemu-${ENGINE}"
   # Boot the iso image
-  qemu-${ENGINE} -name ${VMNAME},process=${VMNAME} \
+  ${QEMU} -name ${VMNAME},process=${VMNAME} \
     ${BIOS} \
     -cdrom "${iso}" \
     -drive "file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on" \
@@ -194,9 +213,9 @@ function usage() {
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
   echo "  --efi      : Enable EFI BIOS (experimental)."
+  echo "  --qemu     : Override full path to QEMU executable."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
-  echo "  --virgil   : Use virgil, if available."
   exit 1
 }
 
@@ -204,7 +223,7 @@ disk="64G"
 BIOS=""
 DELETE=0
 ENABLE_EFI=0
-ENGINE="system-x86_64"
+QEMU=""
 RESTORE=0
 SNAPSHOT=0
 VM=""
@@ -223,8 +242,9 @@ while [ $# -gt 0 ]; do
     -snapshot|--snapshot)
       SNAPSHOT=1
       shift;;
-    -virgil|--virgil)
-      ENGINE="virgil"
+    -qemu|--qemu)
+      QEMU="$2"
+      shift
       shift;;
     -vm|--vm)
       VM="$2"
@@ -250,7 +270,11 @@ if [ -n "${VM}" ] || [ -e "${VM}" ]; then
 else
   echo "ERROR! VM not found."
   exit 1
+fi
 
+if [ -n "${QEMU}" ] && [ ! -e "${QEMU}" ]; then
+  echo "ERROR! ${QEMU} not found. Quitting"
+  exit 1
 fi
 
 if [ ${DELETE} -eq 1 ]; then
