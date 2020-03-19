@@ -135,7 +135,7 @@ function vm_boot() {
   if [ -n "${SAMBA}" ]; then
     echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
   else
-    echo " - smbd:     %{HOME} will not be exported to the guest. 'smbd' not found."
+    echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
   fi
 
   #echo " - QEMU:     qemu-${ENGINE}"
