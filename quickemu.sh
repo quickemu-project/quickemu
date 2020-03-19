@@ -90,10 +90,10 @@ function vm_boot() {
 
   local BIOS=""
   if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/OVMF.fd ] ; then
-      BIOS="-bios /snap/qemu-virgil/current/usr/share/qemu/OVMF.fd"
+    if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
+      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
     elif [ -e /usr/share/qemu/OVMF.fd ]; then
-      BIOS="-bios /usr/share/qemu/OVMF.fd"
+      BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
     else
       echo "WARNING! EFI booting requested but no EFI firmware found."
       echo "         Booting from Legacy BIOS."
