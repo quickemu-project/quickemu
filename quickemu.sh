@@ -33,16 +33,15 @@ function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local BIOS=""
   local GL="on"
+  local VIRGL="on"
   local UI="sdl"
   if [ ${ENABLE_EFI} -eq 1 ]; then
     if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
-      GL="off"
-      UI="gtk"
+      VIRGL="off"
     elif [ -e /usr/share/qemu/OVMF.fd ]; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
-      GL="off"
-      UI="gtk"
+      VIRGL="off"
     else
       echo " - EFI:      Booting requested but no EFI firmware found."
       echo "             Booting from Legacy BIOS."
@@ -94,6 +93,7 @@ function vm_boot() {
   fi
   echo " - UI:       ${UI}"
   echo " - GL:       ${GL}"
+  echo " - VIRGL:    ${VIRGL}"
 
   # TODO: Detect Wayland here and "do the right thing".
   # Determine the most suitable 16:9 resolution of for VM based
@@ -153,7 +153,7 @@ function vm_boot() {
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
     -device qemu-xhci \
-    -device virtio-vga,virgl=on,xres=${xres},yres=${yres} \
+    -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
     ${display} \
     "$@" 2>/dev/null
 }
