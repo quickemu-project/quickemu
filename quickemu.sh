@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-LAUNCHER=$(basename $0 .sh)
 allcores=$(nproc --all)
 if [ ${allcores} -ge 8 ]; then
   cores="4"
@@ -138,6 +137,7 @@ function vm_boot() {
 }
 
 function usage() {
+  local LAUNCHER=$(basename $0)
   echo
   echo "Usage"
   echo "  ${LAUNCHER} --vm ubuntu.conf"
@@ -145,7 +145,6 @@ function usage() {
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
   echo "  --efi      : Enable EFI BIOS (experimental)."
-  echo "  --legacy   : Enable legacy BIOS (default)."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
