@@ -20,16 +20,6 @@ else
 fi
 
 disk="64G"
-xres="1440"
-yres="900"
-ver=$(qemu-system-x86_64 -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-if [ "${ver}" == "2.11.1" ]; then
-  display="-display sdl"
-  # Fix stuttering mouse pointer when SDL backend is used.
-  export SDL_VIDEO_X11_DGAMOUSE=0
-else
-  display="-display gtk,grab-on-hover=on,zoom-to-fit=off"
-fi
 
 function vm_delete() {
   if [ -f "${disk_img}" ]; then
@@ -67,6 +57,38 @@ function vm_boot() {
   else
     # If there is a disk image, do not boot from the iso
     iso=""
+  fi
+
+  # Determine what display to use
+  ver=$(qemu-${ENGINE} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+  if [ "${ENGINE}" == "virgil" ]; then
+    display="-display sdl,gl=on"
+  elif [ "${ver}" == "2.11.1" ]; then
+    display="-display sdl"
+    # Fix stuttering mouse pointer when SDL backend is used.
+    export SDL_VIDEO_X11_DGAMOUSE=0
+  else
+    display="-display gtk,grab-on-hover=on"
+  fi
+
+  # Determine the most suitable 16:9 resolution of for VM based
+  # on the lowest resolution connected monitor.
+  LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+  if [ ${LOWEST_WIDTH} -ge 3840 ]; then
+    xres=3200
+    yres=1800
+  elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
+    xres=2048
+    yres=1152
+  elif [ ${LOWEST_WIDTH} -ge 1920 ]; then
+    xres=1664
+    yres=936
+  elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
+    xres=1152
+    yres=648
+  else
+    xres=800
+    yres=600
   fi
 
   if [ ${ENABLE_EFI} -eq 1 ]; then
@@ -110,7 +132,7 @@ function vm_boot() {
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
     -device qemu-xhci \
-    -device virtio-vga,virgl=on,edid=on,xres=${xres},yres=${yres} \
+    -device virtio-vga,virgl=on,xres=${xres},yres=${yres} \
     ${display} \
     "$@"
 }
