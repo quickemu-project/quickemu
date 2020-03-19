@@ -53,6 +53,7 @@ snap connect qemu-virgil:removable-media
 ```
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2
+disk=128G
 ```
 
   * Use `quickemu.sh` to start the virtual machine:
@@ -69,16 +70,14 @@ Usage
 
 You can also pass optional parameters
   --delete   : Delete the disk image.
-  --efi      : Enable EFI BIOS (default).
-  --legacy   : Enable legacy BIOS.
+  --efi      : Enable EFI BIOS (experimental).
   --restore  : Restore the snapshot.
-  --samba    : Share your home directory to the guest.
   --snapshot : Create a disk snapshot.
   --virgil   : Use virgil, if available.
 ```
 
 ## TODO
 
-  - [ ] Make display configuration more robust
+  - [x] Make display configuration more robust
   - [ ] Improve stdout presentation
   - [ ] Make disk image optionally size configurable
