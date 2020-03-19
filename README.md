@@ -80,4 +80,5 @@ You can also pass optional parameters
 
   - [x] Make display configuration more robust
   - [ ] Improve stdout presentation
-  - [ ] Make disk image optionally size configurable
+  - [x] Make disk image optionally size configurable
+  - [ ] Improve snapshot management
