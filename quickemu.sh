@@ -160,7 +160,7 @@ function vm_boot() {
     -device qemu-xhci \
     -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
     ${display} \
-    "$@" 2>/dev/null
+    "$@"
 }
 
 function usage() {
