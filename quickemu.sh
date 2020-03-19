@@ -184,7 +184,6 @@ function usage() {
   echo "  --snapshot : Create a disk snapshot."
   echo "  --virgil   : Use virgil, if available."
   echo "  --ssh      : Enable SSH to the machine (disabled by default)."
-  echo "  --ssh-port : Local port to forward to the machine (default 2222)."
   exit 1
 }
 
@@ -196,7 +195,6 @@ ENGINE="system-x86_64"
 RESTORE=0
 SNAPSHOT=0
 SSH=0
-SSH_PORT=2222
 VM=""
 
 while [ $# -gt 0 ]; do
@@ -218,10 +216,12 @@ while [ $# -gt 0 ]; do
       shift;;
     -ssh|--ssh)
       SSH=1
-      shift;;
-    -ssh-port|--ssh-port)
-      SSH_PORT=$2
-      shift
+      if [[ $2 =~ ^[0-9]+$ ]]; then
+        SSH_PORT=$2
+        shift
+      else
+        SSH_PORT=2222
+      fi
       shift;;
     -vm|--vm)
       VM="$2"
