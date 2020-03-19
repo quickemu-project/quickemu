@@ -31,11 +31,17 @@ function vm_snapshot() {
 
 function vm_boot() {
   local BIOS=""
+  local GL="on"
+  local UI="sdl"
   if [ ${ENABLE_EFI} -eq 1 ]; then
     if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
+      GL="off"
+      UI="gtk"
     elif [ -e /usr/share/qemu/OVMF.fd ]; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
+      GL="off"
+      UI="gtk"
     else
       echo " - EFI:      Booting requested but no EFI firmware found."
       echo "             Booting from Legacy BIOS."
@@ -78,16 +84,15 @@ function vm_boot() {
   echo " - RAM:      ${ram}"
 
   # Determine what display to use
-  local display="-display gtk,grab-on-hover=on"
-
+  local display="-display ${UI},gl=${GL}"
   local ver=$(qemu-${ENGINE} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  if [ "${ENGINE}" == "virgil" ]; then
-    display="-display sdl,gl=on"
-  elif [ "${ver}" == "2.11.1" ]; then
+  if [ "${ver}" == "2.11.1" ]; then
     display="-display sdl"
     # Fix stuttering mouse pointer when SDL backend is used.
     export SDL_VIDEO_X11_DGAMOUSE=0
   fi
+  echo " - UI:       ${UI}"
+  echo " - GL:       ${GL}"
 
   # TODO: Detect Wayland here and "do the right thing".
   # Determine the most suitable 16:9 resolution of for VM based
