@@ -137,18 +137,27 @@ function vm_boot() {
     echo " - Monitor:  ${xres}x${yres}"
   fi
 
-  local SAMBA=""
+  local NET=""
   # If smbd is available, export $HOME to the guest via samba
   if [ "${ENGINE}" == "virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
-      SAMBA=",smb=${HOME}"
+      NET=",smb=${HOME}"
   elif [ "${ENGINE}" == "system-x86_64" ] && [ -e /usr/sbin/smbd ]; then
-      SAMBA=",smb=${HOME}"
+      NET=",smb=${HOME}"
   fi
 
-  if [ -n "${SAMBA}" ]; then
+  if [ -n "${NET}" ]; then
     echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
   else
     echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
+  fi
+
+  # Find a free port to expose ssh to the guest
+  local PORT=$(get_port)
+  if [ -n "${PORT}" ]; then
+    NET="${NET},hostfwd=tcp::${PORT}-:22"
+    echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
+  else
+    echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
   #echo " - QEMU:     qemu-${ENGINE}"
@@ -163,7 +172,7 @@ function vm_boot() {
     -m ${ram} \
     -smp ${cores} \
     -net nic,model=virtio \
-    -net user"${SAMBA}" \
+    -net user"${NET}" \
     -rtc base=localtime,clock=host \
     -serial mon:stdio \
     -soundhw hda \
