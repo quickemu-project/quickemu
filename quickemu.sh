@@ -30,6 +30,7 @@ function vm_snapshot() {
 }
 
 function vm_boot() {
+  local VMNAME=$(basename ${VM} .conf)
   local BIOS=""
   local GL="on"
   local UI="sdl"
@@ -135,7 +136,8 @@ function vm_boot() {
 
   #echo " - QEMU:     qemu-${ENGINE}"
   # Boot the iso image
-  qemu-${ENGINE} ${BIOS} \
+  qemu-${ENGINE} -name ${VMNAME},process=${VMNAME} \
+    ${BIOS} \
     -cdrom "${iso}" \
     -drive "file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on" \
     -enable-kvm \
