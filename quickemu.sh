@@ -141,8 +141,10 @@ function vm_boot() {
   #
   if [ ${SSH} -eq 1 ]; then
       SSH_FWD=",hostfwd=tcp::${SSH_PORT}-:22"
+      echo " - ssh:     SSH is enabled on ${SSH_PORT} - ssh USER@localhost -p ${SSH_PORT}."
   else
       SSH_FWD=""
+      echo " - ssh:     SSH is not enabled."
   fi
 
 
