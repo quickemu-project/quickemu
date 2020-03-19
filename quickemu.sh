@@ -83,11 +83,20 @@ function vm_boot() {
     echo " - BIOS:     Legacy"
   fi
 
-  echo " - Disk:     ${disk_img}"
-  echo " - Size:     ${disk}"
+  echo " - Disk:     ${disk_img} (${disk})"
+  # If the disk is present but doesn't appear to have an install, then
+  # remove it.
+  if [ -e ${disk_img} ]; then
+    local disk_curr_size=$(stat -c%s "${disk_img}")
+    if [ ${disk_curr_size} -le 395264 ]; then
+      echo "             Looks unused, recreating."
+      rm "${disk_img}"
+    fi
+  fi
+
   if [ ! -f "${disk_img}" ]; then
     # If there is no disk image, create a new image.
-    qemu-img create -q -f qcow2 "${disk_img}" "${disk}"
+    ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
     if [ $? -ne 0 ]; then
       echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
