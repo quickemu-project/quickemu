@@ -29,6 +29,19 @@ function vm_snapshot() {
   exit 0
 }
 
+function get_port() {
+    local PORT_START=22220
+    local PORT_RANGE=9
+    while true; do
+        local CANDIDATE=$[${PORT_START} + (${RANDOM} % ${PORT_RANGE})]
+        (echo "" >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "${CANDIDATE}"
+            break
+        fi
+    done
+}
+
 function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local BIOS=""
