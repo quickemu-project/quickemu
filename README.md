@@ -82,10 +82,12 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
-  --delete   : Delete the disk image.
-  --efi      : Enable EFI BIOS.
-  --restore  : Restore the snapshot.
-  --snapshot : Create a disk snapshot.
+  --delete                : Delete the disk image.
+  --efi                   : Enable EFI BIOS.
+  --snapshot apply <tag>  : Apply/restore a snapshot.
+  --snapshot create <tag> : Create a snapshot.
+  --snapshot delete <tag> : Delete a snapshot.
+  --snapshot info         : Show disk/snapshot info.
 ```
 
 ## TODO
@@ -93,7 +95,7 @@ You can also pass optional parameters
   - [x] Make display configuration more robust
   - [x] Improve stdout presentation
   - [x] Make disk image optionally size configurable
-  - [ ] Improve snapshot management
+  - [x] Improve snapshot management
   - [ ] Create desktop launcher for a VM
   - [x] Fix Virgil 3D on EFI boot
   - [x] Get QEMU `-audiodev` working for audio input, something like:

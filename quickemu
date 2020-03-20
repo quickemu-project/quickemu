@@ -9,25 +9,67 @@ function disk_delete() {
   fi
 }
 
-function vm_restore() {
-  if [ -f "${disk_img_snapshot}" ]; then
-    mv "${disk_img_snapshot}" "${disk_img}"
+function snapshot_apply() {
+  local snapshot_tag="${1}"
+  if [ -z "${snapshot_tag}" ]; then
+    echo "ERROR! No snapshot tag provided."
+    exit
   fi
-  echo "SUCCESS! Restored ${disk_img_snapshot}"
-  exit 0
+
+  if [ -e "${disk_img}" ]; then
+    ${QEMU_IMG} snapshot -q -a "${snapshot_tag}" "${disk_img}"
+    if [ $? -eq 0 ]; then
+      echo "SUCCESS! Applied snapshot ${snapshot_tag} to ${disk_img}"
+    else
+      echo "ERROR! Failed to apply snapshot ${snapshot_id} to ${disk_img}"
+    fi
+  else
+    echo "NOTE! ${disk_img} not found. Doing nothing."
+  fi
 }
 
-function vm_snapshot() {
-  if [ -f "${disk_img_snapshot}" ]; then
-    mv "${disk_img_snapshot}" "${disk_img_snapshot}.old"
+function snapshot_create() {
+  local snapshot_tag="${1}"
+  if [ -z "${snapshot_tag}" ]; then
+    echo "ERROR! No snapshot tag provided."
+    exit
   fi
-  qemu-img create -b "${disk_img}" -f qcow2 "${disk_img_snapshot}" -q
-  if [ $? -eq 0 ]; then
-    echo "SUCCESS! Created ${disk_img_snapshot}"
+
+  if [ -e "${disk_img}" ]; then
+    ${QEMU_IMG} snapshot -q -c "${snapshot_tag}" "${disk_img}"
+    if [ $? -eq 0 ]; then
+      echo "SUCCESS! Created snapshot ${snapshot_tag} of ${disk_img}"
+    else
+      echo "ERROR! Failed to create snapshot ${snapshot_tag} of ${disk_img}"
+    fi
   else
-    echo "ERROR! Failed to create ${disk_img_snapshot}"
+    echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
-  exit 0
+}
+
+function snapshot_delete() {
+  local snapshot_tag="${1}"
+  if [ -z "${snapshot_tag}" ]; then
+    echo "ERROR! No snapshot tag provided."
+    exit
+  fi
+
+  if [ -e "${disk_img}" ]; then
+    ${QEMU_IMG} snapshot -q -d "${snapshot_tag}" "${disk_img}"
+    if [ $? -eq 0 ]; then
+      echo "SUCCESS! Deleted snapshot ${snapshot_tag} of ${disk_img}"
+    else
+      echo "ERROR! Failed to delete snapshot ${snapshot_tag} of ${disk_img}"
+    fi
+  else
+    echo "NOTE! ${disk_img} not found. Doing nothing."
+  fi
+}
+
+function snapshot_info() {
+  if [ -e "${disk_img}" ]; then
+    ${QEMU_IMG} info "${disk_img}"
+  fi
 }
 
 function get_port() {
@@ -207,7 +249,8 @@ ENABLE_EFI=0
 readonly QEMU="/snap/bin/qemu-virgil"
 readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
 readonly LAUNCHER=$(basename $0)
-SNAPSHOT=0
+SNAPSHOT_ACTION=""
+SNAPSHOT_TAG=""
 VM=""
 
 while [ $# -gt 0 ]; do
@@ -219,7 +262,18 @@ while [ $# -gt 0 ]; do
       DELETE=1
       shift;;
     -snapshot|--snapshot)
-      SNAPSHOT=1
+      SNAPSHOT_ACTION="${2}"
+      if [ -z "${SNAPSHOT_ACTION}" ]; then
+        echo "ERROR! No snapshot action provided."
+        exit 1
+      fi
+      shift
+      SNAPSHOT_TAG="${2}"
+      if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
+        echo "ERROR! No snapshot tag provided."
+        exit 1
+      fi
+      shift
       shift;;
     -vm|--vm)
       VM="$2"
@@ -253,11 +307,30 @@ fi
 
 if [ ${DELETE} -eq 1 ]; then
   disk_delete
-  exit 0
+  exit
 fi
 
-if [ ${SNAPSHOT} -eq 1 ]; then
-  vm_snapshot
+if [ -n "${SNAPSHOT_ACTION}" ]; then
+  case ${SNAPSHOT_ACTION} in
+    apply)
+      snapshot_apply "${SNAPSHOT_TAG}"
+      snapshot_info
+      exit;;
+    create)
+      snapshot_create "${SNAPSHOT_TAG}"
+      snapshot_info
+      exit;;
+    delete)
+      snapshot_delete "${SNAPSHOT_TAG}"
+      snapshot_info
+      exit;;
+    info)
+      snapshot_info
+      exit;;
+    *)
+      echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
+      usage;;
+  esac
 fi
 
 vm_boot
