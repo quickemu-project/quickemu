@@ -61,6 +61,7 @@ function vm_boot() {
   fi  
 
   readonly disk_min_size=395264
+  local disk_curr_size=$(stat -c%s "${disk_img}")
   if [ -z "${disk}" ]; then
     disk="64G"
   fi
@@ -81,24 +82,16 @@ function vm_boot() {
   fi
 
   echo " - Disk:     ${disk_img} (${disk})"
-  # If the disk is present but doesn't appear to have an install, then
-  # remove it.
-  if [ -e ${disk_img} ]; then
-    local disk_curr_size=$(stat -c%s "${disk_img}")
-    if [ ${disk_curr_size} -le ${disk_min_size} ]; then
-      echo "             Looks unused, recreating."
-      rm "${disk_img}"
-    fi
-  fi
-
-  if [ ! -f "${disk_img}" ]; then
+  if [ -e ${disk_img} ] && [ ${disk_curr_size} -le ${disk_min_size} ]; then
+      echo "             Looks unused, booting from ${iso}"
+  elif [ ! -f "${disk_img}" ]; then
     # If there is no disk image, create a new image.
     ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
+      echo "             Just created, booting from ${iso}"
     if [ $? -ne 0 ]; then
       echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
     fi
-    echo " - ISO:      ${iso}"
   else
     # If there is a disk image, do not boot from the iso
     iso=""
