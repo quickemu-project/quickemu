@@ -89,7 +89,7 @@ function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local VMDIR=$(dirname ${disk_img})
   local BIOS=""
-  local GL="on"
+  local GL="off"
   local VIRGL="on"
   local UI="sdl"
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
