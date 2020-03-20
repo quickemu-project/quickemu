@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 function disk_delete() {
-  if [ -f "${disk_img}" ]; then
+  if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
     echo "SUCCESS! Deleted ${disk_img}"
+  else
+    echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
 }
 
