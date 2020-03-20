@@ -53,15 +53,12 @@ function vm_boot() {
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
-  if [ -n "${disk_img}" ]; then
-    disk_img_snapshot="${disk_img}.snapshot"
-  else
+  if [ -z "${disk_img}" ]; then
     echo "ERROR! No disk_img defined."
     exit 1
-  fi  
+  fi
 
   readonly disk_min_size=395264
-  local disk_curr_size=$(stat -c%s "${disk_img}")
   if [ -z "${disk}" ]; then
     disk="64G"
   fi
@@ -84,21 +81,21 @@ function vm_boot() {
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
     # If there is no disk image, create a new image.
-    ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
+      ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
       echo "             Just created, booting from ${iso}"
     if [ $? -ne 0 ]; then
       echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
     fi
-  elif [ -e ${disk_img} ] && [ ${disk_curr_size} -le ${disk_min_size} ]; then
+  elif [ -e ${disk_img} ]; then
+    disk_curr_size=$(stat -c%s "${disk_img}")
+    if [ ${disk_curr_size} -le ${disk_min_size} ]; then
       echo "             Looks unused, booting from ${iso}"
-  else
-    # If there is a disk image, that appears to have an install
-    # then do not boot from the iso
-    iso=""
-  fi
-  if [ -e ${disk_img_snapshot} ]; then
-    echo " - Snapshot: ${disk_img_snapshot}"
+    else
+      # If there is a disk image, that appears to have an install
+      # then do not boot from the iso
+      iso=""
+    fi
   fi
 
   local cores="1"
