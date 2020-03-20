@@ -83,7 +83,7 @@ Usage
 
 You can also pass optional parameters
   --delete   : Delete the disk image.
-  --efi      : Enable EFI BIOS (experimental).
+  --efi      : Enable EFI BIOS.
   --restore  : Restore the snapshot.
   --snapshot : Create a disk snapshot.
 ```
@@ -95,4 +95,5 @@ You can also pass optional parameters
   - [x] Make disk image optionally size configurable
   - [ ] Improve snapshot management
   - [ ] Create desktop launcher for a VM
+  - [x] Fix Virgil 3D on EFI boot
   - [x] Get QEMU `-audiodev` working for audio input, something like:

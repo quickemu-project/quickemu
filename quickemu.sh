@@ -44,6 +44,7 @@ function get_port() {
 
 function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
+  local VMDIR=$(dirname ${disk_img})
   local BIOS=""
   local GL="on"
   local VIRGL="on"
@@ -66,8 +67,10 @@ function vm_boot() {
 
   if [ ${ENABLE_EFI} -eq 1 ]; then
     if [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
-      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
-      VIRGL="off"
+      if [ ! -e ${VMDIR}/${VMNAME}-vars.fd ]; then
+        cp /snap/qemu-virgil/current/usr/share/qemu/edk2-i386-vars.fd ${VMDIR}/${VMNAME}-vars.fd
+      fi
+      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd -drive if=pflash,format=raw,file=${VMDIR}/${VMNAME}-vars.fd"
     else
       echo " - EFI:      Booting requested but no EFI firmware found."
       echo "             Booting from Legacy BIOS."
@@ -201,7 +204,7 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
-  echo "  --efi      : Enable EFI BIOS (experimental)."
+  echo "  --efi      : Enable EFI BIOS."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   exit 1
