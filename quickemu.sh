@@ -183,18 +183,17 @@ function vm_boot() {
     -net user"${NET}" \
     -rtc base=localtime,clock=host \
     -serial mon:stdio \
-    -soundhw hda \
+    -audiodev pa,id=pa,server=unix:$XDG_RUNTIME_DIR/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+    -device intel-hda -device hda-duplex,audiodev=pa \
     -usb -device usb-kbd -device usb-tablet \
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
-    -device qemu-xhci \
     -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
     ${display} \
     "$@"
 }
 
 function usage() {
-  local LAUNCHER=$(basename $0)
   echo
   echo "Usage"
   echo "  ${LAUNCHER} --vm ubuntu.conf"
@@ -211,6 +210,7 @@ DELETE=0
 ENABLE_EFI=0
 readonly QEMU="/snap/bin/qemu-virgil"
 readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
+readonly LAUNCHER=$(basename $0)
 RESTORE=0
 SNAPSHOT=0
 VM=""

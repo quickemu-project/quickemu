@@ -95,3 +95,4 @@ You can also pass optional parameters
   - [x] Make disk image optionally size configurable
   - [ ] Improve snapshot management
   - [ ] Create desktop launcher for a VM
+  - [x] Get QEMU `-audiodev` working for audio input, something like:
