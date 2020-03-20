@@ -51,7 +51,7 @@ disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2
 disk=128G
 ```
 
-  * Use `quickemu.sh` to start the virtual machine:
+  * Use `quickemu` to start the virtual machine:
 
 ```
 ./quickemu --vm ubuntu-focal-desktop.conf

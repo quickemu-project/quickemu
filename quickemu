@@ -151,7 +151,6 @@ function vm_boot() {
   fi
   echo " - Display:  ${xres}x${yres}"
 
-
   local NET=""
   # If smbd is available, export $HOME to the guest via samba
   if [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
