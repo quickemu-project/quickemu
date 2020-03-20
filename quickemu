@@ -165,11 +165,7 @@ function vm_boot() {
     ram="3G"
   fi
   echo " - RAM:      ${ram}"
-
-  # Determine what display to use
-  local display="-display ${UI},gl=${GL}"
   echo " - UI:       ${UI}"
-  echo " - GL:       ${GL}"
   echo " - VIRGL:    ${VIRGL}"
 
   local xres=1152
@@ -235,7 +231,7 @@ function vm_boot() {
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
     -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
-    ${display} ${STATUSQUO}\
+    -display ${UI},gl=${GL} ${STATUSQUO} \
     "$@"
 }
 
