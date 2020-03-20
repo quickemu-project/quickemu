@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-function vm_delete() {
+function disk_delete() {
   if [ -f "${disk_img}" ]; then
     rm "${disk_img}"
     echo "SUCCESS! Deleted ${disk_img}"
   fi
-  exit 0
 }
 
 function vm_restore() {
@@ -195,7 +194,6 @@ function usage() {
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
   echo "  --efi      : Enable EFI BIOS."
-  echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   exit 1
 }
@@ -205,7 +203,6 @@ ENABLE_EFI=0
 readonly QEMU="/snap/bin/qemu-virgil"
 readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
 readonly LAUNCHER=$(basename $0)
-RESTORE=0
 SNAPSHOT=0
 VM=""
 
@@ -216,9 +213,6 @@ while [ $# -gt 0 ]; do
       shift;;
     -delete|--delete)
       DELETE=1
-      shift;;
-    -restore|--restore)
-      RESTORE=1
       shift;;
     -snapshot|--snapshot)
       SNAPSHOT=1
@@ -250,11 +244,8 @@ else
 fi
 
 if [ ${DELETE} -eq 1 ]; then
-  vm_delete
-fi
-
-if [ ${RESTORE} -eq 1 ]; then
-  vm_restore
+  disk_delete
+  exit 0
 fi
 
 if [ ${SNAPSHOT} -eq 1 ]; then
