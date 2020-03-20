@@ -84,13 +84,20 @@ function vm_boot() {
       exit 1
     fi
   elif [ -e ${disk_img} ]; then
-    disk_curr_size=$(stat -c%s "${disk_img}")
-    if [ ${disk_curr_size} -le ${disk_min_size} ]; then
-      echo "             Looks unused, booting from ${iso}"
+    # Check there isn't already a process attached to the disk image.
+    QEMU_LOCK_TEST=$(${QEMU_IMG} info ${disk_img} 2>/dev/null)
+    if [ $? -ne 0 ]; then
+      echo "             Failed to get "write" lock. Is another process using the disk?"
+      exit 1
     else
-      # If there is a disk image, that appears to have an install
-      # then do not boot from the iso
-      iso=""
+      disk_curr_size=$(stat -c%s "${disk_img}")
+      if [ ${disk_curr_size} -le ${disk_min_size} ]; then
+        echo "             Looks unused, booting from ${iso}"
+      else
+        # If there is a disk image, that appears to have an install
+        # then do not boot from the iso
+        iso=""
+      fi
     fi
   fi
 
