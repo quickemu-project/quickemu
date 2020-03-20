@@ -48,39 +48,32 @@ function vm_boot() {
   local GL="on"
   local VIRGL="on"
   local UI="sdl"
-
-  # If QEMU has not already been selected, pick one
-  if [ -z "${QEMU}" ]; then
-    if [ -e /snap/bin/qemu-virgil ]; then
-      QEMU="/snap/bin/qemu-virgil"
-      QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
-      #QEMU_IMG="/usr/bin/qemu-img"
-    elif [ -e /usr/bin/qemu-system-x86_64 ]; then
-      QEMU="/usr/bin/qemu-system-x86_64"
-      QEMU_IMG="/usr/bin/qemu-img"
-    else
-      echo "ERROR! Could not find QEMU. Quitting."
-      exit 1
-    fi
-  fi
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  local QEMU_BIN=$(basename ${QEMU})
+  echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
   if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ "${QEMU_BIN}" == "qemu-virgil" ] && [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
+    if [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
-      VIRGL="off"
-    elif [ -e /usr/share/qemu/OVMF.fd ]; then
-      BIOS="-drive if=pflash,format=raw,readonly,file=/usr/share/qemu/OVMF.fd"
       VIRGL="off"
     else
       echo " - EFI:      Booting requested but no EFI firmware found."
       echo "             Booting from Legacy BIOS."
     fi
-    echo " - BIOS:     ${BIOS}"
+    echo " - BIOS:     EFI"
   else
     echo " - BIOS:     Legacy"
+  fi
+
+  if [ -n "${disk_img}" ]; then
+    disk_img_snapshot="${disk_img}.snapshot"
+  else
+    echo "ERROR! No disk_img defined."
+    exit 1
+  fi  
+
+  if [ -z "${disk}" ]; then
+    disk="64G"
   fi
 
   echo " - Disk:     ${disk_img} (${disk})"
@@ -130,45 +123,34 @@ function vm_boot() {
 
   # Determine what display to use
   local display="-display ${UI},gl=${GL}"
-  if [ "${QEMU_VER}" == "2.11.1" ]; then
-    display="-display sdl"
-    # Fix stuttering mouse pointer when SDL backend is used.
-    export SDL_VIDEO_X11_DGAMOUSE=0
-  fi
   echo " - UI:       ${UI}"
   echo " - GL:       ${GL}"
   echo " - VIRGL:    ${VIRGL}"
 
-  # TODO: Detect Wayland here and "do the right thing".
-  # Determine the most suitable 16:9 resolution of for VM based
-  # on the lowest resolution connected monitor.
-  local xres=800
-  local yres=600
-
-  local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-  if [ ${LOWEST_WIDTH} -ge 3840 ]; then
-    xres=3200
-    yres=1800
-  elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
-    xres=2048
-    yres=1152
-  elif [ ${LOWEST_WIDTH} -ge 1920 ]; then
-    xres=1664
-    yres=936
-  elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
-    xres=1152
-    yres=648
+  local xres=1152
+  local yres=648
+  if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
+    local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+    if [ ${LOWEST_WIDTH} -ge 3840 ]; then
+      xres=3200
+      yres=1800
+    elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
+      xres=2048
+      yres=1152
+    elif [ ${LOWEST_WIDTH} -ge 1920 ]; then
+      xres=1664
+      yres=936
+    elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
+      xres=1152
+      yres=648
+    fi
   fi
+  echo " - Display:  ${xres}x${yres}"
 
-  if [ "${QEMU_BIN}" == "qemu-virgil" ]; then
-    echo " - Monitor:  ${xres}x${yres}"
-  fi
 
   local NET=""
   # If smbd is available, export $HOME to the guest via samba
-  if [ "${QEMU_BIN}" == "qemu-virgil" ] && [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
-      NET=",smb=${HOME}"
-  elif [ "${QEMU_BIN}" == "qemu-system-x86_64" ] && [ -e /usr/sbin/smbd ]; then
+  if [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
       NET=",smb=${HOME}"
   fi
 
@@ -187,7 +169,6 @@ function vm_boot() {
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
-  #echo " - QEMU:     qemu-${ENGINE}"
   # Boot the iso image
   ${QEMU} -name ${VMNAME},process=${VMNAME} \
     ${BIOS} \
@@ -221,17 +202,15 @@ function usage() {
   echo "You can also pass optional parameters"
   echo "  --delete   : Delete the disk image."
   echo "  --efi      : Enable EFI BIOS (experimental)."
-  echo "  --qemu     : Override full path to QEMU executable."
   echo "  --restore  : Restore the snapshot."
   echo "  --snapshot : Create a disk snapshot."
   exit 1
 }
 
-disk="64G"
-BIOS=""
 DELETE=0
 ENABLE_EFI=0
-QEMU=""
+readonly QEMU="/snap/bin/qemu-virgil"
+readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
 RESTORE=0
 SNAPSHOT=0
 VM=""
@@ -250,10 +229,6 @@ while [ $# -gt 0 ]; do
     -snapshot|--snapshot)
       SNAPSHOT=1
       shift;;
-    -qemu|--qemu)
-      QEMU="$2"
-      shift
-      shift;;
     -vm|--vm)
       VM="$2"
       shift
@@ -266,23 +241,18 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -n "${VM}" ] || [ -e "${VM}" ]; then
-  source "${VM}"
-  echo Starting "${VM}"
-  if [ -n "${disk_img}" ]; then
-    disk_img_snapshot="${disk_img}.snapshot"
-  else
-    echo "ERROR! No disk_img defined."
-    exit 1
-  fi
-else
-  echo "ERROR! VM not found."
+# Check we have qemu-virgil available
+if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
+  echo "ERROR! qemu-virgil not found. Please install the qemu-virgil snap."
+  echo "       https://snapcraft.io/qemu-virgil"
   exit 1
 fi
 
-if [ -n "${QEMU}" ] && [ ! -e "${QEMU}" ]; then
-  echo "ERROR! ${QEMU} not found. Quitting"
-  exit 1
+if [ -n "${VM}" ] || [ -e "${VM}" ]; then
+  source "${VM}"
+else
+  echo "ERROR! Virtual machine configuration not found."
+  usage
 fi
 
 if [ ${DELETE} -eq 1 ]; then

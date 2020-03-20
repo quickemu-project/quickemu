@@ -17,29 +17,22 @@ distributions where the virtual machines can be stored anywhere, such as
 external USB storage.
 
 Quickemu is opinionated and will attempt to *"do the right thing"* rather than
-expose rich configuration options. See the video where I explain some of my
-motivations for creating this script.
+expose rich configuration options. Quickemu is a frontend to the fully
+accelerated [qemu-virgil](https://snapcraft.io/qemu-virgil). See the video
+where I explain some of my motivations for creating this script.
 
 [![Replace VirtualBox with Bash & QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
 ## Installation
 
-### Ubuntu 19.10 or newer
+Clone this repository:
 
-Install qemu
-
-```bash
-sudo apt install qemu qemu-kvm libvirt-clients libvirt-daemon bridge-utils ovmf
-sudo adduser ${SUDO_USER} kvm
+```
+git clone https://github.com/wimpysworld/quickemu.git
 ```
 
-Install `samba` *(optional)* if you want to share home directories with guest virtual machines
-
-```bash
-sudo apt install samba
-```
-
-Install the `qemu-virgil` snap *(optional)*
+Install the `qemu-virgil` snap. You can find details about how to install snapd
+and `qemu-virgil`  on the [Snap Store page for qemu-virgil](https://snapcraft.io/qemu-virgil)
 
 ```bash
 snap install qemu-virgil
@@ -68,16 +61,16 @@ Which will output something like this:
 
 ```
 Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
+ - QEMU:     /snap/bin/qemu-virgil v4.2.0
  - BIOS:     Legacy
- - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2
- - Size:     64G
+ - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2 (64G)
  - ISO:      /media/martin/Quickemu/ubuntu/focal-desktop-amd64.iso
  - CPU:      4 Core(s)
  - RAM:      4G
  - UI:       sdl
  - GL:       on
  - VIRGL:    on
- - Monitor:  1664x936
+ - Display:  1664x936
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
 ```
@@ -93,7 +86,6 @@ You can also pass optional parameters
   --efi      : Enable EFI BIOS (experimental).
   --restore  : Restore the snapshot.
   --snapshot : Create a disk snapshot.
-  --virgil   : Use virgil, if available.
 ```
 
 ## TODO
@@ -102,3 +94,4 @@ You can also pass optional parameters
   - [x] Improve stdout presentation
   - [x] Make disk image optionally size configurable
   - [ ] Improve snapshot management
+  - [ ] Create desktop launcher for a VM
