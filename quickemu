@@ -89,7 +89,7 @@ function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local VMDIR=$(dirname ${disk_img})
   local BIOS=""
-  local GL="off"
+  local GL="on"
   local VIRGL="on"
   local UI="sdl"
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
@@ -165,8 +165,6 @@ function vm_boot() {
     ram="3G"
   fi
   echo " - RAM:      ${ram}"
-  echo " - UI:       ${UI}"
-  echo " - VIRGL:    ${VIRGL}"
 
   local xres=1152
   local yres=648
@@ -186,7 +184,17 @@ function vm_boot() {
       yres=648
     fi
   fi
-  echo " - Display:  ${xres}x${yres}"
+
+  # GL is not working with GTK currently
+  if [ "${UI}" == "gtk" ]; then
+    GL="off"
+  else
+    echo " - Display:  ${xres}x${yres}"
+  fi
+  echo " - GL:       ${GL}"
+  echo " - Virgil3D: ${VIRGL}"
+  echo " - Output:   ${UI^^}"
+
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
@@ -215,7 +223,7 @@ function vm_boot() {
   ${QEMU} -name ${VMNAME},process=${VMNAME} \
     ${BIOS} \
     -cdrom "${iso}" \
-    -drive "file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on" \
+    -drive id=disk,file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on \
     -enable-kvm \
     -machine q35,accel=kvm \
     -cpu host,kvm=on \
