@@ -88,6 +88,7 @@ You can also pass optional parameters
   --snapshot create <tag> : Create a snapshot.
   --snapshot delete <tag> : Delete a snapshot.
   --snapshot info         : Show disk/snapshot info.
+  --status-quo            : Do not commit any changes to disk/snapshot.
 ```
 
 ## TODO

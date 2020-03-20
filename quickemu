@@ -143,6 +143,11 @@ function vm_boot() {
     fi
   fi
 
+  # Has the status quo been requested?
+  if [ "${STATUSQUO}" == "-snapshot" ] &&  [ -z "${iso}" ]; then
+    echo "             Existing disk state will be preserved, no writes will be committed."
+  fi
+
   local cores="1"
   local allcores=$(nproc --all)
   if [ ${allcores} -ge 8 ]; then
@@ -228,7 +233,7 @@ function vm_boot() {
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
     -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
-    ${display} \
+    ${display} ${STATUSQUO}\
     "$@"
 }
 
@@ -244,6 +249,7 @@ function usage() {
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
+  echo "  --status-quo            : Do not commit any changes to disk/snapshot."
   exit 1
 }
 
@@ -254,6 +260,7 @@ readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
 readonly LAUNCHER=$(basename $0)
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
+STATUSQUO=""
 VM=""
 
 while [ $# -gt 0 ]; do
@@ -277,6 +284,9 @@ while [ $# -gt 0 ]; do
         exit 1
       fi
       shift
+      shift;;
+    -status-quo|--status-quo)
+      STATUSQUO="-snapshot"
       shift;;
     -vm|--vm)
       VM="$2"
