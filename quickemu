@@ -54,12 +54,7 @@ function vm_boot() {
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
-  if [ -z "${disk_img}" ]; then
-    echo "ERROR! No disk_img defined."
-    exit 1
-  fi
-
-  readonly disk_min_size=395264
+  readonly disk_min_size=$((197632 * 8))
   if [ -z "${disk}" ]; then
     disk="64G"
   fi
@@ -240,6 +235,10 @@ fi
 
 if [ -n "${VM}" ] || [ -e "${VM}" ]; then
   source "${VM}"
+  if [ -z "${disk_img}" ]; then
+    echo "ERROR! No disk_img defined."
+    exit 1
+  fi
 else
   echo "ERROR! Virtual machine configuration not found."
   usage
