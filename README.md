@@ -35,7 +35,7 @@ Install the `qemu-virgil` snap. You can find details about how to install snapd
 and `qemu-virgil`  on the [Snap Store page for qemu-virgil](https://snapcraft.io/qemu-virgil)
 
 ```bash
-snap install qemu-virgil
+snap install qemu-virgil --edge
 snap connect qemu-virgil:kvm
 snap connect qemu-virgil:removable-media
 ```
