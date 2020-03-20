@@ -67,9 +67,9 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - ISO:      /media/martin/Quickemu/ubuntu/focal-desktop-amd64.iso
  - CPU:      4 Core(s)
  - RAM:      4G
- - UI:       sdl
  - GL:       on
- - VIRGL:    on
+ - Virgil3D: on
+ - Output:   SDL
  - Display:  1664x936
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
