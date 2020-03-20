@@ -238,9 +238,12 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --delete   : Delete the disk image."
-  echo "  --efi      : Enable EFI BIOS."
-  echo "  --snapshot : Create a disk snapshot."
+  echo "  --delete                : Delete the disk image."
+  echo "  --efi                   : Enable EFI BIOS."
+  echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
+  echo "  --snapshot create <tag> : Create a snapshot."
+  echo "  --snapshot delete <tag> : Delete a snapshot."
+  echo "  --snapshot info         : Show disk/snapshot info."
   exit 1
 }
 
