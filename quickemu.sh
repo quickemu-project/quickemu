@@ -52,6 +52,18 @@ function vm_boot() {
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
+  if [ -n "${disk_img}" ]; then
+    disk_img_snapshot="${disk_img}.snapshot"
+  else
+    echo "ERROR! No disk_img defined."
+    exit 1
+  fi  
+
+  readonly disk_min_size=395264
+  if [ -z "${disk}" ]; then
+    disk="64G"
+  fi
+
   if [ ${ENABLE_EFI} -eq 1 ]; then
     if [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
       BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd"
@@ -65,23 +77,12 @@ function vm_boot() {
     echo " - BIOS:     Legacy"
   fi
 
-  if [ -n "${disk_img}" ]; then
-    disk_img_snapshot="${disk_img}.snapshot"
-  else
-    echo "ERROR! No disk_img defined."
-    exit 1
-  fi  
-
-  if [ -z "${disk}" ]; then
-    disk="64G"
-  fi
-
   echo " - Disk:     ${disk_img} (${disk})"
   # If the disk is present but doesn't appear to have an install, then
   # remove it.
   if [ -e ${disk_img} ]; then
     local disk_curr_size=$(stat -c%s "${disk_img}")
-    if [ ${disk_curr_size} -le 395264 ]; then
+    if [ ${disk_curr_size} -le ${disk_min_size} ]; then
       echo "             Looks unused, recreating."
       rm "${disk_img}"
     fi
