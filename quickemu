@@ -192,13 +192,15 @@ function vm_boot() {
   fi
   echo " - Display:  ${xres}x${yres}"
 
-  local NET=""
+  # Set the hostname of the VM
+  local NET="user,hostname=${VMNAME}"
+
   # If smbd is available, export $HOME to the guest via samba
   if [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
-      NET=",smb=${HOME}"
+      NET="${NET},smb=${HOME}"
   fi
 
-  if [ -n "${NET}" ]; then
+  if [[ ${NET} == *"smb"* ]]; then
     echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
   else
     echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
@@ -223,8 +225,8 @@ function vm_boot() {
     -cpu host,kvm=on \
     -m ${ram} \
     -smp ${cores} \
-    -net nic,model=virtio \
-    -net user"${NET}" \
+    -netdev ${NET},id=nic \
+    -device virtio-net,netdev=nic \
     -rtc base=localtime,clock=host \
     -serial mon:stdio \
     -audiodev pa,id=pa,server=unix:$XDG_RUNTIME_DIR/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
