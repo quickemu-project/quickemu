@@ -92,10 +92,12 @@ function vm_boot() {
   local BIOS=""
   local CPU="-cpu host,kvm=on"
   local GUEST_TWEAKS=""
-  local VIDEO_DRV=""
+  local DISPLAY_DEVICE=""
+  local VIDEO=""
   local GL="on"
   local VIRGL="on"
   local OUTPUT="sdl"
+  local OUTPUT_EXTRA=""
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
@@ -122,12 +124,12 @@ function vm_boot() {
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
-      VIDEO_DRV="virtio-vga"
+      DISPLAY_DEVICE="virtio-vga"
       ;;
     windows)
       CPU="${CPU},hv_time"
       GUEST_TWEAKS="-no-hpet"
-      VIDEO_DRV="qxl"
+      DISPLAY_DEVICE="qxl-vga"
       ;;
     *)
       echo "ERROR! Unrecognised guest OS: ${guest_os}"
@@ -225,19 +227,21 @@ function vm_boot() {
 
   # GL is not working with GTK currently
   if [ "${OUTPUT}" == "gtk" ]; then
-    GL="off"
+    GL="es"
+    OUTPUT_EXTRA=",grab-on-hover=on,zoom-to-fit=on"
   else
     echo " - Screen:   ${X_RES}x${Y_RES}"
   fi
-  
-  if [ "${VIDEO_DRV}" == "qxl" ]; then
-    echo " - Video:    ${VIDEO_DRV^^}"
-    local VIDEO_DEV=" -vga ${VIDEO_DRV}"
-    VIRGL="off"
+
+  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ]; then
+    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES}"
+  elif [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+    VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
   else
-    echo " - Video:    ${VIDEO_DRV^^[v,g,a]}"
-    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
+    VIDEO=" -device VGA,vgamem_mb=32xres=${X_RES},yres=${Y_RES}"
   fi
+
+  echo " - Video:    ${DISPLAY_DEVICE}"
   echo " - GL:       ${GL^^}"
   echo " - Virgil3D: ${VIRGL^^}"
   echo " - Display:  ${OUTPUT^^}"
