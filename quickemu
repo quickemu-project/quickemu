@@ -190,14 +190,14 @@ function vm_boot() {
     echo " - Drivers:  ${driver_iso}"
   fi
 
-  local cores="1"
+  local CORES_VM="1"
   local CORES_HOST=$(nproc --all)
   if [ ${CORES_HOST} -ge 8 ]; then
-    cores="4"
+    CORES_VM="4"
   elif [ ${CORES_HOST} -ge 4 ]; then
-    cores="2"
+    CORES_VM="2"
   fi
-  echo " - CPU:      ${cores} Core(s)"
+  echo " - CPU:      ${CORES_VM} Core(s)"
 
   local ram="2G"
   local allram=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
@@ -277,7 +277,7 @@ function vm_boot() {
     -enable-kvm \
     -machine q35,accel=kvm \
     -cpu host,kvm=on \
-    -smp ${cores} \
+    -smp ${CORES_VM} \
     -m ${ram} \
     -device virtio-balloon \
     -netdev ${NET},id=nic \
