@@ -46,8 +46,10 @@ snap connect qemu-virgil:removable-media
 
   * Download a .iso image of a Linux distribution
   * Create a VM configuration file; for example `ubuntu.conf`
+    * The **default** `guest_os` is `linux`, so this is optional for Linux VM configs.
 
 ```
+guest_os="linux"
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
 disk=128G
@@ -64,6 +66,7 @@ Which will output something like this:
 ```
 Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - Guest:    Linux optimised.
  - BIOS:     Legacy
  - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2 (64G)
  - ISO:      /media/martin/Quickemu/ubuntu/focal-desktop-amd64.iso
@@ -87,13 +90,13 @@ You can use `quickemu` to run a Windows 10 virtual machine.
   * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
   * [Download VirtIO drivers for Windows](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
   * Create a VM configuration file; for example `windows10.conf`
-    * The `VIDEO_DRV=qxl` line instructs `quickemu` to use a Windows compatible video driver.
+    * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
 
 ```
+guest_os="windows"
 iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
 driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
 disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
-VIDEO_DRV="qxl"
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -107,6 +110,7 @@ Which will output something like this:
 ```
 Starting /media/martin/Quickemu/windows10.conf
  - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - Guest:    Windows optimised.
  - BIOS:     Legacy
  - Disk:     /media/martin/Quickemu/windows10/windows10.qcow2 (64G)
              Just created, booting from /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso

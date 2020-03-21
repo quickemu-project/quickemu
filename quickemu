@@ -113,6 +113,33 @@ function vm_boot() {
     echo " - BIOS:     Legacy"
   fi
 
+  # If guest_os is unset, default to "linux"
+  if [ -z "${guest_os}" ]; then
+    guest_os="linux"
+  else
+    # Force to lowercase.
+    guest_os=$(echo ${guest_os,,})
+  fi
+
+  # Make any OS specific adjustments
+  case ${guest_os} in
+    linux)
+      VIDEO_DRV="virtio-vga"
+      ;;
+    windows)
+      VIDEO_DRV="qxl"
+      ;;
+    *)
+      echo "ERROR! Unrecognised guest OS: ${guest_os}"
+      exit
+      ;;
+  esac
+  echo " - Guest:    ${guest_os^} optimised."
+
+  if [ -z "${disk}" ]; then
+    disk="64G"
+  fi
+
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
