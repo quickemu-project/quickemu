@@ -279,7 +279,7 @@ function vm_boot() {
     -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
     ${ISO_BOOT} ${ISO_DRIVER} \
     ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-    -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd -device usb-tablet \
+    -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 \
     -device virtio-net,netdev=nic -netdev ${NET},id=nic \
     -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
     -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
