@@ -90,17 +90,13 @@ function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local VMDIR=$(dirname ${disk_img})
   local BIOS=""
+  local VIDEO_DRV=""
   local GL="on"
   local VIRGL="on"
   local UI="sdl"
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
-
-  readonly disk_min_size=$((197632 * 8))
-  if [ -z "${disk}" ]; then
-    disk="64G"
-  fi
 
   if [ ${ENABLE_EFI} -eq 1 ]; then
     if [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
@@ -280,15 +276,22 @@ function usage() {
   exit 1
 }
 
+guest_os=""
+iso=""
+driver_iso=""
+disk_img=""
+disk=""
+disk_min_size=$((197632 * 8))
 DELETE=0
 ENABLE_EFI=0
-readonly QEMU="/snap/bin/qemu-virgil"
-readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
-readonly LAUNCHER=$(basename $0)
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUSQUO=""
 VM=""
+readonly QEMU="/snap/bin/qemu-virgil"
+readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
+readonly LAUNCHER=$(basename $0)
+
 
 while [ $# -gt 0 ]; do
   case "${1}" in
