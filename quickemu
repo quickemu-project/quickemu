@@ -90,6 +90,7 @@ function vm_boot() {
   local VMNAME=$(basename ${VM} .conf)
   local VMDIR=$(dirname ${disk_img})
   local BIOS=""
+  local CPU="-cpu host,kvm=on"
   local VIDEO_DRV=""
   local GL="on"
   local VIRGL="on"
@@ -123,6 +124,7 @@ function vm_boot() {
       VIDEO_DRV="virtio-vga"
       ;;
     windows)
+      CPU="${CPU},hv_time"
       VIDEO_DRV="qxl"
       ;;
     *)
@@ -268,7 +270,7 @@ function vm_boot() {
     ${ISO_BOOT} ${ISO_DRIVER} \
     -enable-kvm \
     -machine q35 \
-    -cpu host,kvm=on \
+    ${CPU} \
     -smp ${CORES_VM} \
     -m ${RAM_VM} \
     -device virtio-balloon \
