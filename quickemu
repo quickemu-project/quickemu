@@ -160,8 +160,8 @@ function vm_boot() {
       echo "             Failed to get "write" lock. Is another process using the disk?"
       exit 1
     else
-      disk_curr_size=$(stat -c%s "${disk_img}")
-      if [ ${disk_curr_size} -le ${DISK_MIN_SIZE} ]; then
+      DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
+      if [ ${DISK_CURR_SIZE} -le ${DISK_MIN_SIZE} ]; then
         echo "             Looks unused, booting from ${iso}"
         if [ -z "${iso}" ]; then
           echo "ERROR! You haven't specified a .iso image to boot from."
