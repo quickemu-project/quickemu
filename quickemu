@@ -11,18 +11,18 @@ function disk_delete() {
 }
 
 function snapshot_apply() {
-  local snapshot_tag="${1}"
-  if [ -z "${snapshot_tag}" ]; then
+  local TAG="${1}"
+  if [ -z "${TAG}" ]; then
     echo "ERROR! No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -a "${snapshot_tag}" "${disk_img}"
+    ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Applied snapshot ${snapshot_tag} to ${disk_img}"
+      echo "SUCCESS! Applied snapshot ${TAG} to ${disk_img}"
     else
-      echo "ERROR! Failed to apply snapshot ${snapshot_id} to ${disk_img}"
+      echo "ERROR! Failed to apply snapshot ${TAG} to ${disk_img}"
     fi
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
@@ -30,18 +30,18 @@ function snapshot_apply() {
 }
 
 function snapshot_create() {
-  local snapshot_tag="${1}"
-  if [ -z "${snapshot_tag}" ]; then
+  local TAG="${1}"
+  if [ -z "${TAG}" ]; then
     echo "ERROR! No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -c "${snapshot_tag}" "${disk_img}"
+    ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Created snapshot ${snapshot_tag} of ${disk_img}"
+      echo "SUCCESS! Created snapshot ${TAG} of ${disk_img}"
     else
-      echo "ERROR! Failed to create snapshot ${snapshot_tag} of ${disk_img}"
+      echo "ERROR! Failed to create snapshot ${TAG} of ${disk_img}"
     fi
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
@@ -49,18 +49,18 @@ function snapshot_create() {
 }
 
 function snapshot_delete() {
-  local snapshot_tag="${1}"
-  if [ -z "${snapshot_tag}" ]; then
+  local TAG="${1}"
+  if [ -z "${TAG}" ]; then
     echo "ERROR! No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -d "${snapshot_tag}" "${disk_img}"
+    ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Deleted snapshot ${snapshot_tag} of ${disk_img}"
+      echo "SUCCESS! Deleted snapshot ${TAG} of ${disk_img}"
     else
-      echo "ERROR! Failed to delete snapshot ${snapshot_tag} of ${disk_img}"
+      echo "ERROR! Failed to delete snapshot ${TAG} of ${disk_img}"
     fi
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
