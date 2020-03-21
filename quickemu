@@ -200,10 +200,10 @@ function vm_boot() {
   echo " - CPU:      ${CORES_VM} Core(s)"
 
   local ram="2G"
-  local allram=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
-  if [ ${allram} -ge 64 ]; then
+  local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+  if [ ${RAM_HOST} -ge 64 ]; then
     ram="4G"
-  elif [ ${allram} -ge 16 ]; then
+  elif [ ${RAM_HOST} -ge 16 ]; then
     ram="3G"
   fi
   echo " - RAM:      ${ram}"
