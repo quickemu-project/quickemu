@@ -176,7 +176,7 @@ function vm_boot() {
   fi
 
   # Has the status quo been requested?
-  if [ "${STATUSQUO}" == "-snapshot" ] &&  [ -z "${iso}" ]; then
+  if [ "${STATUS_QUO}" == "-snapshot" ] &&  [ -z "${iso}" ]; then
     echo "             Existing disk state will be preserved, no writes will be committed."
   fi
 
@@ -291,7 +291,7 @@ function vm_boot() {
     -device virtio-rng-pci,rng=rng0 \
     ${VIDEO_DEV} \
     -display ${UI},gl=${GL} \
-    ${STATUSQUO} \
+    ${STATUS_QUO} \
     "$@"
 }
 
@@ -320,7 +320,7 @@ DELETE=0
 ENABLE_EFI=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
-STATUSQUO=""
+STATUS_QUO=""
 VM=""
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly QEMU="/snap/bin/qemu-virgil"
@@ -351,7 +351,7 @@ while [ $# -gt 0 ]; do
       shift
       shift;;
     -status-quo|--status-quo)
-      STATUSQUO="-snapshot"
+      STATUS_QUO="-snapshot"
       shift;;
     -vm|--vm)
       VM="$2"
