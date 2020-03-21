@@ -282,7 +282,7 @@ function vm_boot() {
     -rtc base=localtime,clock=host \
     -serial mon:stdio \
     -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-    -device intel-hda -device hda-duplex,audiodev=pa \
+    -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
     -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd -device usb-tablet \
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
