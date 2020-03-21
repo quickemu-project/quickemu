@@ -93,7 +93,7 @@ function vm_boot() {
   local VIDEO_DRV=""
   local GL="on"
   local VIRGL="on"
-  local UI="sdl"
+  local OUTPUT="sdl"
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
@@ -228,10 +228,10 @@ function vm_boot() {
   fi
 
   # GL is not working with GTK currently
-  if [ "${UI}" == "gtk" ]; then
+  if [ "${OUTPUT}" == "gtk" ]; then
     GL="off"
   else
-    echo " - Display:  ${X_RES}x${Y_RES}"
+    echo " - Screen:   ${X_RES}x${Y_RES}"
   fi
   
   if [ "${VIDEO_DRV}" == "qxl" ]; then
@@ -244,7 +244,7 @@ function vm_boot() {
   fi
   echo " - GL:       ${GL^^}"
   echo " - Virgil3D: ${VIRGL^^}"
-  echo " - Output:   ${UI^^}"
+  echo " - Display:  ${OUTPUT^^}"
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
@@ -290,7 +290,7 @@ function vm_boot() {
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
     ${VIDEO_DEV} \
-    -display ${UI},gl=${GL} \
+    -display ${OUTPUT},gl=${GL} \
     ${STATUS_QUO} \
     "$@"
 }
