@@ -246,8 +246,9 @@ function vm_boot() {
     -enable-kvm \
     -machine q35,accel=kvm \
     -cpu host,kvm=on \
-    -m ${ram} \
     -smp ${cores} \
+    -m ${ram} \
+    -device virtio-balloon \
     -netdev ${NET},id=nic \
     -device virtio-net,netdev=nic \
     -rtc base=localtime,clock=host \
