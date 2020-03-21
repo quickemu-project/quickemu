@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+export LC_ALL=C
 
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
