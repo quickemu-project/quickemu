@@ -208,22 +208,22 @@ function vm_boot() {
   fi
   echo " - RAM:      ${RAM_VM}"
 
-  local xres=1152
-  local yres=648
+  local X_RES=1152
+  local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
     local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
     if [ ${LOWEST_WIDTH} -ge 3840 ]; then
-      xres=3200
-      yres=1800
+      X_RES=3200
+      Y_RES=1800
     elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
-      xres=2048
-      yres=1152
+      X_RES=2048
+      Y_RES=1152
     elif [ ${LOWEST_WIDTH} -ge 1920 ]; then
-      xres=1664
-      yres=936
+      X_RES=1664
+      Y_RES=936
     elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
-      xres=1152
-      yres=648
+      X_RES=1152
+      Y_RES=648
     fi
   fi
 
@@ -231,7 +231,7 @@ function vm_boot() {
   if [ "${UI}" == "gtk" ]; then
     GL="off"
   else
-    echo " - Display:  ${xres}x${yres}"
+    echo " - Display:  ${X_RES}x${Y_RES}"
   fi
   
   if [ "${VIDEO_DRV}" == "qxl" ]; then
@@ -240,7 +240,7 @@ function vm_boot() {
     VIRGL="off"
   else
     echo " - Video:    VirtIO-VGA"
-    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},xres=${xres},yres=${yres}"
+    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},X_RES=${X_RES},Y_RES=${Y_RES}"
   fi
   echo " - GL:       ${GL}"
   echo " - Virgil3D: ${VIRGL}"
