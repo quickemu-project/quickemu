@@ -268,7 +268,8 @@ function vm_boot() {
   # Boot the iso image
   ${QEMU} -name ${VMNAME},process=${VMNAME} \
     ${BIOS} ${GUEST_TWEAKS} \
-    -drive id=disk,file=${disk_img},format=qcow2,if=virtio,aio=native,cache.direct=on \
+    -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file=${disk_img} \
+    -device virtio-blk-pci,drive=drive0,scsi=off \
     ${ISO_BOOT} ${ISO_DRIVER} \
     -enable-kvm \
     -machine q35 \
