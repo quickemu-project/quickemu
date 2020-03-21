@@ -345,7 +345,7 @@ if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
   exit 1
 fi
 
-if [ -n "${VM}" ] || [ -e "${VM}" ]; then
+if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   source "${VM}"
   if [ -z "${disk_img}" ]; then
     echo "ERROR! No disk_img defined."
