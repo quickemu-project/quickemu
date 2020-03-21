@@ -99,11 +99,11 @@ function vm_boot() {
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
   if [ ${ENABLE_EFI} -eq 1 ]; then
-    if [ -e /snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd ] ; then
-      if [ ! -e ${VMDIR}/${VMNAME}-vars.fd ]; then
-        cp /snap/qemu-virgil/current/usr/share/qemu/edk2-i386-vars.fd ${VMDIR}/${VMNAME}-vars.fd
+    if [ -e "${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd" ] ; then
+      if [ ! -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
+        cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${VMDIR}/${VMNAME}-vars.fd"
       fi
-      BIOS="-drive if=pflash,format=raw,readonly,file=/snap/qemu-virgil/current/usr/share/qemu/edk2-x86_64-code.fd -drive if=pflash,format=raw,file=${VMDIR}/${VMNAME}-vars.fd"
+      BIOS="-drive if=pflash,format=raw,readonly,file=${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd -drive if=pflash,format=raw,file=${VMDIR}/${VMNAME}-vars.fd"
     else
       echo " - EFI:      Booting requested but no EFI firmware found."
       echo "             Booting from Legacy BIOS."
@@ -250,7 +250,7 @@ function vm_boot() {
   local NET="user,hostname=${VMNAME}"
 
   # If smbd is available, export $HOME to the guest via samba
-  if [ -e /snap/qemu-virgil/current/usr/sbin/smbd ]; then
+  if [ -e "${VIRGIL_PATH}/usr/sbin/smbd" ]; then
       NET="${NET},smb=${HOME}"
   fi
 
