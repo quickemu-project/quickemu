@@ -204,11 +204,11 @@ function vm_boot() {
   fi
   
   if [ "${VIDEO_DRV}" == "qxl" ]; then
-    echo " - Driver:   QXL"
+    echo " - Video:    QXL"
     local VIDEO_DEV=" -vga ${VIDEO_DRV}"
     VIRGL="off"
   else
-    echo " - Driver:   VirtIO-VGA"
+    echo " - Video:    VirtIO-VGA"
     local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},xres=${xres},yres=${yres}"
   fi
   echo " - GL:       ${GL}"
