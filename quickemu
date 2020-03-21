@@ -173,12 +173,12 @@ function vm_boot() {
   fi
 
   if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-    local ISO_BOOT="-drive media=cdrom,file="${iso}",index=2"
+    local ISO_BOOT="-drive media=cdrom,file=${iso},index=0"
     echo " - Boot:     ${iso}"
   fi
 
   if [ -n "${driver_iso}" ] && [ -e "${driver_iso}" ]; then
-    local ISO_DRIVER="-drive media=cdrom,file="${driver_iso}",index=3"
+    local ISO_DRIVER="-drive media=cdrom,file=${driver_iso},index=1"
     echo " - Drivers:  ${driver_iso}"
   fi
 
