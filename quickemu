@@ -240,7 +240,7 @@ function vm_boot() {
     VIRGL="off"
   else
     echo " - Video:    ${VIDEO_DRV^^[v,g,a]}"
-    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},X_RES=${X_RES},Y_RES=${Y_RES}"
+    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
   fi
   echo " - GL:       ${GL^^}"
   echo " - Virgil3D: ${VIRGL^^}"
