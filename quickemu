@@ -113,14 +113,8 @@ function vm_boot() {
     echo " - BIOS:     Legacy"
   fi
 
-  # If guest_os is unset, default to "linux"
-  if [ -z "${guest_os}" ]; then
-    guest_os="linux"
-  else
-    # Force to lowercase.
-    guest_os=$(echo ${guest_os,,})
-  fi
-
+  # Force to lowercase.
+  guest_os=$(echo ${guest_os,,})
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
@@ -312,7 +306,7 @@ function usage() {
 }
 
 # Lowercase variables are used in the VM config file only
-guest_os=""
+guest_os="linux"
 iso=""
 driver_iso=""
 disk_img=""
