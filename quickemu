@@ -199,14 +199,14 @@ function vm_boot() {
   fi
   echo " - CPU:      ${CORES_VM} Core(s)"
 
-  local ram="2G"
+  local RAM_VM="2G"
   local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
   if [ ${RAM_HOST} -ge 64 ]; then
-    ram="4G"
+    RAM_VM="4G"
   elif [ ${RAM_HOST} -ge 16 ]; then
-    ram="3G"
+    RAM_VM="3G"
   fi
-  echo " - RAM:      ${ram}"
+  echo " - RAM:      ${RAM_VM}"
 
   local xres=1152
   local yres=648
@@ -278,7 +278,7 @@ function vm_boot() {
     -machine q35,accel=kvm \
     -cpu host,kvm=on \
     -smp ${CORES_VM} \
-    -m ${ram} \
+    -m ${RAM_VM} \
     -device virtio-balloon \
     -netdev ${NET},id=nic \
     -device virtio-net,netdev=nic \
