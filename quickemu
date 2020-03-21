@@ -311,22 +311,25 @@ function usage() {
   exit 1
 }
 
+# Lowercase variables are used in the VM config file only
 guest_os=""
 iso=""
 driver_iso=""
 disk_img=""
 disk=""
+
 DELETE=0
 ENABLE_EFI=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUS_QUO=""
 VM=""
+
+readonly LAUNCHER=$(basename $0)
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly QEMU="/snap/bin/qemu-virgil"
 readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
-readonly LAUNCHER=$(basename $0)
-
+readonly VIRGIL_PATH="/snap/qemu-virgil/current"
 
 while [ $# -gt 0 ]; do
   case "${1}" in
