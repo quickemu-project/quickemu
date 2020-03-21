@@ -98,19 +98,21 @@ function vm_boot() {
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
-  if [ ${ENABLE_EFI} -eq 1 ]; then
+  # Force to lowercase.
+  boot=$(echo ${boot,,})
+  if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ -e "${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd" ] ; then
       if [ ! -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
         cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${VMDIR}/${VMNAME}-vars.fd"
       fi
       BIOS="-drive if=pflash,format=raw,readonly,file=${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd -drive if=pflash,format=raw,file=${VMDIR}/${VMNAME}-vars.fd"
+      echo " - BOOT:     EFI"
     else
-      echo " - EFI:      Booting requested but no EFI firmware found."
-      echo "             Booting from Legacy BIOS."
+      echo " - BOOT:     Legacy BIOS"
+      echo " -           EFI Booting requested but no EFI firmware found."
     fi
-    echo " - BIOS:     EFI"
   else
-    echo " - BIOS:     Legacy"
+    echo " - BOOT:     Legacy BIOS"
   fi
 
   # Force to lowercase.
@@ -292,7 +294,6 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
-  echo "  --efi                   : Enable EFI BIOS."
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
@@ -302,6 +303,7 @@ function usage() {
 }
 
 # Lowercase variables are used in the VM config file only
+boot="legacy"
 guest_os="linux"
 iso=""
 driver_iso=""
@@ -323,9 +325,6 @@ readonly VIRGIL_PATH="/snap/qemu-virgil/current"
 
 while [ $# -gt 0 ]; do
   case "${1}" in
-    -efi|--efi)
-      ENABLE_EFI=1
-      shift;;
     -delete|--delete)
       DELETE=1
       shift;;
