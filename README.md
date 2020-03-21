@@ -75,6 +75,29 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
 ```
 
+### Windows 10
+
+You can use `quickemu` to run a Windows 10 virtual machine.
+
+  * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
+  * [Download VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.173-8/virtio-win.iso)
+  * Create a VM configuration file; for example `windows10.conf`
+
+```
+iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
+driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
+disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
+disk=128G
+```
+
+  * Use `quickemu` to start the virtual machine:
+
+```
+./quickemu --vm windows10.conf
+```
+
+### All the options
+
 Here are the full usage instructions:
 
 ```
