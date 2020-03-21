@@ -191,10 +191,10 @@ function vm_boot() {
   fi
 
   local cores="1"
-  local allcores=$(nproc --all)
-  if [ ${allcores} -ge 8 ]; then
+  local CORES_HOST=$(nproc --all)
+  if [ ${CORES_HOST} -ge 8 ]; then
     cores="4"
-  elif [ ${allcores} -ge 4 ]; then
+  elif [ ${CORES_HOST} -ge 4 ]; then
     cores="2"
   fi
   echo " - CPU:      ${cores} Core(s)"
