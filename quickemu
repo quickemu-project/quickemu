@@ -130,7 +130,7 @@ function vm_boot() {
       exit
       ;;
   esac
-  echo " - Guest:    ${guest_os^} optimised."
+  echo " - Guest:    ${guest_os^} optimised"
 
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then

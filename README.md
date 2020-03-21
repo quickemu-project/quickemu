@@ -47,8 +47,10 @@ snap connect qemu-virgil:removable-media
   * Download a .iso image of a Linux distribution
   * Create a VM configuration file; for example `ubuntu.conf`
     * The **default** `guest_os` is `linux`, so this is optional for Linux VM configs.
+    * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
 
 ```
+boot="legacy"
 guest_os="linux"
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
@@ -66,17 +68,17 @@ Which will output something like this:
 ```
 Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - QEMU:     /snap/bin/qemu-virgil v4.2.0
- - Guest:    Linux optimised.
- - BIOS:     Legacy
+ - Guest:    Linux optimised
+ - BIOS:     Legacy BIOS
  - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2 (64G)
  - ISO:      /media/martin/Quickemu/ubuntu/focal-desktop-amd64.iso
  - CPU:      4 Core(s)
  - RAM:      4G
- - Display:  1664x936
- - Video:    VirtIO-VGA
- - GL:       on
- - Virgil3D: on
- - Output:   SDL
+ - Screen:   1664x936
+ - Video:    Virtio-VGA
+ - GL:       ON
+ - Virgil3D: ON
+ - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
 ```
@@ -90,13 +92,16 @@ You can use `quickemu` to run a Windows 10 virtual machine.
   * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
   * [Download VirtIO drivers for Windows](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
   * Create a VM configuration file; for example `windows10.conf`
+    * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
     * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
 
 ```
+boot="legacy"
 guest_os="windows"
 iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
 driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
 disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
+disk=128G
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -110,19 +115,19 @@ Which will output something like this:
 ```
 Starting /media/martin/Quickemu/windows10.conf
  - QEMU:     /snap/bin/qemu-virgil v4.2.0
- - Guest:    Windows optimised.
- - BIOS:     Legacy
+ - Guest:    Windows optimised
+ - BIOS:     Legacy BIOS
  - Disk:     /media/martin/Quickemu/windows10/windows10.qcow2 (64G)
              Just created, booting from /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
  - Boot:     /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
  - Drivers:  /media/martin/Quickemu/windows10/virtio-win-0.1.173.iso
  - CPU:      4 Core(s)
  - RAM:      4G
- - Display:  1664x936
+ - Screen:   1664x936
  - Video:    QXL
- - GL:       on
- - Virgil3D: off
- - Output:   SDL
+ - GL:       ON
+ - Virgil3D: OFF
+ - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
 ```
