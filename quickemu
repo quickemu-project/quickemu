@@ -130,10 +130,6 @@ function vm_boot() {
   esac
   echo " - Guest:    ${guest_os^} optimised."
 
-  if [ -z "${disk}" ]; then
-    disk="64G"
-  fi
-
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
@@ -310,7 +306,7 @@ guest_os="linux"
 iso=""
 driver_iso=""
 disk_img=""
-disk=""
+disk="64G"
 
 DELETE=0
 ENABLE_EFI=0
