@@ -75,7 +75,7 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - CPU:      4 Core(s)
  - RAM:      4G
  - Screen:   1664x936
- - Video:    Virtio-VGA
+ - Video:    virtio-vga
  - GL:       ON
  - Virgil3D: ON
  - Display:  SDL
@@ -124,7 +124,7 @@ Starting /media/martin/Quickemu/windows10.conf
  - CPU:      4 Core(s)
  - RAM:      4G
  - Screen:   1664x936
- - Video:    QXL
+ - Video:    qxl-vga
  - GL:       ON
  - Virgil3D: OFF
  - Display:  SDL
