@@ -235,15 +235,15 @@ function vm_boot() {
   fi
   
   if [ "${VIDEO_DRV}" == "qxl" ]; then
-    echo " - Video:    QXL"
+    echo " - Video:    ${VIDEO_DRV^^}"
     local VIDEO_DEV=" -vga ${VIDEO_DRV}"
     VIRGL="off"
   else
-    echo " - Video:    VirtIO-VGA"
+    echo " - Video:    ${VIDEO_DRV^^[v,g,a]}"
     local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},X_RES=${X_RES},Y_RES=${Y_RES}"
   fi
-  echo " - GL:       ${GL}"
-  echo " - Virgil3D: ${VIRGL}"
+  echo " - GL:       ${GL^^}"
+  echo " - Virgil3D: ${VIRGL^^}"
   echo " - Output:   ${UI^^}"
 
   # Set the hostname of the VM
