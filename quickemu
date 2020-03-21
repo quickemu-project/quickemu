@@ -202,6 +202,15 @@ function vm_boot() {
   else
     echo " - Display:  ${xres}x${yres}"
   fi
+  
+  if [ "${VIDEO_DRV}" == "qxl" ]; then
+    echo " - Driver:   QXL"
+    local VIDEO_DEV=" -vga ${VIDEO_DRV}"
+    VIRGL="off"
+  else
+    echo " - Driver:   VirtIO-VGA"
+    local VIDEO_DEV="-device ${VIDEO_DRV},virgl=${VIRGL},xres=${xres},yres=${yres}"
+  fi
   echo " - GL:       ${GL}"
   echo " - Virgil3D: ${VIRGL}"
   echo " - Output:   ${UI^^}"
@@ -249,7 +258,7 @@ function vm_boot() {
     -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd -device usb-tablet \
     -object rng-random,id=rng0,filename=/dev/urandom \
     -device virtio-rng-pci,rng=rng0 \
-    -device virtio-vga,virgl=${VIRGL},xres=${xres},yres=${yres} \
+    ${VIDEO_DEV} \
     -display ${UI},gl=${GL} ${STATUSQUO} \
     "$@"
 }

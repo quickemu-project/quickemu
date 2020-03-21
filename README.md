@@ -87,7 +87,7 @@ You can use `quickemu` to run a Windows 10 virtual machine.
 iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
 driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
 disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
-disk=128G
+VIDEO_DRV="qxl"
 ```
 
   * Use `quickemu` to start the virtual machine:
