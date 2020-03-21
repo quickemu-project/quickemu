@@ -47,7 +47,7 @@ snap connect qemu-virgil:removable-media
 
 ```
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
-disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2
+disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
 disk=128G
 ```
 
