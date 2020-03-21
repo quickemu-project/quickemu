@@ -102,6 +102,34 @@ VIDEO_DRV="qxl"
 ./quickemu --vm windows10.conf
 ```
 
+Which will output something like this:
+
+```
+Starting /media/martin/Quickemu/windows10.conf
+ - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - BIOS:     Legacy
+ - Disk:     /media/martin/Quickemu/windows10/windows10.qcow2 (64G)
+             Just created, booting from /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
+ - Boot:     /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
+ - Drivers:  /media/martin/Quickemu/windows10/virtio-win-0.1.173.iso
+ - CPU:      4 Core(s)
+ - RAM:      4G
+ - Display:  1664x936
+ - Video:    QXL
+ - GL:       on
+ - Virgil3D: off
+ - Output:   SDL
+ - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
+ - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
+```
+
+  * During the Windows 10 install you will be asked *"Where do you want to install Windows?"*
+    * Click **Load driver** and **OK** the the dialogue box that pops up.
+    * Select `VirtIO SCSI controller (E:\amd64\w10\viostor.inf)` from the list and click **Next**.
+    * The disk will now be available for partitioning and formatting.
+  * Complete the installation as you normally would.
+  * Post-install you should run the VirtIO installer from the CD-ROM: drive.
+
 ### All the options
 
 Here are the full usage instructions:
@@ -129,3 +157,4 @@ You can also pass optional parameters
   - [ ] Create desktop launcher for a VM
   - [x] Fix Virgil 3D on EFI boot
   - [x] Get QEMU `-audiodev` working for audio input, something like:
+  - [x] Add Windows support
