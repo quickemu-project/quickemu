@@ -55,6 +55,7 @@ guest_os="linux"
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
 disk=128G
+usb_devices=("046d:082d" "046d:085e")
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -81,6 +82,10 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
+ - USB:      Device pass-through requested:
+              - Logitech, Inc. HD Pro Webcam C920
+              - Logitech, Inc. Logitech BRIO
+             Requested USB device(s) are accessible.
 ```
 
   * Complete the installation as normal.
@@ -102,6 +107,7 @@ iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
 driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
 disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
 disk=128G
+usb_devices=("046d:082d" "046d:085e")
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -130,6 +136,10 @@ Starting /media/martin/Quickemu/windows10.conf
  - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
+ - USB:      Device pass-through requested:
+              - Logitech, Inc. HD Pro Webcam C920
+              - Logitech, Inc. Logitech BRIO
+             Requested USB device(s) are accessible.
 ```
 
   * During the Windows 10 install you will be asked *"Where do you want to install Windows?"*
@@ -149,7 +159,6 @@ Usage
 
 You can also pass optional parameters
   --delete                : Delete the disk image.
-  --efi                   : Enable EFI BIOS.
   --snapshot apply <tag>  : Apply/restore a snapshot.
   --snapshot create <tag> : Create a snapshot.
   --snapshot delete <tag> : Delete a snapshot.
@@ -159,13 +168,13 @@ You can also pass optional parameters
 
 ## TODO
 
-  - [ ] Add USB pass-through support
   - [ ] Create desktop launcher for a VM
   - [ ] Improve disk management
-  - [x] Make display configuration more robust
-  - [x] Improve stdout presentation
-  - [x] Make disk image optionally size configurable
-  - [x] Improve snapshot management
+  - [x] Add USB pass-through support
   - [x] Fix Virgil 3D on EFI boot
-  - [x] Get QEMU `-audiodev` working for audio input, something like:
   - [x] Add Windows support
+  - [x] Get QEMU `-audiodev` working for audio input
+  - [x] Make display configuration more robust
+  - [x] Improve snapshot management
+  - [x] Improve stdout presentation
+  - [x] Make disk image size configurable
