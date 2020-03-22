@@ -86,10 +86,56 @@ function get_port() {
     done
 }
 
+enable_usb_passthrough() {
+  local DEVICE=""
+  local USB_BUS=""
+  local USB_DEV=""
+  local USB_NAME=""
+  local VENDOR_ID=""
+  local PRODUCT_ID=""
+  local TEMP_SCRIPT=$(mktemp)
+  local EXEC_SCRIPT=0
+
+  # Have any USB devices been requested for pass-through?
+  if (( ${#usb_devices[@]} )); then
+    echo " - USB:      Device pass-through requested:"
+    echo "#!/usr/bin/env bash" > "${TEMP_SCRIPT}"
+    for DEVICE in "${usb_devices[@]}"; do
+      VENDOR_ID=$(echo ${DEVICE} | cut -d':' -f1)
+      PRODUCT_ID=$(echo ${DEVICE} | cut -d':' -f2)
+      USB_BUS=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f2)
+      USB_DEV=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f4 | cut -d':' -f1)
+      USB_NAME=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f7-)
+      echo "              - ${USB_NAME}"
+      USB_PASSTHROUGH="${USB_PASSTHROUGH} -usb -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID}"
+      
+      if [ ! -w /dev/bus/usb/${USB_BUS}/${USB_DEV} ]; then
+        local EXEC_SCRIPT=1
+        echo "chown root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}" >> "${TEMP_SCRIPT}"
+      fi
+    done
+
+    if [ ${EXEC_SCRIPT} -eq 1 ]; then
+      chmod +x "${TEMP_SCRIPT}"
+      echo "             Requested USB device(s) are NOT accessible."
+      echo "             ${TEMP_SCRIPT} will be executed to enable access:"
+      echo
+      cat ${TEMP_SCRIPT}
+      echo
+      sudo "${TEMP_SCRIPT}"
+      if [ $? -ne 0 ]; then
+        echo "            WARNING! Enabling USB device access failed."
+      fi
+    else
+      echo "             Requested USB device(s) are accessible."
+    fi
+    rm -f "${TEMP_SCRIPT}"
+  fi
+}
+
 function vm_boot() {
   local VMNAME=$(basename "${VM}" .conf)
   local VMDIR=$(dirname "${disk_img}")
-  local BIOS=""
   local CPU="-cpu host,kvm=on"
   local GUEST_TWEAKS=""
   local DISPLAY_DEVICE=""
@@ -275,6 +321,8 @@ function vm_boot() {
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
+  enable_usb_passthrough
+
   # Boot the iso image
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     ${QEMU} \
@@ -351,12 +399,14 @@ iso=""
 driver_iso=""
 disk_img=""
 disk="64G"
+usb_devices=()
 
 DELETE=0
 ENABLE_EFI=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUS_QUO=""
+USB_PASSTHOUGH=""
 VM=""
 
 readonly LAUNCHER=$(basename "${0}")
