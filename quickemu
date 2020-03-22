@@ -87,8 +87,8 @@ function get_port() {
 }
 
 function vm_boot() {
-  local VMNAME=$(basename ${VM} .conf)
-  local VMDIR=$(dirname ${disk_img})
+  local VMNAME=$(basename "${VM}" .conf)
+  local VMDIR=$(dirname "${disk_img}")
   local BIOS=""
   local CPU="-cpu host,kvm=on"
   local GUEST_TWEAKS=""
@@ -106,10 +106,11 @@ function vm_boot() {
   boot=$(echo ${boot,,})
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ -e "${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd" ] ; then
-      if [ ! -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
-        cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${VMDIR}/${VMNAME}-vars.fd"
+      local EFI_CODE="${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd"
+      local EFI_VARS="${VMDIR}/${VMNAME}-vars.fd"
+      if [ ! -e "${EFI_VARS}" ]; then
+        cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${EFI_VARS}"
       fi
-      BIOS="-drive if=pflash,format=raw,readonly,file=${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd -drive if=pflash,format=raw,file=${VMDIR}/${VMNAME}-vars.fd"
       echo " - BOOT:     EFI"
     else
       echo " - BOOT:     Legacy BIOS"
@@ -141,7 +142,12 @@ function vm_boot() {
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
+      mkdir -p "${VMDIR}" 2>/dev/null
       ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
+      if [ $? -ne 0 ]; then
+        echo "ERROR! Failed to create ${disk_img}"
+        exit 1
+      fi
       if [ -z "${iso}" ]; then
         echo "ERROR! You haven't specified a .iso image to boot from."
         exit 1
@@ -151,9 +157,9 @@ function vm_boot() {
       echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
     fi
-  elif [ -e ${disk_img} ]; then
+  elif [ -e "${disk_img}" ]; then
     # Check there isn't already a process attached to the disk image.
-    QEMU_LOCK_TEST=$(${QEMU_IMG} info ${disk_img} 2>/dev/null)
+    QEMU_LOCK_TEST=$(${QEMU_IMG} info "${disk_img}" 2>/dev/null)
     if [ $? -ne 0 ]; then
       echo "             Failed to get "write" lock. Is another process using the disk?"
       exit 1
@@ -179,12 +185,10 @@ function vm_boot() {
   fi
 
   if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-    local ISO_BOOT="-drive media=cdrom,file=${iso},index=0"
     echo " - Boot:     ${iso}"
   fi
 
   if [ -n "${driver_iso}" ] && [ -e "${driver_iso}" ]; then
-    local ISO_DRIVER="-drive media=cdrom,file=${driver_iso},index=1"
     echo " - Drivers:  ${driver_iso}"
   fi
 
@@ -272,24 +276,57 @@ function vm_boot() {
   fi
 
   # Boot the iso image
-  ${QEMU} \
-    -name ${VMNAME},process=${VMNAME} \
-    -enable-kvm -machine q35 ${BIOS} ${GUEST_TWEAKS} \
-    ${CPU} -smp ${CORES_VM} \
-    -m ${RAM_VM} -device virtio-balloon \
-    -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file=${disk_img} \
-    -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
-    ${ISO_BOOT} ${ISO_DRIVER} \
-    ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-    -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 \
-    -device virtio-net,netdev=nic -netdev ${NET},id=nic \
-    -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-    -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-    -rtc base=localtime,clock=host \
-    -object rng-random,id=rng0,filename=/dev/urandom \
-    -device virtio-rng-pci,rng=rng0 \
-    -serial mon:stdio \
-    "$@"
+  if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
+    ${QEMU} \
+      -name ${VMNAME},process=${VMNAME} \
+      -enable-kvm -machine q35 ${GUEST_TWEAKS} \
+      ${CPU} -smp ${CORES_VM} \
+      -m ${RAM_VM} -device virtio-balloon \
+      -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+      -drive if=pflash,format=raw,file="${EFI_VARS}" \
+      -drive media=cdrom,index=0,file="${iso}" \
+      -drive media=cdrom,index=1,file="${driver_iso}" \
+      -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
+      -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
+      ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
+      -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 ${USB_PASSTHROUGH} \
+      -device virtio-net,netdev=nic -netdev ${NET},id=nic \
+      -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+      -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+      -rtc base=localtime,clock=host \
+      -object rng-random,id=rng0,filename=/dev/urandom \
+      -device virtio-rng-pci,rng=rng0 \
+      -spice port=5930,disable-ticketing \
+      -device virtio-serial-pci \
+      -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+      -chardev spicevmc,id=spicechannel0,name=vdagent \
+      -serial mon:stdio \
+      "${@}"
+  else
+    ${QEMU} \
+      -name ${VMNAME},process=${VMNAME} \
+      -enable-kvm -machine q35 ${GUEST_TWEAKS} \
+      ${CPU} -smp ${CORES_VM} \
+      -m ${RAM_VM} -device virtio-balloon \
+      -drive media=cdrom,index=0,file="${iso}" \
+      -drive media=cdrom,index=1,file="${driver_iso}" \
+      -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
+      -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
+      ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
+      -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 ${USB_PASSTHROUGH} \
+      -device virtio-net,netdev=nic -netdev ${NET},id=nic \
+      -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+      -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+      -rtc base=localtime,clock=host \
+      -object rng-random,id=rng0,filename=/dev/urandom \
+      -device virtio-rng-pci,rng=rng0 \
+      -spice port=5930,disable-ticketing \
+      -device virtio-serial-pci \
+      -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+      -chardev spicevmc,id=spicechannel0,name=vdagent \
+      -serial mon:stdio \
+      "${@}"
+   fi
 }
 
 function usage() {
@@ -322,7 +359,7 @@ SNAPSHOT_TAG=""
 STATUS_QUO=""
 VM=""
 
-readonly LAUNCHER=$(basename $0)
+readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly QEMU="/snap/bin/qemu-virgil"
 readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
@@ -351,7 +388,7 @@ while [ $# -gt 0 ]; do
       STATUS_QUO="-snapshot"
       shift;;
     -vm|--vm)
-      VM="$2"
+      VM="${2}"
       shift
       shift;;
     -h|--h|-help|--help)
