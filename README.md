@@ -37,6 +37,7 @@ and `qemu-virgil`  on the [Snap Store page for qemu-virgil](https://snapcraft.io
 ```bash
 snap install qemu-virgil --edge
 snap connect qemu-virgil:kvm
+snap connect qemu-virgil:raw-usb
 snap connect qemu-virgil:removable-media
 ```
 
