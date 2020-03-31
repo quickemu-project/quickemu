@@ -91,6 +91,11 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
 
   * Complete the installation as normal.
 
+  * A Desktop shortcut can be created (in ~/.local/share/applications):
+```
+./quickemu --shortcut --vm ubuntu-focal-desktop.conf
+```
+
 ### Windows 10
 
 You can use `quickemu` to run a Windows 10 virtual machine.
@@ -160,6 +165,7 @@ Usage
 
 You can also pass optional parameters
   --delete                : Delete the disk image.
+  --shortcut              : Create a desktop shortcut
   --snapshot apply <tag>  : Apply/restore a snapshot.
   --snapshot create <tag> : Create a snapshot.
   --snapshot delete <tag> : Delete a snapshot.
@@ -169,7 +175,7 @@ You can also pass optional parameters
 
 ## TODO
 
-  - [ ] Create desktop launcher for a VM
+  - [x] Create desktop launcher for a VM
   - [ ] Improve disk management
   - [x] Add USB pass-through support
   - [x] Fix Virgil 3D on EFI boot
