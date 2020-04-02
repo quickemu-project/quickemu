@@ -8,6 +8,12 @@ function disk_delete() {
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
+  local VMNAME=$(basename "${VM}" .conf)
+  local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
+  if [ -e ${SHORTCUT_DIR}/${VMNAME}.desktop ]; then
+    rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
+    echo "Deleted ${VM} desktop shortcut" 
+  fi
 }
 
 function snapshot_apply() {
@@ -377,6 +383,22 @@ function vm_boot() {
    fi
 }
 
+function shortcut_create {
+  local VMNAME=$(basename "${VM}" .conf)
+  local LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
+  local filename="/home/${USER}/.local/share/applications/${VMNAME}.desktop"
+  cat << EOF > ${filename}
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=true
+Exec=${LAUNCHER_DIR}/${LAUNCHER} --vm ${VM}
+Name=${VMNAME}
+Icon=/snap/qemu-virgil/current/meta/gui/icon.png
+EOF
+  echo "Created ${VMNAME}.desktop file"
+}
+
 function usage() {
   echo
   echo "Usage"
@@ -384,6 +406,7 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
+  echo "  --shortcut              : Create a desktop shortcut"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
@@ -408,6 +431,7 @@ SNAPSHOT_TAG=""
 STATUS_QUO=""
 USB_PASSTHOUGH=""
 VM=""
+SHORTCUT=0
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
@@ -440,6 +464,9 @@ while [ $# -gt 0 ]; do
     -vm|--vm)
       VM="${2}"
       shift
+      shift;;
+    -shortcut|--shortcut)
+      SHORTCUT=1
       shift;;
     -h|--h|-help|--help)
       usage;;
@@ -493,6 +520,12 @@ if [ -n "${SNAPSHOT_ACTION}" ]; then
       echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
       usage;;
   esac
+fi
+
+if [ ${SHORTCUT} -eq 1 ]; then
+  # echo "VM=" ${VM}
+  shortcut_create
+  exit
 fi
 
 vm_boot
