@@ -257,3 +257,4 @@ You can also pass optional parameters
   - [x] Improve snapshot management
   - [x] Improve stdout presentation
   - [x] Make disk image size configurable
+  - [ ] [Add Faux OEM](# https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
