@@ -331,7 +331,7 @@ function vm_boot() {
   elif [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
     VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
   else
-    VIDEO=" -device VGA,vgamem_mb=32,xres=${X_RES},yres=${Y_RES}"
+    VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}"
   fi
 
   echo " - Video:    ${DISPLAY_DEVICE}"
