@@ -155,6 +155,78 @@ Starting /media/martin/Quickemu/windows10.conf
   * Complete the installation as you normally would.
   * Post-install you should run the VirtIO installer from the CD-ROM: drive.
 
+### macOS
+
+There are some considerations when running macOS via Quickemu.
+
+  * `quickemu` will automatically download the required [Clover EFI bootloader](https://sourceforge.net/projects/cloverefiboot/) and OVMF firmware from [the macOS-Simple-KVM project](https://github.com/foxlet/macOS-Simple-KVM).
+  * **macOS 10.14.3 or newer is supported**:
+    * [VirtIO block devices QEMU standard VGA are supported](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) since macOS 10.14.3 (Mohave).
+    * [VirtIO `usb-tablet` devices are supported](http://philjordan.eu/osx-virt/) since macOS 10.11 (El Capitan).
+    * [vmxnet3 network devices are supported](https://github.com/foxlet/macOS-Simple-KVM/blob/master/docs/guide-networking.md) since macOS 10.11 (El Capitan).
+    * Running macOS on QEMU required the guest CPU is set to `Penryn`.
+    *   This is a very old architecture, [so to unlock higher CPU performance; AVX, AES-NI, SSE et al are enabled](https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/).
+  * UHCI USB (USB 2.0) is the fastest supported.
+    * USB pass-through has not been tested.
+
+You can use `quickemu` to run a macOS virtual machine.
+
+  * Download macOS using `fetch-macos.py`
+
+```
+wget https://raw.githubusercontent.com/foxlet/macOS-Simple-KVM/master/tools/FetchMacOS/fetch-macos.py -O fetch-macos.py
+chmod +x fetch-macos.py
+./fetch-macos.py
+qemu-virgil.qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
+```
+
+  * Create a VM configuration file; for example `macos.conf`
+    * The `guest_os="macos"` line instructs `quickemu` to use optimise for macOS.
+    * The `img=` sets the boot disk that you downloaded with `fetch-macos.py`
+
+```
+guest_os="macos"
+img="/media/$USER/Quickemu/macos/BaseSystem.img"
+disk_img="/media/$USER/Quickemu/macos/macos.qcow2"
+disk=128G
+usb_devices=("046d:082d" "046d:085e")
+```
+
+  * Use `quickemu` to start the virtual machine:
+
+```
+./quickemu --vm macos.conf
+```
+
+Which will output something like this:
+
+```
+Starting macos.conf
+ - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - BOOT:     EFI
+ - Guest:    Macos optimised
+ - Disk:     /media/martin/Quickemu/macos/macos.qcow2 (64G)
+             Just created, booting from /media/martin/Quickemu/macos/BaseSystem.img
+ - CPU:      4 Core(s)
+ - RAM:      4G
+ - Screen:   1664x936
+ - Video:    VGA
+ - GL:       ON
+ - Virgil3D: OFF
+ - Display:  SDL
+ - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
+ - ssh:      22223/tcp is connected. Login via 'ssh user@localhost -p 22223'
+```
+
+  * Boot from the BaseSystem
+    * Click **Disk Utility** and **Continue**
+    * Select `Apple Inc. VirtIO Block Media` that is ~68GB from the list and click **Erase**.
+    * Enter a `Name:` for the disk and click **Erase**.
+    * Click **Done**.
+    * Close Disk Utility
+    * Click **Reinstall macOS** and **Continue**
+  * Complete the installation as you normally would.
+
 ### All the options
 
 Here are the full usage instructions:
@@ -185,3 +257,4 @@ You can also pass optional parameters
   - [x] Improve snapshot management
   - [x] Improve stdout presentation
   - [x] Make disk image size configurable
+  - [ ] [Add Faux OEM](# https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)

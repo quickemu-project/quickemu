@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+function web_get() {
+  local URL="${1}"
+  local FILE=$(echo "${URL##*/}")
+  if [ ! -e "${VMDIR}/${FILE}" ]; then
+    wget -q -c "${URL}" -O "${VMDIR}/${FILE}"
+    if [ $? -ne 0 ]; then
+      echo "ERROR! Failed to download ${URL}"
+      exit 1
+    fi
+  fi
+}
+
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
@@ -113,8 +125,7 @@ enable_usb_passthrough() {
       USB_DEV=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f4 | cut -d':' -f1)
       USB_NAME=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f7-)
       echo "              - ${USB_NAME}"
-      USB_PASSTHROUGH="${USB_PASSTHROUGH} -usb -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID}"
-      
+      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=usb.0"
       if [ ! -w /dev/bus/usb/${USB_BUS}/${USB_DEV} ]; then
         local EXEC_SCRIPT=1
         echo "chown root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}" >> "${TEMP_SCRIPT}"
@@ -156,12 +167,26 @@ function vm_boot() {
 
   # Force to lowercase.
   boot=$(echo ${boot,,})
+
+  # A;ways Boot macOS using EFI
+  if [ "${guest_os}" == "macos" ]; then
+    boot="efi"
+  fi
+
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ -e "${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd" ] ; then
-      local EFI_CODE="${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd"
-      local EFI_VARS="${VMDIR}/${VMNAME}-vars.fd"
-      if [ ! -e "${EFI_VARS}" ]; then
-        cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${EFI_VARS}"
+      if [ "${guest_os}" == "macos" ]; then
+        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/ESP.qcow2"
+        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/firmware/OVMF_CODE.fd"
+        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/firmware/OVMF_VARS-1024x768.fd"
+        local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+        local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+      else
+        local EFI_CODE="${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd"
+        local EFI_VARS="${VMDIR}/${VMNAME}-vars.fd"
+        if [ ! -e "${EFI_VARS}" ]; then
+          cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${EFI_VARS}"
+        fi
       fi
       echo " - BOOT:     EFI"
     else
@@ -178,6 +203,14 @@ function vm_boot() {
   case ${guest_os} in
     linux)
       DISPLAY_DEVICE="virtio-vga"
+      ;;
+    macos)
+      CPU="-cpu Penryn,vendor=GenuineIntel,kvm=on,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+invtsc,+movbe,+pcid,+smep,+sse3,+sse4.2,+xgetbv1,+xsave,+xsavec,+xsaveopt"
+      readonly ROT_OSK="bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap"
+      readonly OSK=$(echo ${ROT_OSK} | rot13)
+      GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
+      DISPLAY_DEVICE="VGA"
+      VIRGL="off"
       ;;
     windows)
       CPU="${CPU},hv_time"
@@ -200,11 +233,11 @@ function vm_boot() {
         echo "ERROR! Failed to create ${disk_img}"
         exit 1
       fi
-      if [ -z "${iso}" ]; then
-        echo "ERROR! You haven't specified a .iso image to boot from."
+      if [ -z "${iso}" ] && [ -z "${img}" ]; then
+        echo "ERROR! You haven't specified a .iso or .img image to boot from."
         exit 1
       fi
-      echo "             Just created, booting from ${iso}"
+      echo "             Just created, booting from ${iso}${img}"
     if [ $? -ne 0 ]; then
       echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
@@ -218,15 +251,16 @@ function vm_boot() {
     else
       DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
       if [ ${DISK_CURR_SIZE} -le ${DISK_MIN_SIZE} ]; then
-        echo "             Looks unused, booting from ${iso}"
-        if [ -z "${iso}" ]; then
-          echo "ERROR! You haven't specified a .iso image to boot from."
+        echo "             Looks unused, booting from ${iso}${img}"
+        if [ -z "${iso}" ] && [ -z "${img}" ]; then
+          echo "ERROR! You haven't specified a .iso or .img image to boot from."
           exit 1
         fi
       else
         # If there is a disk image, that appears to have an install
-        # then do not boot from the iso
+        # then do not boot from the iso/img
         iso=""
+        img=""
       fi
     fi
   fi
@@ -251,6 +285,7 @@ function vm_boot() {
   elif [ ${CORES_HOST} -ge 4 ]; then
     CORES_VM="2"
   fi
+  local SMP="-smp ${CORES_VM},sockets=1,cores=${CORES_VM},threads=1"
   echo " - CPU:      ${CORES_VM} Core(s)"
 
   local RAM_VM="2G"
@@ -296,7 +331,7 @@ function vm_boot() {
   elif [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
     VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
   else
-    VIDEO=" -device VGA,vgamem_mb=32,xres=${X_RES},yres=${Y_RES}"
+    VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}"
   fi
 
   echo " - Video:    ${DISPLAY_DEVICE}"
@@ -331,43 +366,89 @@ function vm_boot() {
 
   # Boot the iso image
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
-    ${QEMU} \
-      -name ${VMNAME},process=${VMNAME} \
-      -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-      ${CPU} -smp ${CORES_VM} \
-      -m ${RAM_VM} -device virtio-balloon \
-      -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
-      -drive if=pflash,format=raw,file="${EFI_VARS}" \
-      -drive media=cdrom,index=0,file="${iso}" \
-      -drive media=cdrom,index=1,file="${driver_iso}" \
-      -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
-      -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
-      ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-      -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 ${USB_PASSTHROUGH} \
-      -device virtio-net,netdev=nic -netdev ${NET},id=nic \
-      -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-      -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-      -rtc base=localtime,clock=host \
-      -object rng-random,id=rng0,filename=/dev/urandom \
-      -device virtio-rng-pci,rng=rng0 \
-      -spice port=5930,disable-ticketing \
-      -device virtio-serial-pci \
-      -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
-      -chardev spicevmc,id=spicechannel0,name=vdagent \
-      -serial mon:stdio \
-      "${@}"
+    if [ "${guest_os}" == "macos" ]; then
+      if [ -z "${img}" ]; then
+        ${QEMU} \
+          -name ${VMNAME},process=${VMNAME} \
+          -enable-kvm -machine q35 ${GUEST_TWEAKS} \
+          ${CPU} ${SMP} \
+          -m ${RAM_VM} -device virtio-balloon \
+          -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+          -drive if=pflash,format=raw,file="${EFI_VARS}" \
+          -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
+          -device virtio-blk-pci,drive=ESP,scsi=off \
+          -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO} \
+          -device virtio-blk-pci,drive=SystemDisk,scsi=off \
+          ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
+          -device usb-ehci,id=usb -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
+          -device vmxnet3,netdev=nic -netdev ${NET},id=nic \
+          -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+          -rtc base=localtime,clock=host \
+          -serial mon:stdio \
+          "${@}"
+      else
+        ${QEMU} \
+          -name ${VMNAME},process=${VMNAME} \
+          -enable-kvm -machine q35 ${GUEST_TWEAKS} \
+          ${CPU} ${SMP} \
+          -m ${RAM_VM} -device virtio-balloon \
+          -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+          -drive if=pflash,format=raw,file="${EFI_VARS}" \
+          -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
+          -device virtio-blk-pci,drive=ESP,scsi=off \
+          -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly,file="${img}" \
+          -device virtio-blk-pci,drive=InstallMedia,scsi=off \
+          -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO} \
+          -device virtio-blk-pci,drive=SystemDisk,scsi=off \
+          ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
+          -device usb-ehci,id=usb -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
+          -device vmxnet3,netdev=nic -netdev ${NET},id=nic \
+          -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+          -rtc base=localtime,clock=host \
+          -serial mon:stdio \
+          "${@}"
+        fi
+    else
+      ${QEMU} \
+        -name ${VMNAME},process=${VMNAME} \
+        -enable-kvm -machine q35 ${GUEST_TWEAKS} \
+        ${CPU} ${SMP} \
+        -m ${RAM_VM} -device virtio-balloon \
+        -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+        -drive if=pflash,format=raw,file="${EFI_VARS}" \
+        -drive media=cdrom,index=0,file="${iso}" \
+        -drive media=cdrom,index=1,file="${driver_iso}" \
+        -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
+        -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
+        ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
+        -device qemu-xhci,id=usb,p2=8,p3=8 -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
+        -device virtio-net,netdev=nic -netdev ${NET},id=nic \
+        -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+        -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+        -rtc base=localtime,clock=host \
+        -object rng-random,id=rng0,filename=/dev/urandom \
+        -device virtio-rng-pci,rng=rng0 \
+        -spice port=5930,disable-ticketing \
+        -device virtio-serial-pci \
+        -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+        -chardev spicevmc,id=spicechannel0,name=vdagent \
+        -serial mon:stdio \
+        "${@}"
+      fi
   else
     ${QEMU} \
       -name ${VMNAME},process=${VMNAME} \
       -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-      ${CPU} -smp ${CORES_VM} \
+      ${CPU} ${SMP} \
       -m ${RAM_VM} -device virtio-balloon \
       -drive media=cdrom,index=0,file="${iso}" \
       -drive media=cdrom,index=1,file="${driver_iso}" \
       -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
       -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
       ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-      -device qemu-xhci,id=xhci,p2=8,p3=8 -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0 ${USB_PASSTHROUGH} \
+      -device qemu-xhci,id=usb,p2=8,p3=8 -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
       -device virtio-net,netdev=nic -netdev ${NET},id=nic \
       -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
       -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
@@ -418,6 +499,7 @@ function usage() {
 # Lowercase variables are used in the VM config file only
 boot="legacy"
 guest_os="linux"
+img=""
 iso=""
 driver_iso=""
 disk_img=""
