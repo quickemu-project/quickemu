@@ -279,23 +279,31 @@ function vm_boot() {
   fi
 
   local CORES_VM="1"
-  local CORES_HOST=$(nproc --all)
-  if [ ${CORES_HOST} -ge 8 ]; then
-    CORES_VM="4"
-  elif [ ${CORES_HOST} -ge 4 ]; then
-    CORES_VM="2"
+  if [ -z "$cpu_cores" ]; then
+      local CORES_HOST=$(nproc --all)
+      if [ ${CORES_HOST} -ge 8 ]; then
+        CORES_VM="4"
+      elif [ ${CORES_HOST} -ge 4 ]; then
+        CORES_VM="2"
+      fi
+  else
+      CORES_VM="$cpu_cores"
   fi
   local SMP="-smp ${CORES_VM},sockets=1,cores=${CORES_VM},threads=1"
   echo " - CPU:      ${CORES_VM} Core(s)"
 
   local RAM_VM="2G"
-  local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
-  #Round up - https://github.com/wimpysworld/quickemu/issues/11
-  RAM_HOST=$(printf '%.*f\n' 0 ${RAM_HOST})
-  if [ ${RAM_HOST} -ge 64 ]; then
-    RAM_VM="4G"
-  elif [ ${RAM_HOST} -ge 16 ]; then
-    RAM_VM="3G"
+  if [ -z "$ram" ]; then
+      local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+      #Round up - https://github.com/wimpysworld/quickemu/issues/11
+      RAM_HOST=$(printf '%.*f\n' 0 ${RAM_HOST})
+      if [ ${RAM_HOST} -ge 64 ]; then
+        RAM_VM="4G"
+      elif [ ${RAM_HOST} -ge 16 ]; then
+        RAM_VM="3G"
+      fi
+  else
+      RAM_VM="$ram"
   fi
   echo " - RAM:      ${RAM_VM}"
 
