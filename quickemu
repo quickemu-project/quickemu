@@ -513,6 +513,8 @@ driver_iso=""
 disk_img=""
 disk="64G"
 usb_devices=()
+ram=""
+cpu_cores=""
 
 DELETE=0
 ENABLE_EFI=0
