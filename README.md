@@ -157,6 +157,15 @@ Starting /media/martin/Quickemu/windows10.conf
 
 ### macOS
 
+#### Optional extras for macOS
+
+If you want to run macOS then `quickemu` requires some additional utilities.
+`rot13` from `bsdgames` is used to *"decrypt"* the OSK key.
+
+```
+sudo apt install bsdgames wget
+```
+
 There are some considerations when running macOS via Quickemu.
 
   * `quickemu` will automatically download the required [Clover EFI bootloader](https://sourceforge.net/projects/cloverefiboot/) and OVMF firmware from [the macOS-Simple-KVM project](https://github.com/foxlet/macOS-Simple-KVM).
