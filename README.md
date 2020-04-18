@@ -236,6 +236,21 @@ Starting macos.conf
     * Click **Reinstall macOS** and **Continue**
   * Complete the installation as you normally would.
 
+
+### Additional Configuration Options
+
+Override calculated cpu core count.
+
+```
+cpu_cores=6
+```
+
+Override calculated ram.
+
+```
+ram=32GB
+```
+
 ### All the options
 
 Here are the full usage instructions:
