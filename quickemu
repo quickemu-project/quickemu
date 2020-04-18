@@ -104,6 +104,19 @@ function get_port() {
     done
 }
 
+function get_spice_port() {
+    local PORT_START=5930
+    local PORT_RANGE=9
+    while true; do
+        local CANDIDATE=$[${PORT_START} + (${RANDOM} % ${PORT_RANGE})]
+        (echo "" >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "${CANDIDATE}"
+            break
+        fi
+    done
+}
+
 enable_usb_passthrough() {
   local DEVICE=""
   local USB_BUS=""
@@ -370,6 +383,9 @@ function vm_boot() {
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
+  # Find a free port to connect to spice server
+  local SPICE_PORT=$(get_spice_port)
+
   enable_usb_passthrough
 
   # Boot the iso image
@@ -438,7 +454,7 @@ function vm_boot() {
         -rtc base=localtime,clock=host \
         -object rng-random,id=rng0,filename=/dev/urandom \
         -device virtio-rng-pci,rng=rng0 \
-        -spice port=5930,disable-ticketing \
+        -spice port=${SPICE_PORT},disable-ticketing \
         -device virtio-serial-pci \
         -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
         -chardev spicevmc,id=spicechannel0,name=vdagent \
@@ -463,7 +479,7 @@ function vm_boot() {
       -rtc base=localtime,clock=host \
       -object rng-random,id=rng0,filename=/dev/urandom \
       -device virtio-rng-pci,rng=rng0 \
-      -spice port=5930,disable-ticketing \
+      -spice port=${SPICE_PORT},disable-ticketing \
       -device virtio-serial-pci \
       -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
       -chardev spicevmc,id=spicechannel0,name=vdagent \
