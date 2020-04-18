@@ -252,7 +252,7 @@ You can also pass optional parameters
   --snapshot delete <tag> : Delete a snapshot.
   --snapshot info         : Show disk/snapshot info.
   --status-quo            : Do not commit any changes to disk/snapshot.
-  --fullscreen            : Starts VM in full screen mode"
+  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
 ```
 
 ## TODO
