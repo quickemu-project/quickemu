@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+FONT_RED=`tput setaf 1`
+FONT_GREEN=`tput setaf 2`
+FONT_YELLOW=`tput setaf 3`
+FONT_BLUE=`tput setaf 4`
+FONT_RESET=`tput sgr0`
+FONT_BOLD=`tput bold`
+
 function web_get() {
   local URL="${1}"
   local FILE=$(echo "${URL##*/}")
   if [ ! -e "${VMDIR}/${FILE}" ]; then
     wget -q -c "${URL}" -O "${VMDIR}/${FILE}"
     if [ $? -ne 0 ]; then
-      echo "ERROR! Failed to download ${URL}"
+      echo "${FONT_RED}ERROR!${FONT_RESET} Failed to download ${URL}"
       exit 1
     fi
   fi
@@ -16,9 +23,9 @@ function web_get() {
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
-    echo "SUCCESS! Deleted ${disk_img}"
+    echo "${FONT_GREEN}SUCCESS!${FONT_RESET} Deleted ${disk_img}"
   else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
+    echo "${FONT_YELLOW}NOTE!${FONT_RESET} ${disk_img} not found. Doing nothing."
   fi
   local VMNAME=$(basename "${VM}" .conf)
   local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
@@ -31,57 +38,57 @@ function disk_delete() {
 function snapshot_apply() {
   local TAG="${1}"
   if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
+    echo "${FONT_RED}ERROR!${FONT_RESET} No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
     ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Applied snapshot ${TAG} to ${disk_img}"
+      echo "${FONT_GREEN}SUCCESS!${FONT_RESET} Applied snapshot ${TAG} to ${disk_img}"
     else
-      echo "ERROR! Failed to apply snapshot ${TAG} to ${disk_img}"
+      echo "${FONT_RED}ERROR!${FONT_RESET} Failed to apply snapshot ${TAG} to ${disk_img}"
     fi
   else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
+    echo "${FONT_YELLOW}NOTE!${FONT_RESET} ${disk_img} not found. Doing nothing."
   fi
 }
 
 function snapshot_create() {
   local TAG="${1}"
   if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
+    echo "${FONT_RED}ERROR!${FONT_RESET} No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
     ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Created snapshot ${TAG} of ${disk_img}"
+      echo "${FONT_GREEN}SUCCESS!${FONT_RESET} Created snapshot ${TAG} of ${disk_img}"
     else
-      echo "ERROR! Failed to create snapshot ${TAG} of ${disk_img}"
+      echo "${FONT_RED}ERROR!${FONT_RESET} Failed to create snapshot ${TAG} of ${disk_img}"
     fi
   else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
+    echo "${FONT_YELLOW}NOTE!${FONT_RESET} ${disk_img} not found. Doing nothing."
   fi
 }
 
 function snapshot_delete() {
   local TAG="${1}"
   if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
+    echo "${FONT_RED}ERROR!${FONT_RESET} No snapshot tag provided."
     exit
   fi
 
   if [ -e "${disk_img}" ]; then
     ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"
     if [ $? -eq 0 ]; then
-      echo "SUCCESS! Deleted snapshot ${TAG} of ${disk_img}"
+      echo "${FONT_GREEN}SUCCESS!${FONT_RESET} Deleted snapshot ${TAG} of ${disk_img}"
     else
-      echo "ERROR! Failed to delete snapshot ${TAG} of ${disk_img}"
+      echo "${FONT_RED}ERROR!${FONT_RESET} Failed to delete snapshot ${TAG} of ${disk_img}"
     fi
   else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
+    echo "${FONT_YELLOW}NOTE!${FONT_RESET} ${disk_img} not found. Doing nothing."
   fi
 }
 
@@ -116,7 +123,7 @@ enable_usb_passthrough() {
 
   # Have any USB devices been requested for pass-through?
   if (( ${#usb_devices[@]} )); then
-    echo " - USB:      Device pass-through requested:"
+    echo " ${FONT_BOLD}- USB:${FONT_RESET}      Device pass-through requested:"
     echo "#!/usr/bin/env bash" > "${TEMP_SCRIPT}"
     for DEVICE in "${usb_devices[@]}"; do
       VENDOR_ID=$(echo ${DEVICE} | cut -d':' -f1)
@@ -141,7 +148,7 @@ enable_usb_passthrough() {
       echo
       sudo "${TEMP_SCRIPT}"
       if [ $? -ne 0 ]; then
-        echo "            WARNING! Enabling USB device access failed."
+        echo "            ${FONT_RED}WARNING!${FONT_RESET} Enabling USB device access failed."
       fi
     else
       echo "             Requested USB device(s) are accessible."
@@ -162,8 +169,8 @@ function vm_boot() {
   local OUTPUT="sdl"
   local OUTPUT_EXTRA=""
   local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  echo "Starting ${VM}"
-  echo " - QEMU:     ${QEMU} v${QEMU_VER}"
+  echo "${FONT_GREEN}Starting${FONT_RESET} ${VM}"
+  echo " ${FONT_BOLD}- QEMU:${FONT_RESET}     ${QEMU} v${QEMU_VER}"
 
   # Force to lowercase.
   boot=$(echo ${boot,,})
@@ -188,13 +195,13 @@ function vm_boot() {
           cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${EFI_VARS}"
         fi
       fi
-      echo " - BOOT:     EFI"
+      echo " ${FONT_BOLD}- BOOT:${FONT_RESET}     EFI"
     else
-      echo " - BOOT:     Legacy BIOS"
+      echo " ${FONT_BOLD}- BOOT:${FONT_RESET}     Legacy BIOS"
       echo " -           EFI Booting requested but no EFI firmware found."
     fi
   else
-    echo " - BOOT:     Legacy BIOS"
+    echo " ${FONT_BOLD}- BOOT:${FONT_RESET}     Legacy BIOS"
   fi
 
   # Force to lowercase.
@@ -218,28 +225,28 @@ function vm_boot() {
       DISPLAY_DEVICE="qxl-vga"
       ;;
     *)
-      echo "ERROR! Unrecognised guest OS: ${guest_os}"
+      echo "${FONT_RED}ERROR!${FONT_RESET} Unrecognised guest OS: ${guest_os}"
       exit
       ;;
   esac
-  echo " - Guest:    ${guest_os^} optimised"
+  echo " ${FONT_BOLD}- Guest:${FONT_RESET}    ${guest_os^} optimised"
 
-  echo " - Disk:     ${disk_img} (${disk})"
+  echo " ${FONT_BOLD}- Disk:${FONT_RESET}     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
       mkdir -p "${VMDIR}" 2>/dev/null
       ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
       if [ $? -ne 0 ]; then
-        echo "ERROR! Failed to create ${disk_img}"
+        echo "${FONT_RED}ERROR!${FONT_RESET} Failed to create ${disk_img}"
         exit 1
       fi
       if [ -z "${iso}" ] && [ -z "${img}" ]; then
-        echo "ERROR! You haven't specified a .iso or .img image to boot from."
+        echo "${FONT_RED}ERROR!${FONT_RESET} You haven't specified a .iso or .img image to boot from."
         exit 1
       fi
       echo "             Just created, booting from ${iso}${img}"
     if [ $? -ne 0 ]; then
-      echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
+      echo "${FONT_RED}ERROR!${FONT_RESET} Failed to create ${disk_img} of ${disk}. Stopping here."
       exit 1
     fi
   elif [ -e "${disk_img}" ]; then
@@ -253,7 +260,7 @@ function vm_boot() {
       if [ ${DISK_CURR_SIZE} -le ${DISK_MIN_SIZE} ]; then
         echo "             Looks unused, booting from ${iso}${img}"
         if [ -z "${iso}" ] && [ -z "${img}" ]; then
-          echo "ERROR! You haven't specified a .iso or .img image to boot from."
+          echo "${FONT_RED}ERROR!${FONT_RESET} You haven't specified a .iso or .img image to boot from."
           exit 1
         fi
       else
@@ -271,11 +278,11 @@ function vm_boot() {
   fi
 
   if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-    echo " - Boot:     ${iso}"
+    echo " ${FONT_BOLD}- Boot:${FONT_RESET}     ${iso}"
   fi
 
   if [ -n "${driver_iso}" ] && [ -e "${driver_iso}" ]; then
-    echo " - Drivers:  ${driver_iso}"
+    echo " ${FONT_BOLD}- Drivers:${FONT_RESET}  ${driver_iso}"
   fi
 
   local CORES_VM="1"
@@ -290,7 +297,7 @@ function vm_boot() {
       CORES_VM="$cpu_cores"
   fi
   local SMP="-smp ${CORES_VM},sockets=1,cores=${CORES_VM},threads=1"
-  echo " - CPU:      ${CORES_VM} Core(s)"
+  echo " ${FONT_BOLD}- CPU:${FONT_RESET}      ${CORES_VM} Core(s)"
 
   local RAM_VM="2G"
   if [ -z "$ram" ]; then
@@ -305,7 +312,7 @@ function vm_boot() {
   else
       RAM_VM="$ram"
   fi
-  echo " - RAM:      ${RAM_VM}"
+  echo " ${FONT_BOLD}- RAM:${FONT_RESET}      ${RAM_VM}"
 
   local X_RES=1152
   local Y_RES=648
@@ -331,7 +338,7 @@ function vm_boot() {
     GL="es"
     OUTPUT_EXTRA=",grab-on-hover=on,zoom-to-fit=on"
   else
-    echo " - Screen:   ${X_RES}x${Y_RES}"
+    echo " ${FONT_BOLD}- Screen:${FONT_RESET}   ${X_RES}x${Y_RES}"
   fi
 
   if [ "${DISPLAY_DEVICE}" == "qxl-vga" ]; then
@@ -342,10 +349,10 @@ function vm_boot() {
     VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}"
   fi
 
-  echo " - Video:    ${DISPLAY_DEVICE}"
-  echo " - GL:       ${GL^^}"
-  echo " - Virgil3D: ${VIRGL^^}"
-  echo " - Display:  ${OUTPUT^^}"
+  echo " ${FONT_BOLD}- Video:${FONT_RESET}    ${DISPLAY_DEVICE}"
+  echo " ${FONT_BOLD}- GL:${FONT_RESET}       ${GL^^}"
+  echo " ${FONT_BOLD}- Virgil3D:${FONT_RESET} ${VIRGL^^}"
+  echo " ${FONT_BOLD}- Display:${FONT_RESET}  ${OUTPUT^^}"
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
@@ -356,18 +363,18 @@ function vm_boot() {
   fi
 
   if [[ ${NET} == *"smb"* ]]; then
-    echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
+    echo " ${FONT_BOLD}- smbd:${FONT_RESET}     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
   else
-    echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
+    echo " ${FONT_BOLD}- smbd:${FONT_RESET}     ${HOME} will not be exported to the guest. 'smbd' not found."
   fi
 
   # Find a free port to expose ssh to the guest
   local PORT=$(get_port)
   if [ -n "${PORT}" ]; then
     NET="${NET},hostfwd=tcp::${PORT}-:22"
-    echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
+    echo " ${FONT_BOLD}- ssh:${FONT_RESET}      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
   else
-    echo " - ssh:      All ports for exposing ssh have been exhausted."
+    echo " ${FONT_BOLD}- ssh:${FONT_RESET}      All ports for exposing ssh have been exhausted."
   fi
 
   enable_usb_passthrough
@@ -539,13 +546,13 @@ while [ $# -gt 0 ]; do
     -snapshot|--snapshot)
       SNAPSHOT_ACTION="${2}"
       if [ -z "${SNAPSHOT_ACTION}" ]; then
-        echo "ERROR! No snapshot action provided."
+        echo "${FONT_RED}ERROR!${FONT_RESET} No snapshot action provided."
         exit 1
       fi
       shift
       SNAPSHOT_TAG="${2}"
       if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
-        echo "ERROR! No snapshot tag provided."
+        echo "${FONT_RED}ERROR!${FONT_RESET} No snapshot tag provided."
         exit 1
       fi
       shift
@@ -563,14 +570,14 @@ while [ $# -gt 0 ]; do
     -h|--h|-help|--help)
       usage;;
     *)
-      echo "ERROR! \"${1}\" is not a supported parameter."
+      echo "${FONT_RED}ERROR!${FONT_RESET} \"${1}\" is not a supported parameter."
       usage;;
   esac
 done
 
 # Check we have qemu-virgil available
 if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! qemu-virgil not found. Please install the qemu-virgil snap."
+  echo "${FONT_RED}ERROR!${FONT_RESET} qemu-virgil not found. Please install the qemu-virgil snap."
   echo "       https://snapcraft.io/qemu-virgil"
   exit 1
 fi
@@ -578,11 +585,11 @@ fi
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   source "${VM}"
   if [ -z "${disk_img}" ]; then
-    echo "ERROR! No disk_img defined."
+    echo "${FONT_RED}ERROR!${FONT_RESET} No disk_img defined."
     exit 1
   fi
 else
-  echo "ERROR! Virtual machine configuration not found."
+  echo "${FONT_RED}ERROR!${FONT_RESET} Virtual machine configuration not found."
   usage
 fi
 
@@ -609,7 +616,7 @@ if [ -n "${SNAPSHOT_ACTION}" ]; then
       snapshot_info
       exit;;
     *)
-      echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
+      echo "${FONT_RED}ERROR!${FONT_RESET} \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
       usage;;
   esac
 fi
