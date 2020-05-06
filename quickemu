@@ -168,7 +168,7 @@ function vm_boot() {
   # Force to lowercase.
   boot=$(echo ${boot,,})
 
-  # A;ways Boot macOS using EFI
+  # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
     boot="efi"
   fi
