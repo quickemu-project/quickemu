@@ -501,6 +501,7 @@ function usage() {
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
+  echo "  --system-qemu           : Use system install of qemu."
   exit 1
 }
 
@@ -527,9 +528,9 @@ SHORTCUT=0
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly QEMU="/snap/bin/qemu-virgil"
-readonly QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
-readonly VIRGIL_PATH="/snap/qemu-virgil/current"
+QEMU="/snap/bin/qemu-virgil"
+QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
+VIRGIL_PATH="/snap/qemu-virgil/current"
 
 while [ $# -gt 0 ]; do
   case "${1}" in
@@ -560,6 +561,9 @@ while [ $# -gt 0 ]; do
     -shortcut|--shortcut)
       SHORTCUT=1
       shift;;
+    -system-qemu|--system-qemu)
+      SYSTEM_QEMU=1
+      shift;;
     -h|--h|-help|--help)
       usage;;
     *)
@@ -568,11 +572,22 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# Check we have qemu-virgil available
-if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! qemu-virgil not found. Please install the qemu-virgil snap."
-  echo "       https://snapcraft.io/qemu-virgil"
-  exit 1
+if [ -n "$SYSTEM_QEMU" ]; then
+  QEMU=$(which qemu-system-x86_64)
+  QEMU_IMG=$(which qemu-img)
+  VIRGIL_PATH=""
+  if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu not found. Please install qemu."
+    exit 1
+  fi
+  echo "WARNING! using system install of qemu. Please make sure virgil is supported."
+else
+  # Check we have qemu-virgil available
+  if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu-virgil not found. Please install the qemu-virgil snap."
+    echo "       https://snapcraft.io/qemu-virgil"
+    exit 1
+  fi
 fi
 
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
