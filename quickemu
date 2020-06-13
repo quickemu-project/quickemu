@@ -447,7 +447,7 @@ function vm_boot() {
         -rtc base=localtime,clock=host \
         -object rng-random,id=rng0,filename=/dev/urandom \
         -device virtio-rng-pci,rng=rng0 \
-        -spice port=5930,disable-ticketing \
+        -spice port=${SPICE_PORT},disable-ticketing \
         -device virtio-serial-pci \
         -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
         -chardev spicevmc,id=spicechannel0,name=vdagent \
@@ -472,7 +472,7 @@ function vm_boot() {
       -rtc base=localtime,clock=host \
       -object rng-random,id=rng0,filename=/dev/urandom \
       -device virtio-rng-pci,rng=rng0 \
-      -spice port=5930,disable-ticketing \
+      -spice port=${SPICE_PORT},disable-ticketing \
       -device virtio-serial-pci \
       -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
       -chardev spicevmc,id=spicechannel0,name=vdagent \
