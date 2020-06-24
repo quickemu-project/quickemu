@@ -150,7 +150,7 @@ Starting /media/martin/Quickemu/windows10.conf
  - PORTS:    Port forwards requested:
               - 8123 => 8123
               - 8888 => 80
-- USB:      Device pass-through requested:
+ - USB:      Device pass-through requested:
               - Logitech, Inc. HD Pro Webcam C920
               - Logitech, Inc. Logitech BRIO
              Requested USB device(s) are accessible.
