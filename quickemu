@@ -150,6 +150,22 @@ enable_usb_passthrough() {
   fi
 }
 
+function enable_port_forwards() {
+  local HOSTFWDS=""
+
+  # Have any port forwards been requested?
+  if (( ${#port_forwards[@]} )); then
+    SEPARATOR=""
+    for FORWARD in "${port_forwards[@]}"; do
+      HOST_PORT=$(echo ${FORWARD} | cut -d':' -f1)
+      GUEST_PORT=$(echo ${FORWARD} | cut -d':' -f2)
+      HOSTFWDS="${HOSTFWDS}${SEPARATOR}hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
+      SEPARATOR=","
+    done
+  fi
+  echo ${HOSTFWDS}
+}
+
 function vm_boot() {
   local VMNAME=$(basename "${VM}" .conf)
   local VMDIR=$(dirname "${disk_img}")
@@ -368,6 +384,12 @@ function vm_boot() {
     echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
   else
     echo " - ssh:      All ports for exposing ssh have been exhausted."
+  fi
+
+  local HOSTFWDS=$(enable_port_forwards)
+  if [ ! -z "${HOSTFWDS}" ]; then
+    echo " - ports:    forwarding requested ports"
+    NET="${NET},${HOSTFWDS}"
   fi
 
   # Find a free port for spice
