@@ -388,7 +388,7 @@ function vm_boot() {
   fi
 
   enable_usb_passthrough
-exit
+
   # Boot the iso image
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ "${guest_os}" == "macos" ]; then
