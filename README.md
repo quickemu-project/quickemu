@@ -56,6 +56,7 @@ guest_os="linux"
 iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
 disk=128G
+port_forwards=("8123:8123" "8888:80")
 usb_devices=("046d:082d" "046d:085e")
 ```
 
@@ -83,6 +84,9 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
  - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
+ - PORTS:    Port forwards requested:
+              - 8123 => 8123
+              - 8888 => 80
  - USB:      Device pass-through requested:
               - Logitech, Inc. HD Pro Webcam C920
               - Logitech, Inc. Logitech BRIO
@@ -113,6 +117,7 @@ iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
 driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
 disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
 disk=128G
+port_forwards=("8123:8123" "8888:80")
 usb_devices=("046d:082d" "046d:085e")
 ```
 
@@ -142,7 +147,10 @@ Starting /media/martin/Quickemu/windows10.conf
  - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
- - USB:      Device pass-through requested:
+ - PORTS:    Port forwards requested:
+              - 8123 => 8123
+              - 8888 => 80
+- USB:      Device pass-through requested:
               - Logitech, Inc. HD Pro Webcam C920
               - Logitech, Inc. Logitech BRIO
              Requested USB device(s) are accessible.
@@ -198,6 +206,7 @@ guest_os="macos"
 img="/media/$USER/Quickemu/macos/BaseSystem.img"
 disk_img="/media/$USER/Quickemu/macos/macos.qcow2"
 disk=128G
+port_forwards=("8123:8123" "8888:80")
 usb_devices=("046d:082d" "046d:085e")
 ```
 
@@ -225,6 +234,9 @@ Starting macos.conf
  - Display:  SDL
  - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
  - ssh:      22223/tcp is connected. Login via 'ssh user@localhost -p 22223'
+ - PORTS:    Port forwards requested:
+              - 8123 => 8123
+              - 8888 => 80
 ```
 
   * Boot from the BaseSystem

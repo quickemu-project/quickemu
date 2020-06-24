@@ -150,22 +150,6 @@ enable_usb_passthrough() {
   fi
 }
 
-function enable_port_forwards() {
-  local HOSTFWDS=""
-
-  # Have any port forwards been requested?
-  if (( ${#port_forwards[@]} )); then
-    SEPARATOR=""
-    for FORWARD in "${port_forwards[@]}"; do
-      HOST_PORT=$(echo ${FORWARD} | cut -d':' -f1)
-      GUEST_PORT=$(echo ${FORWARD} | cut -d':' -f2)
-      HOSTFWDS="${HOSTFWDS}${SEPARATOR}hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
-      SEPARATOR=","
-    done
-  fi
-  echo ${HOSTFWDS}
-}
-
 function vm_boot() {
   local VMNAME=$(basename "${VM}" .conf)
   local VMDIR=$(dirname "${disk_img}")
@@ -386,10 +370,15 @@ function vm_boot() {
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
-  local HOSTFWDS=$(enable_port_forwards)
-  if [ ! -z "${HOSTFWDS}" ]; then
-    echo " - ports:    forwarding requested ports"
-    NET="${NET},${HOSTFWDS}"
+  # Have any port forwards been requested?
+  if (( ${#port_forwards[@]} )); then
+    echo " - PORTS:    Port forwards requested:"
+    for FORWARD in "${port_forwards[@]}"; do
+      HOST_PORT=$(echo ${FORWARD} | cut -d':' -f1)
+      GUEST_PORT=$(echo ${FORWARD} | cut -d':' -f2)
+      echo "              - ${HOST_PORT} => ${GUEST_PORT}"
+      NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
+    done
   fi
 
   # Find a free port for spice
@@ -399,7 +388,7 @@ function vm_boot() {
   fi
 
   enable_usb_passthrough
-
+exit
   # Boot the iso image
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ "${guest_os}" == "macos" ]; then
