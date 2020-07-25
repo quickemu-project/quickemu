@@ -6,7 +6,7 @@
 
 <p align="center"><b>Simple shell script to "manage" Qemu virtual machines.</b></p>
 <div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
-<p align="center">Made with 💝 for <img src="https://raw.githubusercontent.com/anythingcodes/slack-emoji-for-techies/gh-pages/emoji/tux.png" align="top" width="24" /></p>
+<p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
 
 ## Introduction
 
