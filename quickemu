@@ -370,6 +370,17 @@ function vm_boot() {
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
 
+  # Have any port forwards been requested?
+  if (( ${#port_forwards[@]} )); then
+    echo " - PORTS:    Port forwards requested:"
+    for FORWARD in "${port_forwards[@]}"; do
+      HOST_PORT=$(echo ${FORWARD} | cut -d':' -f1)
+      GUEST_PORT=$(echo ${FORWARD} | cut -d':' -f2)
+      echo "              - ${HOST_PORT} => ${GUEST_PORT}"
+      NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
+    done
+  fi
+
   # Find a free port for spice
   local SPICE_PORT=$(get_port 5930 9)
   if [ ! -n "${SPICE_PORT}" ]; then
