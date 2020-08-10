@@ -311,7 +311,10 @@ function vm_boot() {
   local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
     local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-    if [ ${LOWEST_WIDTH} -ge 3840 ]; then
+    if [ ${FULLSCREEN} ]; then
+      X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+      Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
+    elif [ ${LOWEST_WIDTH} -ge 3840 ]; then
       X_RES=3200
       Y_RES=1800
     elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
@@ -335,11 +338,11 @@ function vm_boot() {
   fi
 
   if [ "${DISPLAY_DEVICE}" == "qxl-vga" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES}"
+    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
   elif [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}"
+    VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
   else
-    VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}"
+    VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
   fi
 
   echo " - Video:    ${DISPLAY_DEVICE}"
@@ -519,6 +522,7 @@ function usage() {
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
   echo "  --system-qemu           : Use system install of qemu."
+  echo "  --fullscreen            : Starts VM in full screen mode"
   exit 1
 }
 
@@ -534,6 +538,7 @@ usb_devices=()
 ram=""
 cpu_cores=""
 
+FULLSCREEN=""
 DELETE=0
 ENABLE_EFI=0
 SNAPSHOT_ACTION=""
@@ -570,6 +575,9 @@ while [ $# -gt 0 ]; do
       shift;;
     -status-quo|--status-quo)
       STATUS_QUO="-snapshot"
+      shift;;
+    -fullscreen|--fullscreen)
+      FULLSCREEN="--full-screen"
       shift;;
     -vm|--vm)
       VM="${2}"
