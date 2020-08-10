@@ -554,48 +554,54 @@ QEMU="/snap/bin/qemu-virgil"
 QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
 VIRGIL_PATH="/snap/qemu-virgil/current"
 
-while [ $# -gt 0 ]; do
-  case "${1}" in
-    -delete|--delete)
-      DELETE=1
-      shift;;
-    -snapshot|--snapshot)
-      SNAPSHOT_ACTION="${2}"
-      if [ -z "${SNAPSHOT_ACTION}" ]; then
-        echo "ERROR! No snapshot action provided."
-        exit 1
-      fi
-      shift
-      SNAPSHOT_TAG="${2}"
-      if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
-        echo "ERROR! No snapshot tag provided."
-        exit 1
-      fi
-      shift
-      shift;;
-    -status-quo|--status-quo)
-      STATUS_QUO="-snapshot"
-      shift;;
-    -fullscreen|--fullscreen)
-      FULLSCREEN="--full-screen"
-      shift;;
-    -vm|--vm)
-      VM="${2}"
-      shift
-      shift;;
-    -shortcut|--shortcut)
-      SHORTCUT=1
-      shift;;
-    -system-qemu|--system-qemu)
-      SYSTEM_QEMU=1
-      shift;;
-    -h|--h|-help|--help)
-      usage;;
-    *)
-      echo "ERROR! \"${1}\" is not a supported parameter."
-      usage;;
-  esac
-done
+# Take command line arguments
+if [ $# -lt 1 ]; then
+    usage
+    exit 0
+else
+    while [ $# -gt 0 ]; do
+        case "${1}" in
+          -delete|--delete)
+            DELETE=1
+            shift;;
+          -snapshot|--snapshot)
+            SNAPSHOT_ACTION="${2}"
+            if [ -z "${SNAPSHOT_ACTION}" ]; then
+              echo "ERROR! No snapshot action provided."
+              exit 1
+            fi
+            shift
+            SNAPSHOT_TAG="${2}"
+            if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
+              echo "ERROR! No snapshot tag provided."
+              exit 1
+            fi
+            shift
+            shift;;
+          -status-quo|--status-quo)
+            STATUS_QUO="-snapshot"
+            shift;;
+          -fullscreen|--fullscreen)
+            FULLSCREEN="--full-screen"
+            shift;;
+          -vm|--vm)
+            VM="${2}"
+            shift
+            shift;;
+          -shortcut|--shortcut)
+            SHORTCUT=1
+            shift;;
+          -system-qemu|--system-qemu)
+            SYSTEM_QEMU=1
+            shift;;
+          -h|--h|-help|--help)
+            usage;;
+          *)
+            echo "ERROR! \"${1}\" is not a supported parameter."
+            usage;;
+        esac
+    done
+fi
 
 if [ -n "$SYSTEM_QEMU" ]; then
   QEMU=$(which qemu-system-x86_64)
