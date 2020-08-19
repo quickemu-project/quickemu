@@ -353,13 +353,15 @@ function vm_boot() {
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
-  # If smbd is available, export $HOME to the guest via samba
-  if [ -e "${VIRGIL_PATH}/usr/sbin/smbd" ]; then
+  # If smbd is available, and --no-smb is not set, export $HOME to the guest via samba
+  if [[ -e "${VIRGIL_PATH}/usr/sbin/smbd" && -z ${NO_SMB} ]]; then
       NET="${NET},smb=${HOME}"
   fi
 
   if [[ ${NET} == *"smb"* ]]; then
     echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
+  elif  [[ ${NO_SMB} -eq 1 ]]; then
+    echo " - smbd:     ${HOME} will not be exported to the guest. '--no-smb' is set."
   else
     echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
   fi
@@ -523,6 +525,7 @@ function usage() {
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
   echo "  --system-qemu           : Use system install of qemu."
   echo "  --fullscreen            : Starts VM in full screen mode"
+  echo "  --no-smb                : Do not expose the home directory via SMB."
   exit 1
 }
 
@@ -593,6 +596,9 @@ else
             shift;;
           -system-qemu|--system-qemu)
             SYSTEM_QEMU=1
+            shift;;
+          -no-smb|--no-smb)
+            NO_SMB=1
             shift;;
           -h|--h|-help|--help)
             usage;;

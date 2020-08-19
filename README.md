@@ -270,6 +270,7 @@ You can also pass optional parameters
   --snapshot info         : Show disk/snapshot info.
   --status-quo            : Do not commit any changes to disk/snapshot.
   --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
+  --no-smb                : Do not expose the home directory via SMB.
 ```
 
 ## TODO
@@ -285,3 +286,4 @@ You can also pass optional parameters
   - [x] Improve stdout presentation
   - [x] Make disk image size configurable
   - [ ] [Add Faux OEM](# https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
+  - [x] Improve SMB Management
