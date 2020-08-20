@@ -1,0 +1,12 @@
+name: Run shellcheck on Pull Requests
+
+on:
+- pull_request
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        find $GITHUB_WORKSPACE -type f -and \( -name "*.sh" -or -name "quickemu" \) | xargs shellcheck
