@@ -3,7 +3,8 @@ export LC_ALL=C
 
 function web_get() {
   local URL="${1}"
-  local FILE=$(echo "${URL##*/}")
+  local FILE
+  FILE=$(echo "${URL##*/}")
   if [ ! -e "${VMDIR}/${FILE}" ]; then
     wget -q -c "${URL}" -O "${VMDIR}/${FILE}"
     if [ $? -ne 0 ]; then
@@ -20,7 +21,8 @@ function disk_delete() {
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
-  local VMNAME=$(basename "${VM}" .conf)
+  local VMNAME
+  VMNAME=$(basename "${VM}" .conf)
   local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
   if [ -e ${SHORTCUT_DIR}/${VMNAME}.desktop ]; then
     rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
@@ -111,8 +113,9 @@ enable_usb_passthrough() {
   local USB_NAME=""
   local VENDOR_ID=""
   local PRODUCT_ID=""
-  local TEMP_SCRIPT=$(mktemp)
+  local TEMP_SCRIPT
   local EXEC_SCRIPT=0
+  TEMP_SCRIPT=$(mktemp)
 
   # Have any USB devices been requested for pass-through?
   if (( ${#usb_devices[@]} )); then
@@ -151,8 +154,10 @@ enable_usb_passthrough() {
 }
 
 function vm_boot() {
-  local VMNAME=$(basename "${VM}" .conf)
-  local VMDIR=$(dirname "${disk_img}")
+  local VMNAME
+  VMNAME=$(basename "${VM}" .conf)
+  local VMDIR
+  VMDIR=$(dirname "${disk_img}")
   local CPU="-cpu host,kvm=on"
   local GUEST_TWEAKS=""
   local DISPLAY_DEVICE=""
@@ -161,7 +166,8 @@ function vm_boot() {
   local VIRGL="on"
   local OUTPUT="sdl"
   local OUTPUT_EXTRA=""
-  local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+  local QEMU_VER
+  QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
@@ -280,7 +286,8 @@ function vm_boot() {
 
   local CORES_VM="1"
   if [ -z "$cpu_cores" ]; then
-      local CORES_HOST=$(nproc --all)
+      local CORES_HOST
+      CORES_HOST=$(nproc --all)
       if [ ${CORES_HOST} -ge 8 ]; then
         CORES_VM="4"
       elif [ ${CORES_HOST} -ge 4 ]; then
@@ -294,7 +301,8 @@ function vm_boot() {
 
   local RAM_VM="2G"
   if [ -z "$ram" ]; then
-      local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+      local RAM_HOST
+      RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
       #Round up - https://github.com/wimpysworld/quickemu/issues/11
       RAM_HOST=$(printf '%.*f\n' 0 ${RAM_HOST})
       if [ ${RAM_HOST} -ge 64 ]; then
@@ -310,7 +318,8 @@ function vm_boot() {
   local X_RES=1152
   local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-    local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+    local LOWEST_WIDTH
+    LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
     if [ ${FULLSCREEN} ]; then
       X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
       Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
@@ -365,7 +374,8 @@ function vm_boot() {
   fi
 
   # Find a free port to expose ssh to the guest
-  local PORT=$(get_port 22220 9)
+  local PORT
+  PORT=$(get_port 22220 9)
   if [ -n "${PORT}" ]; then
     NET="${NET},hostfwd=tcp::${PORT}-:22"
     echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
@@ -385,7 +395,8 @@ function vm_boot() {
   fi
 
   # Find a free port for spice
-  local SPICE_PORT=$(get_port 5930 9)
+  local SPICE_PORT
+  SPICE_PORT=$(get_port 5930 9)
   if [ ! -n "${SPICE_PORT}" ]; then
     echo " - spice:      All spice ports have been exhausted."
   fi
@@ -493,8 +504,10 @@ function vm_boot() {
 }
 
 function shortcut_create {
-  local VMNAME=$(basename "${VM}" .conf)
-  local LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
+  local VMNAME
+  VMNAME=$(basename "${VM}" .conf)
+  local LAUNCHER_DIR
+  LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
   local filename="/home/${USER}/.local/share/applications/${VMNAME}.desktop"
   cat << EOF > ${filename}
 [Desktop Entry]
