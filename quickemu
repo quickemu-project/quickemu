@@ -252,7 +252,7 @@ function vm_boot() {
     # Check there isn't already a process attached to the disk image.
     QEMU_LOCK_TEST=$(${QEMU_IMG} info "${disk_img}" 2>/dev/null)
     if [ $? -ne 0 ]; then
-      echo "             Failed to get "write" lock. Is another process using the disk?"
+      echo "             Failed to get \"write\" lock. Is another process using the disk?"
       exit 1
     else
       DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
