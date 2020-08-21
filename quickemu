@@ -635,6 +635,7 @@ else
 fi
 
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
+  # shellcheck source=/dev/null
   source "${VM}"
   if [ -z "${disk_img}" ]; then
     echo "ERROR! No disk_img defined."
