@@ -250,7 +250,7 @@ function vm_boot() {
     fi
   elif [ -e "${disk_img}" ]; then
     # Check there isn't already a process attached to the disk image.
-    QEMU_LOCK_TEST=$(${QEMU_IMG} info "${disk_img}" 2>/dev/null)
+    ${QEMU_IMG} info "${disk_img}" 2>/dev/null
     if [ $? -ne 0 ]; then
       echo "             Failed to get \"write\" lock. Is another process using the disk?"
       exit 1
@@ -553,11 +553,9 @@ cpu_cores=""
 
 FULLSCREEN=""
 DELETE=0
-ENABLE_EFI=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUS_QUO=""
-USB_PASSTHOUGH=""
 VM=""
 SHORTCUT=0
 
