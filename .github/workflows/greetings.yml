@@ -1,0 +1,29 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: |
+          'Hello there!
+          You seem to have filed your first issue for the `quickemu` project. Great!
+          
+          It doesn't matter if you are just starting out and dip your feet into the GitHub water for the first time
+          or if you are you are an experienced programmer/Linux enthusiast - we are a welcoming, friendly community.
+          Consider taking a look at Wimpy's [YouTube Channel](https://www.youtube.com/channel/UChpYmMp7EFaxuogUX1eAqyw)
+          or [Discord](https://discord.gg/sNmz3uw), if you fancy chatting with us nerds 🤓
+          Hopefully your issue gets resolved soon. Bye for now!'
+        pr-message: |
+          'Hello there!
+          You seem to have filed your first Pull Request to the `quickemu` project. Great!
+          
+          It doesn't matter if you are just starting out and dip your feet into the GitHub water for the first time
+          or if you are you are an experienced programmer/Linux enthusiast - we are a welcoming, friendly community.
+          Consider taking a look at Wimpy's [YouTube Channel](https://www.youtube.com/channel/UChpYmMp7EFaxuogUX1eAqyw)
+          or [Discord](https://discord.gg/sNmz3uw), if you fancy chatting with us nerds 🤓
+          Bye for now and happy coding!'
