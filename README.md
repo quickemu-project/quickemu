@@ -21,9 +21,7 @@ expose rich configuration options. Quickemu is a frontend to the fully
 accelerated [qemu-virgil](https://snapcraft.io/qemu-virgil). See the video
 where I explain some of my motivations for creating this script.
 
-We have a Discord for this project:
-
-  * <https://discord.gg/sNmz3uw>
+We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
 
 [![Replace VirtualBox with Bash & QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
