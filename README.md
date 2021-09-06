@@ -17,9 +17,7 @@ distributions where the virtual machines can be stored anywhere, such as
 external USB storage.
 
 Quickemu is opinionated and will attempt to *"do the right thing"* rather than
-expose rich configuration options. Quickemu is a frontend to the fully
-accelerated [qemu-virgil](https://snapcraft.io/qemu-virgil). See the video
-where I explain some of my motivations for creating this script.
+expose rich configuration options. Quickemu is a frontend to [QEMU](https://www.qemu.org/). See the video where I explain some of my motivations for creating this script.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
 
@@ -27,21 +25,21 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 
 ## Installation
 
+### Install Quickemu
+
 Clone this repository:
 
 ```
 git clone https://github.com/wimpysworld/quickemu.git
 ```
 
-Install the `qemu-virgil` snap. You can find details about how to install snapd
-and `qemu-virgil`  on the [Snap Store page for qemu-virgil](https://snapcraft.io/qemu-virgil)
+### Install QEMU
+
+#### Ubuntu
 
 ```bash
-snap install qemu-virgil --edge
-snap connect qemu-virgil:audio-record
-snap connect qemu-virgil:kvm
-snap connect qemu-virgil:raw-usb
-snap connect qemu-virgil:removable-media
+sudo apt-add-repository ppa:flexiondotorg/quickemu
+sudo apt install qemu-system
 ```
 
 ## Usage
@@ -73,7 +71,7 @@ Which will output something like this:
 
 ```
 Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
- - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
  - Guest:    Linux optimised
  - BIOS:     Legacy BIOS
  - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2 (64G)
@@ -134,7 +132,7 @@ Which will output something like this:
 
 ```
 Starting /media/martin/Quickemu/windows10.conf
- - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
  - Guest:    Windows optimised
  - BIOS:     Legacy BIOS
  - Disk:     /media/martin/Quickemu/windows10/windows10.qcow2 (64G)
@@ -223,7 +221,7 @@ Which will output something like this:
 
 ```
 Starting macos.conf
- - QEMU:     /snap/bin/qemu-virgil v4.2.0
+ - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
  - BOOT:     EFI
  - Guest:    Macos optimised
  - Disk:     /media/martin/Quickemu/macos/macos.qcow2 (64G)
@@ -283,5 +281,5 @@ You can also pass optional parameters
   - [x] Improve snapshot management
   - [x] Improve stdout presentation
   - [x] Make disk image size configurable
-  - [ ] [Add Faux OEM](# https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
+  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
   - [x] Improve SMB Management
