@@ -412,7 +412,7 @@ function vm_boot() {
           -enable-kvm -machine q35 ${GUEST_TWEAKS} \
           ${CPU} ${SMP} \
           -m ${RAM_VM} -device virtio-balloon \
-          -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+          -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
           -drive if=pflash,format=raw,file="${EFI_VARS}" \
           -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
           -device virtio-blk-pci,drive=ESP,scsi=off \
@@ -432,11 +432,11 @@ function vm_boot() {
           -enable-kvm -machine q35 ${GUEST_TWEAKS} \
           ${CPU} ${SMP} \
           -m ${RAM_VM} -device virtio-balloon \
-          -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+          -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
           -drive if=pflash,format=raw,file="${EFI_VARS}" \
           -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
           -device virtio-blk-pci,drive=ESP,scsi=off \
-          -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly,file="${img}" \
+          -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly=on,file="${img}" \
           -device virtio-blk-pci,drive=InstallMedia,scsi=off \
           -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO} \
           -device virtio-blk-pci,drive=SystemDisk,scsi=off \
@@ -455,7 +455,7 @@ function vm_boot() {
         -enable-kvm -machine q35 ${GUEST_TWEAKS} \
         ${CPU} ${SMP} \
         -m ${RAM_VM} -device virtio-balloon \
-        -drive if=pflash,format=raw,readonly,file="${EFI_CODE}" \
+        -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
         -drive if=pflash,format=raw,file="${EFI_VARS}" \
         -drive media=cdrom,index=0,file="${iso}" \
         -drive media=cdrom,index=1,file="${driver_iso}" \
@@ -469,7 +469,7 @@ function vm_boot() {
         -rtc base=localtime,clock=host \
         -object rng-random,id=rng0,filename=/dev/urandom \
         -device virtio-rng-pci,rng=rng0 \
-        -spice port=${SPICE_PORT},disable-ticketing \
+        -spice port=${SPICE_PORT},disable-ticketing=on \
         -device virtio-serial-pci \
         -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
         -chardev spicevmc,id=spicechannel0,name=vdagent \
@@ -494,7 +494,7 @@ function vm_boot() {
       -rtc base=localtime,clock=host \
       -object rng-random,id=rng0,filename=/dev/urandom \
       -device virtio-rng-pci,rng=rng0 \
-      -spice port=${SPICE_PORT},disable-ticketing \
+      -spice port=${SPICE_PORT},disable-ticketing=on \
       -device virtio-serial-pci \
       -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
       -chardev spicevmc,id=spicechannel0,name=vdagent \
