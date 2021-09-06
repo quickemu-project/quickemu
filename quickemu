@@ -175,7 +175,7 @@ function vm_boot() {
   fi
 
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
-    if [ -e "${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd" ] ; then
+    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ; then
       if [ "${guest_os}" == "macos" ]; then
         web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/ESP.qcow2"
         web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/firmware/OVMF_CODE.fd"
@@ -183,10 +183,10 @@ function vm_boot() {
         local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
         local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
       else
-        local EFI_CODE="${VIRGIL_PATH}/usr/share/qemu/edk2-x86_64-code.fd"
+        local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
         local EFI_VARS="${VMDIR}/${VMNAME}-vars.fd"
         if [ ! -e "${EFI_VARS}" ]; then
-          cp "${VIRGIL_PATH}/usr/share/qemu/edk2-i386-vars.fd" "${EFI_VARS}"
+          cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
         fi
       fi
       echo " - BOOT:     EFI"
@@ -365,7 +365,7 @@ function vm_boot() {
   local NET="user,hostname=${VMNAME}"
 
   # If smbd is available, and --no-smb is not set, export $HOME to the guest via samba
-  if [[ -e "${VIRGIL_PATH}/usr/sbin/smbd" && -z ${NO_SMB} ]]; then
+  if [[ -e "/usr/sbin/smbd" && -z ${NO_SMB} ]]; then
       NET="${NET},smb=${HOME}"
   fi
 
@@ -516,7 +516,7 @@ Type=Application
 Terminal=true
 Exec=${LAUNCHER_DIR}/${LAUNCHER} --vm ${VM}
 Name=${VMNAME}
-Icon=/snap/qemu-virgil/current/meta/gui/icon.png
+Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
 EOF
   echo "Created ${VMNAME}.desktop file"
 }
@@ -534,7 +534,6 @@ function usage() {
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --system-qemu           : Use system install of qemu."
   echo "  --fullscreen            : Starts VM in full screen mode"
   echo "  --no-smb                : Do not expose the home directory via SMB."
   exit 1
@@ -563,9 +562,14 @@ SHORTCUT=0
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-QEMU="/snap/bin/qemu-virgil"
-QEMU_IMG="/snap/bin/qemu-virgil.qemu-img"
-VIRGIL_PATH="/snap/qemu-virgil/current"
+
+# TODO: Make this run the native architecture binary
+QEMU=$(which qemu-system-x86_64)
+QEMU_IMG=$(which qemu-img)
+if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
+  echo "ERROR! qemu not found. Please install qemu."
+  exit 1
+fi
 
 # Take command line arguments
 if [ $# -lt 1 ]; then
@@ -604,9 +608,6 @@ else
           -shortcut|--shortcut)
             SHORTCUT=1
             shift;;
-          -system-qemu|--system-qemu)
-            SYSTEM_QEMU=1
-            shift;;
           -no-smb|--no-smb)
             NO_SMB=1
             shift;;
@@ -617,24 +618,6 @@ else
             usage;;
         esac
     done
-fi
-
-if [ -n "$SYSTEM_QEMU" ]; then
-  QEMU=$(which qemu-system-x86_64)
-  QEMU_IMG=$(which qemu-img)
-  VIRGIL_PATH=""
-  if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-    echo "ERROR! qemu not found. Please install qemu."
-    exit 1
-  fi
-  echo "WARNING! using system install of qemu. Please make sure virgil is supported."
-else
-  # Check we have qemu-virgil available
-  if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-    echo "ERROR! qemu-virgil not found. Please install the qemu-virgil snap."
-    echo "       https://snapcraft.io/qemu-virgil"
-    exit 1
-  fi
 fi
 
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
