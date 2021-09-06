@@ -342,18 +342,16 @@ function vm_boot() {
 
   # GL is not working with GTK currently
   if [ "${OUTPUT}" == "gtk" ]; then
-    GL="es"
-    OUTPUT_EXTRA=",grab-on-hover=on,zoom-to-fit=on"
+    GL="off"
+    OUTPUT_EXTRA=",grab-on-hover=on,zoom-to-fit=off"
   else
     echo " - Screen:   ${X_RES}x${Y_RES}"
   fi
 
-  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
-  elif [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},virgl=${VIRGL},xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
+  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
+    VIDEO="-device ${DISPLAY_DEVICE},vgamem_mb=128,xres=${X_RES},yres=${Y_RES},${FULLSCREEN}"
   else
-    VIDEO="-device VGA,vgamem_mb=128,xres=${X_RES},yres=${Y_RES}, ${FULLSCREEN}"
+    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES},${FULLSCREEN}"
   fi
 
   echo " - Video:    ${DISPLAY_DEVICE}"
