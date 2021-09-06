@@ -424,8 +424,7 @@ function vm_boot() {
           -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
           -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
           -rtc base=localtime,clock=host \
-          -serial mon:stdio \
-          "${@}"
+          -serial mon:stdio
       else
         ${QEMU} \
           -name ${VMNAME},process=${VMNAME} \
@@ -446,9 +445,8 @@ function vm_boot() {
           -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
           -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
           -rtc base=localtime,clock=host \
-          -serial mon:stdio \
-          "${@}"
-        fi
+          -serial mon:stdio
+      fi
     else
       ${QEMU} \
         -name ${VMNAME},process=${VMNAME} \
@@ -473,9 +471,8 @@ function vm_boot() {
         -device virtio-serial-pci \
         -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
         -chardev spicevmc,id=spicechannel0,name=vdagent \
-        -serial mon:stdio \
-        "${@}"
-      fi
+        -serial mon:stdio
+    fi
   else
     ${QEMU} \
       -name ${VMNAME},process=${VMNAME} \
@@ -498,9 +495,8 @@ function vm_boot() {
       -device virtio-serial-pci \
       -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
       -chardev spicevmc,id=spicechannel0,name=vdagent \
-      -serial mon:stdio \
-      "${@}"
-   fi
+      -serial mon:stdio
+  fi
 }
 
 function shortcut_create {
