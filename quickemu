@@ -302,7 +302,13 @@ function vm_boot() {
       local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
       #Round up - https://github.com/wimpysworld/quickemu/issues/11
       RAM_HOST=$(printf '%.*f\n' 0 ${RAM_HOST})
-      if [ ${RAM_HOST} -ge 64 ]; then
+      if [ ${RAM_HOST} -ge 256 ]; then
+        RAM_VM="32G"
+      elif [ ${RAM_HOST} -ge 128 ]; then
+        RAM_VM="16G"
+      elif [ ${RAM_HOST} -ge 64 ]; then
+        RAM_VM="8G"
+      elif [ ${RAM_HOST} -ge 32 ]; then
         RAM_VM="4G"
       elif [ ${RAM_HOST} -ge 16 ]; then
         RAM_VM="3G"
