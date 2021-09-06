@@ -22,7 +22,7 @@ function disk_delete() {
   fi
   local VMNAME=$(basename "${VM}" .conf)
   local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
-  if [ -e ${SHORTCUT_DIR}/${VMNAME}.desktop ]; then
+  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
     rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
     echo "Deleted ${VM} desktop shortcut" 
   fi
@@ -95,7 +95,7 @@ function get_port() {
     local PORT_START=$1
     local PORT_RANGE=$2
     while true; do
-        local CANDIDATE=$[${PORT_START} + (${RANDOM} % ${PORT_RANGE})]
+        local CANDIDATE=$((PORT_START + (RANDOM % PORT_RANGE)))
         (echo "" >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
         if [ $? -ne 0 ]; then
             echo "${CANDIDATE}"
@@ -111,9 +111,10 @@ enable_usb_passthrough() {
   local USB_NAME=""
   local VENDOR_ID=""
   local PRODUCT_ID=""
-  local TEMP_SCRIPT=$(mktemp)
+  local TEMP_SCRIPT=""
   local EXEC_SCRIPT=0
 
+  TEMP_SCRIPT=$(mktemp)
   # Have any USB devices been requested for pass-through?
   if (( ${#usb_devices[@]} )); then
     echo " - USB:      Device pass-through requested:"
@@ -126,7 +127,7 @@ enable_usb_passthrough() {
       USB_NAME=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f7-)
       echo "              - ${USB_NAME}"
       USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=usb.0"
-      if [ ! -w /dev/bus/usb/${USB_BUS}/${USB_DEV} ]; then
+      if [ ! -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
         local EXEC_SCRIPT=1
         echo "chown root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}" >> "${TEMP_SCRIPT}"
       fi
@@ -137,7 +138,7 @@ enable_usb_passthrough() {
       echo "             Requested USB device(s) are NOT accessible."
       echo "             ${TEMP_SCRIPT} will be executed to enable access:"
       echo
-      cat ${TEMP_SCRIPT}
+      cat "${TEMP_SCRIPT}"
       echo
       sudo "${TEMP_SCRIPT}"
       if [ $? -ne 0 ]; then
