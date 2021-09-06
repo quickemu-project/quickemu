@@ -24,7 +24,7 @@ function disk_delete() {
   local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
   if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
     rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
-    echo "Deleted ${VM} desktop shortcut" 
+    echo "Deleted ${VM} desktop shortcut"
   fi
 }
 
