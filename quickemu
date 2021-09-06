@@ -282,7 +282,11 @@ function vm_boot() {
   local CORES_VM="1"
   if [ -z "$cpu_cores" ]; then
       local CORES_HOST=$(nproc --all)
-      if [ ${CORES_HOST} -ge 8 ]; then
+      if [ ${CORES_HOST} -ge 32 ]; then
+        CORES_VM="16"
+      elif [ ${CORES_HOST} -ge 16 ]; then
+        CORES_VM="8"
+      elif [ ${CORES_HOST} -ge 8 ]; then
         CORES_VM="4"
       elif [ ${CORES_HOST} -ge 4 ]; then
         CORES_VM="2"
