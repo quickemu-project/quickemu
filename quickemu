@@ -104,7 +104,7 @@ function get_port() {
     done
 }
 
-enable_usb_passthrough() {
+function enable_usb_passthrough() {
   local DEVICE=""
   local USB_BUS=""
   local USB_DEV=""
