@@ -219,8 +219,9 @@ function vm_boot() {
       DISPLAY_DEVICE="qxl-vga"
       ;;
     *)
-      echo "ERROR! Unrecognised guest OS: ${guest_os}"
-      exit
+      echo "WARNING! Unrecognised guest OS: ${guest_os}"
+      DISPLAY_DEVICE="VGA"
+      VIRGL="off"
       ;;
   esac
   echo " - Guest:    ${guest_os^} optimised"
