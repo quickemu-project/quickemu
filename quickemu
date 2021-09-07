@@ -239,10 +239,6 @@ function vm_boot() {
         exit 1
       fi
       echo "             Just created, booting from ${iso}${img}"
-    if [ $? -ne 0 ]; then
-      echo "ERROR! Failed to create ${disk_img} of ${disk}. Stopping here."
-      exit 1
-    fi
   elif [ -e "${disk_img}" ]; then
     # Check there isn't already a process attached to the disk image.
     if ! ${QEMU_IMG} info "${disk_img}" >/dev/null; then
@@ -667,7 +663,6 @@ if [ -n "${SNAPSHOT_ACTION}" ]; then
 fi
 
 if [ ${SHORTCUT} -eq 1 ]; then
-  # echo "VM=" ${VM}
   shortcut_create
   exit
 fi
