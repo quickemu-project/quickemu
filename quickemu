@@ -3,10 +3,10 @@ export LC_ALL=C
 
 function web_get() {
   local URL="${1}"
-  local FILE=$(echo "${URL##*/}")
+  local FILE=""
+  FILE="${URL##*/}"
   if [ ! -e "${VMDIR}/${FILE}" ]; then
-    wget -q -c "${URL}" -O "${VMDIR}/${FILE}"
-    if [ $? -ne 0 ]; then
+    if ! wget -q -c "${URL}" -O "${VMDIR}/${FILE}"; then
       echo "ERROR! Failed to download ${URL}"
       exit 1
     fi
@@ -20,7 +20,8 @@ function disk_delete() {
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
-  local VMNAME=$(basename "${VM}" .conf)
+  local VMNAME=""
+  VMNAME=$(basename "${VM}" .conf)
   local SHORTCUT_DIR="/home/${USER}/.local/share/applications/"
   if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
     rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
@@ -36,8 +37,7 @@ function snapshot_apply() {
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"
-    if [ $? -eq 0 ]; then
+    if ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"; then
       echo "SUCCESS! Applied snapshot ${TAG} to ${disk_img}"
     else
       echo "ERROR! Failed to apply snapshot ${TAG} to ${disk_img}"
@@ -55,8 +55,7 @@ function snapshot_create() {
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"
-    if [ $? -eq 0 ]; then
+    if ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"; then
       echo "SUCCESS! Created snapshot ${TAG} of ${disk_img}"
     else
       echo "ERROR! Failed to create snapshot ${TAG} of ${disk_img}"
@@ -74,8 +73,7 @@ function snapshot_delete() {
   fi
 
   if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"
-    if [ $? -eq 0 ]; then
+    if ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"; then
       echo "SUCCESS! Deleted snapshot ${TAG} of ${disk_img}"
     else
       echo "ERROR! Failed to delete snapshot ${TAG} of ${disk_img}"
@@ -120,11 +118,11 @@ function enable_usb_passthrough() {
     echo " - USB:      Device pass-through requested:"
     echo "#!/usr/bin/env bash" > "${TEMP_SCRIPT}"
     for DEVICE in "${usb_devices[@]}"; do
-      VENDOR_ID=$(echo ${DEVICE} | cut -d':' -f1)
-      PRODUCT_ID=$(echo ${DEVICE} | cut -d':' -f2)
-      USB_BUS=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f2)
-      USB_DEV=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f4 | cut -d':' -f1)
-      USB_NAME=$(lsusb -d ${VENDOR_ID}:${PRODUCT_ID} | cut -d' ' -f7-)
+      VENDOR_ID=$(echo "${DEVICE}" | cut -d':' -f1)
+      PRODUCT_ID=$(echo "${DEVICE}" | cut -d':' -f2)
+      USB_BUS=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f2)
+      USB_DEV=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f4 | cut -d':' -f1)
+      USB_NAME=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f7-)
       echo "              - ${USB_NAME}"
       USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=usb.0"
       if [ ! -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
@@ -140,8 +138,7 @@ function enable_usb_passthrough() {
       echo
       cat "${TEMP_SCRIPT}"
       echo
-      sudo "${TEMP_SCRIPT}"
-      if [ $? -ne 0 ]; then
+      if ! sudo "${TEMP_SCRIPT}"; then
         echo "            WARNING! Enabling USB device access failed."
       fi
     else
@@ -152,8 +149,10 @@ function enable_usb_passthrough() {
 }
 
 function vm_boot() {
-  local VMNAME=$(basename "${VM}" .conf)
-  local VMDIR=$(dirname "${disk_img}")
+  local VMNAME=""
+  VMNAME=$(basename "${VM}" .conf)
+  local VMDIR=""
+  VMDIR=$(dirname "${disk_img}")
   local CPU="-cpu host,kvm=on"
   local GUEST_TWEAKS=""
   local DISPLAY_DEVICE=""
@@ -162,12 +161,13 @@ function vm_boot() {
   local VIRGL="on"
   local OUTPUT="sdl"
   local OUTPUT_EXTRA=""
-  local QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+  local QEMU_VER=""
+  QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
   # Force to lowercase.
-  boot=$(echo ${boot,,})
+  boot=${boot,,}
 
   # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
@@ -199,7 +199,7 @@ function vm_boot() {
   fi
 
   # Force to lowercase.
-  guest_os=$(echo ${guest_os,,})
+  guest_os=${guest_os,,}
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
@@ -207,8 +207,8 @@ function vm_boot() {
       ;;
     macos)
       CPU="-cpu Penryn,vendor=GenuineIntel,kvm=on,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+invtsc,+movbe,+pcid,+smep,+sse3,+sse4.2,+xgetbv1,+xsave,+xsavec,+xsaveopt"
-      readonly ROT_OSK="bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap"
-      readonly OSK=$(echo ${ROT_OSK} | rot13)
+      OSK=""
+      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
       DISPLAY_DEVICE="VGA"
       VIRGL="off"
@@ -229,8 +229,7 @@ function vm_boot() {
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
       mkdir -p "${VMDIR}" 2>/dev/null
-      ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"
-      if [ $? -ne 0 ]; then
+      if ! ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"; then
         echo "ERROR! Failed to create ${disk_img}"
         exit 1
       fi
@@ -245,13 +244,12 @@ function vm_boot() {
     fi
   elif [ -e "${disk_img}" ]; then
     # Check there isn't already a process attached to the disk image.
-    QEMU_LOCK_TEST=$(${QEMU_IMG} info "${disk_img}" 2>/dev/null)
-    if [ $? -ne 0 ]; then
-      echo "             Failed to get "write" lock. Is another process using the disk?"
+    if ! ${QEMU_IMG} info "${disk_img}" >/dev/null; then
+      echo "             Failed to get \"write\" lock. Is another process using the disk?"
       exit 1
     else
       DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
-      if [ ${DISK_CURR_SIZE} -le ${DISK_MIN_SIZE} ]; then
+      if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
         echo "             Looks unused, booting from ${iso}${img}"
         if [ -z "${iso}" ] && [ -z "${img}" ]; then
           echo "ERROR! You haven't specified a .iso or .img image to boot from."
@@ -281,14 +279,15 @@ function vm_boot() {
 
   local CORES_VM="1"
   if [ -z "$cpu_cores" ]; then
-      local CORES_HOST=$(nproc --all)
-      if [ ${CORES_HOST} -ge 32 ]; then
+      local CORES_HOST=""
+      CORES_HOST=$(nproc --all)
+      if [ "${CORES_HOST}" -ge 32 ]; then
         CORES_VM="16"
-      elif [ ${CORES_HOST} -ge 16 ]; then
+      elif [ "${CORES_HOST}" -ge 16 ]; then
         CORES_VM="8"
-      elif [ ${CORES_HOST} -ge 8 ]; then
+      elif [ "${CORES_HOST}" -ge 8 ]; then
         CORES_VM="4"
-      elif [ ${CORES_HOST} -ge 4 ]; then
+      elif [ "${CORES_HOST}" -ge 4 ]; then
         CORES_VM="2"
       fi
   else
@@ -299,18 +298,19 @@ function vm_boot() {
 
   local RAM_VM="2G"
   if [ -z "$ram" ]; then
-      local RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+      local RAM_HOST=""
+      RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
       #Round up - https://github.com/wimpysworld/quickemu/issues/11
-      RAM_HOST=$(printf '%.*f\n' 0 ${RAM_HOST})
-      if [ ${RAM_HOST} -ge 256 ]; then
+      RAM_HOST=$(printf '%.*f\n' 0 "${RAM_HOST}")
+      if [ "${RAM_HOST}" -ge 256 ]; then
         RAM_VM="32G"
-      elif [ ${RAM_HOST} -ge 128 ]; then
+      elif [ "${RAM_HOST}" -ge 128 ]; then
         RAM_VM="16G"
-      elif [ ${RAM_HOST} -ge 64 ]; then
+      elif [ "${RAM_HOST}" -ge 64 ]; then
         RAM_VM="8G"
-      elif [ ${RAM_HOST} -ge 32 ]; then
+      elif [ "${RAM_HOST}" -ge 32 ]; then
         RAM_VM="4G"
-      elif [ ${RAM_HOST} -ge 16 ]; then
+      elif [ "${RAM_HOST}" -ge 16 ]; then
         RAM_VM="3G"
       fi
   else
@@ -321,20 +321,21 @@ function vm_boot() {
   local X_RES=1152
   local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-    local LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-    if [ ${FULLSCREEN} ]; then
+    local LOWEST_WIDTH=""
+    LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+    if [ "${FULLSCREEN}" ]; then
       X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
       Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-    elif [ ${LOWEST_WIDTH} -ge 3840 ]; then
+    elif [ "${LOWEST_WIDTH}" -ge 3840 ]; then
       X_RES=3200
       Y_RES=1800
-    elif [ ${LOWEST_WIDTH} -ge 2560 ]; then
+    elif [ "${LOWEST_WIDTH}" -ge 2560 ]; then
       X_RES=2048
       Y_RES=1152
-    elif [ ${LOWEST_WIDTH} -ge 1920 ]; then
+    elif [ "${LOWEST_WIDTH}" -ge 1920 ]; then
       X_RES=1664
       Y_RES=936
-    elif [ ${LOWEST_WIDTH} -ge 1280 ]; then
+    elif [ "${LOWEST_WIDTH}" -ge 1280 ]; then
       X_RES=1152
       Y_RES=648
     fi
@@ -376,7 +377,8 @@ function vm_boot() {
   fi
 
   # Find a free port to expose ssh to the guest
-  local PORT=$(get_port 22220 9)
+  local PORT=""
+  PORT=$(get_port 22220 9)
   if [ -n "${PORT}" ]; then
     NET="${NET},hostfwd=tcp::${PORT}-:22"
     echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
@@ -388,16 +390,17 @@ function vm_boot() {
   if (( ${#port_forwards[@]} )); then
     echo " - PORTS:    Port forwards requested:"
     for FORWARD in "${port_forwards[@]}"; do
-      HOST_PORT=$(echo ${FORWARD} | cut -d':' -f1)
-      GUEST_PORT=$(echo ${FORWARD} | cut -d':' -f2)
+      HOST_PORT=$(echo "${FORWARD}" | cut -d':' -f1)
+      GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
       echo "              - ${HOST_PORT} => ${GUEST_PORT}"
       NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
     done
   fi
 
   # Find a free port for spice
-  local SPICE_PORT=$(get_port 5930 9)
-  if [ ! -n "${SPICE_PORT}" ]; then
+  local SPICE_PORT=""
+  SPICE_PORT=$(get_port 5930 9)
+  if [ -z "${SPICE_PORT}" ]; then
     echo " - spice:      All spice ports have been exhausted."
   fi
 
@@ -500,10 +503,12 @@ function vm_boot() {
 }
 
 function shortcut_create {
-  local VMNAME=$(basename "${VM}" .conf)
-  local LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
+  local VMNAME=""
+  VMNAME=$(basename "${VM}" .conf)
+  local LAUNCHER_DIR=""
+  LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
   local filename="/home/${USER}/.local/share/applications/${VMNAME}.desktop"
-  cat << EOF > ${filename}
+  cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -566,7 +571,7 @@ if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
 fi
 
 QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g')
-if [ ${QEMU_VER} -lt 600 ]; then
+if [ "${QEMU_VER}" -lt 600 ]; then
   echo "ERROR! Qemu 6.0.0 is newer is required, detected $(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)."
   exit 1
 fi
@@ -621,6 +626,7 @@ else
 fi
 
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
+  # shellcheck source=/dev/null
   source "${VM}"
   if [ -z "${disk_img}" ]; then
     echo "ERROR! No disk_img defined."
