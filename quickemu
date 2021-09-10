@@ -569,7 +569,7 @@ fi
 
 QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g')
 if [ "${QEMU_VER}" -lt 600 ]; then
-  echo "ERROR! Qemu 6.0.0 is newer is required, detected $(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)."
+  echo "ERROR! Qemu 6.0.0 or newer is required, detected $(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)."
   exit 1
 fi
 
