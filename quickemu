@@ -319,10 +319,19 @@ function vm_boot() {
   local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
     local LOWEST_WIDTH=""
-    LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+    if [ -z "${SCREEN}" ]; then
+      LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+    else
+      LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+    fi
     if [ "${FULLSCREEN}" ]; then
-      X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-      Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
+      if [ -z "${SCREEN}" ]; then
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
+      else
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
+      fi
     elif [ "${LOWEST_WIDTH}" -ge 3840 ]; then
       X_RES=3200
       Y_RES=1800
@@ -555,6 +564,7 @@ STATUS_QUO=""
 USB_PASSTHROUGH=""
 VM=""
 SHORTCUT=0
+SCREEN=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
@@ -605,6 +615,10 @@ else
             shift;;
           -vm|--vm)
             VM="${2}"
+            shift
+            shift;;
+          -screen|--screen)
+            SCREEN="${2}"
             shift
             shift;;
           -shortcut|--shortcut)
