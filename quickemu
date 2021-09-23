@@ -347,9 +347,9 @@ function vm_boot() {
   fi
 
   if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},vgamem_mb=128,xres=${X_RES},yres=${Y_RES},${FULLSCREEN}"
+    VIDEO="-device ${DISPLAY_DEVICE},vgamem_mb=128,xres=${X_RES},yres=${Y_RES} ${FULLSCREEN}"
   else
-    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES},${FULLSCREEN}"
+    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES} ${FULLSCREEN}"
   fi
 
   echo " - Video:    ${DISPLAY_DEVICE}"
@@ -601,7 +601,7 @@ else
             STATUS_QUO="-snapshot"
             shift;;
           -fullscreen|--fullscreen)
-            FULLSCREEN="--full-screen"
+            FULLSCREEN="-full-screen"
             shift;;
           -vm|--vm)
             VM="${2}"
