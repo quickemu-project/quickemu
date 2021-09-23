@@ -193,9 +193,11 @@ You can use `quickemu` to run a macOS virtual machine.
 
 ```
 wget https://raw.githubusercontent.com/foxlet/macOS-Simple-KVM/master/tools/FetchMacOS/fetch-macos.py -O fetch-macos.py
-chmod +x fetch-macos.py
-./fetch-macos.py
-qemu-virgil.qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
+python3 -m venv venv
+. venv/bin/activate
+python3 -m pip install requests click
+python3 ./fetch-macos.py
+qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
 ```
 
   * Create a VM configuration file; for example `macos.conf`
@@ -240,9 +242,9 @@ Starting macos.conf
               - 8888 => 80
 ```
 
-  * Boot from the BaseSystem
+  * Boot from the BaseSystem (use cursor keys if the mouse doesn't work)
     * Click **Disk Utility** and **Continue**
-    * Select `Apple Inc. VirtIO Block Media` that is ~68GB from the list and click **Erase**.
+    * Select `Apple Inc. VirtIO Block Media` that is ~138GB from the list and click **Erase**.
     * Enter a `Name:` for the disk and click **Erase**.
     * Click **Done**.
     * Close Disk Utility
