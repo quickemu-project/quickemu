@@ -267,7 +267,35 @@ You can also pass optional parameters
   --status-quo            : Do not commit any changes to disk/snapshot.
   --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   --no-smb                : Do not expose the home directory via SMB.
+  --screen <screen>       : Use specified screen to determine the window size.
 ```
+
+<ins>Note about screen and window size</ins>
+
+`qemu` will always default to the primary monitor to display the VM's window.
+
+Without the `--screen` option, `quickemu` will look for the size of the smallest monitor, and use a size that fits on said monitor.
+
+The `--screen` option forces `quickemu` to use the size of the given monitor to compute the size of the window. **It wont't use that monitor to display the VM's window if it's not the primary monitor**. This is usefull if the primary monitor if not the smallest one, and if the VM's window doesn't need to be moved around.
+
+The `--screen` option is also usefull with the `--fullscreen` option, again because `qemu` will always use the primary monitor. In order for the fullscreen mode to work properly, the resolution of the VM's window must match the resolution of the screen.
+
+To know which screen to use, type :
+```
+xrandr --listmonitors | grep -v Monitors
+```
+The command will output something like this :
+```
+ 0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
+ 1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
+```
+The first number is what needs to be passed to the `--screen` option.
+
+For example : 
+```
+quickemu --vm vm.conf --screen 0
+```
+will use my big screen to compute the size of the window, and make it 2048x1152. Without the `--screen` option, it would have used the smallest monitor and make the window 1664x936.
 
 ## TODO
 
