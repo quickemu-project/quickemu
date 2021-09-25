@@ -239,7 +239,14 @@ In the example above:
   * The USB device with vendor_id 046d and product_id 085e will be exposed to the guest.
 
 If the USB devices are not writable, `quickemu` will display the appropriate
-commands to modify the USB device(s) access permissions.
+commands to modify the USB device(s) access permissions, like this:
+
+```
+ - USB:      Host pass-through requested:
+              - Sennheiser Communications EPOS GTW 270 on bus 001 device 005 needs permission changes:
+                sudo chown -v root:martin /dev/bus/usb/001/005
+                ERROR! USB permission changes are required 👆
+```
 
 ## All the options
 
