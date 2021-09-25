@@ -37,7 +37,7 @@ Essential requirements:
 Optional requirements:
 
   * `rot13` to *"decrypt"* the macOS OSK key; found in the `bsdgames` package in Debian/Ubuntu
-  * `smbd` to export user home directory from the host to the guest VM; found in the `samba` package in Debian/Ubuntu
+  * `spicy` to connect to VMs via the SPICE protocol; found in the `spice-client-gtk` package in Debian/Ubuntu
 
 ## Install Quickemu
 
@@ -104,6 +104,11 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
 ```
 
   * Complete the installation as normal.
+  * Post-install:
+    * Install the SPICE agent (`spice-vdagent`) to enable copy/paste and USB redirection
+      * Debian/Ubuntu `sudo apt install spice-vdagent`
+    * Install the SPICE WebDAV agent (`spice-webdavd`) to enable file sharing.
+      * Debian/Ubuntu `sudo apt install spice-webdavd`
 
   * A Desktop shortcut can be created (in ~/.local/share/applications):
 ```
@@ -116,6 +121,10 @@ You can use `quickemu` to run a Windows 10 virtual machine.
 
   * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
   * [Download VirtIO drivers for Windows](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
+  * [Download `spice-webdavd` for Windows](https://www.spice-space.org/download/windows/spice-webdavd/)
+    * Enables the Windows guest access to shared files on the host.
+  * [Download UsbDk for Windows](https://www.spice-space.org/download/windows/usbdk/)
+    * Enables the Windows guest access to redirected USB devices from the host.
   * Create a VM configuration file; for example `windows10.conf`
     * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
     * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
@@ -171,7 +180,10 @@ Starting /media/martin/Quickemu/windows10.conf
     * Select `VirtIO SCSI controller (E:\amd64\w10\viostor.inf)` from the list and click **Next**.
     * The disk will now be available for partitioning and formatting.
   * Complete the installation as you normally would.
-  * Post-install you should run the VirtIO installer from the CD-ROM: drive.
+  * Post-install:
+    * Run the VirtIO installer from the CD-ROM: drive.
+    * Install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/)
+    * Install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
 
 ### macOS
 
@@ -186,6 +198,8 @@ There are some considerations when running macOS via Quickemu.
     *   This is a very old architecture, [so to unlock higher CPU performance; AVX, AES-NI, SSE et al are enabled](https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/).
   * UHCI USB (USB 2.0) is the fastest supported.
     * USB pass-through has not been tested.
+  * Copy/paste between the guest and host is not supported in macOS.
+  * File sharing is not supported on macOS.
 
 You can use `quickemu` to run a macOS virtual machine.
 
@@ -251,9 +265,53 @@ Starting macos.conf
     * Click **Reinstall macOS** and **Continue**
   * Complete the installation as you normally would.
 
-### All the options
+## SPICE
 
-Here are the full usage instructions:
+The following features are only available while using the SPICE protocol:
+
+  * Copy/paste between the guest and host *(not available for macOS guests)*
+  * Host file sharing to the guest *(not available for macOS guests)*
+  * USB device redirection *(untested on macOS)*
+
+To use SPICE add `--display spice` to the Quickemu invocation, this requires that
+the `spicy` client is installed, available from the `spice-client-gtk` package
+in Debian/Ubuntu.
+
+```bash
+quickemu --vm ubuntu-focal-desktop.conf --display spice
+```
+
+## USB redirection
+
+Quickemu support USB redirection via host passthrough and SPICE passthrough.
+
+### SPICE redirection
+
+Using SPICE for USB passthrough is easiest as it doesn't require any elevated
+permission, start Quickemu with `--display spice` and then select `Input` ->
+`Select USB Device for redirection` from the menu to chose which device(s) you want
+to attach to the VM.
+
+### Host redirection
+
+**USB host redirection is not recommended**, it is provided purely for backwards
+compatibility to older versions of Quickemu. Using SPICE is preferred, see above.
+
+Add an additional line to your virtual machine configuration. For example:
+
+  * `usb_devices=("046d:082d" "046d:085e")`
+
+In the example above:
+
+  * The USB device with vendor_id 046d and product_id 082d will be exposed to the guest.
+  * The USB device with vendor_id 046d and product_id 085e will be exposed to the guest.
+
+If the USB devices are not writable, `quickemu` will display the appropriate
+commands to modify the USB device(s) access permissions.
+
+## All the options
+
+Here are the usage instructions:
 
 ```
 Usage
@@ -261,6 +319,7 @@ Usage
 
 You can also pass optional parameters
   --delete                : Delete the disk image.
+  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'
   --shortcut              : Create a desktop shortcut
   --snapshot apply <tag>  : Apply/restore a snapshot.
   --snapshot create <tag> : Create a snapshot.
@@ -300,6 +359,5 @@ will use my big screen to compute the size of the window, and make it 2048x1152.
 
 ## TODO
 
-  - [ ] SPICE support
   - [ ] Improve disk management
   - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)

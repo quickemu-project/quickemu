@@ -355,6 +355,13 @@ function vm_boot() {
     DISPLAY_DEVICE="qxl-vga"
   fi
 
+  if [ "${OUTPUT}" == "spice" ]; then
+    if [ "${guest_os}" != "macos" ]; then
+      DISPLAY_DEVICE="qxl-vga"
+    fi
+    OUTPUT="none"
+  fi
+
   echo " - Video:    ${DISPLAY_DEVICE}"
 
   # Allocate VRAM to VGA devices
@@ -409,10 +416,27 @@ function vm_boot() {
   fi
 
   # Find a free port for spice
+  local SPICE="disable-ticketing=on"
   local SPICE_PORT=""
   SPICE_PORT=$(get_port 5930 9)
   if [ -z "${SPICE_PORT}" ]; then
-    echo " - spice:      All spice ports have been exhausted."
+    echo " - SPICE:    All spice ports have been exhausted."
+    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
+      echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
+      exit 1
+    fi
+  else
+    if [ "${OUTPUT}" == "spice-app" ]; then
+      echo " - SPICE:    Enabled"
+    else
+      echo " - SPICE:    ${SPICE_PORT}/tcp is connected. Login via 'spicy --title \"${VMNAME}\" --port ${SPICE_PORT} --spice-shared-dir ${HOME}' ${FULLSPICY}"
+      SPICE="${SPICE},port=${SPICE_PORT}"
+    fi
+
+    # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
+    if [ "${guest_os}" != "macos" ]; then
+      echo " - WebDAV:   ${HOME} will be exported to ${VMNAME} via dav://localhost:9843/"
+    fi
   fi
 
   enable_usb_passthrough
@@ -510,6 +534,11 @@ function vm_boot() {
       -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
       -chardev spicevmc,id=spicechannel0,name=vdagent \
       -serial mon:stdio
+  echo " - PID:      ${!}"
+
+  # If output is 'none' then SPICE was requested.
+  if [ ${OUTPUT} == "none" ]; then
+    spicy --title "${VMNAME}" --port ${SPICE_PORT} ${FULLSPICY} --spice-shared-dir "${HOME}" >/dev/null 2>&1
   fi
 }
 
@@ -538,6 +567,7 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
+  echo "  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'"
   echo "  --shortcut              : Create a desktop shortcut"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
@@ -562,7 +592,9 @@ ram=""
 cpu_cores=""
 
 FULLSCREEN=""
+FULLSPICY=""
 DELETE=0
+OUTPUT="sdl"
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUS_QUO=""
@@ -598,6 +630,17 @@ else
           -delete|--delete)
             DELETE=1
             shift;;
+          -display|--display)
+            OUTPUT="${2}"
+            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+              echo "ERROR! Requested output '${OUTPUT}' is not recognised."
+              exit 1
+            elif [ "${OUTPUT}" == "spice" ] && [ ! "$(which spicy)" ]; then
+              echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
+              exit 1
+            fi
+            shift
+            shift;;
           -snapshot|--snapshot)
             SNAPSHOT_ACTION="${2}"
             if [ -z "${SNAPSHOT_ACTION}" ]; then
@@ -615,8 +658,9 @@ else
           -status-quo|--status-quo)
             STATUS_QUO="-snapshot"
             shift;;
-          -fullscreen|--fullscreen)
+          -fullscreen|--fullscreen|-full-screen|--full-screen)
             FULLSCREEN="-full-screen"
+            FULLSPICY="--full-screen"
             shift;;
           -vm|--vm)
             VM="${2}"
