@@ -153,15 +153,13 @@ function vm_boot() {
   VMNAME=$(basename "${VM}" .conf)
   local VMDIR=""
   VMDIR=$(dirname "${disk_img}")
-  local CPU="-cpu host,kvm=on"
-  local GUEST_TWEAKS=""
+  local CPU=""
   local DISPLAY_DEVICE=""
-  local VIDEO=""
   local GL="on"
-  local VIRGL="on"
-  local OUTPUT="sdl"
-  local OUTPUT_EXTRA=""
+  local GUEST_TWEAKS=""
+  local OSK=""
   local QEMU_VER=""
+  local VIDEO=""
   QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
@@ -203,25 +201,20 @@ function vm_boot() {
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
-      DISPLAY_DEVICE="virtio-vga"
+      CPU="-cpu host,kvm=on"
       ;;
     macos)
       CPU="-cpu Penryn,vendor=GenuineIntel,kvm=on,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+invtsc,+movbe,+pcid,+smep,+sse3,+sse4.2,+xgetbv1,+xsave,+xsavec,+xsaveopt"
-      OSK=""
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
-      DISPLAY_DEVICE="VGA"
-      VIRGL="off"
       ;;
     windows)
-      CPU="${CPU},hv_time"
+      CPU="-cpu host,kvm=on,hv_time"
       GUEST_TWEAKS="-no-hpet"
-      DISPLAY_DEVICE="qxl-vga"
       ;;
     *)
+      CPU="-cpu host,kvm=on"
       echo "WARNING! Unrecognised guest OS: ${guest_os}"
-      DISPLAY_DEVICE="VGA"
-      VIRGL="off"
       ;;
   esac
   echo " - Guest:    ${guest_os^} optimised"
@@ -347,29 +340,42 @@ function vm_boot() {
     fi
   fi
 
-  # GL is not working with GTK currently
-  if [ "${OUTPUT}" == "gtk" ]; then
-    GL="off"
-    OUTPUT_EXTRA=",grab-on-hover=on,zoom-to-fit=off"
+  echo " - Screen:   ${X_RES}x${Y_RES}"
+  echo " - Display:  ${OUTPUT^^}"
+
+  # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
+  if [ "${guest_os}" == "linux" ]; then
+    DISPLAY_DEVICE="virtio-vga"
+  elif [ "${guest_os}" == "macos" ]; then
+    DISPLAY_DEVICE="VGA"
+    #DISPLAY_DEVICE="bochs-display"
+  elif [ "${guest_os}" == "windows" ]; then
+    DISPLAY_DEVICE="qxl-vga"
   else
-    echo " - Screen:   ${X_RES}x${Y_RES}"
+    DISPLAY_DEVICE="qxl-vga"
   fi
 
+  echo " - Video:    ${DISPLAY_DEVICE}"
+
+  # Allocate VRAM to VGA devices
   if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},vgamem_mb=128,xres=${X_RES},yres=${Y_RES} ${FULLSCREEN}"
+    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES},vgamem_mb=128 ${FULLSCREEN}"
   else
     VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES} ${FULLSCREEN}"
   fi
 
-  echo " - Video:    ${DISPLAY_DEVICE}"
-  echo " - GL:       ${GL^^}"
+  if [ "${OUTPUT}" == "gtk" ]; then
+    OUTPUT="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
     # GL is not working with GTK and virtio-vga
-  echo " - Display:  ${OUTPUT^^}"
-
-  # Set the hostname of the VM
-  local NET="user,hostname=${VMNAME}"
-
+    if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+      GL="off"
+    fi
   fi
+
+  if [ "${OUTPUT}" != "none" ]; then
+    OUTPUT="${OUTPUT},gl=${GL}"
+  fi
+  echo " - GL:       ${GL^^}"
 
   if [ "${GL}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
     DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
@@ -377,6 +383,9 @@ function vm_boot() {
   else
     echo " - Virgil3D: OFF"
   fi
+
+  # Set the hostname of the VM
+  local NET="user,hostname=${VMNAME}"
 
   # Find a free port to expose ssh to the guest
   local PORT=""
