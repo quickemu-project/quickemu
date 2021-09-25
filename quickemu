@@ -558,8 +558,8 @@ function usage() {
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --fullscreen            : Starts VM in full screen mode"
-  echo "  --no-smb                : Do not expose the home directory via SMB."
+  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
+  echo "  --screen <screen>       : Use specified screen to determine the window size."
   exit 1
 }
 
