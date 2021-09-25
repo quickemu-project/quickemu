@@ -323,5 +323,6 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
 
 ## TODO
 
-  - [ ] Improve disk management
-  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
+  - [ ] `spice-app` support via `virt-viewer`.
+  - [ ] Improve disk management.
+  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899).
