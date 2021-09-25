@@ -63,7 +63,6 @@ sudo apt install quickemu
     * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
 
 ```bash
-boot="legacy"
 guest_os="linux"
 iso="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.iso"
 disk_img="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
@@ -87,7 +86,7 @@ quickemu --vm ubuntu-focal-desktop.conf
 You can use `quickemu` to run Windows 10 in a virtual machine.
 
   * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
-  * [Download VirtIO drivers for Windows](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
+  * [Download VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
   * [Download `spice-webdavd` for Windows](https://www.spice-space.org/download/windows/spice-webdavd/)
     * Enables the Windows guest access to shared files on the host.
   * [Download UsbDk for Windows](https://www.spice-space.org/download/windows/usbdk/)
@@ -97,11 +96,10 @@ You can use `quickemu` to run Windows 10 in a virtual machine.
     * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
 
 ```bash
-boot="legacy"
 guest_os="windows"
-iso="${HOME}/Quickemu/windows10/Win10_1909_English_x64.iso"
-driver_iso="${HOME}/Quickemu/windows10/virtio-win-0.1.173.iso"
-disk_img="${HOME}/Quickemu/windows10/windows10.qcow2"
+iso="${HOME}/Quickemu/windows/Win10_21H1_EnglishInternational_x64.iso"
+driver_iso="${HOME}/Quickemu/windows/virtio-win-0.1.208.iso"
+disk_img="${HOME}/Quickemu/windows/windows.qcow2"
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -124,7 +122,8 @@ quickemu --vm windows10.conf
 
 There are some considerations when running macOS via Quickemu.
 
-  * `quickemu` will automatically download the required [Clover EFI bootloader](https://sourceforge.net/projects/cloverefiboot/) and OVMF firmware from [the macOS-Simple-KVM project](https://github.com/foxlet/macOS-Simple-KVM).
+  * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
+    bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
   * **macOS 10.14.3 or newer is supported**:
     * [VirtIO block devices QEMU standard VGA are supported](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) since macOS 10.14.3 (Mohave).
     * [VirtIO `usb-tablet` devices are supported](http://philjordan.eu/osx-virt/) since macOS 10.11 (El Capitan).
@@ -138,20 +137,32 @@ There are some considerations when running macOS via Quickemu.
 
 You can use `quickemu` to run a macOS virtual machine.
 
-  * Download macOS using `fetch-macos.py`
+  * Download macOS using `fetch-macOS-v2.py`
 
 ```bash
-wget https://raw.githubusercontent.com/foxlet/macOS-Simple-KVM/master/tools/FetchMacOS/fetch-macos.py -O fetch-macos.py
-python3 -m venv venv
-. venv/bin/activate
-python3 -m pip install requests click
-python3 ./fetch-macos.py
+wget https://github.com/kholia/OSX-KVM/blob/master/fetch-macOS-v2.py -O fetch-macOS-v2.py
+python3 ./fetch-macOS-v2.py
+```
+
+This will display the following menu.
+
+```
+1. High Sierra (10.13)
+2. Mojave (10.14)
+3. Catalina (10.15) - RECOMMENDED
+4. Latest (Big Sur - 11)
+Choose a product to download (1-4):
+```
+
+When prompted choose the recommended release.
+
+```
 qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
 ```
 
   * Create a VM configuration file; for example `macos.conf`
     * The `guest_os="macos"` line instructs `quickemu` to use optimise for macOS.
-    * The `img=` sets the boot disk that you downloaded with `fetch-macos.py`
+    * The `img=` sets the boot disk that you downloaded with `fetch-macOS-v2.py`.
 
 ```bash
 guest_os="macos"
@@ -167,7 +178,7 @@ quickemu --vm macos.conf
 
   * Boot from the BaseSystem (use cursor keys if the mouse doesn't work)
     * Click **Disk Utility** and **Continue**
-    * Select `Apple Inc. VirtIO Block Media` that is ~138GB from the list and click **Erase**.
+    * Select `Apple Inc. VirtIO Block Media` that is ~65GB from the list and click **Erase**.
     * Enter a `Name:` for the disk and click **Erase**.
     * Click **Done**.
     * Close Disk Utility
@@ -323,6 +334,28 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
 
 ## TODO
 
+  - [ ] Default to EFI booting.
+  - [ ] Only use video drivers with legacy VGA when legacy boot is enabled.
+  - [ ] Include macOS compatible firmware.
+  - [ ] Make default virtual disk capacity suitable for the target guest OS.
+  - [ ] Optimise macOS guests.
+  - [ ] Optimise Windows guests.
+  - [ ] Add BSD support.
   - [ ] `spice-app` support via `virt-viewer`.
   - [ ] Improve disk management.
   - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899).
+
+
+# References
+
+  * macOS
+    * <https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/>
+    * <https://github.com/kholia/OSX-KVM>
+    * <https://github.com/thenickdude/KVM-Opencore>
+    * <https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery>
+    * <https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/>
+    * <https://github.com/Dids/clover-builder>
+  * Windows
+    * <https://www.heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/>
+    * <https://leduccc.medium.com/improving-the-performance-of-a-windows-10-guest-on-qemu-a5b3f54d9cf5>
+    * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
