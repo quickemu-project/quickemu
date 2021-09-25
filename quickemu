@@ -388,11 +388,11 @@ function vm_boot() {
   local NET="user,hostname=${VMNAME}"
 
   # Find a free port to expose ssh to the guest
-  local PORT=""
-  PORT=$(get_port 22220 9)
-  if [ -n "${PORT}" ]; then
-    NET="${NET},hostfwd=tcp::${PORT}-:22"
-    echo " - ssh:      ${PORT}/tcp is connected. Login via 'ssh user@localhost -p ${PORT}'"
+  local SSH_PORT=""
+  SSH_PORT=$(get_port 22220 9)
+  if [ -n "${SSH_PORT}" ]; then
+    NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
+    echo " - ssh:      ${SSH_PORT}/tcp is connected. Login via 'ssh user@localhost -p ${SSH_PORT}'"
   else
     echo " - ssh:      All ports for exposing ssh have been exhausted."
   fi
