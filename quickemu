@@ -565,28 +565,28 @@ function usage() {
 
 # Lowercase variables are used in the VM config file only
 boot="legacy"
+cpu_cores=""
+disk_img=""
+disk="64G"
+driver_iso=""
 guest_os="linux"
 img=""
 iso=""
-driver_iso=""
-disk_img=""
-disk="64G"
-usb_devices=()
 port_forwards=()
 ram=""
-cpu_cores=""
+usb_devices=()
 
+DELETE=0
 FULLSCREEN=""
 FULLSPICY=""
-DELETE=0
 OUTPUT="sdl"
+SCREEN=""
+SHORTCUT=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 STATUS_QUO=""
 USB_PASSTHROUGH=""
 VM=""
-SHORTCUT=0
-SCREEN=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
