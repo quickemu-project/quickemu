@@ -363,23 +363,19 @@ function vm_boot() {
 
   echo " - Video:    ${DISPLAY_DEVICE}"
   echo " - GL:       ${GL^^}"
-  echo " - Virgil3D: ${VIRGL^^}"
+    # GL is not working with GTK and virtio-vga
   echo " - Display:  ${OUTPUT^^}"
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
-  # If smbd is available, and --no-smb is not set, export $HOME to the guest via samba
-  if [[ -e "/usr/sbin/smbd" && -z ${NO_SMB} ]]; then
-      NET="${NET},smb=${HOME}"
   fi
 
-  if [[ ${NET} == *"smb"* ]]; then
-    echo " - smbd:     ${HOME} will be exported to the guest via smb://10.0.2.4/qemu"
-  elif  [[ ${NO_SMB} -eq 1 ]]; then
-    echo " - smbd:     ${HOME} will not be exported to the guest. '--no-smb' is set."
+  if [ "${GL}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+    DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    echo " - Virgil3D: ON"
   else
-    echo " - smbd:     ${HOME} will not be exported to the guest. 'smbd' not found."
+    echo " - Virgil3D: OFF"
   fi
 
   # Find a free port to expose ssh to the guest
@@ -623,9 +619,6 @@ else
             shift;;
           -shortcut|--shortcut)
             SHORTCUT=1
-            shift;;
-          -no-smb|--no-smb)
-            NO_SMB=1
             shift;;
           -h|--h|-help|--help)
             usage;;

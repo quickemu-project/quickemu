@@ -268,7 +268,6 @@ You can also pass optional parameters
   --snapshot info         : Show disk/snapshot info.
   --status-quo            : Do not commit any changes to disk/snapshot.
   --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  --no-smb                : Do not expose the home directory via SMB.
   --screen <screen>       : Use specified screen to determine the window size.
 ```
 
