@@ -109,42 +109,31 @@ function enable_usb_passthrough() {
   local USB_NAME=""
   local VENDOR_ID=""
   local PRODUCT_ID=""
-  local TEMP_SCRIPT=""
-  local EXEC_SCRIPT=0
+  local USB_NOT_READY=0
 
-  TEMP_SCRIPT=$(mktemp)
   # Have any USB devices been requested for pass-through?
   if (( ${#usb_devices[@]} )); then
-    echo " - USB:      Device pass-through requested:"
-    echo "#!/usr/bin/env bash" > "${TEMP_SCRIPT}"
+    echo " - USB:      Host pass-through requested:"
     for DEVICE in "${usb_devices[@]}"; do
       VENDOR_ID=$(echo "${DEVICE}" | cut -d':' -f1)
       PRODUCT_ID=$(echo "${DEVICE}" | cut -d':' -f2)
       USB_BUS=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f2)
       USB_DEV=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f4 | cut -d':' -f1)
       USB_NAME=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f7-)
-      echo "              - ${USB_NAME}"
-      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=usb.0"
-      if [ ! -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
-        local EXEC_SCRIPT=1
-        echo "chown root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}" >> "${TEMP_SCRIPT}"
+      if [ -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
+        echo "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
+      else
+        echo "             x ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} needs permission changes:"
+        echo "               sudo chown -v root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}"
+        USB_NOT_READY=1
       fi
+      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=hostpass.0"
     done
 
-    if [ ${EXEC_SCRIPT} -eq 1 ]; then
-      chmod +x "${TEMP_SCRIPT}"
-      echo "             Requested USB device(s) are NOT accessible."
-      echo "             ${TEMP_SCRIPT} will be executed to enable access:"
-      echo
-      cat "${TEMP_SCRIPT}"
-      echo
-      if ! sudo "${TEMP_SCRIPT}"; then
-        echo "            WARNING! Enabling USB device access failed."
-      fi
-    else
-      echo "             Requested USB device(s) are accessible."
+    if [ "${USB_NOT_READY}" -eq 1 ]; then
+        echo "               ERROR! USB permission changes are required 👆"
+      exit 1
     fi
-    rm -f "${TEMP_SCRIPT}"
   fi
 }
 
