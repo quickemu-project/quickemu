@@ -4,20 +4,22 @@
   Quickemu
 </h1>
 
-<p align="center"><b>Simple shell script to "manage" Qemu virtual machines.</b></p>
+<p align="center"><b>Simple script to "manage" Qemu virtual machines.</b></p>
 <div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
 <p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
 
 ## Introduction
 
-Quickemu is a very simple script to "manage" Qemu virtual machines. Each
-virtual machine configuration is broadly the same requiring minimal setup. The
+Quickemu is a simple script to *"manage"* Qemu virtual machines. Each virtual
+machine configuration is a few lines long requiring minimal setup. The
 main objective of the project is to enable quick testing of desktop Linux
-distributions where the virtual machines can be stored anywhere, such as
-external USB storage.
+distributions where the virtual machines configuration and disk images can be
+stored anywhere, such as external USB storage or your home directory. **Windows
+and macOS guests are also supported.**
 
-Quickemu is opinionated and will attempt to *"do the right thing"* rather than
-expose rich configuration options. Quickemu is a wrapper for [QEMU](https://www.qemu.org/). See the video where I explain some of my motivations for creating this script.
+Quickemu will attempt to *"do the right thing"* rather than expose rich
+configuration options. Quickemu is a wrapper for [QEMU](https://www.qemu.org/).
+See the video where I explain some of my motivations for creating this script.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
 
@@ -53,54 +55,24 @@ sudo apt install quickemu
 
 ## Usage
 
-### Linux
+### Linux Guest
 
   * Download a .iso image of a Linux distribution
   * Create a VM configuration file; for example `ubuntu.conf`
     * The **default** `guest_os` is `linux`, so this is optional for Linux VM configs.
     * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
 
-```
+```bash
 boot="legacy"
 guest_os="linux"
-iso="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.iso"
-disk_img="/media/$USER/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
-disk=128G
-port_forwards=("8123:8123" "8888:80")
-usb_devices=("046d:082d" "046d:085e")
+iso="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.iso"
+disk_img="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
 ```
 
   * Use `quickemu` to start the virtual machine:
 
-```
-./quickemu --vm ubuntu-focal-desktop.conf
-```
-
-Which will output something like this:
-
-```
-Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
- - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
- - Guest:    Linux optimised
- - BIOS:     Legacy BIOS
- - Disk:     /media/martin/Quickemu/ubuntu/focal-desktop-amd64.qcow2 (64G)
- - ISO:      /media/martin/Quickemu/ubuntu/focal-desktop-amd64.iso
- - CPU:      4 Core(s)
- - RAM:      4G
- - Screen:   1664x936
- - Video:    virtio-vga
- - GL:       ON
- - Virgil3D: ON
- - Display:  SDL
- - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
- - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
- - PORTS:    Port forwards requested:
-              - 8123 => 8123
-              - 8888 => 80
- - USB:      Device pass-through requested:
-              - Logitech, Inc. HD Pro Webcam C920
-              - Logitech, Inc. Logitech BRIO
-             Requested USB device(s) are accessible.
+```bash
+quickemu --vm ubuntu-focal-desktop.conf
 ```
 
   * Complete the installation as normal.
@@ -110,14 +82,9 @@ Starting /media/martin/Quickemu/ubuntu-focal-desktop.conf
     * Install the SPICE WebDAV agent (`spice-webdavd`) to enable file sharing.
       * Debian/Ubuntu `sudo apt install spice-webdavd`
 
-  * A Desktop shortcut can be created (in ~/.local/share/applications):
-```
-./quickemu --shortcut --vm ubuntu-focal-desktop.conf
-```
+### Windows 10 Guest
 
-### Windows 10
-
-You can use `quickemu` to run a Windows 10 virtual machine.
+You can use `quickemu` to run Windows 10 in a virtual machine.
 
   * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
   * [Download VirtIO drivers for Windows](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
@@ -129,50 +96,18 @@ You can use `quickemu` to run a Windows 10 virtual machine.
     * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
     * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
 
-```
+```bash
 boot="legacy"
 guest_os="windows"
-iso="/media/$USER/Quickemu/windows10/Win10_1909_English_x64.iso"
-driver_iso="/media/$USER/Quickemu/windows10/virtio-win-0.1.173.iso"
-disk_img="/media/$USER/Quickemu/windows10/windows10.qcow2"
-disk=128G
-port_forwards=("8123:8123" "8888:80")
-usb_devices=("046d:082d" "046d:085e")
+iso="${HOME}/Quickemu/windows10/Win10_1909_English_x64.iso"
+driver_iso="${HOME}/Quickemu/windows10/virtio-win-0.1.173.iso"
+disk_img="${HOME}/Quickemu/windows10/windows10.qcow2"
 ```
 
   * Use `quickemu` to start the virtual machine:
 
-```
-./quickemu --vm windows10.conf
-```
-
-Which will output something like this:
-
-```
-Starting /media/martin/Quickemu/windows10.conf
- - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
- - Guest:    Windows optimised
- - BIOS:     Legacy BIOS
- - Disk:     /media/martin/Quickemu/windows10/windows10.qcow2 (64G)
-             Just created, booting from /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
- - Boot:     /media/martin/Quickemu/windows10/Win10_1909_English_x64.iso
- - Drivers:  /media/martin/Quickemu/windows10/virtio-win-0.1.173.iso
- - CPU:      4 Core(s)
- - RAM:      4G
- - Screen:   1664x936
- - Video:    qxl-vga
- - GL:       ON
- - Virgil3D: OFF
- - Display:  SDL
- - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
- - ssh:      22221/tcp is connected. Login via 'ssh user@localhost -p 22221'
- - PORTS:    Port forwards requested:
-              - 8123 => 8123
-              - 8888 => 80
- - USB:      Device pass-through requested:
-              - Logitech, Inc. HD Pro Webcam C920
-              - Logitech, Inc. Logitech BRIO
-             Requested USB device(s) are accessible.
+```bash
+quickemu --vm windows10.conf
 ```
 
   * During the Windows 10 install you will be asked *"Where do you want to install Windows?"*
@@ -185,7 +120,7 @@ Starting /media/martin/Quickemu/windows10.conf
     * Install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/)
     * Install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
 
-### macOS
+### macOS Guest
 
 There are some considerations when running macOS via Quickemu.
 
@@ -205,7 +140,7 @@ You can use `quickemu` to run a macOS virtual machine.
 
   * Download macOS using `fetch-macos.py`
 
-```
+```bash
 wget https://raw.githubusercontent.com/foxlet/macOS-Simple-KVM/master/tools/FetchMacOS/fetch-macos.py -O fetch-macos.py
 python3 -m venv venv
 . venv/bin/activate
@@ -218,42 +153,16 @@ qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
     * The `guest_os="macos"` line instructs `quickemu` to use optimise for macOS.
     * The `img=` sets the boot disk that you downloaded with `fetch-macos.py`
 
-```
+```bash
 guest_os="macos"
-img="/media/$USER/Quickemu/macos/BaseSystem.img"
-disk_img="/media/$USER/Quickemu/macos/macos.qcow2"
-disk=128G
-port_forwards=("8123:8123" "8888:80")
-usb_devices=("046d:082d" "046d:085e")
+img="${HOME}/Quickemu/macos/BaseSystem.img"
+disk_img="${HOME}/Quickemu/macos/macos.qcow2"
 ```
 
   * Use `quickemu` to start the virtual machine:
 
-```
-./quickemu --vm macos.conf
-```
-
-Which will output something like this:
-
-```
-Starting macos.conf
- - QEMU:     /usr/bin/qemu-system-x86_64 v6.0.0
- - BOOT:     EFI
- - Guest:    Macos optimised
- - Disk:     /media/martin/Quickemu/macos/macos.qcow2 (64G)
-             Just created, booting from /media/martin/Quickemu/macos/BaseSystem.img
- - CPU:      4 Core(s)
- - RAM:      4G
- - Screen:   1664x936
- - Video:    VGA
- - GL:       ON
- - Virgil3D: OFF
- - Display:  SDL
- - smbd:     /home/martin will be exported to the guest via smb://10.0.2.4/qemu
- - ssh:      22223/tcp is connected. Login via 'ssh user@localhost -p 22223'
- - PORTS:    Port forwards requested:
-              - 8123 => 8123
-              - 8888 => 80
+```bash
+quickemu --vm macos.conf
 ```
 
   * Boot from the BaseSystem (use cursor keys if the mouse doesn't work)
@@ -280,6 +189,29 @@ in Debian/Ubuntu.
 ```bash
 quickemu --vm ubuntu-focal-desktop.conf --display spice
 ```
+
+## Tuning CPU cores, RAM & disks
+
+By default, Quickemu will calculate the number of CPUs cores and RAM to allocate
+to a VM based on the specifications of your host computer. You can override this
+default behaviour and tune the VM configuration to your liking.
+
+Add additional lines to your virtual machine configuration:
+
+  * `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
+  * `ram="4G"` - Specify the amount of RAM to allocate to the VM
+  * `disk="16G"` - Specify the size of the virtual disk allocated to the VM
+
+## Network port forwarding
+
+Add an additional line to your virtual machine configuration. For example:
+
+  * `port_forwards=("8123:8123" "8888:80")`
+
+In the example above:
+
+  * Port 8123 on the host is forwarded to port 8123 on the guest.
+  * Port 8888 on the host is forwarded to port 80 on the guest.
 
 ## USB redirection
 
@@ -330,32 +262,57 @@ You can also pass optional parameters
   --screen <screen>       : Use specified screen to determine the window size.
 ```
 
+## Desktop shortcuts
+
+Desktop shortcuts can be created for a VM, the shortcuts are saved in `~/.local/share/applications`. Here is an example of how to create a shortcut.
+
+```bash
+quickemu --vm ubuntu-focal-desktop.conf --shortcut
+```
+
+### Screen and window size
+
 <ins>Note about screen and window size</ins>
 
 `qemu` will always default to the primary monitor to display the VM's window.
 
-Without the `--screen` option, `quickemu` will look for the size of the smallest monitor, and use a size that fits on said monitor.
+Without the `--screen` option, `quickemu` will look for the size of the smallest
+monitor, and use a size that fits on said monitor.
 
-The `--screen` option forces `quickemu` to use the size of the given monitor to compute the size of the window. **It wont't use that monitor to display the VM's window if it's not the primary monitor**. This is usefull if the primary monitor if not the smallest one, and if the VM's window doesn't need to be moved around.
+The `--screen` option forces `quickemu` to use the size of the given monitor to
+compute the size of the window. **It wont't use that monitor to display the VM's
+window if it's not the primary monitor**. This is useful if the primary monitor
+if not the smallest one, and if the VM's window doesn't need to be moved around.
 
-The `--screen` option is also usefull with the `--fullscreen` option, again because `qemu` will always use the primary monitor. In order for the fullscreen mode to work properly, the resolution of the VM's window must match the resolution of the screen.
+The `--screen` option is also useful with the `--fullscreen` option, again
+because `qemu` will always use the primary monitor. In order for the fullscreen
+mode to work properly, the resolution of the VM's window must match the
+resolution of the screen.
 
-To know which screen to use, type :
-```
+To know which screen to use, type:
+
+```bash
 xrandr --listmonitors | grep -v Monitors
 ```
-The command will output something like this :
+
+The command will output something like this:
+
 ```
  0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
  1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
 ```
+
 The first number is what needs to be passed to the `--screen` option.
 
-For example : 
-```
+For example:
+
+```bash
 quickemu --vm vm.conf --screen 0
 ```
-will use my big screen to compute the size of the window, and make it 2048x1152. Without the `--screen` option, it would have used the smallest monitor and make the window 1664x936.
+
+The above uses the 2560x1440 screen to compute the size of the window, which
+Quickemu sizes to 2048x1152. Without the `--screen` option, Quickemu would have
+used the 1920x1080 monitor which results in a window size of 1664x936.
 
 ## TODO
 
