@@ -441,99 +441,94 @@ function vm_boot() {
 
   enable_usb_passthrough
 
-  # Boot the iso image
-  if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
-    if [ "${guest_os}" == "macos" ]; then
-      if [ -z "${img}" ]; then
-        ${QEMU} \
-          -name ${VMNAME},process=${VMNAME} \
-          -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-          ${CPU} ${SMP} \
-          -m ${RAM_VM} -device virtio-balloon \
-          -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
-          -drive if=pflash,format=raw,file="${EFI_VARS}" \
-          -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
-          -device virtio-blk-pci,drive=ESP,scsi=off \
-          -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO} \
-          -device virtio-blk-pci,drive=SystemDisk,scsi=off \
-          ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-          -device usb-ehci,id=usb -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
-          -device vmxnet3,netdev=nic -netdev ${NET},id=nic \
-          -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-          -rtc base=localtime,clock=host \
-          -serial mon:stdio
-      else
-        ${QEMU} \
-          -name ${VMNAME},process=${VMNAME} \
-          -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-          ${CPU} ${SMP} \
-          -m ${RAM_VM} -device virtio-balloon \
-          -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
-          -drive if=pflash,format=raw,file="${EFI_VARS}" \
-          -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file="${VMDIR}/ESP.qcow2" \
-          -device virtio-blk-pci,drive=ESP,scsi=off \
-          -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly=on,file="${img}" \
-          -device virtio-blk-pci,drive=InstallMedia,scsi=off \
-          -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO} \
-          -device virtio-blk-pci,drive=SystemDisk,scsi=off \
-          ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-          -device usb-ehci,id=usb -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
-          -device vmxnet3,netdev=nic -netdev ${NET},id=nic \
-          -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-          -rtc base=localtime,clock=host \
-          -serial mon:stdio
-      fi
-    else
-      ${QEMU} \
-        -name ${VMNAME},process=${VMNAME} \
-        -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-        ${CPU} ${SMP} \
-        -m ${RAM_VM} -device virtio-balloon \
-        -drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}" \
-        -drive if=pflash,format=raw,file="${EFI_VARS}" \
-        -drive media=cdrom,index=0,file="${iso}" \
-        -drive media=cdrom,index=1,file="${driver_iso}" \
-        -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
-        -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
-        ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-        -device qemu-xhci,id=usb,p2=8,p3=8 -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
-        -device virtio-net,netdev=nic -netdev ${NET},id=nic \
-        -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-        -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-        -rtc base=localtime,clock=host \
-        -object rng-random,id=rng0,filename=/dev/urandom \
-        -device virtio-rng-pci,rng=rng0 \
-        -spice port=${SPICE_PORT},disable-ticketing=on \
-        -device virtio-serial-pci \
-        -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
-        -chardev spicevmc,id=spicechannel0,name=vdagent \
-        -serial mon:stdio
+  # Build the VM configuration
+  local DISKS=""
+  local NET_DEVICE=""
+  local SMARTCARD=""
+  local USB_HOSTPASS=""
+  local USB_SPICEPASS=""
+
+  if [ "${guest_os}" == "macos" ]; then
+    DISKS="-drive if=pflash,format=raw,readonly=on,file=${EFI_CODE}
+    -drive if=pflash,format=raw,file=${EFI_VARS}
+    -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file=${VMDIR}/ESP.qcow2"
+    if [ -n "${img}" ]; then
+      DISKS="${DISKS}
+      -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly=on,file=${img}
+      -device virtio-blk-pci,drive=InstallMedia,scsi=off"
     fi
+    DISKS="${DISKS}
+    -device virtio-blk-pci,drive=ESP,scsi=off
+    -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file=${disk_img} ${STATUS_QUO}
+    -device virtio-blk-pci,drive=SystemDisk,scsi=off"
+    NET_DEVICE="vmxnet3"
+    # UNTESTED! USB2 passthrough since USB3 isn't(?) supported in macOS VMs
+    # USB_SPICEPASS="
+    # -device usb-ehci,id=spicepass
+    # -device ich9-usb-uhci1,masterbus=spicepass.0,firstport=0,multifunction=on
+    # -device ich9-usb-uhci2,masterbus=spicepass.0,firstport=2
+    # -device ich9-usb-uhci3,masterbus=spicepass.0,firstport=4
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev1
+    # -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev2
+    # -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev3
+    # -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3"
+    USB_HOSTPASS="-device usb-ehci,id=hostpass
+    ${USB_PASSTHROUGH}"
   else
-    ${QEMU} \
-      -name ${VMNAME},process=${VMNAME} \
-      -enable-kvm -machine q35 ${GUEST_TWEAKS} \
-      ${CPU} ${SMP} \
-      -m ${RAM_VM} -device virtio-balloon \
-      -drive media=cdrom,index=0,file="${iso}" \
-      -drive media=cdrom,index=1,file="${driver_iso}" \
-      -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file="${disk_img}" \
-      -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO} \
-      ${VIDEO} -display ${OUTPUT},gl=${GL}${OUTPUT_EXTRA} \
-      -device qemu-xhci,id=usb,p2=8,p3=8 -device usb-kbd,bus=usb.0 -device usb-tablet,bus=usb.0 ${USB_PASSTHROUGH} \
-      -device virtio-net,netdev=nic -netdev ${NET},id=nic \
-      -audiodev pa,id=pa,server=unix:${XDG_RUNTIME_DIR}/pulse/native,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
-      -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
-      -rtc base=localtime,clock=host \
-      -object rng-random,id=rng0,filename=/dev/urandom \
-      -device virtio-rng-pci,rng=rng0 \
-      -spice port=${SPICE_PORT},disable-ticketing=on \
-      -device virtio-serial-pci \
-      -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
-      -chardev spicevmc,id=spicechannel0,name=vdagent \
-      -serial mon:stdio
+    if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
+      DISKS="-drive if=pflash,format=raw,readonly=on,file=${EFI_CODE}
+      -drive if=pflash,format=raw,file=${EFI_VARS}"
+    fi
+    DISKS="${DISKS}
+    -drive media=cdrom,index=0,file=${iso}
+    -drive media=cdrom,index=1,file=${driver_iso}
+    -drive if=none,id=drive0,cache=directsync,aio=native,format=qcow2,file=${disk_img}
+    -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO}"
+    NET_DEVICE="virtio-net"
+    SMARTCARD="-device usb-ccid
+    -chardev spicevmc,id=ccid,name=smartcard
+    -device ccid-card-passthru,chardev=ccid"
+    USB_SPICEPASS="-device qemu-xhci,id=spicepass
+    -chardev spicevmc,id=usbredirchardev1,name=usbredir
+    -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+    -chardev spicevmc,id=usbredirchardev2,name=usbredir
+    -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+    -chardev spicevmc,id=usbredirchardev3,name=usbredir
+    -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3"
+    USB_HOSTPASS="-device qemu-xhci,id=hostpass
+    ${USB_PASSTHROUGH}"
+  fi
+
+  # Boot the VM
+  ${QEMU} \
+    -name ${VMNAME},process=${VMNAME} \
+    -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS} \
+    ${CPU} ${SMP} \
+    -m ${RAM_VM} -device virtio-balloon \
+    ${DISKS} \
+    ${VIDEO} -display ${OUTPUT} \
+    -device usb-ehci,id=input \
+    -device usb-kbd,bus=input.0 \
+    -device usb-tablet,bus=input.0 \
+    ${USB_SPICEPASS} \
+    ${USB_HOSTPASS} \
+    ${SMARTCARD} \
+    -device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic \
+    -audiodev pa,id=pa,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME} \
+    -device intel-hda -device hda-duplex,audiodev=pa,mixer=off \
+    -rtc base=localtime,clock=host \
+    -object rng-random,id=rng0,filename=/dev/urandom \
+    -device virtio-rng-pci,rng=rng0 \
+    -spice ${SPICE} \
+    -device virtio-serial-pci \
+    -chardev spicevmc,id=vdagent0,name=vdagent \
+    -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0 \
+    -device virtio-serial-pci \
+    -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0 \
+    -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0 \
+    -serial mon:stdio > "${VMDIR}/${VMNAME}.log" &
   echo " - PID:      ${!}"
 
   # If output is 'none' then SPICE was requested.
