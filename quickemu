@@ -6,6 +6,7 @@ function web_get() {
   local FILE=""
   FILE="${URL##*/}"
   if [ ! -e "${VMDIR}/${FILE}" ]; then
+    mkdir -p "${VMDIR}" 2>/dev/null
     if ! wget -q -c "${URL}" -O "${VMDIR}/${FILE}"; then
       echo "ERROR! Failed to download ${URL}"
       exit 1
@@ -164,9 +165,9 @@ function vm_boot() {
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ; then
       if [ "${guest_os}" == "macos" ]; then
-        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/ESP.qcow2"
-        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/firmware/OVMF_CODE.fd"
-        web_get "https://github.com/foxlet/macOS-Simple-KVM/raw/master/firmware/OVMF_VARS-1024x768.fd"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd"
         local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
         local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
       else
@@ -440,15 +441,15 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     DISKS="-drive if=pflash,format=raw,readonly=on,file=${EFI_CODE}
     -drive if=pflash,format=raw,file=${EFI_VARS}
-    -drive id=ESP,cache=directsync,aio=native,if=none,format=qcow2,file=${VMDIR}/ESP.qcow2"
+    -drive id=OpenCore,if=none,snapshot=on,format=qcow2,file=${VMDIR}/OpenCore.qcow2
+    -device virtio-blk-pci,drive=OpenCore,scsi=off"
     if [ -n "${img}" ]; then
       DISKS="${DISKS}
-      -drive id=InstallMedia,cache=directsync,aio=native,if=none,format=raw,readonly=on,file=${img}
+      -drive id=InstallMedia,if=none,format=raw,readonly=on,file=${img}
       -device virtio-blk-pci,drive=InstallMedia,scsi=off"
     fi
     DISKS="${DISKS}
-    -device virtio-blk-pci,drive=ESP,scsi=off
-    -drive id=SystemDisk,cache=directsync,aio=native,if=none,format=qcow2,file=${disk_img} ${STATUS_QUO}
+    -drive id=SystemDisk,if=none,format=qcow2,file=${disk_img} ${STATUS_QUO}
     -device virtio-blk-pci,drive=SystemDisk,scsi=off"
     NET_DEVICE="vmxnet3"
     # UNTESTED! USB2 passthrough since USB3 isn't(?) supported in macOS VMs
