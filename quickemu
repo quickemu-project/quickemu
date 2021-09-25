@@ -565,7 +565,7 @@ function usage() {
 }
 
 # Lowercase variables are used in the VM config file only
-boot="legacy"
+boot="efi"
 cpu_cores=""
 disk_img=""
 disk="64G"
