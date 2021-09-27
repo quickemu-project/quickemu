@@ -146,8 +146,10 @@ function vm_boot() {
   local GL="on"
   local GUEST_TWEAKS=""
   local HOST_CPU=""
+  local NET_DEVICE="virtio-net"
   local OSK=""
   local QEMU_VER=""
+  local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
   QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
   echo "Starting ${VM}"
@@ -201,6 +203,8 @@ function vm_boot() {
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
       disk="64G"
+      NET_DEVICE="vmxnet3"
+      USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
       ;;
     windows)
       CPU="-cpu host,kvm=on,hv_time"
@@ -209,6 +213,7 @@ function vm_boot() {
       ;;
     *)
       CPU="-cpu host,kvm=on"
+      NET_DEVICE="rtl8139"
       echo "WARNING! Unrecognised guest OS: ${guest_os}"
       ;;
   esac
