@@ -199,7 +199,17 @@ function vm_boot() {
       disk="16G"
       ;;
     macos)
-      CPU="-cpu Penryn,vendor=GenuineIntel,kvm=on,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+invtsc,+movbe,+pcid,+smep,+sse3,+sse4.2,+xgetbv1,+xsave,+xsavec,+xsaveopt"
+      #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
+      if [ "${HOST_CPU}" == "AuthenticIntel" ]; then
+        CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
+      elif [ "${HOST_CPU}" == "AuthenticAMD" ]; then
+        # CPU flags used in past Quickemu: +movbe,+smep,+xgetbv1,+xsavec
+        # CPU flags that warn on AMD:      +fma4,+pcid
+        CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+      else
+        CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+      fi
+
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
       disk="64G"
