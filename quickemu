@@ -147,6 +147,7 @@ function vm_boot() {
   local DISPLAY_DEVICE=""
   local GL="on"
   local GUEST_TWEAKS=""
+  local HOST_CPU=""
   local OSK=""
   local QEMU_VER=""
   local VIDEO=""
@@ -188,6 +189,9 @@ function vm_boot() {
 
   # Force to lowercase.
   guest_os=${guest_os,,}
+
+  HOST_CPU=$(grep vendor /proc/cpuinfo | uniq | cut -d':' -f2 | sed 's/ //g')
+
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
