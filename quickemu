@@ -5,12 +5,10 @@ function web_get() {
   local URL="${1}"
   local FILE=""
   FILE="${URL##*/}"
-  if [ ! -e "${VMDIR}/${FILE}" ]; then
-    mkdir -p "${VMDIR}" 2>/dev/null
-    if ! wget -q -c "${URL}" -O "${VMDIR}/${FILE}"; then
-      echo "ERROR! Failed to download ${URL}"
-      exit 1
-    fi
+  mkdir -p "${VMDIR}" 2>/dev/null
+  if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${VMDIR}/${FILE}"; then
+    echo "ERROR! Failed to download ${URL}"
+    exit 1
   fi
 }
 
