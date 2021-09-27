@@ -358,7 +358,6 @@ function vm_boot() {
     DISPLAY_DEVICE="virtio-vga"
   elif [ "${guest_os}" == "macos" ]; then
     DISPLAY_DEVICE="VGA"
-    #DISPLAY_DEVICE="bochs-display"
   elif [ "${guest_os}" == "windows" ]; then
     DISPLAY_DEVICE="qxl-vga"
   else
