@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+
+function os_support() {
+    echo kubuntu \
+    lubuntu \
+    macos \
+    ubuntu \
+    ubuntu-kylin \
+    ubuntu-mate \
+    ubuntu-budgie \
+    ubuntu-studio \
+    xubuntu
+}
+
+function releases_macos() {
+    echo high-sierra \
+    mojave \
+    catalina \
+    big-sur
+}
+
+function releases_ubuntu() {
+    echo bionic \
+    focal \
+    hirsute \
+    devel
+}
+
+function web_get() {
+    local DIR="${2}"
+    local FILE=""
+    local URL="${1}"
+    FILE="${URL##*/}"
+    mkdir -p "${DIR}" 2>/dev/null
+    if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+        echo "ERROR! Failed to download ${URL}"
+        exit 1
+    fi
+}
+
+function zsync_get() {
+    local DIR="${2}"
+    local FILE=""
+    local URL="${1}"
+    FILE="${URL##*/}"
+    mkdir -p "${DIR}" 2>/dev/null
+    if ! zsync "${URL}.zsync" -o "${DIR}/${FILE}"; then
+        echo "ERROR! Failed to download ${URL}.zsync"
+        exit 1
+    fi
+
+    if [ -e "${DIR}/${FILE}.zs-old" ]; then
+        rm -v "${DIR}/${FILE}.zs-old"
+    fi
+}
+
+function make_vm_dir() {
+    if ! mkdir -p "${VM_PATH}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${VM_PATH}"
+    fi
+}
+
+function make_vm_config() {
+    local IMAGE_FILE=""
+    local IMAGE_TYPE=""
+    local GUEST=""
+    IMAGE_FILE="${1}"
+    if [[ "${OS}" == *"ubuntu"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "macos" ]; then
+        GUEST="macos"
+        IMAGE_TYPE="img"
+    fi
+
+    if [ ! -e "${OS}-${RELEASE}.conf" ]; then
+        echo "Making VM configuration for ${OS}-${RELEASE}..."
+        cat << EOF > "${OS}-${RELEASE}.conf"
+guest_os="${GUEST}"
+${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
+disk_img="${VM_PATH}/disk.qcow2"
+EOF
+    fi
+}
+
+function start_vm_info() {
+    echo
+    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
+    echo
+}
+
+function get_macos() {
+    local CWD=""
+    local MACRECOVERY=""
+
+    case ${RELEASE} in
+        high-sierra)
+            BOARD_ID="Mac-7BA5B2D9E42DDD94"
+            MLB="00000000000J80300";;
+        mohave)
+            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
+            MLB="00000000000KXPG00";;
+        catalina)
+            BOARD_ID="Mac-CFF7D910A743CAAF"
+            MLB="00000000000PHCD00";;
+        big-sur)
+            BOARD_ID="Mac-E43C1C25D4880AD6"
+            MLB="00000000000000000";;
+        *) echo "ERROR! Unknown release: ${RELEASE}"
+           releases_macos
+           exit 1;;
+    esac
+
+    # Use a bundled macrecovery if possible
+    CWD="$(dirname ${0})"
+    if [ -x "${CWD}/macrecovery.py" ]; then
+        MACRECOVERY="${CWD}/macrecovery.py"
+    elif [ -x /usr/bin/macrecovery ]; then
+        MACRECOVERY="/usr/bin/macrecovery"
+    else
+        web_get "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery.py"
+        sed -i 's/\<env python\>/env python3/g' "${MACRECOVERY}"
+    fi
+
+    if [ -z "${MACRECOVERY}" ]; then
+        echo "ERROR! Can not find a usable macrecovery.py."
+        exit 1
+    fi
+
+    make_vm_dir
+
+    if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+        echo "Downloading ${RELEASE}..."
+        ${MACRECOVERY} \
+            --board-id "${BOARD_ID}" \
+            --mlb "${MLB}" \
+            --basename RecoveryImage \
+            --outdir "${VM_PATH}" \
+            download
+    fi
+
+    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+        echo "Converting RecoveryImage..."
+        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img"
+    fi
+
+    make_vm_config RecoveryImage.img
+    start_vm_info
+}
+
+function get_ubuntu() {
+    local DEVEL="daily-live"
+    local ISO=""
+    local PROJECT=""
+    local RELEASES=""
+    local URL=""
+
+    case ${OS} in
+      kubuntu|lubuntu|ubuntu|ubuntu-budgie|ubuntu-mate|xubuntu)
+        PROJECT="${OS}";;
+      ubuntu-kylin)
+        PROJECT="ubuntukylin";;
+      ubuntu-studio)
+        PROJECT="ubuntustudio"
+        DEVEL="dvd";;
+      *)
+        echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
+        exit 1;;
+    esac
+
+    if [ "${RELEASE}" == "devel" ]; then
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${PROJECT}" == "ubuntu" ]; then
+        URL="http://releases.ubuntu.com/${RELEASE}"
+    else
+        URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
+    fi
+
+    RELEASES=$(releases_ubuntu)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! ${RELEASE} is not a supported release."
+        releases_ubuntu
+        exit 1
+    fi
+
+    make_vm_dir
+
+    echo "Downloading SHA256SUMS..."
+    web_get "${URL}/SHA256SUMS" "${VM_PATH}"
+
+    ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
+
+    echo "Downloading "${URL}/${ISO}"..."
+    if [ "${RELEASE}" == "devel" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        echo "Checking SHA256SUMS..."
+        cd "${VM_PATH}"
+        if ! sha256sum --check SHA256SUMS --ignore-missing --status; then
+            echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA256SUMS. Try running 'quickget' again."
+            exit 1
+        else
+            echo "All good."
+        fi
+        cd ..
+    fi
+
+    make_vm_config "${ISO}"
+    start_vm_info
+}
+
+if [ -n "${1}" ]; then
+    OS="${1,,}"
+else
+    echo "ERROR! You must specify an OS:"
+    os_support
+    exit 1
+fi
+
+if [ -n "${2}" ]; then
+    RELEASE="${2,,}"
+else
+    echo "ERROR! You must specify an OS release name."
+    if [ "${OS}" == "macos" ]; then
+        releases_macos
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        releases_ubuntu
+    fi
+    exit 1
+fi
+
+VM_PATH="${PWD}/${OS}-${RELEASE}"
+
+if [ "${OS}" == "macos" ]; then
+    get_macos
+elif [[ "${OS}" == *"ubuntu"* ]]; then
+    get_ubuntu
+else
+    echo "ERROR! You must specify an OS:"
+    os_support
+    exit 1
+fi
