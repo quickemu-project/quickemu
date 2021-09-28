@@ -8,7 +8,7 @@
 <div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
 <p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
 
-## Introduction
+# Introduction
 
 Quickemu is a simple script to *"manage"* Qemu virtual machines. Each virtual
 machine configuration is a few lines long requiring minimal setup. The
@@ -31,19 +31,22 @@ Essential requirements:
 
   * [QEMU](https://www.qemu.org/) 6.0.0 or newer
   * [Coreutils](https://www.gnu.org/software/coreutils/)
+  * [jq](https://stedolan.github.io/jq/)
   * [procps](https://gitlab.com/procps-ng/procps)
   * [usbutils](https://github.com/gregkh/usbutils)
   * [Wget](https://www.gnu.org/software/wget/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
+  * [zsync](http://zsync.moria.org.uk/)
 
 Optional requirements:
 
-  * `rot13` to *"decrypt"* the macOS OSK key; found in the `bsdgames` package in Debian/Ubuntu
-  * `spicy` to connect to VMs via the SPICE protocol; found in the `spice-client-gtk` package in Debian/Ubuntu
+  * `python3` to run [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery) to download macOS recovery images; provided by `python3-minimal` in Debian/Ubuntu
+  * `rot13` to *"decrypt"* the macOS OSK key; provided by `bsdgames` in Debian/Ubuntu
+  * `spicy` to connect to VMs via the SPICE protocol; provided by `spice-client-gtk` in Debian/Ubuntu
 
-## Install Quickemu
+# Install Quickemu
 
-### Ubuntu
+## Ubuntu
 
 Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
 includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04 (Hirsute).
@@ -53,59 +56,141 @@ sudo apt-add-repository ppa:flexiondotorg/quickemu
 sudo apt install quickemu
 ```
 
-## Usage
-
-### Linux Guest
-
-  * Download a .iso image of a Linux distribution
-  * Create a VM configuration file; for example `ubuntu.conf`
-    * The **default** `guest_os` is `linux`, so this is optional for Linux VM configs.
-    * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
+## Other Linux
 
 ```bash
-guest_os="linux"
-iso="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.iso"
-disk_img="${HOME}/Quickemu/ubuntu/focal-desktop-amd64.qcow2"
+git clone https://github.com/wimpysworld/quickemu
+cd quickemu
 ```
 
-  * Use `quickemu` to start the virtual machine:
+# Usage
+
+## Ubuntu Guest
+
+`quickget` will automatically download an Ubuntu release and also create the
+virtual machine configuration.
 
 ```bash
-quickemu --vm ubuntu-focal-desktop.conf
+quickget ubuntu focal
+quickemu --vm ubuntu-focal.conf
 ```
 
   * Complete the installation as normal.
   * Post-install:
     * Install the SPICE agent (`spice-vdagent`) to enable copy/paste and USB redirection
-      * Debian/Ubuntu `sudo apt install spice-vdagent`
+      * `sudo apt install spice-vdagent`
     * Install the SPICE WebDAV agent (`spice-webdavd`) to enable file sharing.
-      * Debian/Ubuntu `sudo apt install spice-webdavd`
+      * `sudo apt install spice-webdavd`
 
-### Windows 10 Guest
+### Ubuntu devel (daily-live) images
 
-You can use `quickemu` to run Windows 10 in a virtual machine.
-
-  * [Download Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
-  * [Download VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
-  * [Download `spice-webdavd` for Windows](https://www.spice-space.org/download/windows/spice-webdavd/)
-    * Enables the Windows guest access to shared files on the host.
-  * [Download UsbDk for Windows](https://www.spice-space.org/download/windows/usbdk/)
-    * Enables the Windows guest access to redirected USB devices from the host.
-  * Create a VM configuration file; for example `windows10.conf`
-    * The `boot` option enables Legacy BIOS (`legacy`) or EFI (`efi`) booting. `legacy` is the default.
-    * The `guest_os="windows"` line instructs `quickemu` to use optimise for Windows.
+`quickget` can also download/refresh devel images via `zsync` for Ubuntu
+developers and testers.
 
 ```bash
-guest_os="windows"
-iso="${HOME}/Quickemu/windows/Win10_21H1_EnglishInternational_x64.iso"
-driver_iso="${HOME}/Quickemu/windows/virtio-win-0.1.208.iso"
-disk_img="${HOME}/Quickemu/windows/windows.qcow2"
+quickget ubuntu devel
+quickemu --vm ubuntu-devel.conf
+```
+
+You can run `quickget ubuntu devel` to refresh your daily development image as
+often as you like, it will even automatically switch to a new series.
+
+### Ubuntu Flavours
+
+All the official Ubuntu flavours are supported, just replace `ubuntu` with your
+preferred flavour.
+
+  * `kubuntu`
+  * `lubuntu`
+  * `ubuntu-budgie`
+  * `ubuntu-kylin`
+  * `ubuntu-mate`
+  * `ubuntu-studio`
+  * `xubuntu`
+
+## Linux Guest
+
+  * Download a .iso image of a Linux distribution
+  * Create a VM configuration file; for example `debian-bullseye.conf`
+
+```bash
+guest_os="linux"
+disk_img="${HOME}/Quickemu/debian-bullseye/disk.qcow2"
+iso="${HOME}/Quickemu/debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 ```
 
   * Use `quickemu` to start the virtual machine:
 
 ```bash
-quickemu --vm windows10.conf
+quickemu --vm debian-bullseye.conf
+```
+
+  * Complete the installation as normal.
+  * Post-install:
+    * Install the SPICE agent (`spice-vdagent`) to enable copy/paste and USB redirection
+    * Install the SPICE WebDAV agent (`spice-webdavd`) to enable file sharing.
+
+## macOS Guest
+
+`quickget` automatically downloads a macOS recovery image and automatically
+creates a virtual machine configuration.
+
+```bash
+quickget macos catalina
+quickemu --vm macos-catalina.conf
+```
+
+macOS `mojave`, `catalina` and `big-sur` are supported.
+
+  * Use cursor keys to select the Hard Disk icon
+    * Click **Disk Utility** and **Continue**
+    * Select `Apple Inc. VirtIO Block Media` from the list and click **Erase**.
+    * Enter a `Name:` for the disk and click **Erase**.
+    * Click **Done**.
+    * Close Disk Utility
+    * Click **Reinstall macOS** and **Continue**
+  * Complete the installation as you normally would.
+
+The default macOS configuration looks like this:
+
+```bash
+guest_os="macos"
+disk_img="${HOME}/Quickemu/macos-big-sur/RecoveryImage.img"
+iso="${HOME}/Quickemu/macos-big-sur/disk.qcow2"
+```
+
+  * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
+
+### macOS compatibility
+
+There are some considerations when running macOS via Quickemu.
+
+  * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
+    bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
+  * Supported macOS releases:
+    * Mojave
+    * Catalina
+    * Big Sur
+  * Optimised by default
+    * Host CPU vendor is detected and guest CPU configuration is optimised accordingly.
+    * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk (*available since macOS Mojave*).
+    * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse (*available since macOS El Capitan*).
+    * `vmxnet3` network device is used (*available since macOS El Capitan*).
+  * USB host pass-through is limited to UHCI (USB 2.0)
+  * Not supported on macOS:
+    * Copy/paste between the guest and host via SPICE agent.
+    * File sharing between the guest and host via SPICE webdavd.
+    * USB passthrough via SPICE.
+
+## Windows 10 Guest
+
+`quickget` automatically downloads [Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO),
+the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
+and creates a virtual machine configuration.
+
+```bash
+quickget windows 10
+quickemu --vm windows-10.conf
 ```
 
   * During the Windows 10 install you will be asked *"Where do you want to install Windows?"*
@@ -118,74 +203,28 @@ quickemu --vm windows10.conf
     * Install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/)
     * Install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
 
-### macOS Guest
+### Regional versions
 
-There are some considerations when running macOS via Quickemu.
-
-  * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
-    bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
-  * **macOS 10.14.3 or newer is supported**:
-    * [VirtIO block devices QEMU standard VGA are supported](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) since macOS 10.14.3 (Mohave).
-    * [VirtIO `usb-tablet` devices are supported](http://philjordan.eu/osx-virt/) since macOS 10.11 (El Capitan).
-    * [vmxnet3 network devices are supported](https://github.com/foxlet/macOS-Simple-KVM/blob/master/docs/guide-networking.md) since macOS 10.11 (El Capitan).
-    * Running macOS on QEMU required the guest CPU is set to `Penryn`.
-    *   This is a very old architecture, [so to unlock higher CPU performance; AVX, AES-NI, SSE et al are enabled](https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/).
-  * UHCI USB (USB 2.0) is the fastest supported.
-    * USB pass-through has not been tested.
-  * Copy/paste between the guest and host is not supported in macOS.
-  * File sharing is not supported on macOS.
-
-You can use `quickemu` to run a macOS virtual machine.
-
-  * Download macOS using `fetch-macOS-v2.py`
+By default `quickget` will download the *"English International"* release, but
+you can optionally specify one of the supported languages: For example:
 
 ```bash
-wget https://github.com/kholia/OSX-KVM/blob/master/fetch-macOS-v2.py -O fetch-macOS-v2.py
-python3 ./fetch-macOS-v2.py
+quickget windows 10 "Chinese (Traditional)"
 ```
 
-This will display the following menu.
-
-```
-1. High Sierra (10.13)
-2. Mojave (10.14)
-3. Catalina (10.15) - RECOMMENDED
-4. Latest (Big Sur - 11)
-Choose a product to download (1-4):
-```
-
-When prompted choose the recommended release.
-
-```
-qemu-img convert BaseSystem/BaseSystem.dmg -O raw BaseSystem.img
-```
-
-  * Create a VM configuration file; for example `macos.conf`
-    * The `guest_os="macos"` line instructs `quickemu` to use optimise for macOS.
-    * The `img=` sets the boot disk that you downloaded with `fetch-macOS-v2.py`.
+The default Windows 10 configuration looks like this:
 
 ```bash
-guest_os="macos"
-img="${HOME}/Quickemu/macos/BaseSystem.img"
-disk_img="${HOME}/Quickemu/macos/macos.qcow2"
+guest_os="windows"
+disk_img="${HOME}/Quickemu/windows-10/disk.qcow2"
+iso="${HOME}/Quickemu/windows-10/Win10_21H1_English_x64.iso"
+driver_iso="${HOME}/Quickemu/windows-10/virtio-win.iso"
 ```
 
-  * Use `quickemu` to start the virtual machine:
+  * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
+  * The `driver_iso=` line specifies the ISO image that provides VirtIO drivers.
 
-```bash
-quickemu --vm macos.conf
-```
-
-  * Boot from the BaseSystem (use cursor keys if the mouse doesn't work)
-    * Click **Disk Utility** and **Continue**
-    * Select `Apple Inc. VirtIO Block Media` that is ~65GB from the list and click **Erase**.
-    * Enter a `Name:` for the disk and click **Erase**.
-    * Click **Done**.
-    * Close Disk Utility
-    * Click **Reinstall macOS** and **Continue**
-  * Complete the installation as you normally would.
-
-## SPICE
+# SPICE
 
 The following features are only available while using the SPICE protocol:
 
@@ -198,10 +237,18 @@ the `spicy` client is installed, available from the `spice-client-gtk` package
 in Debian/Ubuntu.
 
 ```bash
-quickemu --vm ubuntu-focal-desktop.conf --display spice
+quickemu --vm ubuntu-focal.conf --display spice
 ```
 
-## Tuning CPU cores, RAM & disks
+# BIOS and EFI
+
+Since Quickemu 2.1.0 `efi` is the default boot option. If you want to override
+this behaviour then add the following line to you VM configuration to enable
+legacy BIOS.
+
+  * `boot="legacy"` - Enable Legacy BIOS boot
+
+# Tuning CPU cores, RAM & disks
 
 By default, Quickemu will calculate the number of CPUs cores and RAM to allocate
 to a VM based on the specifications of your host computer. You can override this
@@ -213,7 +260,7 @@ Add additional lines to your virtual machine configuration:
   * `ram="4G"` - Specify the amount of RAM to allocate to the VM
   * `disk="16G"` - Specify the size of the virtual disk allocated to the VM
 
-## Network port forwarding
+# Network port forwarding
 
 Add an additional line to your virtual machine configuration. For example:
 
@@ -224,18 +271,18 @@ In the example above:
   * Port 8123 on the host is forwarded to port 8123 on the guest.
   * Port 8888 on the host is forwarded to port 80 on the guest.
 
-## USB redirection
+# USB redirection
 
-Quickemu support USB redirection via host passthrough and SPICE passthrough.
+Quickemu supports USB redirection via SPICE passthrough and host passthrough.
 
-### SPICE redirection
+## SPICE redirection (recommended)
 
 Using SPICE for USB passthrough is easiest as it doesn't require any elevated
 permission, start Quickemu with `--display spice` and then select `Input` ->
 `Select USB Device for redirection` from the menu to chose which device(s) you want
-to attach to the VM.
+to attach to the guest.
 
-### Host redirection
+## Host redirection
 
 **USB host redirection is not recommended**, it is provided purely for backwards
 compatibility to older versions of Quickemu. Using SPICE is preferred, see above.
@@ -255,11 +302,11 @@ commands to modify the USB device(s) access permissions, like this:
 ```
  - USB:      Host pass-through requested:
               - Sennheiser Communications EPOS GTW 270 on bus 001 device 005 needs permission changes:
-                sudo chown -v root:martin /dev/bus/usb/001/005
+                sudo chown -v root:user /dev/bus/usb/001/005
                 ERROR! USB permission changes are required 👆
 ```
 
-## All the options
+# All the options
 
 Here are the usage instructions:
 
@@ -288,7 +335,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in `~/.local/
 quickemu --vm ubuntu-focal-desktop.conf --shortcut
 ```
 
-### Screen and window size
+## Screen and window size
 
 <ins>Note about screen and window size</ins>
 
@@ -332,30 +379,37 @@ The above uses the 2560x1440 screen to compute the size of the window, which
 Quickemu sizes to 2048x1152. Without the `--screen` option, Quickemu would have
 used the 1920x1080 monitor which results in a window size of 1664x936.
 
-## TODO
+# TODO
 
-  - [ ] Default to EFI booting.
-  - [ ] Only use video drivers with legacy VGA when legacy boot is enabled.
-  - [ ] Include macOS compatible firmware.
-  - [ ] Make default virtual disk capacity suitable for the target guest OS.
-  - [ ] Optimise macOS guests.
-  - [ ] Optimise Windows guests.
-  - [ ] Add BSD support.
-  - [ ] `spice-app` support via `virt-viewer`.
-  - [ ] Improve disk management.
-  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899).
-
+  - [ ] Add 9p support
+  - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
+  - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
+  - [ ] Include macOS compatible firmware
+  - [ ] Add BSD support
+  - [ ] Improve disk management
+  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
 
 # References
 
+Useful reference that assisted the development of Quickemu.
+
   * macOS
     * <https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/>
+    * <https://passthroughpo.st/mac-os-adds-early-support-for-virtio-qemu/>
     * <https://github.com/kholia/OSX-KVM>
     * <https://github.com/thenickdude/KVM-Opencore>
     * <https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery>
     * <https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/>
+    * <https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/>
+    * <http://philjordan.eu/osx-virt/>
     * <https://github.com/Dids/clover-builder>
   * Windows
     * <https://www.heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/>
     * <https://leduccc.medium.com/improving-the-performance-of-a-windows-10-guest-on-qemu-a5b3f54d9cf5>
     * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
+    * <https://github.com/pbatard/Fido>
+  * 9p & virtiofs
+    * <https://wiki.qemu.org/Documentation/9psetup>
+    * <https://www.linux-kvm.org/page/9p_virtio>
+    * <https://superuser.com/questions/628169/how-to-share-a-directory-with-the-host-without-networking-in-qemu>
+    * <https://virtio-fs.gitlab.io/>
