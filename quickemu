@@ -555,7 +555,7 @@ function vm_boot() {
   echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
   echo "${QEMU}" "${args[@]}" >> "${VMDIR}/${VMNAME}.sh"
 
-  ${QEMU} "${args[@]}" >> "${VMDIR}/${VMNAME}.log" &
+  ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
   echo " - PID:      ${!}"
 
   # If output is 'none' then SPICE was requested.
