@@ -164,6 +164,7 @@ disk_img="macos-big-sur/disk.qcow2"
   * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
   * If you want to disable VirtIO Block Media and use SATA emulation add `virtio_blk="off"` to your configuration.
     * `quickget` disables VirtIO Block Media for High Sierra and Mojave by default since it is not supported on those releases.
+  * If you want to expose an ISO image from the host to guest add `fixed_iso=/path/to/image.iso` to the configuration.
 
 ### macOS compatibility
 
@@ -228,11 +229,12 @@ The default Windows 10 configuration looks like this:
 guest_os="windows"
 disk_img="windows-10/disk.qcow2"
 iso="windows-10/Win10_21H1_English_x64.iso"
-driver_iso="windows-10/virtio-win.iso"
+fixed_iso="windows-10/virtio-win.iso"
 ```
 
   * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
-  * The `driver_iso=` line specifies the ISO image that provides VirtIO drivers.
+  * The `fixed_iso=` line specifies the ISO image that provides VirtIO drivers.
+    * Or can also be used to expose any ISO image from the host to the guest
 
 # SPICE
 
