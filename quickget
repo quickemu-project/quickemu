@@ -9,6 +9,7 @@ function os_support() {
     ubuntu-kylin \
     ubuntu-mate \
     ubuntu-studio \
+    windows \
     xubuntu
 }
 
@@ -25,14 +26,65 @@ function releases_ubuntu() {
     devel
 }
 
+function languages_windows() {
+    echo Arabic \
+    Brazilian Portuguese \
+    Bulgarian \
+    Chinese \(Simplified\) \
+    Chinese \(Traditional\) \
+    Croatian \
+    Czech \
+    Danish \
+    Dutch \
+    English \
+    English International \
+    Estonian \
+    Finnish \
+    French \
+    French Canadian \
+    German \
+    Greek \
+    Hebrew \
+    Hungarian \
+    Italian \
+    Japanese \
+    Korean \
+    Latvian \
+    Lithuanian \
+    Norwegian \
+    Polish \
+    Portuguese \
+    Romanian \
+    Russian \
+    Serbian Latin \
+    Slovak \
+    Slovenian \
+    Spanish \
+    Spanish \(Mexico\) \
+    Swedish \
+    Thai \
+    Turkish \
+    Ukrainian
+}
+
+
+function releases_windows() {
+    echo 10
+}
+
 function web_get() {
     local DIR="${2}"
     local FILE=""
     local URL="${1}"
-    FILE="${URL##*/}"
+    if [ -n "${3}" ]; then
+        FILE="${3}"
+    else
+        FILE="${URL##*/}"
+    fi
+
     mkdir -p "${DIR}" 2>/dev/null
     if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-        echo "ERROR! Failed to download ${URL}"
+        echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
         exit 1
     fi
 }
@@ -77,15 +129,21 @@ function make_vm_config() {
     elif [ "${OS}" == "macos" ]; then
         GUEST="macos"
         IMAGE_TYPE="img"
+    elif [ "${OS}" == "windows" ]; then
+        GUEST="windows"
+        IMAGE_TYPE="iso"
     fi
 
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
         echo "Making VM configuration for ${OS}-${RELEASE}..."
         cat << EOF > "${OS}-${RELEASE}.conf"
 guest_os="${GUEST}"
-${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 disk_img="${VM_PATH}/disk.qcow2"
+${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
+        if [ -n "${2}" ]; then
+            echo "driver_iso=${VM_PATH}/${2}" >> "${OS}-${RELEASE}.conf"
+        fi
     fi
 }
 
@@ -219,6 +277,53 @@ function get_ubuntu() {
     start_vm_info
 }
 
+# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
+function get_windows() {
+    if [ "${RELEASE}" != "10" ]; then
+        echo "ERROR! Unknown release: ${RELEASE}"
+        releases_windows
+        exit 1
+    fi
+
+    local ARCH="x64"
+    local LANG_CODE="en"
+    local LATEST_WINDOWS_VERSION=""
+    local WINDOWS_NAME=""
+    local VERSION_ID=""
+    local EDITION_ID=""
+    local LANGUAGE_ID=""
+    local FILE_NAME=""
+    local ARCH_ID=""
+    local DOWNLOAD_INFO=""
+    local DOWNLOAD_ID=""
+    local DOWNLOAD_URL=""
+
+    echo "Getting Windows ${RELEASE} URL..."
+    LATEST_WINDOWS_VERSION=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))[0]')
+    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
+    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
+    EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 10").edition_id')
+    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
+    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
+    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
+    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
+    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
+    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+
+    make_vm_dir
+
+    echo "Downloading ${WINDOWS_NAME}..."
+    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+
+    echo "Downloading virtio-win.iso..."
+    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+
+    make_vm_config "${FILE_NAME}" "virtio-win.iso"
+
+    start_vm_info
+}
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
 else
@@ -235,6 +340,8 @@ else
         releases_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
+    elif [ "${OS}" == "windows" ]]; then
+        releases_windows
     fi
     exit 1
 fi
@@ -245,6 +352,19 @@ if [ "${OS}" == "macos" ]; then
     get_macos
 elif [[ "${OS}" == *"ubuntu"* ]]; then
     get_ubuntu
+elif [ "${OS}" == "windows" ]; then
+    if [ -n "${3}" ]; then
+        LANG_NAME="${3}"
+        LANG_NAMES=$(languages_windows)
+        if [[ "${LANG_NAMES}" != *"${LANG_NAME}"* ]]; then
+            echo "ERROR! ${LANG_NAME} is not a supported language:"
+            languages_windows
+            exit 1
+        fi
+    else
+        LANG_NAME="English International"
+    fi
+    get_windows "${LANG_NAME}"
 else
     echo "ERROR! You must specify an OS:"
     os_support
