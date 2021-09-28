@@ -147,6 +147,13 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+
+        # VirtIO Block Media doesn't work in High Sierra or Mojave so use SATA
+        case ${RELEASE} in
+            high-sierra|mojave)
+                echo "virtio_blk=\"off\"" >> "${OS}-${RELEASE}.conf"
+                ;;
+        esac
     fi
 }
 

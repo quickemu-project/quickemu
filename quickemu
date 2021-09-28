@@ -498,9 +498,15 @@ function vm_boot() {
              -device ide-hd,bus=ahci.1,drive=InstallMedia)
     fi
 
-    # shellcheck disable=SC2054,SC2206
-    args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
-            -device virtio-blk-pci,drive=SystemDisk,scsi=off ${STATUS_QUO})
+    if [ "${virtio_blk}" == "on" ]; then
+      # shellcheck disable=SC2054
+      args+=(-device virtio-blk-pci,drive=SystemDisk,scsi=off
+             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    else
+      # shellcheck disable=SC2054,SC2206
+      args+=(-device ide-hd,bus=ahci.2,drive=SystemDisk
+             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    fi
 
     if [ -n "${fixed_iso}" ]; then
       # shellcheck disable=SC2054
@@ -601,6 +607,7 @@ iso=""
 port_forwards=()
 ram=""
 usb_devices=()
+virtio_blk="on"
 
 DELETE=0
 FULLSCREEN=""

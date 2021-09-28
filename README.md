@@ -163,6 +163,8 @@ iso="${HOME}/Quickemu/macos-big-sur/disk.qcow2"
 ```
 
   * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
+  * If you want to disable VirtIO Block Media and use SATA emulation add `virtio_blk="off"` to your configuration.
+    * `quickget` disables VirtIO Block Media for High Sierra and Mojave by default since it is not supported on those releases.
 
 ### macOS compatibility
 
@@ -177,7 +179,7 @@ There are some considerations when running macOS via Quickemu.
     * Big Sur
   * Optimised by default
     * Host CPU vendor is detected and guest CPU configuration is optimised accordingly.
-    * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk (*available since macOS Mojave*).
+    * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse (*available since macOS El Capitan*).
     * `vmxnet3` network device is used (*available since macOS El Capitan*).
   * USB host pass-through is limited to UHCI (USB 2.0)
