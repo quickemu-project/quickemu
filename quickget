@@ -40,10 +40,17 @@ function web_get() {
 function zsync_get() {
     local DIR="${2}"
     local FILE=""
+    local OUT=""
     local URL="${1}"
     FILE="${URL##*/}"
+    if [ -n "${3}" ]; then
+        OUT="${3}"
+    else
+        OUT="${FILE}"
+    fi
+
     mkdir -p "${DIR}" 2>/dev/null
-    if ! zsync "${URL}.zsync" -o "${DIR}/${FILE}"; then
+    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}"; then
         echo "ERROR! Failed to download ${URL}.zsync"
         exit 1
     fi
@@ -193,7 +200,8 @@ function get_ubuntu() {
 
     echo "Downloading "${URL}/${ISO}"..."
     if [ "${RELEASE}" == "devel" ]; then
-        zsync_get "${URL}/${ISO}" "${VM_PATH}"
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
+        make_vm_config "${OS}-${RELEASE}.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
         echo "Checking SHA256SUMS..."
@@ -205,9 +213,9 @@ function get_ubuntu() {
             echo "All good."
         fi
         cd ..
+        make_vm_config "${ISO}"
     fi
 
-    make_vm_config "${ISO}"
     start_vm_info
 }
 
