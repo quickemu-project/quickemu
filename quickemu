@@ -219,7 +219,7 @@ function vm_boot() {
       USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
       ;;
     windows)
-      CPU="-cpu host,kvm=on,-hypervisor,+invtsc,l3-cache=on,migratable=no,hv_vapic,hv_relaxed,hv_time,hv_vendor_id=1234567890ab"
+      CPU="-cpu host,kvm=on,-hypervisor,+invtsc,l3-cache=on,migratable=no,hv_vapic,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vendor_id=1234567890ab,hv_vpindex"
       GUEST_TWEAKS="-no-hpet"
       disk="64G"
       ;;
