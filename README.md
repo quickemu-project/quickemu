@@ -27,22 +27,17 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 
 ## Requirements
 
-Essential requirements:
-
   * [QEMU](https://www.qemu.org/) 6.0.0 or newer
   * [Coreutils](https://www.gnu.org/software/coreutils/)
   * [jq](https://stedolan.github.io/jq/)
   * [procps](https://gitlab.com/procps-ng/procps)
+  * `python3` to run [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery); provided by `python3-minimal` in Debian/Ubuntu
+  * `rot13` to *"decrypt"* the macOS OSK key; provided by `bsdgames` in Debian/Ubuntu
   * [usbutils](https://github.com/gregkh/usbutils)
+  * [Spicy]() `spicy` to connect to VMs via the SPICE protocol; provided by `spice-client-gtk` in Debian/Ubuntu
   * [Wget](https://www.gnu.org/software/wget/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
   * [zsync](http://zsync.moria.org.uk/)
-
-Optional requirements:
-
-  * `python3` to run [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery) to download macOS recovery images; provided by `python3-minimal` in Debian/Ubuntu
-  * `rot13` to *"decrypt"* the macOS OSK key; provided by `bsdgames` in Debian/Ubuntu
-  * `spicy` to connect to VMs via the SPICE protocol; provided by `spice-client-gtk` in Debian/Ubuntu
 
 # Install Quickemu
 
@@ -115,8 +110,8 @@ preferred flavour.
 
 ```bash
 guest_os="linux"
-disk_img="${HOME}/Quickemu/debian-bullseye/disk.qcow2"
-iso="${HOME}/Quickemu/debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
+disk_img="debian-bullseye/disk.qcow2"
+iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 ```
 
   * Use `quickemu` to start the virtual machine:
@@ -142,7 +137,8 @@ quickemu --vm macos-catalina.conf
 
 macOS `high-sierra`, `mojave`, `catalina` and `big-sur` are supported.
 
-  * Use cursor keys to select the Hard Disk icon
+  * Use cursor keys and enter key to select the **macOS Base System**
+  * From **macOS Utilities**
     * Click **Disk Utility** and **Continue**
       * On macOS Catalina and Big Sur
         * Select `Apple Inc. VirtIO Block Media` from the list and click **Erase**.
@@ -151,15 +147,18 @@ macOS `high-sierra`, `mojave`, `catalina` and `big-sur` are supported.
     * Enter a `Name:` for the disk and click **Erase**.
     * Click **Done**.
     * Close Disk Utility
+  * From **macOS Utilities**
     * Click **Reinstall macOS** and **Continue**
   * Complete the installation as you normally would.
+    * On the first reboot use cursor keys and enter key to select **macOS Installer**
+    * On the subsequent reboots use cursor keys and enter key to select the disk you named
 
 The default macOS configuration looks like this:
 
 ```bash
 guest_os="macos"
-disk_img="${HOME}/Quickemu/macos-big-sur/RecoveryImage.img"
-iso="${HOME}/Quickemu/macos-big-sur/disk.qcow2"
+img="macos-big-sur/RecoveryImage.img"
+disk_img="macos-big-sur/disk.qcow2"
 ```
 
   * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
@@ -180,13 +179,15 @@ There are some considerations when running macOS via Quickemu.
   * Optimised by default
     * Host CPU vendor is detected and guest CPU configuration is optimised accordingly.
     * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
-    * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse (*available since macOS El Capitan*).
-    * `vmxnet3` network device is used (*available since macOS El Capitan*).
+    * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
+    * `vmxnet3` network device is used.
   * USB host pass-through is limited to UHCI (USB 2.0)
-  * Not supported on macOS:
-    * Copy/paste between the guest and host via SPICE agent.
-    * File sharing between the guest and host via SPICE webdavd.
-    * USB passthrough via SPICE.
+  * Display resolution can only be changed via macOS System Preferences.
+  * **SPICE has limited supported on macOS**:
+    * Copy/paste via SPICE agent is not available.
+    * File sharing via SPICE webdavd is not available.
+    * USB passthrough via SPICE is not available.
+    * Smartcard passthrough is not available.
 
 ## Windows 10 Guest
 
@@ -205,9 +206,12 @@ quickemu --vm windows-10.conf
     * The disk will now be available for partitioning and formatting.
   * Complete the installation as you normally would.
   * Post-install:
-    * Run the VirtIO installer from the CD-ROM: drive.
-    * Install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/)
-    * Install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
+    * Run the VirtIO installer (`virtio-win-gt-x64`) from the CD Drive (E:).
+    * Run the Guest Tools installer (`virtio-win-guest-tools`) from the CD Drive (E:).
+    * Download and install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi)
+      * Enables file sharing between the host and guest.
+    * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
+      * Enables USB SPICE passthrough between the host and guest.
 
 ### Regional versions
 
@@ -222,9 +226,9 @@ The default Windows 10 configuration looks like this:
 
 ```bash
 guest_os="windows"
-disk_img="${HOME}/Quickemu/windows-10/disk.qcow2"
-iso="${HOME}/Quickemu/windows-10/Win10_21H1_English_x64.iso"
-driver_iso="${HOME}/Quickemu/windows-10/virtio-win.iso"
+disk_img="windows-10/disk.qcow2"
+iso="windows-10/Win10_21H1_English_x64.iso"
+driver_iso="windows-10/virtio-win.iso"
 ```
 
   * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
@@ -232,11 +236,11 @@ driver_iso="${HOME}/Quickemu/windows-10/virtio-win.iso"
 
 # SPICE
 
-The following features are only available while using the SPICE protocol:
+The following features are available while using the SPICE protocol:
 
-  * Copy/paste between the guest and host *(not available for macOS guests)*
-  * Host file sharing to the guest *(not available for macOS guests)*
-  * USB device redirection *(untested on macOS)*
+  * Copy/paste between the guest and host
+  * Host file sharing to the guest
+  * USB device redirection
 
 To use SPICE add `--display spice` to the Quickemu invocation, this requires that
 the `spicy` client is installed, available from the `spice-client-gtk` package
@@ -343,8 +347,6 @@ quickemu --vm ubuntu-focal-desktop.conf --shortcut
 
 ## Screen and window size
 
-<ins>Note about screen and window size</ins>
-
 `qemu` will always default to the primary monitor to display the VM's window.
 
 Without the `--screen` option, `quickemu` will look for the size of the smallest
@@ -409,6 +411,7 @@ Useful reference that assisted the development of Quickemu.
     * <https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/>
     * <http://philjordan.eu/osx-virt/>
     * <https://github.com/Dids/clover-builder>
+    * [OpenCore Configurator](https://mackie100projects.altervista.org).
   * Windows
     * <https://www.heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/>
     * <https://leduccc.medium.com/improving-the-performance-of-a-windows-10-guest-on-qemu-a5b3f54d9cf5>
