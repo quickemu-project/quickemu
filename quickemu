@@ -481,8 +481,6 @@ function vm_boot() {
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
          -monitor none
-         -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-         -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
          -serial mon:stdio)
 
   # Add the disks
@@ -542,7 +540,10 @@ function vm_boot() {
           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
           -device usb-ccid
           -chardev spicevmc,id=ccid,name=smartcard
-          -device ccid-card-passthru,chardev=ccid)
+          -device ccid-card-passthru,chardev=ccid
+          -device virtio-serial-pci
+          -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+          -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
           -device virtio-rng-pci,rng=rng0
           -object rng-random,id=rng0,filename=/dev/urandom)
   fi
