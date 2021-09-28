@@ -141,6 +141,7 @@ function vm_boot() {
   VMNAME=$(basename "${VM}" .conf)
   local VMDIR=""
   VMDIR=$(dirname "${disk_img}")
+  local BALLOON="-device virtio-balloon"
   local CPU=""
   local DISPLAY_DEVICE=""
   local GL="on"
@@ -199,6 +200,7 @@ function vm_boot() {
       disk="16G"
       ;;
     macos)
+      BALLOON=""
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       if [ "${HOST_CPU}" == "AuthenticIntel" ]; then
         CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
@@ -457,7 +459,7 @@ function vm_boot() {
   args+=(-name ${VMNAME},process=${VMNAME}
          -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
-         -m ${RAM_VM} -device virtio-balloon
+    -m ${RAM_VM} ${BALLOON}
          -smbios type=2
          ${VIDEO} -display ${OUTPUT}
          -device usb-ehci,id=input
