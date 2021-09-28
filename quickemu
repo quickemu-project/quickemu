@@ -219,8 +219,8 @@ function vm_boot() {
       USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
       ;;
     windows)
-      CPU="-cpu host,kvm=on,-hypervisor,+invtsc,l3-cache=on,migratable=no,hv_vapic,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vendor_id=1234567890ab,hv_vpindex"
-      GUEST_TWEAKS="-no-hpet"
+      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
       disk="64G"
       ;;
     *)
