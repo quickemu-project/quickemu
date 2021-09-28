@@ -462,12 +462,12 @@ function vm_boot() {
   # Boot the VM
   local args=()
 
-  # shellcheck disable=SC2054,SC2206
+  # shellcheck disable=SC2054,SC2206,SC2140
   args+=(-name ${VMNAME},process=${VMNAME}
          -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
-         -smbios type=2
+         -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
          ${VIDEO} -display ${OUTPUT}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
