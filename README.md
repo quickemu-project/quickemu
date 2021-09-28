@@ -187,8 +187,8 @@ There are some considerations when running macOS via Quickemu.
   * **SPICE has limited supported on macOS**:
     * Copy/paste via SPICE agent is not available.
     * File sharing via SPICE webdavd is not available.
-    * USB passthrough via SPICE is not available.
-    * Smartcard passthrough is not available.
+    * USB pass-through via SPICE is not available.
+    * Smartcard pass-through is not available.
 
 ## Windows 10 Guest
 
@@ -212,7 +212,7 @@ quickemu --vm windows-10.conf
     * Download and install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi)
       * Enables file sharing between the host and guest.
     * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
-      * Enables USB SPICE passthrough between the host and guest.
+      * Enables USB SPICE pass-through between the host and guest.
 
 ### Regional versions
 
@@ -285,11 +285,11 @@ In the example above:
 
 # USB redirection
 
-Quickemu supports USB redirection via SPICE passthrough and host passthrough.
+Quickemu supports USB redirection via SPICE pass-through and host pass-through.
 
 ## SPICE redirection (recommended)
 
-Using SPICE for USB passthrough is easiest as it doesn't require any elevated
+Using SPICE for USB pass-through is easiest as it doesn't require any elevated
 permission, start Quickemu with `--display spice` and then select `Input` ->
 `Select USB Device for redirection` from the menu to chose which device(s) you want
 to attach to the guest.
@@ -394,6 +394,7 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
   - [ ] Add 9p support
   - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
   - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
+  - [ ] Discrete GPU pass-through
   - [ ] Include macOS compatible firmware
   - [ ] Add BSD support
   - [ ] Improve disk management
