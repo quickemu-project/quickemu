@@ -271,6 +271,13 @@ Add additional lines to your virtual machine configuration:
   * `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
   * `ram="4G"` - Specify the amount of RAM to allocate to the VM
   * `disk="16G"` - Specify the size of the virtual disk allocated to the VM
+## Floppy disks
+
+If you're like [Alan Pope](https://popey.com) you'll probably want to mount a
+floppy disk image in the guest. To do so add the following line to the VM
+configuration:
+
+  * `floppy="/path/to/floppy.img"`
 
 # Network port forwarding
 

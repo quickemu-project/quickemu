@@ -483,6 +483,11 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
+  if [ -n "${floppy}" ] && [ -e "${floppy}" ]; then
+    # shellcheck disable=SC2054
+    args+=(-drive file=${floppy},index=0,if=floppy,format=raw)
+  fi
+
   # Add the disks
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     # shellcheck disable=SC2054
@@ -608,6 +613,7 @@ cpu_cores=""
 disk_img=""
 disk="64G"
 fixed_iso=""
+floppy=""
 guest_os="linux"
 img=""
 iso=""
