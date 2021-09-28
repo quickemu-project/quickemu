@@ -356,7 +356,7 @@ else
     exit 1
 fi
 
-VM_PATH="${PWD}/${OS}-${RELEASE}"
+VM_PATH="${OS}-${RELEASE}"
 
 if [ "${OS}" == "macos" ]; then
     get_macos
