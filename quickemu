@@ -493,12 +493,12 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -drive id=OpenCore,if=none,format=qcow2,file="${VMDIR}/OpenCore.qcow2"
-           -device ide-hd,bus=ahci.0,drive=OpenCore)
+           -device ide-hd,bus=ahci.0,drive=OpenCore
+           -drive id=OpenCore,if=none,format=qcow2,file="${VMDIR}/OpenCore.qcow2")
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
-      args+=(-drive id=InstallMedia,if=none,format=raw,file="${img}"
-             -device ide-hd,bus=ahci.1,drive=InstallMedia)
+      args+=(-device ide-hd,bus=ahci.1,drive=InstallMedia
+             -drive id=InstallMedia,if=none,format=raw,file="${img}")
     fi
 
     if [ "${virtio_blk}" == "on" ]; then
@@ -527,10 +527,8 @@ function vm_boot() {
     fi
 
     # shellcheck disable=SC2054,SC2206
-    args+=(
-      -device virtio-blk-pci,drive=drive0,scsi=off
-          -drive id=drive0,if=none,cache=directsync,aio=native,format=qcow2,file="${disk_img}"
-          -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO}
+    args+=(-device virtio-blk-pci,drive=drive0,scsi=off
+          -drive id=drive0,if=none,cache=directsync,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO}
           -device qemu-xhci,id=spicepass
           -chardev spicevmc,id=usbredirchardev1,name=usbredir
           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
