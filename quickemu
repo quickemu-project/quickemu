@@ -476,8 +476,6 @@ function vm_boot() {
          -audiodev pa,id=pa,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off
          -rtc base=localtime,clock=host
-         -object rng-random,id=rng0,filename=/dev/urandom
-         -device virtio-rng-pci,rng=rng0
          -spice ${SPICE}
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
@@ -545,6 +543,8 @@ function vm_boot() {
           -device usb-ccid
           -chardev spicevmc,id=ccid,name=smartcard
           -device ccid-card-passthru,chardev=ccid)
+          -device virtio-rng-pci,rng=rng0
+          -object rng-random,id=rng0,filename=/dev/urandom)
   fi
 
   if [ -n "${USB_PASSTHROUGH}" ]; then
