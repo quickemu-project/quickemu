@@ -384,7 +384,7 @@ function vm_boot() {
   fi
 
   # Allocate VRAM to VGA devices
-  if [[ "${DISPLAY_DEVICE}" == *"vga"* ]] || [[ "${DISPLAY_DEVICE}" == *"VGA"* ]]; then
+  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
     VIDEO="${VIDEO},vgamem_mb=128"
   fi
   VIDEO="${VIDEO} ${FULLSCREEN}"
