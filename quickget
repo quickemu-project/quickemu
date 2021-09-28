@@ -13,8 +13,7 @@ function os_support() {
 }
 
 function releases_macos() {
-    echo high-sierra \
-    mojave \
+    echo mojave \
     catalina \
     big-sur
 }

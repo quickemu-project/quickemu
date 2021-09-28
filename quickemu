@@ -496,17 +496,10 @@ function vm_boot() {
              -device ide-hd,bus=ahci.1,drive=InstallMedia)
     fi
 
-    # TODO: High Sierra and older doesn't support VirtIO disks.
-    #       Add an option to use VirtIO
-    if true; then
-      # shellcheck disable=SC2054,SC2206
-      args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
-             -device ide-hd,bus=ahci.2,drive=SystemDisk ${STATUS_QUO})
-    else
-      # shellcheck disable=SC2054,SC2206
-      args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
-             -device virtio-blk-pci,drive=SystemDisk,scsi=off ${STATUS_QUO})
-    fi
+    # shellcheck disable=SC2054,SC2206
+    args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
+            -device virtio-blk-pci,drive=SystemDisk,scsi=off ${STATUS_QUO})
+
     # shellcheck disable=SC2054
     args+=(-drive media=cdrom,index=0,file="${iso}")
   else
