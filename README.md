@@ -397,7 +397,6 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
   - [ ] Include macOS compatible firmware
   - [ ] Add BSD support
   - [ ] Improve disk management
-  - [ ] [Add Faux OEM](https://code.launchpad.net/~ubuntu-installer/ubiquity/+git/ubiquity/+merge/379899)
 
 # References
 
@@ -422,5 +421,6 @@ Useful reference that assisted the development of Quickemu.
   * 9p & virtiofs
     * <https://wiki.qemu.org/Documentation/9psetup>
     * <https://www.linux-kvm.org/page/9p_virtio>
+    * <https://www.kraxel.org/blog/2019/06/macos-qemu-guest/>
     * <https://superuser.com/questions/628169/how-to-share-a-directory-with-the-host-without-networking-in-qemu>
     * <https://virtio-fs.gitlab.io/>
