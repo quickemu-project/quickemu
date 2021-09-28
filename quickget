@@ -5,9 +5,9 @@ function os_support() {
     lubuntu \
     macos \
     ubuntu \
+    ubuntu-budgie \
     ubuntu-kylin \
     ubuntu-mate \
-    ubuntu-budgie \
     ubuntu-studio \
     xubuntu
 }

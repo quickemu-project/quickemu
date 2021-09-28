@@ -126,7 +126,7 @@ function enable_usb_passthrough() {
         echo "               sudo chown -v root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}"
         USB_NOT_READY=1
       fi
-      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID},bus=hostpass.0"
+      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,bus=hostpass.0,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID}"
     done
 
     if [ "${USB_NOT_READY}" -eq 1 ]; then
