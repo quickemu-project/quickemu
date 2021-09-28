@@ -213,7 +213,7 @@ function vm_boot() {
       fi
 
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
-      GUEST_TWEAKS="-device isa-applesmc,osk=${OSK}"
+      GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -global kvm-pit.lost_tick_policy=discard"
       disk="64G"
       NET_DEVICE="vmxnet3"
       USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
@@ -475,7 +475,7 @@ function vm_boot() {
          -device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic
          -audiodev pa,id=pa,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=pa,mixer=off
-         -rtc base=localtime,clock=host
+         -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
