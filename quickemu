@@ -375,12 +375,19 @@ function vm_boot() {
 
   echo " - Video:    ${DISPLAY_DEVICE}"
 
-  # Allocate VRAM to VGA devices
-  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
-    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES},vgamem_mb=128 ${FULLSCREEN}"
-  else
-    VIDEO="-device ${DISPLAY_DEVICE},xres=${X_RES},yres=${Y_RES} ${FULLSCREEN}"
+  # Build the video configuration
+  VIDEO="-device ${DISPLAY_DEVICE}"
+
+  # Do not try and coerce the display resolution for macOS
+  if [ "${guest_os}" != "macos" ]; then
+    VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
   fi
+
+  # Allocate VRAM to VGA devices
+  if [[ "${DISPLAY_DEVICE}" == *"vga"* ]] || [[ "${DISPLAY_DEVICE}" == *"VGA"* ]]; then
+    VIDEO="${VIDEO},vgamem_mb=128"
+  fi
+  VIDEO="${VIDEO} ${FULLSCREEN}"
 
   if [ "${OUTPUT}" == "gtk" ]; then
     OUTPUT="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
@@ -395,7 +402,7 @@ function vm_boot() {
   fi
   echo " - GL:       ${GL^^}"
 
-  if [ "${GL}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+  if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
     DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
     echo " - Virgil3D: ON"
   else
