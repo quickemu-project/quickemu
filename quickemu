@@ -275,8 +275,8 @@ function vm_boot() {
     echo " - Boot:     ${iso}"
   fi
 
-  if [ -n "${driver_iso}" ] && [ -e "${driver_iso}" ]; then
-    echo " - Drivers:  ${driver_iso}"
+  if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
+    echo " - CD-ROM:   ${fixed_iso}"
   fi
 
   local CORES_VM="1"
@@ -502,14 +502,24 @@ function vm_boot() {
     args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
             -device virtio-blk-pci,drive=SystemDisk,scsi=off ${STATUS_QUO})
 
+    if [ -n "${fixed_iso}" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=0,file="${fixed_iso}")
+    fi
+  else
     if [ -n "${iso}" ]; then
       # shellcheck disable=SC2054
       args+=(-drive media=cdrom,index=0,file="${iso}")
     fi
-  else
+
+    if [ -n "${fixed_iso}" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+    fi
+
     # shellcheck disable=SC2054,SC2206
-    args+=(-drive media=cdrom,index=0,file="${iso}"
-          -drive media=cdrom,index=1,file="${driver_iso}"
+    args+=(
+      -device virtio-blk-pci,drive=drive0,scsi=off
           -drive id=drive0,if=none,cache=directsync,aio=native,format=qcow2,file="${disk_img}"
           -device virtio-blk-pci,drive=drive0,scsi=off ${STATUS_QUO}
           -device qemu-xhci,id=spicepass
@@ -584,7 +594,7 @@ boot="efi"
 cpu_cores=""
 disk_img=""
 disk="64G"
-driver_iso=""
+fixed_iso=""
 guest_os="linux"
 img=""
 iso=""
@@ -689,6 +699,11 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   if [ -z "${disk_img}" ]; then
     echo "ERROR! No disk_img defined."
     exit 1
+  fi
+
+  # Backwards compatibility for ${driver_iso}
+  if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
+    fixed_iso="${driver_iso}"
   fi
 else
   echo "ERROR! Virtual machine configuration not found."

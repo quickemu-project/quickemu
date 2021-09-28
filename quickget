@@ -121,9 +121,11 @@ function make_vm_dir() {
 
 function make_vm_config() {
     local IMAGE_FILE=""
+    local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
     IMAGE_FILE="${1}"
+    ISO_FILE="${2}"
     if [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -142,8 +144,8 @@ guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        if [ -n "${2}" ]; then
-            echo "driver_iso=${VM_PATH}/${2}" >> "${OS}-${RELEASE}.conf"
+        if [ -n "${ISO_FILE}" ]; then
+            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
 }
