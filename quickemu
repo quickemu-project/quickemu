@@ -359,7 +359,7 @@ function vm_boot() {
   if [ "${guest_os}" == "linux" ]; then
     DISPLAY_DEVICE="virtio-vga"
   elif [ "${guest_os}" == "macos" ]; then
-    DISPLAY_DEVICE="VGA"
+    DISPLAY_DEVICE="qxl"
   elif [ "${guest_os}" == "windows" ]; then
     DISPLAY_DEVICE="qxl-vga"
   else
@@ -367,7 +367,7 @@ function vm_boot() {
   fi
 
   if [ "${OUTPUT}" == "spice" ]; then
-    if [ "${guest_os}" != "macos" ]; then
+    if [ "${guest_os}" == "linux" ]; then
       DISPLAY_DEVICE="qxl-vga"
     fi
     OUTPUT="none"
@@ -475,10 +475,10 @@ function vm_boot() {
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
-         -device virtio-serial-pci
+    -monitor none
          -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
          -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
-         -serial mon:stdio)
+    -serial mon:stdio)
 
   # Add the disks
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
