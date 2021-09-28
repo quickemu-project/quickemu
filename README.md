@@ -164,7 +164,6 @@ disk_img="macos-big-sur/disk.qcow2"
   * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
   * If you want to disable VirtIO Block Media and use SATA emulation add `virtio_blk="off"` to your configuration.
     * `quickget` disables VirtIO Block Media for High Sierra and Mojave by default since it is not supported on those releases.
-  * If you want to expose an ISO image from the host to guest add `fixed_iso=/path/to/image.iso` to the configuration.
 
 ### macOS compatibility
 
@@ -234,7 +233,6 @@ fixed_iso="windows-10/virtio-win.iso"
 
   * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
   * The `fixed_iso=` line specifies the ISO image that provides VirtIO drivers.
-    * Or can also be used to expose any ISO image from the host to the guest
 
 # SPICE
 
@@ -284,6 +282,13 @@ Specify what disk preallocation should be used, if any, when creating the system
 disk image by adding a line like this to your VM configuration.
 
   * `preallocation="metadata"`
+
+## CD-ROM disks
+
+If you want to expose an ISO image from the host to guest add the following line
+to the VM configuration:
+
+   * `fixed_iso="/path/to/image.iso"`
 
 ## Floppy disks
 
