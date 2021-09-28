@@ -153,7 +153,7 @@ function vm_boot() {
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
   QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  echo "Starting ${VM}"
+  echo "Quickemu ${VERSION} starting ${VM}"
   echo " - QEMU:     ${QEMU} v${QEMU_VER}"
 
   # Force to lowercase.
@@ -598,6 +598,7 @@ function usage() {
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
+  echo "  --version               : Print version"
   exit 1
 }
 
@@ -629,6 +630,7 @@ VM=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
+readonly VERSION="2.1.0"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(which qemu-system-x86_64)
@@ -697,6 +699,9 @@ else
           -shortcut|--shortcut)
             SHORTCUT=1
             shift;;
+          -version|--version)
+            echo "${VERSION}"
+            exit;;
           -h|--h|-help|--help)
             usage;;
           *)
