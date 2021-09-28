@@ -500,8 +500,10 @@ function vm_boot() {
     args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}"
             -device virtio-blk-pci,drive=SystemDisk,scsi=off ${STATUS_QUO})
 
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=0,file="${iso}")
+    if [ -n "${iso}" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=0,file="${iso}")
+    fi
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-drive media=cdrom,index=0,file="${iso}"
