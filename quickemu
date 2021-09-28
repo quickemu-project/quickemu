@@ -466,7 +466,7 @@ function vm_boot() {
   args+=(-name ${VMNAME},process=${VMNAME}
          -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
-    -m ${RAM_VM} ${BALLOON}
+         -m ${RAM_VM} ${BALLOON}
          -smbios type=2
          ${VIDEO} -display ${OUTPUT}
          -device usb-ehci,id=input
@@ -480,10 +480,10 @@ function vm_boot() {
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
-    -monitor none
+         -monitor none
          -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
          -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
-    -serial mon:stdio)
+         -serial mon:stdio)
 
   # Add the disks
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
