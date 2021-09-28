@@ -235,10 +235,19 @@ function vm_boot() {
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
       mkdir -p "${VMDIR}" 2>/dev/null
-      if ! ${QEMU_IMG} create -q -f qcow2 "${disk_img}" "${disk}"; then
+      case ${preallocation} in
+        off|metadata|falloc|full) true;;
+        *)
+          echo "ERROR! ${preallocation} is an unsupported disk preallocation option."
+          exit 1;;
+      esac
+
+      # https://blog.programster.org/qcow2-performance
+      if ! ${QEMU_IMG} create -q -f qcow2 -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk}"; then
         echo "ERROR! Failed to create ${disk_img}"
         exit 1
       fi
+
       if [ -z "${iso}" ] && [ -z "${img}" ]; then
         echo "ERROR! You haven't specified a .iso or .img image to boot from."
         exit 1
@@ -618,6 +627,7 @@ guest_os="linux"
 img=""
 iso=""
 port_forwards=()
+preallocation="metadata"
 ram=""
 usb_devices=()
 virtio_blk="on"

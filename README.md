@@ -271,6 +271,20 @@ Add additional lines to your virtual machine configuration:
   * `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
   * `ram="4G"` - Specify the amount of RAM to allocate to the VM
   * `disk="16G"` - Specify the size of the virtual disk allocated to the VM
+
+
+## Disk preallocation
+
+Preallocation mode (allowed values: `off`, `metadata` (default), `falloc`, `full`).
+An image with preallocated metadata is initially larger but can improve performance
+when the image needs to grow. `falloc` and `full` preallocations are like the
+same options of raw format, but sets up metadata also.
+
+Specify what disk preallocation should be used, if any, when creating the system
+disk image by adding a line like this to your VM configuration.
+
+  * `preallocation="metadata"`
+
 ## Floppy disks
 
 If you're like [Alan Pope](https://popey.com) you'll probably want to mount a
