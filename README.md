@@ -140,11 +140,14 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `mojave`, `catalina` and `big-sur` are supported.
+macOS `high-sierra`, `mojave`, `catalina` and `big-sur` are supported.
 
   * Use cursor keys to select the Hard Disk icon
     * Click **Disk Utility** and **Continue**
-    * Select `Apple Inc. VirtIO Block Media` from the list and click **Erase**.
+      * On macOS Catalina and Big Sur
+        * Select `Apple Inc. VirtIO Block Media` from the list and click **Erase**.
+      * On macOS Mojave and High Sierra
+        * Select `QEMU HARDDISK Media` (~68.72GB) from the list and click **Erase**.
     * Enter a `Name:` for the disk and click **Erase**.
     * Click **Done**.
     * Close Disk Utility
@@ -168,6 +171,7 @@ There are some considerations when running macOS via Quickemu.
   * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
     bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
   * Supported macOS releases:
+    * High Sierra
     * Mojave
     * Catalina
     * Big Sur
