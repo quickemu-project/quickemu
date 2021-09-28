@@ -498,6 +498,7 @@ function vm_boot() {
   fi
 
   # Add the disks
+  # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
   if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
     # shellcheck disable=SC2054
     args+=(-drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}"
@@ -508,21 +509,22 @@ function vm_boot() {
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=OpenCore
-           -drive id=OpenCore,if=none,format=qcow2,file="${VMDIR}/OpenCore.qcow2")
+           -drive id=OpenCore,if=none,cache=none,aio=native,format=qcow2,file="${VMDIR}/OpenCore.qcow2")
+
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
       args+=(-device ide-hd,bus=ahci.1,drive=InstallMedia
-             -drive id=InstallMedia,if=none,format=raw,file="${img}")
+             -drive id=InstallMedia,if=none,cache=none,aio=native,format=raw,file="${img}")
     fi
 
     if [ "${virtio_blk}" == "on" ]; then
       # shellcheck disable=SC2054
       args+=(-device virtio-blk-pci,drive=SystemDisk,scsi=off
-             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+             -drive id=SystemDisk,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO})
     else
       # shellcheck disable=SC2054,SC2206
       args+=(-device ide-hd,bus=ahci.2,drive=SystemDisk
-             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+             -drive id=SystemDisk,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO})
     fi
 
     if [ -n "${fixed_iso}" ]; then
@@ -542,7 +544,7 @@ function vm_boot() {
 
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=drive0,scsi=off
-          -drive id=drive0,if=none,cache=directsync,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO}
+          -drive id=drive0,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO}
           -device qemu-xhci,id=spicepass
           -chardev spicevmc,id=usbredirchardev1,name=usbredir
           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
