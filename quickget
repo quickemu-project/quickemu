@@ -163,7 +163,7 @@ function get_macos() {
         high-sierra)
             BOARD_ID="Mac-7BA5B2D9E42DDD94"
             MLB="00000000000J80300";;
-        mohave)
+        mojave)
             BOARD_ID="Mac-7BA5B2DFE22DDD8C"
             MLB="00000000000KXPG00";;
         catalina)
