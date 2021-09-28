@@ -420,7 +420,7 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
   - [ ] Add 9p support
   - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
   - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
-  - [ ] Discrete GPU pass-through
+  - [ ] Add discrete GPU pass-through
   - [ ] Include macOS compatible firmware
   - [ ] Add BSD support
   - [ ] Improve disk management
@@ -444,6 +444,7 @@ Useful reference that assisted the development of Quickemu.
     * <https://www.heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/>
     * <https://leduccc.medium.com/improving-the-performance-of-a-windows-10-guest-on-qemu-a5b3f54d9cf5>
     * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
+    * <https://turlucode.com/qemu-command-line-args/>
     * <https://github.com/pbatard/Fido>
   * 9p & virtiofs
     * <https://wiki.qemu.org/Documentation/9psetup>
