@@ -27,15 +27,18 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 
 ## Requirements
 
-  * [QEMU](https://www.qemu.org/) 6.0.0 or newer
+  * [QEMU](https://www.qemu.org/) (*6.0.0 or newer*)
   * [Coreutils](https://www.gnu.org/software/coreutils/)
+  * [grep](https://www.gnu.org/software/grep/)
   * [jq](https://stedolan.github.io/jq/)
   * [procps](https://gitlab.com/procps-ng/procps)
-  * `python3` to run [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery); provided by `python3-minimal` in Debian/Ubuntu
-  * `rot13` to *"decrypt"* the macOS OSK key; provided by `bsdgames` in Debian/Ubuntu
+  * [python3](https://www.python.org/)
+  * [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
   * [usbutils](https://github.com/gregkh/usbutils)
-  * [Spicy]() `spicy` to connect to VMs via the SPICE protocol; provided by `spice-client-gtk` in Debian/Ubuntu
+  * [sed](https://www.gnu.org/software/sed/)
+  * [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
   * [Wget](https://www.gnu.org/software/wget/)
+  * [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
   * [zsync](http://zsync.moria.org.uk/)
 
@@ -122,7 +125,7 @@ quickemu --vm debian-bullseye.conf
 
   * Complete the installation as normal.
   * Post-install:
-    * Install the SPICE agent (`spice-vdagent`) to enable copy/paste and USB redirection
+    * Install the SPICE agent (`spice-vdagent`) to enable copy/paste and USB redirection.
     * Install the SPICE WebDAV agent (`spice-webdavd`) to enable file sharing.
 
 ## macOS Guest
@@ -177,11 +180,11 @@ There are some considerations when running macOS via Quickemu.
     * Catalina
     * Big Sur
   * Optimised by default
-    * Host CPU vendor is detected and guest CPU configuration is optimised accordingly.
+    * Host CPU vendor is detected and guest CPU is optimised accordingly.
     * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
     * `vmxnet3` network device is used.
-  * USB host pass-through is limited to UHCI (USB 2.0)
+  * USB host pass-through is limited to UHCI (USB 2.0).
   * Display resolution can only be changed via macOS System Preferences.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
   * **SPICE has limited supported on macOS**:
