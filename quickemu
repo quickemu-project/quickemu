@@ -455,13 +455,17 @@ function vm_boot() {
     if [ "${OUTPUT}" == "spice-app" ]; then
       echo " - SPICE:    Enabled"
     else
-      echo " - SPICE:    ${SPICE_PORT}/tcp is connected. Login via 'spicy --title \"${VMNAME}\" --port ${SPICE_PORT} --spice-shared-dir ${HOME}' ${FULLSPICY}"
+      echo -n " - SPICE:    spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
+      if [ "${guest_os}" != "macos" ]; then
+        echo -n " --spice-shared-dir ${PUBLIC}"
+      fi
+      echo ${FULLSPICY}
       SPICE="${SPICE},port=${SPICE_PORT}"
     fi
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ]; then
-      echo " - WebDAV:   ${HOME} will be exported to ${VMNAME} via dav://localhost:9843/"
+      echo " - WebDAV:   ${PUBLIC} via: dav://localhost:9843/"
     fi
   fi
 
@@ -575,7 +579,7 @@ function vm_boot() {
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
-    spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" --spice-shared-dir "${HOME}" >/dev/null 2>&1
+    spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" --spice-shared-dir "${PUBLIC}" >/dev/null 2>&1
   fi
 }
 
@@ -637,6 +641,7 @@ DELETE=0
 FULLSCREEN=""
 FULLSPICY=""
 OUTPUT="sdl"
+PUBLIC=""
 SCREEN=""
 SHORTCUT=0
 SNAPSHOT_ACTION=""
@@ -648,6 +653,17 @@ VM=""
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="2.1.0"
+
+# PUBLICSHARE is the only directory exposed to guest VMs for file
+# sharing via 9P and spice-webdavd. This path is not configurable.
+PUBLIC=$(xdg-user-dir PUBLICSHARE)
+if [ "${PUBLIC}" != ${HOME} ]; then
+  if [ ! -d "${PUBLIC}" ]; then
+    mkdir -p "${PUBLIC}"
+  fi
+else
+  PUBLIC=""
+fi
 
 # TODO: Make this run the native architecture binary
 QEMU=$(which qemu-system-x86_64)
