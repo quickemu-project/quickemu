@@ -517,7 +517,7 @@ function vm_boot() {
 
   # Add the disks
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
-  if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
+  if [[ "${boot}" == *"efi"* ]]; then
     # shellcheck disable=SC2054
     args+=(-drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}"
            -drive if=pflash,format=raw,file="${EFI_VARS}")
