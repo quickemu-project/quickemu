@@ -607,7 +607,7 @@ function shortcut_create {
   VMNAME=$(basename "${VM}" .conf)
   local LAUNCHER_DIR=""
   LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
-  local filename="/home/${USER}/.local/share/applications/${VMNAME}.desktop"
+  local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
   cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0
