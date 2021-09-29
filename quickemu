@@ -512,7 +512,7 @@ function vm_boot() {
 
   if [ -n "${floppy}" ] && [ -e "${floppy}" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive file=${floppy},index=0,if=floppy,format=raw)
+    args+=(-drive file="${floppy}",index=0,if=floppy,format=raw)
   fi
 
   # Add the disks
