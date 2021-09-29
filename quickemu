@@ -211,8 +211,7 @@ function vm_boot() {
       else
         CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
       fi
-
-      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | rot13)
+      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -global kvm-pit.lost_tick_policy=discard"
       disk="64G"
       NET_DEVICE="vmxnet3"
