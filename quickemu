@@ -164,25 +164,25 @@ function vm_boot() {
     boot="efi"
   fi
 
-  if [ "${boot}" == "efi" ] || [ "${boot}" == "uefi" ]; then
-    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ; then
-      if [ "${guest_os}" == "macos" ]; then
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2"
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd"
-        local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
-        local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
-      else
-        local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-        local EFI_VARS="${VMDIR}/${VMNAME}-vars.fd"
-        if [ ! -e "${EFI_VARS}" ]; then
-          cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        fi
-      fi
+  if [ "${guest_os}" == "macos" ]; then
+    echo " - BOOT:     EFI"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd"
+    local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+    local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+  elif [[ "${boot}" == *"efi"* ]]; then
+    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
       echo " - BOOT:     EFI"
+      local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
+      local EFI_VARS="${VMDIR}/OVMF_VARS_4M.fd"
+      if [ ! -e "${EFI_VARS}" ]; then
+        cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+      fi
     else
       echo " - BOOT:     Legacy BIOS"
       echo " -           EFI Booting requested but no EFI firmware found."
+      boot="legacy"
     fi
   else
     echo " - BOOT:     Legacy BIOS"
