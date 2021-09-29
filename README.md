@@ -183,6 +183,7 @@ There are some considerations when running macOS via Quickemu.
     * `vmxnet3` network device is used.
   * USB host pass-through is limited to UHCI (USB 2.0)
   * Display resolution can only be changed via macOS System Preferences.
+  * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
   * **SPICE has limited supported on macOS**:
     * Copy/paste via SPICE agent is not available.
     * File sharing via SPICE webdavd is not available.
@@ -417,7 +418,6 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
 
 # TODO
 
-  - [ ] Add 9p support
   - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
   - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
   - [ ] Add discrete GPU pass-through
@@ -447,8 +447,8 @@ Useful reference that assisted the development of Quickemu.
     * <https://turlucode.com/qemu-command-line-args/>
     * <https://github.com/pbatard/Fido>
   * 9p & virtiofs
+    * <https://wiki.qemu.org/Documentation/9p>
     * <https://wiki.qemu.org/Documentation/9psetup>
-    * <https://www.linux-kvm.org/page/9p_virtio>
     * <https://www.kraxel.org/blog/2019/06/macos-qemu-guest/>
     * <https://superuser.com/questions/628169/how-to-share-a-directory-with-the-host-without-networking-in-qemu>
     * <https://virtio-fs.gitlab.io/>
