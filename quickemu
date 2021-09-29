@@ -469,13 +469,17 @@ function vm_boot() {
     fi
 
     if [ "${guest_os}" != "windows" ]; then
-      echo -n " - 9P:       ${PUBLIC} via: "
+      echo -n " - 9P:       On guest: "
       if [ "${guest_os}" == "linux" ]; then
-        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${USER}-public ~/Public"
+        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/Public"
       elif [ "${guest_os}" == "macos" ]; then
         # PUBLICSHARE needs to be world writeable for seamless integration with
         # macOS. Test if it is is world writeable, and prompt what to do if not.
-        echo "sudo mount_9p ${USER}-public"
+        echo "sudo mount_9p ${PUBLIC_TAG}"
+        if [ -n "${PUBLIC}" ] && [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
+          echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
+          echo "             Required for macOS integration 👆"
+        fi
       fi
     fi
   fi
@@ -581,7 +585,7 @@ function vm_boot() {
   if [ "${guest_os}" != "windows" ]; then
       # shellcheck disable=SC2054
       args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-             -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${USER}-public")
+             -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
   fi
 
   if [ -n "${USB_PASSTHROUGH}" ]; then
@@ -661,6 +665,8 @@ FULLSCREEN=""
 FULLSPICY=""
 OUTPUT="sdl"
 PUBLIC=""
+PUBLIC_PERMS=""
+PUBLIC_TAG=""
 SCREEN=""
 SHORTCUT=0
 SNAPSHOT_ACTION=""
@@ -680,6 +686,8 @@ if [ "${PUBLIC}" != ${HOME} ]; then
   if [ ! -d "${PUBLIC}" ]; then
     mkdir -p "${PUBLIC}"
   fi
+  PUBLIC_TAG=$(basename ${PUBLIC})-${USER,,}
+  PUBLIC_PERMS=$(ls -ld ${PUBLIC} | cut -d' ' -f1)
 else
   PUBLIC=""
 fi
