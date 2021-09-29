@@ -425,7 +425,7 @@ function vm_boot() {
   SSH_PORT=$(get_port 22220 9)
   if [ -n "${SSH_PORT}" ]; then
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
-    echo " - ssh:      ssh user@localhost -p ${SSH_PORT}"
+    echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
   else
     echo " - ssh:      All ssh ports have been exhausted."
   fi
@@ -455,7 +455,7 @@ function vm_boot() {
     if [ "${OUTPUT}" == "spice-app" ]; then
       echo " - SPICE:    Enabled"
     else
-      echo -n " - SPICE:    spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
+      echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
       if [ "${guest_os}" != "macos" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
@@ -465,7 +465,7 @@ function vm_boot() {
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ]; then
-      echo " - WebDAV:   ${PUBLIC} via: dav://localhost:9843/"
+      echo " - WebDAV:   On host:  dav://localhost:9843/"
     fi
 
     if [ "${guest_os}" != "windows" ]; then
