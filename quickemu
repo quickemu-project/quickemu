@@ -266,8 +266,8 @@ function vm_boot() {
           exit 1
         fi
       else
-        # If there is a disk image, that appears to have an install
-        # then do not boot from the iso/img
+        # If there is a disk image, assume there is an install and do not boot
+        # from installation media.
         iso=""
         img=""
       fi
@@ -425,9 +425,9 @@ function vm_boot() {
   SSH_PORT=$(get_port 22220 9)
   if [ -n "${SSH_PORT}" ]; then
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
-    echo " - ssh:      ${SSH_PORT}/tcp is connected. Login via 'ssh user@localhost -p ${SSH_PORT}'"
+    echo " - ssh:      ssh user@localhost -p ${SSH_PORT}"
   else
-    echo " - ssh:      All ports for exposing ssh have been exhausted."
+    echo " - ssh:      All ssh ports have been exhausted."
   fi
 
   # Have any port forwards been requested?
@@ -446,7 +446,7 @@ function vm_boot() {
   local SPICE_PORT=""
   SPICE_PORT=$(get_port 5930 9)
   if [ -z "${SPICE_PORT}" ]; then
-    echo " - SPICE:    All spice ports have been exhausted."
+    echo " - SPICE:    All SPICE ports have been exhausted."
     if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
       echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
       exit 1
