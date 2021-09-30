@@ -180,9 +180,8 @@ function vm_boot() {
         cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
       fi
     else
-      echo " - BOOT:     Legacy BIOS"
-      echo " -           EFI Booting requested but no EFI firmware found."
       boot="legacy"
+      echo " - BOOT:     Legacy BIOS - EFI requested but no EFI firmware found."
     fi
   else
     echo " - BOOT:     Legacy BIOS"
@@ -459,13 +458,13 @@ function vm_boot() {
       if [ "${guest_os}" != "macos" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
-      echo ${FULLSPICY}
+      echo "${FULLSPICY}"
       SPICE="${SPICE},port=${SPICE_PORT}"
     fi
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ]; then
-      echo " - WebDAV:   On host:  dav://localhost:9843/"
+      echo " - WebDAV:   On guest: dav://localhost:9843/"
     fi
 
     if [ "${guest_os}" != "windows" ]; then
@@ -474,7 +473,7 @@ function vm_boot() {
         echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/Public"
       elif [ "${guest_os}" == "macos" ]; then
         # PUBLICSHARE needs to be world writeable for seamless integration with
-        # macOS. Test if it is is world writeable, and prompt what to do if not.
+        # macOS. Test if it is world writeable, and prompt what to do if not.
         echo "sudo mount_9p ${PUBLIC_TAG}"
         if [ -n "${PUBLIC}" ] && [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
           echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
@@ -519,7 +518,7 @@ function vm_boot() {
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
   if [[ "${boot}" == *"efi"* ]]; then
     # shellcheck disable=SC2054
-    args+=(-drive if=pflash,format=raw,readonly=on,file="${EFI_CODE}"
+    args+=(-drive if=pflash,format=raw,file="${EFI_CODE}",readonly=on
            -drive if=pflash,format=raw,file="${EFI_VARS}")
   fi
 
@@ -602,7 +601,7 @@ function vm_boot() {
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
-    spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" --spice-shared-dir "${PUBLIC}" >/dev/null 2>&1
+    spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
   fi
 }
 
