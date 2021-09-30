@@ -280,12 +280,16 @@ function vm_boot() {
   fi
 
   # Has the status quo been requested?
-  if [ "${STATUS_QUO}" == "-snapshot" ] &&  [ -z "${iso}" ]; then
-    echo "             Existing disk state will be preserved, no writes will be committed."
+  if [ "${STATUS_QUO}" == "-snapshot" ]; then
+    if [ -z "${img}" ] && [ -z "${iso}" ]; then
+      echo "             Existing disk state will be preserved, no writes will be committed."
+    fi
   fi
 
   if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-    echo " - Boot:     ${iso}"
+    echo " - Boot ISO: ${iso}"
+  elif [ -n "${img}" ] && [ -e "${img}" ]; then
+    echo " - Recovery: ${img}"
   fi
 
   if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
