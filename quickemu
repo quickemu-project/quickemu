@@ -519,11 +519,6 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  if [ -n "${floppy}" ] && [ -e "${floppy}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive file="${floppy}",index=0,if=floppy,format=raw)
-  fi
-
   # Add the disks
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
   if [[ "${boot}" == *"efi"* ]]; then
@@ -532,61 +527,59 @@ function vm_boot() {
            -drive if=pflash,format=raw,file="${EFI_VARS}")
   fi
 
+  if [ -n "${floppy}" ]; then
+    # shellcheck disable=SC2054
+    args+=(-drive if=floppy,format=raw,file="${floppy}")
+  fi
+
+  if [ -n "${iso}" ]; then
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=0,file="${iso}")
+  fi
+
+  if [ -n "${fixed_iso}" ]; then
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+  fi
+
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=OpenCore
-           -drive id=OpenCore,if=none,cache=none,aio=native,format=qcow2,file="${VMDIR}/OpenCore.qcow2")
+           -device ide-hd,bus=ahci.0,drive=BootLoader
+           -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
 
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
-      args+=(-device ide-hd,bus=ahci.1,drive=InstallMedia
-             -drive id=InstallMedia,if=none,cache=none,aio=native,format=raw,file="${img}")
+      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
+             -drive id=RecoveryImage,if=none,format=raw,file="${img}",cache=none,aio=native)
     fi
 
-    if [ "${virtio_blk}" == "on" ]; then
-      # shellcheck disable=SC2054
-      args+=(-device virtio-blk-pci,drive=SystemDisk,scsi=off
-             -drive id=SystemDisk,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-    else
-      # shellcheck disable=SC2054,SC2206
-      args+=(-device ide-hd,bus=ahci.2,drive=SystemDisk
-             -drive id=SystemDisk,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-    fi
-
-    if [ -n "${fixed_iso}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=0,file="${fixed_iso}")
-    fi
-  else
-    if [ -n "${iso}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=0,file="${iso}")
-    fi
-
-    if [ -n "${fixed_iso}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-    fi
-
+    # shellcheck disable=SC2054
+    case ${virtio_blk} in
+      off) args+=(-device ide-hd,bus=ahci.2,drive=SystemDisk);;
+      on)  args+=(-device virtio-blk-pci,drive=SystemDisk);;
+    esac
     # shellcheck disable=SC2054,SC2206
-    args+=(-device virtio-blk-pci,drive=drive0,scsi=off
-          -drive id=drive0,if=none,cache=none,aio=native,format=qcow2,file="${disk_img}" ${STATUS_QUO}
-          -device qemu-xhci,id=spicepass
-          -chardev spicevmc,id=usbredirchardev1,name=usbredir
-          -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-          -chardev spicevmc,id=usbredirchardev2,name=usbredir
-          -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-          -chardev spicevmc,id=usbredirchardev3,name=usbredir
-          -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-          -device usb-ccid
-          -chardev spicevmc,id=ccid,name=smartcard
-          -device ccid-card-passthru,chardev=ccid
-          -device virtio-serial-pci
-          -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-          -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
-          -device virtio-rng-pci,rng=rng0
-          -object rng-random,id=rng0,filename=/dev/urandom)
+    args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO})
+  else
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device virtio-blk-pci,drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO}
+           -device qemu-xhci,id=spicepass
+           -chardev spicevmc,id=usbredirchardev1,name=usbredir
+           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+           -chardev spicevmc,id=usbredirchardev2,name=usbredir
+           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+           -chardev spicevmc,id=usbredirchardev3,name=usbredir
+           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+           -device usb-ccid
+           -chardev spicevmc,id=ccid,name=smartcard
+           -device ccid-card-passthru,chardev=ccid
+           -device virtio-serial-pci
+           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
+           -device virtio-rng-pci,rng=rng0
+           -object rng-random,id=rng0,filename=/dev/urandom)
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
