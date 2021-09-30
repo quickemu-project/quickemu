@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
-function web_get() {
-  local URL="${1}"
-  local FILE=""
-  FILE="${URL##*/}"
-  mkdir -p "${VMDIR}" 2>/dev/null
-  if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${VMDIR}/${FILE}"; then
-    echo "ERROR! Failed to download ${URL}"
-    exit 1
-  fi
-}
-
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
@@ -147,6 +136,7 @@ function vm_boot() {
   local GL="on"
   local GUEST_TWEAKS=""
   local HOST_CPU=""
+  local MAC_MISSING=""
   local NET_DEVICE="virtio-net"
   local OSK=""
   local QEMU_VER=""
@@ -162,21 +152,37 @@ function vm_boot() {
   # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
     boot="efi"
-  fi
-
-  if [ "${guest_os}" == "macos" ]; then
     echo " - BOOT:     EFI"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd"
-    local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
-    local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+    if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
+      local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+      local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+    else
+      MAC_MISSING="Firmware"
+    fi
+
+    if [ -e "${VMDIR}/OpenCore.qcow2" ]; then
+      local MAC_BOOTLOADER="${VMDIR}/OpenCore.qcow2"
+    elif [ -e "${VMDIR}/ESP.qcow2" ]; then
+      # Backwards compatibility for Clover
+      local MAC_BOOTLOADER="${VMDIR}/ESP.qcow2"
+    else
+      MAC_MISSING="Bootloader"
+    fi
+
+    if [ -n "${MAC_MISSING}" ]; then
+      echo "ERROR! macOS ${MAC_MISSING} was not found."
+      echo "       Use 'quickget' to download the required files."
+      exit 1
+    fi
   elif [[ "${boot}" == *"efi"* ]]; then
     if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
       echo " - BOOT:     EFI"
       local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
       local EFI_VARS="${VMDIR}/OVMF_VARS_4M.fd"
-      if [ ! -e "${EFI_VARS}" ]; then
+      if [ -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
+        # Preserve backward compatibility
+        mv "${VMDIR}/${VMNAME}-vars.fd" "${EFI_VARS}"
+      elif [ ! -e "${EFI_VARS}" ]; then
         cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
       fi
     else
