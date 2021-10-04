@@ -137,6 +137,7 @@ function vm_boot() {
   local GUEST_TWEAKS=""
   local HOST_CPU=""
   local MAC_MISSING=""
+  local MAC_VIRTIO_BLK="ide-hd,bus=ahci.2"
   local NET_DEVICE="virtio-net"
   local OSK=""
   local QEMU_VER=""
@@ -205,7 +206,6 @@ function vm_boot() {
       disk="16G"
       ;;
     macos)
-      BALLOON=""
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       if [ "${HOST_CPU}" == "AuthenticIntel" ]; then
         CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
@@ -219,8 +219,36 @@ function vm_boot() {
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -global kvm-pit.lost_tick_policy=discard"
       disk="64G"
-      NET_DEVICE="vmxnet3"
-      USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+
+      # Tune Qemu optimisations based on the macOS release, or fallback to lowest
+      # common supported options if none is specificed.
+      #   * VirtIO Block Media doesn't work in High Sierra or Mojave
+      #   * VirtIO Network is supported in Big Sur
+      #   * VirtIO Memory Balloning is supported in Big Sur (https://pmhahn.github.io/virtio-balloon/)
+      #   * VirtIO RNG is supported in Big Sur, but exposed to all guests.
+      case ${macos_release} in
+          catalina)
+            BALLOON=""
+            MAC_DISK_DEV="virtio-blk-pci"
+            NET_DEVICE="vmxnet3"
+            USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+            ;;
+          big-sur)
+            BALLOON="-device virtio-balloon"
+            MAC_DISK_DEV="virtio-blk-pci"
+            NET_DEVICE="virtio-net"
+            USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+            ;;
+          *)
+            # Backwards compatibility if no macos_release is specified.
+            # Also safe catch all for High Sierra and Mojave
+            BALLOON=""
+            MAC_DISK_DEV="ide-hd,bus=ahci.2"
+            NET_DEVICE="vmxnet3"
+            USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+            ;;
+      esac
+
       ;;
     windows)
       CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
@@ -556,13 +584,9 @@ function vm_boot() {
              -drive id=RecoveryImage,if=none,format=raw,file="${img}",cache=none,aio=native)
     fi
 
-    # shellcheck disable=SC2054
-    case ${virtio_blk} in
-      off) args+=(-device ide-hd,bus=ahci.2,drive=SystemDisk);;
-      on)  args+=(-device virtio-blk-pci,drive=SystemDisk);;
-    esac
     # shellcheck disable=SC2054,SC2206
-    args+=(-drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO})
+    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
@@ -656,11 +680,12 @@ floppy=""
 guest_os="linux"
 img=""
 iso=""
+macos_release=""
 port_forwards=()
 preallocation="metadata"
 ram=""
 usb_devices=()
-virtio_blk="on"
+
 
 DELETE=0
 FULLSCREEN=""

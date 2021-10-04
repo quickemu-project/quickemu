@@ -162,9 +162,13 @@ The default macOS configuration looks like this:
 guest_os="macos"
 img="macos-big-sur/RecoveryImage.img"
 disk_img="macos-big-sur/disk.qcow2"
+macos_release="big-sur"
 ```
 
   * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
+  * The `macos_release="big-sur"` line instructs Quickemu to optimise for a particular macOS release.
+    * For example VirtIO Network and Memory Ballooning are available in Big Sir, but not previous releases.
+    * And VirtIO Block Media (disks) are supported/stable in Catalina and newer.
   * If you want to disable VirtIO Block Media and use SATA emulation add `virtio_blk="off"` to your configuration.
     * `quickget` disables VirtIO Block Media for High Sierra and Mojave by default since it is not supported on those releases.
 
@@ -181,10 +185,12 @@ There are some considerations when running macOS via Quickemu.
     * Big Sur
   * Optimised by default
     * Host CPU vendor is detected and guest CPU is optimised accordingly.
-    * [VirtIO block device](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
+    * [VirtIO Block Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
-    * `vmxnet3` network device is used.
-  * USB host pass-through is limited to UHCI (USB 2.0).
+    * VirtIO Network (`virtio-net`) is supported and enabled on macOS Big Sur but previous releases use `vmxnet3`.
+    * VirtIO Memory Ballooning is supported and enabled on macOS Big Sur but disabled for other support macOS releases.
+  * USB host pass-through is limited to UHCI (USB 2.0) on macOS Catalina and earlier.
+    * macOS Big Sur support XHCI (USB 3.0) host-passthrough.
   * Display resolution can only be changed via macOS System Preferences.
   * macOS Big Sur has no audio, but Full Duplex audio works on macOS Catalina is previous releases.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
