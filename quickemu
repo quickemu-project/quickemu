@@ -404,7 +404,10 @@ function vm_boot() {
 
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
-    DISPLAY_DEVICE="virtio-vga"
+    case ${OUTPUT} in
+      spice) DISPLAY_DEVICE="qxl-vga";;
+      *) DISPLAY_DEVICE="virtio-vga";;
+    esac
   elif [ "${guest_os}" == "macos" ]; then
     # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
