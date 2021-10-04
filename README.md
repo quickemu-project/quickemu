@@ -432,7 +432,6 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
   - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
   - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
   - [ ] Add discrete GPU pass-through
-  - [ ] Include macOS compatible firmware
   - [ ] Add BSD support
   - [ ] Improve disk management
 
