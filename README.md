@@ -280,7 +280,7 @@ Add additional lines to your virtual machine configuration:
 
   * `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
   * `ram="4G"` - Specify the amount of RAM to allocate to the VM
-  * `disk="16G"` - Specify the size of the virtual disk allocated to the VM
+  * `disk_size="16G"` - Specify the size of the virtual disk allocated to the VM
 
 
 ## Disk preallocation

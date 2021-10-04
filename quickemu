@@ -290,7 +290,7 @@ function vm_boot() {
   case ${guest_os} in
     linux)
       CPU="-cpu host,kvm=on"
-      disk="16G"
+      disk_size="16G"
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
@@ -345,7 +345,7 @@ function vm_boot() {
     windows)
       CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
       GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
-      disk="64G"
+      disk_size="64G"
       ;;
     *)
       CPU="-cpu host,kvm=on"
@@ -354,7 +354,7 @@ function vm_boot() {
       ;;
   esac
 
-  echo " - Disk:     ${disk_img} (${disk})"
+  echo " - Disk:     ${disk_img} (${disk_size})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
       mkdir -p "${VMDIR}" 2>/dev/null
@@ -366,7 +366,7 @@ function vm_boot() {
       esac
 
       # https://blog.programster.org/qcow2-performance
-      if ! ${QEMU_IMG} create -q -f qcow2 -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk}"; then
+      if ! ${QEMU_IMG} create -q -f qcow2 -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk_size}"; then
         echo "ERROR! Failed to create ${disk_img}"
         exit 1
       fi
@@ -732,7 +732,7 @@ function usage() {
 boot="efi"
 cpu_cores=""
 disk_img=""
-disk="64G"
+disk_size="32G"
 fixed_iso=""
 floppy=""
 guest_os="linux"
@@ -867,6 +867,11 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
     fixed_iso="${driver_iso}"
+  fi
+
+  # Backwards compatibility for ${disk} (size)
+  if [ -n "${disk}" ]; then
+    disk_size="${disk}"
   fi
 else
   echo "ERROR! Virtual machine configuration not found."
