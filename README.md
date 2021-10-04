@@ -35,6 +35,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * [python3](https://www.python.org/)
   * [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
   * [usbutils](https://github.com/gregkh/usbutils)
+  * [util-linux](https://github.com/karelzak/util-linux)
   * [sed](https://www.gnu.org/software/sed/)
   * [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
   * [Wget](https://www.gnu.org/software/wget/)

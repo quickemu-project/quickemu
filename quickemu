@@ -132,10 +132,16 @@ function vm_boot() {
   VMDIR=$(dirname "${disk_img}")
   local BALLOON="-device virtio-balloon"
   local CPU=""
+  local GUEST_CPU_CORES=""
+  local GUEST_CPU_LOGICAL_CORES=""
+  local GUEST_CPU_THREADS=""
+  local HOST_CPU_CORES=""
+  local HOST_CPU_SMT=""
+  local HOST_CPU_SOCKETS=""
+  local HOST_CPU_VENDOR=""
   local DISPLAY_DEVICE=""
   local GL="on"
   local GUEST_TWEAKS=""
-  local HOST_CPU=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
   local NET_DEVICE="virtio-net"
@@ -195,8 +201,69 @@ function vm_boot() {
     echo " - BOOT:     Legacy BIOS (${guest_os})"
   fi
 
+  HOST_CPU_CORES=$(nproc --all)
+  HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
+  HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
 
   #A CPU with Intel VT-x / AMD SVM support is required
+  if [ -z "${cpu_cores}" ]; then
+      if [ "${HOST_CPU_CORES}" -ge 32 ]; then
+        GUEST_CPU_CORES="16"
+      elif [ "${HOST_CPU_CORES}" -ge 16 ]; then
+        GUEST_CPU_CORES="8"
+      elif [ "${HOST_CPU_CORES}" -ge 8 ]; then
+        GUEST_CPU_CORES="4"
+      elif [ "${HOST_CPU_CORES}" -ge 4 ]; then
+        GUEST_CPU_CORES="2"
+      else
+        GUEST_CPU_CORES="1"
+      fi
+  else
+      GUEST_CPU_CORES="${cpu_cores}"
+  fi
+
+  # Account for Hyperthreading/SMT.
+  if [ -e /sys/devices/system/cpu/smt/control ] && [ "${GUEST_CPU_CORES}" -ge 2 ]; then
+    HOST_CPU_SMT=$(cat /sys/devices/system/cpu/smt/control)
+    case ${HOST_CPU_SMT} in
+      on)
+        GUEST_CPU_THREADS=2
+        GUEST_CPU_LOGICAL_CORES=$(( GUEST_CPU_CORES / GUEST_CPU_THREADS ))
+        ;;
+      *)
+        GUEST_CPU_THREADS=1
+        GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
+        ;;
+    esac
+  else
+    GUEST_CPU_THREADS=1
+    GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
+  fi
+
+  local SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
+  echo -n " - CPU:      ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
+
+  local RAM_VM="2G"
+  if [ -z "${ram}" ]; then
+      local RAM_HOST=""
+      RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
+      #Round up - https://github.com/wimpysworld/quickemu/issues/11
+      RAM_HOST=$(printf '%.*f\n' 0 "${RAM_HOST}")
+      if [ "${RAM_HOST}" -ge 256 ]; then
+        RAM_VM="32G"
+      elif [ "${RAM_HOST}" -ge 128 ]; then
+        RAM_VM="16G"
+      elif [ "${RAM_HOST}" -ge 64 ]; then
+        RAM_VM="8G"
+      elif [ "${RAM_HOST}" -ge 32 ]; then
+        RAM_VM="4G"
+      elif [ "${RAM_HOST}" -ge 16 ]; then
+        RAM_VM="3G"
+      fi
+  else
+      RAM_VM="${ram}"
+  fi
+  echo ", ${RAM_VM} RAM"
 
   # Make any OS specific adjustments
   case ${guest_os} in
@@ -321,47 +388,6 @@ function vm_boot() {
   if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
     echo " - CD-ROM:   ${fixed_iso}"
   fi
-
-  local CORES_VM="1"
-  if [ -z "$cpu_cores" ]; then
-      local CORES_HOST=""
-      CORES_HOST=$(nproc --all)
-      if [ "${CORES_HOST}" -ge 32 ]; then
-        CORES_VM="16"
-      elif [ "${CORES_HOST}" -ge 16 ]; then
-        CORES_VM="8"
-      elif [ "${CORES_HOST}" -ge 8 ]; then
-        CORES_VM="4"
-      elif [ "${CORES_HOST}" -ge 4 ]; then
-        CORES_VM="2"
-      fi
-  else
-      CORES_VM="$cpu_cores"
-  fi
-  local SMP="-smp ${CORES_VM},sockets=1,cores=${CORES_VM},threads=1"
-  echo " - CPU:      ${CORES_VM} Core(s)"
-
-  local RAM_VM="2G"
-  if [ -z "$ram" ]; then
-      local RAM_HOST=""
-      RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
-      #Round up - https://github.com/wimpysworld/quickemu/issues/11
-      RAM_HOST=$(printf '%.*f\n' 0 "${RAM_HOST}")
-      if [ "${RAM_HOST}" -ge 256 ]; then
-        RAM_VM="32G"
-      elif [ "${RAM_HOST}" -ge 128 ]; then
-        RAM_VM="16G"
-      elif [ "${RAM_HOST}" -ge 64 ]; then
-        RAM_VM="8G"
-      elif [ "${RAM_HOST}" -ge 32 ]; then
-        RAM_VM="4G"
-      elif [ "${RAM_HOST}" -ge 16 ]; then
-        RAM_VM="3G"
-      fi
-  else
-      RAM_VM="$ram"
-  fi
-  echo " - RAM:      ${RAM_VM}"
 
   local X_RES=1152
   local Y_RES=648
