@@ -435,11 +435,10 @@ function vm_boot() {
     # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
     #  - qxl is used on Big Sur and Catalina
-    #  - VGA is used on Mojave, although options are limited and they are all 4:3
+    #  - VGA is used on Mojave, although available resolutions are all 4:3
     #  - High Sierra will run at the default 1920x1080 only.
     case ${macos_release} in
-      catalina) DISPLAY_DEVICE="qxl";;
-      big-sur) DISPLAY_DEVICE="qxl";;
+      catalina|big-sur) DISPLAY_DEVICE="qxl";;
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
