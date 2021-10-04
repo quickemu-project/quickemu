@@ -516,6 +516,8 @@ function vm_boot() {
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
+         -device virtio-rng-pci,rng=rng0
+         -object rng-random,id=rng0,filename=/dev/urandom
          -monitor none
          -serial mon:stdio)
 
@@ -577,9 +579,7 @@ function vm_boot() {
            -device ccid-card-passthru,chardev=ccid
            -device virtio-serial-pci
            -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
-           -device virtio-rng-pci,rng=rng0
-           -object rng-random,id=rng0,filename=/dev/urandom)
+           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
