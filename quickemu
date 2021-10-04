@@ -137,7 +137,7 @@ function vm_boot() {
   local GUEST_TWEAKS=""
   local HOST_CPU=""
   local MAC_MISSING=""
-  local MAC_VIRTIO_BLK="ide-hd,bus=ahci.2"
+  local MAC_DISK_DEV="ide-hd,bus=ahci.2"
   local NET_DEVICE="virtio-net"
   local OSK=""
   local QEMU_VER=""
@@ -222,7 +222,7 @@ function vm_boot() {
 
       # Tune Qemu optimisations based on the macOS release, or fallback to lowest
       # common supported options if none is specificed.
-      #   * VirtIO Block Media doesn't work in High Sierra or Mojave
+      #   * VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)
       #   * VirtIO Network is supported in Big Sur
       #   * VirtIO Memory Balloning is supported in Big Sur (https://pmhahn.github.io/virtio-balloon/)
       #   * VirtIO RNG is supported in Big Sur, but exposed to all guests.
