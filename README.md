@@ -442,6 +442,7 @@ Useful reference that assisted the development of Quickemu.
 
   General
     * [QEMU’s documentation!](https://qemu.readthedocs.io/en/latest/)
+    * <https://pve.proxmox.com/wiki/Qemu/KVM_Virtual_Machines>
     * <https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/>
 
   * macOS
