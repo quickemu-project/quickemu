@@ -125,6 +125,15 @@ function enable_usb_passthrough() {
   fi
 }
 
+function check_cpu_flag() {
+  local HOST_CPU_FLAG="${1}"
+  if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 function vm_boot() {
   local VMNAME=""
   VMNAME=$(basename "${VM}" .conf)
