@@ -683,7 +683,7 @@ function vm_boot() {
   echo "${QEMU}" "${args[@]}" >> "${VMDIR}/${VMNAME}.sh"
 
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
-  echo " - PID:      ${!}"
+  echo -e " - Process:  On guest: killall ${VMNAME}\t(if a forced kill is required)"
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
