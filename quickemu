@@ -214,7 +214,19 @@ function vm_boot() {
   HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
   HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
 
-  #A CPU with Intel VT-x / AMD SVM support is required
+  # A CPU with Intel VT-x / AMD SVM support is required
+  if [ "${HOST_CPU_VENDOR}" == "AuthenticIntel" ]; then
+    if ! check_cpu_flag vmx; then
+      echo "ERROR! Intel VT-x support is required."
+      exit 1
+    fi
+  elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+    if ! check_cpu_flag svm; then
+      echo "ERROR! AMD SVM support is required."
+      exit 1
+    fi
+  fi
+
   if [ -z "${cpu_cores}" ]; then
       if [ "${HOST_CPU_CORES}" -ge 32 ]; then
         GUEST_CPU_CORES="16"
@@ -282,14 +294,20 @@ function vm_boot() {
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
-      if [ "${HOST_CPU}" == "AuthenticIntel" ]; then
-        CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
-      elif [ "${HOST_CPU}" == "AuthenticAMD" ]; then
-        # CPU flags used in past Quickemu: +movbe,+smep,+xgetbv1,+xsavec
-        # CPU flags that warn on AMD:      +fma4,+pcid
-        CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+      # A CPU with SSE4.1 support is required for >= macOS Sierra
+      # A CPU with AVX2 support is required for >= macOS Mojave
+      if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
+        case ${HOST_CPU_VENDOR} in
+          AuthenticIntel)
+            CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
+          AuthenticAMD|*)
+            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec
+            # Warn on AMD:           +fma4,+pcid
+            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
+        esac
       else
-        CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+        echo "ERROR! macOS requires a CPU with SSE 4.1 and AVX2 support."
+        exit 1
       fi
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
