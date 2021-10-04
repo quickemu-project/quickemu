@@ -397,14 +397,25 @@ function vm_boot() {
     fi
   fi
 
-  echo " - Screen:   ${X_RES}x${Y_RES}"
+  if [ "${guest_os}" != "macos" ]; then
+    echo " - Screen:   ${X_RES}x${Y_RES}"
+  fi
   echo " - Display:  ${OUTPUT^^}"
 
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
     DISPLAY_DEVICE="virtio-vga"
   elif [ "${guest_os}" == "macos" ]; then
-    DISPLAY_DEVICE="qxl"
+    # Tweak video device based on the guest macOS release.
+    # Displays in System Preferences can be used to select a resolution if:
+    #  - qxl is used on Big Sur and Catalina
+    #  - VGA is used on Mojave, although options are limited and they are all 4:3
+    #  - High Sierra will run at the default 1920x1080 only.
+    case ${macos_release} in
+      catalina) DISPLAY_DEVICE="qxl";;
+      big-sur) DISPLAY_DEVICE="qxl";;
+      *) DISPLAY_DEVICE="VGA";;
+    esac
   elif [ "${guest_os}" == "windows" ]; then
     DISPLAY_DEVICE="qxl-vga"
   else
@@ -412,9 +423,6 @@ function vm_boot() {
   fi
 
   if [ "${OUTPUT}" == "spice" ]; then
-    if [ "${guest_os}" == "linux" ]; then
-      DISPLAY_DEVICE="qxl-vga"
-    fi
     OUTPUT="none"
   fi
 
