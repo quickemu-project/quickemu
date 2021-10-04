@@ -151,6 +151,7 @@ function vm_boot() {
   local DISPLAY_DEVICE=""
   local GL="on"
   local GUEST_TWEAKS=""
+  local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
   local NET_DEVICE="virtio-net"
@@ -178,10 +179,10 @@ function vm_boot() {
     fi
 
     if [ -e "${VMDIR}/OpenCore.qcow2" ]; then
-      local MAC_BOOTLOADER="${VMDIR}/OpenCore.qcow2"
+      MAC_BOOTLOADER="${VMDIR}/OpenCore.qcow2"
     elif [ -e "${VMDIR}/ESP.qcow2" ]; then
       # Backwards compatibility for Clover
-      local MAC_BOOTLOADER="${VMDIR}/ESP.qcow2"
+      MAC_BOOTLOADER="${VMDIR}/ESP.qcow2"
     else
       MAC_MISSING="Bootloader"
     fi
