@@ -186,6 +186,7 @@ There are some considerations when running macOS via Quickemu.
     * `vmxnet3` network device is used.
   * USB host pass-through is limited to UHCI (USB 2.0).
   * Display resolution can only be changed via macOS System Preferences.
+  * macOS Big Sur has no audio, but Full Duplex audio works on macOS Catalina is previous releases.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
   * **SPICE has limited supported on macOS**:
     * Copy/paste via SPICE agent is not available.
@@ -434,6 +435,7 @@ Useful reference that assisted the development of Quickemu.
 
   General
     * [QEMU’s documentation!](https://qemu.readthedocs.io/en/latest/)
+    * <https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/>
 
   * macOS
     * <https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/>

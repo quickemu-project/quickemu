@@ -509,8 +509,8 @@ function vm_boot() {
          -device usb-kbd,bus=input.0
          -device usb-tablet,bus=input.0
          -device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic
-         -audiodev pa,id=pa,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
-         -device intel-hda -device hda-duplex,audiodev=pa,mixer=off
+         -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
+         -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
          -device virtio-serial-pci
