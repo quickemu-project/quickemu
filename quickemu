@@ -317,26 +317,26 @@ function vm_boot() {
       #   * VirtIO Memory Balloning is supported in Big Sur (https://pmhahn.github.io/virtio-balloon/)
       #   * VirtIO RNG is supported in Big Sur, but exposed to all guests.
       case ${macos_release} in
-          catalina)
-            BALLOON=""
-            MAC_DISK_DEV="virtio-blk-pci"
-            NET_DEVICE="vmxnet3"
-            USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
-            ;;
-          big-sur)
-            BALLOON="-device virtio-balloon"
-            MAC_DISK_DEV="virtio-blk-pci"
-            NET_DEVICE="virtio-net"
-            USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
-            ;;
-          *)
-            # Backwards compatibility if no macos_release is specified.
-            # Also safe catch all for High Sierra and Mojave
-            BALLOON=""
-            MAC_DISK_DEV="ide-hd,bus=ahci.2"
-            NET_DEVICE="vmxnet3"
-            USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
-            ;;
+        catalina)
+          BALLOON=""
+          MAC_DISK_DEV="virtio-blk-pci"
+          NET_DEVICE="vmxnet3"
+          USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+          ;;
+        big-sur)
+          BALLOON="-device virtio-balloon"
+          MAC_DISK_DEV="virtio-blk-pci"
+          NET_DEVICE="virtio-net"
+          USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+          ;;
+        *)
+          # Backwards compatibility if no macos_release is specified.
+          # Also safe catch all for High Sierra and Mojave
+          BALLOON=""
+          MAC_DISK_DEV="ide-hd,bus=ahci.2"
+          NET_DEVICE="vmxnet3"
+          USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+          ;;
       esac
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
