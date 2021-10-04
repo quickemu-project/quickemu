@@ -149,11 +149,12 @@ function vm_boot() {
 
   # Force to lowercase.
   boot=${boot,,}
+  guest_os=${guest_os,,}
 
   # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
     boot="efi"
-    echo " - BOOT:     EFI"
+    echo " - BOOT:     EFI (${guest_os})"
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
       local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
       local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
@@ -177,7 +178,7 @@ function vm_boot() {
     fi
   elif [[ "${boot}" == *"efi"* ]]; then
     if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
-      echo " - BOOT:     EFI"
+      echo " - BOOT:     EFI (${guest_os})"
       local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
       local EFI_VARS="${VMDIR}/OVMF_VARS_4M.fd"
       if [ -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
@@ -188,16 +189,14 @@ function vm_boot() {
       fi
     else
       boot="legacy"
-      echo " - BOOT:     Legacy BIOS - EFI requested but no EFI firmware found."
+      echo " - BOOT:     Legacy BIOS (${guest_os}) - EFI requested but no EFI firmware found."
     fi
   else
-    echo " - BOOT:     Legacy BIOS"
+    echo " - BOOT:     Legacy BIOS (${guest_os})"
   fi
 
-  # Force to lowercase.
-  guest_os=${guest_os,,}
 
-  HOST_CPU=$(grep vendor /proc/cpuinfo | uniq | cut -d':' -f2 | sed 's/ //g')
+  #A CPU with Intel VT-x / AMD SVM support is required
 
   # Make any OS specific adjustments
   case ${guest_os} in
@@ -261,7 +260,6 @@ function vm_boot() {
       echo "WARNING! Unrecognised guest OS: ${guest_os}"
       ;;
   esac
-  echo " - Guest:    ${guest_os^} optimised"
 
   echo " - Disk:     ${disk_img} (${disk})"
   if [ ! -f "${disk_img}" ]; then
@@ -400,7 +398,6 @@ function vm_boot() {
   if [ "${guest_os}" != "macos" ]; then
     echo " - Screen:   ${X_RES}x${Y_RES}"
   fi
-  echo " - Display:  ${OUTPUT^^}"
 
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
@@ -425,11 +422,11 @@ function vm_boot() {
     DISPLAY_DEVICE="qxl-vga"
   fi
 
+  echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
+
   if [ "${OUTPUT}" == "spice" ]; then
     OUTPUT="none"
   fi
-
-  echo " - Video:    ${DISPLAY_DEVICE}"
 
   # Build the video configuration
   VIDEO="-device ${DISPLAY_DEVICE}"
@@ -456,13 +453,12 @@ function vm_boot() {
   if [ "${OUTPUT}" != "none" ]; then
     OUTPUT="${OUTPUT},gl=${GL}"
   fi
-  echo " - GL:       ${GL^^}"
 
   if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
     DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
-    echo " - Virgil3D: ON"
+    echo ", GL (${GL}), VirGL (on)"
   else
-    echo " - Virgil3D: OFF"
+    echo ", GL (${GL}), VirGL (off)"
   fi
 
   # Set the hostname of the VM
