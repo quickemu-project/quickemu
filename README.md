@@ -432,14 +432,13 @@ used the 1920x1080 monitor which results in a window size of 1664x936.
   - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
   - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
   - [ ] Add discrete GPU pass-through
-  - [ ] Add BSD support
   - [ ] Improve disk management
 
 # References
 
 Useful reference that assisted the development of Quickemu.
 
-  General
+  * General
     * [QEMU’s documentation!](https://qemu.readthedocs.io/en/latest/)
     * <https://pve.proxmox.com/wiki/Qemu/KVM_Virtual_Machines>
     * <https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/>
