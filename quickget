@@ -70,7 +70,9 @@ function languages_windows() {
 
 
 function releases_windows() {
-    echo 10
+    echo 8 \
+    10 \
+    11
 }
 
 function web_get() {
@@ -363,7 +365,7 @@ else
         releases_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
-    elif [ "${OS}" == "windows" ]]; then
+    elif [ "${OS}" == "windows" ]; then
         releases_windows
     fi
     exit 1
