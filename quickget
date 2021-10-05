@@ -185,8 +185,8 @@ function get_macos() {
 
     # Use a bundled macrecovery if possible
     CWD="$(dirname ${0})"
-    if [ -x "${CWD}/macrecovery.py" ]; then
-        MACRECOVERY="${CWD}/macrecovery.py"
+    if [ -x "${CWD}/macrecovery" ]; then
+        MACRECOVERY="${CWD}/macrecovery"
     elif [ -x /usr/bin/macrecovery ]; then
         MACRECOVERY="/usr/bin/macrecovery"
     else

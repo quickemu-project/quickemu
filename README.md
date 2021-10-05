@@ -33,7 +33,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * [jq](https://stedolan.github.io/jq/)
   * [procps](https://gitlab.com/procps-ng/procps)
   * [python3](https://www.python.org/)
-  * [macrecovery.py](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
+  * [macrecovery](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
   * [usbutils](https://github.com/gregkh/usbutils)
   * [util-linux](https://github.com/karelzak/util-linux)
   * [sed](https://www.gnu.org/software/sed/)
