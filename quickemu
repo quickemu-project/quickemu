@@ -290,7 +290,12 @@ function vm_boot() {
   # Make any OS specific adjustments
   case ${guest_os} in
     linux)
-      CPU="-cpu host,kvm=on"
+      case ${HOST_CPU_VENDOR} in
+        AuthenticIntel)
+          CPU="-cpu host,kvm=on";;
+        AuthenticAMD|*)
+          CPU="-cpu host,kvm=on,topoext";;
+      esac
       disk_size="16G"
       ;;
     macos)
@@ -344,7 +349,13 @@ function vm_boot() {
       disk_size="64G"
       ;;
     windows)
-      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+      case ${HOST_CPU_VENDOR} in
+        AuthenticIntel)
+          CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex";;
+        AuthenticAMD|*)
+          CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex,topoext";;
+      esac
+
       GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
       disk_size="64G"
       ;;
