@@ -294,7 +294,7 @@ function get_ubuntu() {
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
     case ${RELEASE} in
-      10|11) true;;
+      8|10|11) true;;
       *) echo "ERROR! Windows ${RELEASE} is not supported."
          releases_windows
          exit 1
@@ -316,18 +316,14 @@ function get_windows() {
 
     echo "Getting Windows ${RELEASE} URL..."
     WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-
-    case ${RELEASE} in
-        10) LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows 10")))[0]');;
-        11) LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows 11")))[0]');;
-    esac
+    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))[0]')
 
     WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
     VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
 
     case ${RELEASE} in
-        10) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 10").edition_id');;
-        11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 11").edition_id');;
+        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
+        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
     esac
 
     LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
