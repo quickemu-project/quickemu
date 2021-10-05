@@ -462,6 +462,7 @@ Useful reference that assisted the development of Quickemu.
     * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
     * <https://turlucode.com/qemu-command-line-args/>
     * <https://github.com/pbatard/Fido>
+    * <https://www.tecklyfe.com/how-to-create-a-windows-11-virtual-machine-in-qemu/>
 
   * 9p & virtiofs
     * <https://wiki.qemu.org/Documentation/9p>
