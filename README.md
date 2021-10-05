@@ -170,8 +170,6 @@ macos_release="big-sur"
   * The `macos_release="big-sur"` line instructs Quickemu to optimise for a particular macOS release.
     * For example VirtIO Network and Memory Ballooning are available in Big Sir, but not previous releases.
     * And VirtIO Block Media (disks) are supported/stable in Catalina and newer.
-  * If you want to disable VirtIO Block Media and use SATA emulation add `virtio_blk="off"` to your configuration.
-    * `quickget` disables VirtIO Block Media for High Sierra and Mojave by default since it is not supported on those releases.
 
 ### macOS compatibility
 
@@ -190,12 +188,14 @@ There are some considerations when running macOS via Quickemu.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
     * VirtIO Network (`virtio-net`) is supported and enabled on macOS Big Sur but previous releases use `vmxnet3`.
     * VirtIO Memory Ballooning is supported and enabled on macOS Big Sur but disabled for other support macOS releases.
-  * USB host pass-through is limited to UHCI (USB 2.0) on macOS Catalina and earlier.
-    * macOS Big Sur support XHCI (USB 3.0) host-passthrough.
+  * USB host pass-through is:
+    * UHCI (USB 2.0) on macOS Catalina and earlier.
+    * XHCI (USB 3.0) on macOS Big Sur.
   * Display resolution can only be changed via macOS System Preferences.
-  * macOS Big Sur has no audio, but Full Duplex audio works on macOS Catalina is previous releases.
+  * Full Duplex audio works on macOS High Sierra, Mojave and Catalina is previous releases.
+      * **macOS Big Sur has no audio at all**.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
-  * **SPICE has limited supported on macOS**:
+  * **SPICE has limited support on macOS**:
     * Copy/paste via SPICE agent is not available.
     * File sharing via SPICE webdavd is not available.
     * USB pass-through via SPICE is not available.
