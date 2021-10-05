@@ -201,7 +201,7 @@ There are some considerations when running macOS via Quickemu.
     * USB pass-through via SPICE is not available.
     * Smartcard pass-through is not available.
 
-## Windows 10 & 11 Guests
+## Windows 8.1, 10 & 11 Guests
 
 `quickget` can automatically download [Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
 and [Windows 11](https://www.microsoft.com/en-gb/software-download/windows11)
