@@ -201,10 +201,11 @@ There are some considerations when running macOS via Quickemu.
     * USB pass-through via SPICE is not available.
     * Smartcard pass-through is not available.
 
-## Windows 10 Guest
+## Windows 10 & 11 Guests
 
-`quickget` automatically downloads [Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO),
-the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
+`quickget` can automatically download [Windows 10](https://www.microsoft.com/en-gb/software-download/windows10ISO)
+and [Windows 11](https://www.microsoft.com/en-gb/software-download/windows11)
+along with the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
 ```bash
