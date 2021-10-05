@@ -12,7 +12,7 @@ function disk_delete() {
   VMNAME=$(basename "${VM}" .conf)
   local SHORTCUT_DIR="${HOME}/.local/share/applications/"
   if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
-    rm -v "${SHORTCUT_DIR}/${VMNAME}.desktop"
+    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
     echo "Deleted ${VM} desktop shortcut"
   fi
 }
@@ -696,7 +696,7 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//(/\\(}"
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
-  
+
   echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
 
