@@ -246,9 +246,9 @@ fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
 ```
 
-  * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
-  * The `fixed_iso=` line specifies the ISO image that provides VirtIO drivers.
-  * The `tpm="on"` line instucts `quickemu` to create a software emulated TPM device using `swtpm`.
+  * `guest_os="windows"` instructs `quickemu` to optimise for Windows.
+  * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
+  * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
 
 # SPICE
 
