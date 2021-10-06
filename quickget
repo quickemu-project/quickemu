@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 function os_support() {
-    echo kubuntu \
+    echo freebsd \
+    kubuntu \
     lubuntu \
     macos \
     ubuntu \
@@ -11,6 +12,12 @@ function os_support() {
     ubuntu-studio \
     windows \
     xubuntu
+}
+
+function releases_freebsd(){
+    echo 13_0 \
+    12_2 # replace with 12.3 upon release
+    # 14_0 # Waiting for 14.0 release
 }
 
 function releases_macos() {
