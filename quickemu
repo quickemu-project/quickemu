@@ -780,7 +780,6 @@ ram=""
 tpm="off"
 usb_devices=()
 
-
 DELETE=0
 FULLSCREEN=""
 FULLSPICY=""
@@ -798,7 +797,7 @@ VM=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.1.0"
+readonly VERSION="2.2.0"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P and spice-webdavd. This path is not configurable.
