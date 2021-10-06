@@ -4,24 +4,50 @@
   Quickemu
 </h1>
 
-<p align="center"><b>Simple script to "manage" Qemu virtual machines.</b></p>
+<p align="center"><b>Quickly create and run optimised Windows, macOS and Linux desktop virtual machines.</b></p>
 <div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
 <p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
 
 # Introduction
 
-Quickemu is a simple script to *"manage"* Qemu virtual machines. Each virtual
-machine configuration is a few lines long requiring minimal setup. The
-main objective of the project is to enable quick testing of desktop Linux
-distributions where the virtual machines configuration and disk images can be
-stored anywhere, such as external USB storage or your home directory. **Windows
-and macOS guests are also supported.**
+Quickemu quickly creates and runs highly optimised desktop virtual machines for
+Linux, macOS and Windows; in just with just two commands. You decide what
+operating system you want to run and Quickemu will figure out the best way to
+do it for you. For example:
 
-Quickemu will attempt to *"do the right thing"* rather than expose rich
-configuration options. Quickemu is a wrapper for [QEMU](https://www.qemu.org/).
-See the video where I explain some of my motivations for creating this script.
+```bash
+quickget ubuntu-mate hirsute
+quickemu --vm ubuntu-mate-hirsute.conf
+```
+
+The original objective of the project was to enable quick testing of Linux
+distributions where the virtual machine configurations can be stored anywhere,
+such as external USB storage or your home directory, and no elevated permissions
+are required to run the virtual machines. **Quickemu now also includes
+comprehensive support for macOS and Windows**.
+
+## Features
+
+  * macOS High Sierra, Mojave, Catalina and Big Sur
+  * Windows 8.1, 10 and 11 including TPM 2.0
+  * Ubuntu, and all the official flavours, supported by `quickget`
+  * SPICE for host/guest clipboard sharing
+  * VirtIO-webdavd file sharing for Linux and Windows guests.
+  * VirtIO-9p file sharing for Linux and macOS guests.
+  * VirGL acceleration
+  * USB device pass-through
+  * Smartcard pass-through
+  * Automatic SSH port forwarding to guests
+  * Network port forwarding
+  * EFI and Legacy BIOS booting
+
+Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
+attempts to automatically *"do the right thing"*, rather than expose exhaustive
+configuration options.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
+
+See this (old) video where I explain some of my motivations for creating Quickemu.
 
 [![Replace VirtualBox with Bash & QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
@@ -162,14 +188,14 @@ The default macOS configuration looks like this:
 
 ```bash
 guest_os="macos"
-img="macos-big-sur/RecoveryImage.img"
-disk_img="macos-big-sur/disk.qcow2"
-macos_release="big-sur"
+img="macos-catalina/RecoveryImage.img"
+disk_img="macos-catalina/disk.qcow2"
+macos_release="catalina"
 ```
 
-  * The `guest_os="macos"` line instructs Quickemu to optimise for macOS.
-  * The `macos_release="big-sur"` line instructs Quickemu to optimise for a particular macOS release.
-    * For example VirtIO Network and Memory Ballooning are available in Big Sir, but not previous releases.
+  * `guest_os="macos"` instructs Quickemu to optimise for macOS.
+  * `macos_release="catalina"` instructs Quickemu to optimise for a particular macOS release.
+    * For example VirtIO Network and Memory Ballooning are available in Big Sur, but not previous releases.
     * And VirtIO Block Media (disks) are supported/stable in Catalina and newer.
 
 ### macOS compatibility
