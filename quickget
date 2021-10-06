@@ -135,7 +135,10 @@ function make_vm_config() {
     local GUEST=""
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [[ "${OS}" == *"ubuntu"* ]]; then
+    if [[ "${OS}" == "freebsd" ]]; then
+        GUEST="freebsd"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "macos" ]; then
@@ -168,6 +171,39 @@ function start_vm_info() {
     echo "To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
+}
+
+function get_freebsd() {
+    # For future releases, use dvd1 iso files.
+    local URL=""
+    local CHECKSUMS=""
+    local DL_BASE="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES"
+    local VERSION=""
+    case ${RELEASE} in
+        13_0)
+            VERSION="13.0"
+        ;;
+        12_2)
+            VERSION="12.2"
+        ;;
+        # Waiting until FreeBSD 14 release
+        # 14_0)
+        #     VERSION="14.0"
+        # ;;
+        *)
+            echo "ERROR! FreeBSD ${RELEASE} is not a supported release."
+            releases_freebsd
+            exit 1
+        ;;
+    esac
+
+    URL="${DL_BASE}/${VERSION}/FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
+
+    ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
+    web_get ${URL} ${VM_PATH}
+    make_vm_dir
+    make_vm_config ${ISO}
+    start_vm_info
 }
 
 function get_macos() {
@@ -382,6 +418,8 @@ VM_PATH="${OS}-${RELEASE}"
 
 if [ "${OS}" == "macos" ]; then
     get_macos
+elif [[ "${OS}" == *"freebsd" ]]; then
+    get_freebsd
 elif [[ "${OS}" == *"ubuntu"* ]]; then
     get_ubuntu
 elif [ "${OS}" == "windows" ]; then
