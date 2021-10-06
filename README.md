@@ -226,6 +226,18 @@ quickemu --vm windows-10.conf
     * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
       * Enables USB SPICE pass-through between the host and guest.
 
+### FreeBSD Guest
+`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
+
+FreeBSD version command reference (just in case):
+* 12.2: `12_2`
+* 13.0: `13_0`
+
+```bash
+quickget freebsd 13_0
+quickemu --vm freebsd-13_0.conf
+```
+
 ### Regional versions
 
 By default `quickget` will download the *"English International"* release, but
