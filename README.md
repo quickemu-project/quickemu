@@ -11,7 +11,7 @@
 # Introduction
 
 Quickemu quickly creates and runs highly optimised desktop virtual machines for
-Linux, macOS and Windows; in just with just two commands. You decide what
+Linux, macOS and Windows; with just two commands. You decide what
 operating system you want to run and Quickemu will figure out the best way to
 do it for you. For example:
 
@@ -241,7 +241,7 @@ quickemu --vm windows-11.conf
 ```
 
   * During the Windows install you will be asked *"Where do you want to install Windows?"*
-    * Click **Load driver** and **OK** the the dialogue box that pops up.
+    * Click **Load driver** and **OK** on the dialogue box that pops up.
     * Select `VirtIO SCSI controller (E:\amd64\w10\viostor.inf)` from the list and click **Next**.
     * The disk will now be available for partitioning and formatting.
   * Complete the installation as you normally would.
@@ -358,7 +358,7 @@ Quickemu supports USB redirection via SPICE pass-through and host pass-through.
 
 Using SPICE for USB pass-through is easiest as it doesn't require any elevated
 permission, start Quickemu with `--display spice` and then select `Input` ->
-`Select USB Device for redirection` from the menu to chose which device(s) you want
+`Select USB Device for redirection` from the menu to choose which device(s) you want
 to attach to the guest.
 
 ## Host redirection
@@ -428,7 +428,7 @@ Without the `--screen` option, `quickemu` will look for the size of the smallest
 monitor, and use a size that fits on said monitor.
 
 The `--screen` option forces `quickemu` to use the size of the given monitor to
-compute the size of the window. **It wont't use that monitor to display the VM's
+compute the size of the window. **It won't use that monitor to display the VM's
 window if it's not the primary monitor**. This is useful if the primary monitor
 if not the smallest one, and if the VM's window doesn't need to be moved around.
 
