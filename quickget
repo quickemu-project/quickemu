@@ -153,6 +153,11 @@ EOF
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+
+        # Enable TPM for Windows 11
+        if [ "${OS}" == "windows" ] && [ ${RELEASE} -ge 11 ]; then
+            echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+        fi
     fi
 }
 

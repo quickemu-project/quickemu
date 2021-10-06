@@ -422,6 +422,20 @@ function vm_boot() {
     echo " - CD-ROM:   ${fixed_iso}"
   fi
 
+  # Enable TPM
+  if [ "${tpm}" == "on" ]; then
+    if which swtpm > /dev/null; then
+      swtpm socket \
+        --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock" \
+        --terminate \
+        --tpmstate dir="${VMDIR}" \
+        --tpm2 &
+      echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
+    else
+      echo " - TPM:      swtpm is not installed, TPM not available!"
+    fi
+  fi
+
   local X_RES=1152
   local Y_RES=648
   if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
@@ -685,6 +699,13 @@ function vm_boot() {
           ${USB_PASSTHROUGH})
   fi
 
+  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}.swtpm-sock" ]; then
+      # shellcheck disable=SC2054
+      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+            -tpmdev emulator,id=tpm0,chardev=chrtpm
+            -device tpm-tis,tpmdev=tpm0)
+  fi
+
   # The OSK parameter contains parenthesis, they need to be escaped in the shell scripts
   # The vendor name, Wimpys World, contains a space. It needs to be double-quoted.
   SHELL_ARGS="${args[*]}"
@@ -756,6 +777,7 @@ macos_release=""
 port_forwards=()
 preallocation="metadata"
 ram=""
+tpm="off"
 usb_devices=()
 
 

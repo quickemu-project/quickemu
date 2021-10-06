@@ -38,6 +38,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * [util-linux](https://github.com/karelzak/util-linux)
   * [sed](https://www.gnu.org/software/sed/)
   * [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
+  * [swtpm](https://github.com/stefanberger/swtpm)
   * [Wget](https://www.gnu.org/software/wget/)
   * [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
@@ -192,7 +193,7 @@ There are some considerations when running macOS via Quickemu.
     * UHCI (USB 2.0) on macOS Catalina and earlier.
     * XHCI (USB 3.0) on macOS Big Sur.
   * Display resolution can only be changed via macOS System Preferences.
-  * Full Duplex audio works on macOS High Sierra, Mojave and Catalina is previous releases.
+  * Full Duplex audio works on macOS High Sierra, Mojave and Catalina.
       * **macOS Big Sur has no audio at all**.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
   * **SPICE has limited support on macOS**:
@@ -209,11 +210,11 @@ along with the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt
 and creates a virtual machine configuration.
 
 ```bash
-quickget windows 10
-quickemu --vm windows-10.conf
+quickget windows 11
+quickemu --vm windows-11.conf
 ```
 
-  * During the Windows 10 install you will be asked *"Where do you want to install Windows?"*
+  * During the Windows install you will be asked *"Where do you want to install Windows?"*
     * Click **Load driver** and **OK** the the dialogue box that pops up.
     * Select `VirtIO SCSI controller (E:\amd64\w10\viostor.inf)` from the list and click **Next**.
     * The disk will now be available for partitioning and formatting.
@@ -232,20 +233,22 @@ By default `quickget` will download the *"English International"* release, but
 you can optionally specify one of the supported languages: For example:
 
 ```bash
-quickget windows 10 "Chinese (Traditional)"
+quickget windows 11 "Chinese (Traditional)"
 ```
 
-The default Windows 10 configuration looks like this:
+The default Windows 11 configuration looks like this:
 
 ```bash
 guest_os="windows"
-disk_img="windows-10/disk.qcow2"
-iso="windows-10/Win10_21H1_English_x64.iso"
-fixed_iso="windows-10/virtio-win.iso"
+disk_img="windows-11/disk.qcow2"
+iso="windows-11/Win11_EnglishInternational_x64.iso"
+fixed_iso="windows-11/virtio-win.iso"
+tpm="on"
 ```
 
   * The `guest_os="windows"` line instructs `quickemu` to optimise for Windows.
   * The `fixed_iso=` line specifies the ISO image that provides VirtIO drivers.
+  * The `tpm="on"` line instucts `quickemu` to create a software emulated TPM device using `swtpm`.
 
 # SPICE
 
@@ -282,7 +285,6 @@ Add additional lines to your virtual machine configuration:
   * `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
   * `ram="4G"` - Specify the amount of RAM to allocate to the VM
   * `disk_size="16G"` - Specify the size of the virtual disk allocated to the VM
-
 
 ## Disk preallocation
 
@@ -356,6 +358,12 @@ commands to modify the USB device(s) access permissions, like this:
                 sudo chown -v root:user /dev/bus/usb/001/005
                 ERROR! USB permission changes are required 👆
 ```
+
+# TPM
+
+Since Quickemu 2.2.0 a software emulated TPM device can be added to guest
+virtual machines. Just add `tpm="on"` to your VM configuration. `quickget` will
+automatically add this line to Windows 11 virtual machines.
 
 # All the options
 
@@ -462,6 +470,9 @@ Useful reference that assisted the development of Quickemu.
     * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
     * <https://turlucode.com/qemu-command-line-args/>
     * <https://github.com/pbatard/Fido>
+
+  * TPM
+    * <https://qemu-project.gitlab.io/qemu/specs/tpm.html>
     * <https://www.tecklyfe.com/how-to-create-a-windows-11-virtual-machine-in-qemu/>
 
   * 9p & virtiofs
