@@ -409,7 +409,9 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
 else
     echo "ERROR! You must specify an OS release name."
-    if [ "${OS}" == "macos" ]; then
+    if [ "${OS}" == "freebsd" ]; then
+        releases_freebsd
+    elif [ "${OS}" == "macos" ]; then
         releases_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
