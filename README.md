@@ -254,11 +254,8 @@ quickemu --vm windows-11.conf
       * Enables USB SPICE pass-through between the host and guest.
 
 ### FreeBSD Guest
-`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
 
-FreeBSD version command reference (just in case):
-* 12.2: `12_2`
-* 13.0: `13_0`
+`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
 
 ```bash
 quickget freebsd 13_0

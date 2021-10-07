@@ -15,9 +15,8 @@ function os_support() {
 }
 
 function releases_freebsd(){
-    echo 13_0 \
-    12_2 # replace with 12.3 upon release
-    # 14_0 # Waiting for 14.0 release
+    echo 12_2 \
+    13_0
 }
 
 function releases_macos() {
@@ -181,25 +180,16 @@ function start_vm_info() {
 function get_freebsd() {
     # For future releases, use dvd1 iso files.
     local URL=""
-    local CHECKSUMS=""
     local DL_BASE="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES"
     local VERSION=""
+
     case ${RELEASE} in
-        13_0)
-            VERSION="13.0"
-        ;;
-        12_2)
-            VERSION="12.2"
-        ;;
-        # Waiting until FreeBSD 14 release
-        # 14_0)
-        #     VERSION="14.0"
-        # ;;
+        12_2|13_0) VERSION=${RELEASE//_/.};;
         *)
             echo "ERROR! FreeBSD ${RELEASE} is not a supported release."
             releases_freebsd
             exit 1
-        ;;
+            ;;
     esac
 
     URL="${DL_BASE}/${VERSION}/FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
