@@ -291,7 +291,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    linux)
+    freebsd|linux)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
