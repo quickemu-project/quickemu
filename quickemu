@@ -156,6 +156,7 @@ function vm_boot() {
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
+  local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
   local QEMU_VER=""
@@ -295,6 +296,9 @@ function vm_boot() {
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
+      fi
+      if [ "${guest_os}" == "freebsd" ]; then
+        MOUSE="usb-mouse"
       fi
       disk_size="16G"
       ;;
@@ -625,7 +629,7 @@ function vm_boot() {
          ${VIDEO} -display ${OUTPUT}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
-         -device usb-tablet,bus=input.0
+         -device ${MOUSE},bus=input.0
          -device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic
          -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=audio0
