@@ -142,6 +142,7 @@ function check_cpu_flag() {
 function vm_boot() {
   local BALLOON="-device virtio-balloon"
   local CPU=""
+  local DISK_USED=""
   local GUEST_CPU_CORES=""
   local GUEST_CPU_LOGICAL_CORES=""
   local GUEST_CPU_THREADS=""
@@ -384,26 +385,35 @@ function vm_boot() {
         exit 1
       fi
       echo "             Just created, booting from ${iso}${img}"
+      DISK_USED="no"
   elif [ -e "${disk_img}" ]; then
     # Check there isn't already a process attached to the disk image.
     if ! ${QEMU_IMG} info "${disk_img}" >/dev/null; then
       echo "             Failed to get \"write\" lock. Is another process using the disk?"
       exit 1
     else
-      DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
-      if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
-        echo "             Looks unused, booting from ${iso}${img}"
-        if [ -z "${iso}" ] && [ -z "${img}" ]; then
-          echo "ERROR! You haven't specified a .iso or .img image to boot from."
-          exit 1
+      # Only check disk image size if preallocation is off
+      if [ "${preallocation}" == "off" ]; then
+        DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
+        if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
+          echo "             Looks unused, booting from ${iso}${img}"
+          if [ -z "${iso}" ] && [ -z "${img}" ]; then
+            echo "ERROR! You haven't specified a .iso or .img image to boot from."
+            exit 1
+          fi
+        else
+          DISK_USED="yes"
         fi
       else
-        # If there is a disk image, assume there is an install and do not boot
-        # from installation media.
-        iso=""
-        img=""
+        DISK_USED="yes"
       fi
     fi
+  fi
+
+  if [ "${DISK_USED}" == "yes" ]; then
+    # If there is a disk image that appears to be used do not boot from installation media.
+    iso=""
+    img=""
   fi
 
   # Has the status quo been requested?
@@ -776,7 +786,7 @@ img=""
 iso=""
 macos_release=""
 port_forwards=()
-preallocation="metadata"
+preallocation="off"
 ram=""
 tpm="off"
 usb_devices=()

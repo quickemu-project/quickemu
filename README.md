@@ -314,10 +314,9 @@ Add additional lines to your virtual machine configuration:
 
 ## Disk preallocation
 
-Preallocation mode (allowed values: `off`, `metadata` (default), `falloc`, `full`).
+Preallocation mode (allowed values: `off` (default), `metadata`, `falloc`, `full`).
 An image with preallocated metadata is initially larger but can improve performance
-when the image needs to grow. `falloc` and `full` preallocations are like the
-same options of raw format, but sets up metadata also.
+when the image needs to grow.
 
 Specify what disk preallocation should be used, if any, when creating the system
 disk image by adding a line like this to your VM configuration.
