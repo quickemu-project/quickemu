@@ -207,7 +207,7 @@ There are some considerations when running macOS via Quickemu.
   * Supported macOS releases:
     * High Sierra
     * Mojave
-    * Catalina
+    * Catalina **(Recommended)**
     * Big Sur
   * Optimised by default
     * Host CPU vendor is detected and guest CPU is optimised accordingly.
