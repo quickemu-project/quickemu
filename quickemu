@@ -4,6 +4,11 @@ export LC_ALL=C
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
+    # Remove any EFI vars, but not for macOS
+    rm "${VMDIR}/OVMF_VARS_4M.fd" >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}/OVMF_VARS_4M.fd" >/dev/null 2>&1
+    rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
@@ -135,10 +140,6 @@ function check_cpu_flag() {
 }
 
 function vm_boot() {
-  local VMNAME=""
-  VMNAME=$(basename "${VM}" .conf)
-  local VMDIR=""
-  VMDIR=$(dirname "${disk_img}")
   local BALLOON="-device virtio-balloon"
   local CPU=""
   local GUEST_CPU_CORES=""
@@ -794,6 +795,9 @@ SNAPSHOT_TAG=""
 STATUS_QUO=""
 USB_PASSTHROUGH=""
 VM=""
+VMDIR=""
+VMNAME=""
+VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
@@ -898,6 +902,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     echo "ERROR! No disk_img defined."
     exit 1
   fi
+
+  VMDIR=$(dirname "${disk_img}")
+  VMNAME=$(basename "${VM}" .conf)
+  VMPATH=$(dirname "${VM}")
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
