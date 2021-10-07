@@ -665,7 +665,7 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=BootLoader
+           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
            -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
 
     if [ -n "${img}" ]; then
