@@ -82,6 +82,7 @@ function releases_windows() {
 }
 
 function unattended_windows() {
+    mkdir -p "$(dirname "${1}")"
     cat << 'EOF' > "${1}"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend"
