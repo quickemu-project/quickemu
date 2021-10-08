@@ -529,7 +529,7 @@ function get_windows() {
     echo "Downloading virtio-win.iso..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
-    #if [ ! -e "${VM_PATH}/unattended.iso" ]; then
+    if [ ! -e "${VM_PATH}/unattended.iso" ]; then
         case ${RELEASE} in
             10|11)
                 echo "Making unattended.iso"
@@ -537,7 +537,7 @@ function get_windows() {
                 mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
                 ;;
         esac
-    #fi
+    fi
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
 
     start_vm_info
