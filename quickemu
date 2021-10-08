@@ -825,15 +825,18 @@ readonly VERSION="2.2.2"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P and spice-webdavd. This path is not configurable.
-PUBLIC=$(xdg-user-dir PUBLICSHARE)
-if [ "${PUBLIC}" != ${HOME} ]; then
-  if [ ! -d "${PUBLIC}" ]; then
-    mkdir -p "${PUBLIC}"
+PUBLIC=""
+if command -v xdg-user-dir &>/dev/null; then
+  PUBLIC=$(xdg-user-dir PUBLICSHARE)
+  if [ "${PUBLIC%/}" != ${HOME} ]; then
+    if [ ! -d "${PUBLIC}" ]; then
+      mkdir -p "${PUBLIC}"
+    fi
+    PUBLIC_TAG=$(basename ${PUBLIC})-${USER,,}
+    PUBLIC_PERMS=$(ls -ld ${PUBLIC} | cut -d' ' -f1)
+  else
+    PUBLIC=""
   fi
-  PUBLIC_TAG=$(basename ${PUBLIC})-${USER,,}
-  PUBLIC_PERMS=$(ls -ld ${PUBLIC} | cut -d' ' -f1)
-else
-  PUBLIC=""
 fi
 
 # TODO: Make this run the native architecture binary

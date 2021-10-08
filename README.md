@@ -68,7 +68,6 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
   * [swtpm](https://github.com/stefanberger/swtpm)
   * [Wget](https://www.gnu.org/software/wget/)
-  * [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
   * [zsync](http://zsync.moria.org.uk/)
 
