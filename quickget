@@ -533,6 +533,7 @@ function get_windows() {
         case ${RELEASE} in
             10|11)
                 echo "Making unattended.iso"
+                mkdir -p "${VM_PATH}/unattended" 2>/dev/null
                 unattended_windows "${VM_PATH}/unattended/autounattend.xml"
                 mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
                 ;;
