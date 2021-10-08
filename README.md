@@ -10,10 +10,10 @@
 
 # Introduction
 
-Quickemu quickly creates and runs highly optimised desktop virtual machines for
-Linux, macOS and Windows; with just two commands. You decide what
-operating system you want to run and Quickemu will figure out the best way to
-do it for you. For example:
+Quickly create and run highly optimised desktop virtual machines for Linux,
+macOS and Windows; with just two commands. You decide what operating system you
+want to run and Quickemu will figure out the best way to do it for you. For
+example:
 
 ```bash
 quickget ubuntu-mate hirsute
@@ -31,14 +31,15 @@ comprehensive support for macOS and Windows**.
   * macOS High Sierra, Mojave, Catalina and Big Sur
   * Windows 8.1, 10 and 11 including TPM 2.0
   * Ubuntu, and all the official flavours, supported by `quickget`
-  * SPICE for host/guest clipboard sharing
-  * VirtIO-webdavd file sharing for Linux and Windows guests.
-  * VirtIO-9p file sharing for Linux and macOS guests.
+  * Full SPICE support including host/guest clipboard sharing
+  * VirtIO-webdavd file sharing for Linux and Windows guests
+  * VirtIO-9p file sharing for Linux and macOS guests
   * VirGL acceleration
   * USB device pass-through
   * Smartcard pass-through
   * Automatic SSH port forwarding to guests
   * Network port forwarding
+  * Full duplex audio
   * EFI and Legacy BIOS booting
 
 Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
@@ -159,8 +160,8 @@ quickemu --vm debian-bullseye.conf
 
 ## macOS Guest
 
-`quickget` automatically downloads a macOS recovery image and automatically
-creates a virtual machine configuration.
+`quickget` automatically downloads a macOS recovery image and creates a virtual
+machine configuration.
 
 ```bash
 quickget macos catalina
@@ -250,15 +251,6 @@ quickemu --vm windows-11.conf
     * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
       * Enables USB SPICE pass-through between the host and guest.
 
-### FreeBSD Guest
-
-`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
-
-```bash
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
-```
-
 ### Regional versions
 
 By default `quickget` will download the *"English International"* release, but
@@ -281,6 +273,15 @@ tpm="on"
   * `guest_os="windows"` instructs `quickemu` to optimise for Windows.
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
+
+## FreeBSD Guest
+
+`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
+
+```bash
+quickget freebsd 13_0
+quickemu --vm freebsd-13_0.conf
+```
 
 # SPICE
 
@@ -501,6 +502,7 @@ Useful reference that assisted the development of Quickemu.
     * <https://frontpagelinux.com/tutorials/how-to-use-linux-kvm-to-optimize-your-windows-10-virtual-machine/>
     * <https://turlucode.com/qemu-command-line-args/>
     * <https://github.com/pbatard/Fido>
+    * <https://www.catapultsystems.com/blogs/create-zero-touch-windows-10-iso/>
 
   * TPM
     * <https://qemu-project.gitlab.io/qemu/specs/tpm.html>
