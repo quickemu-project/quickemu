@@ -666,6 +666,12 @@ function vm_boot() {
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
+  # Attached the unattended configuration to Windows guests when booting from ISO
+  if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
+  fi
+
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci

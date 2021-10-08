@@ -60,6 +60,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [procps](https://gitlab.com/procps-ng/procps)
   * [python3](https://www.python.org/)
   * [macrecovery](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
+  * [mkisofs](http://cdrtools.sourceforge.net/private/cdrecord.html)
   * [usbutils](https://github.com/gregkh/usbutils)
   * [util-linux](https://github.com/karelzak/util-linux)
   * [sed](https://www.gnu.org/software/sed/)
@@ -240,10 +241,6 @@ quickget windows 11
 quickemu --vm windows-11.conf
 ```
 
-  * During the Windows install you will be asked *"Where do you want to install Windows?"*
-    * Click **Load driver** and **OK** on the dialogue box that pops up.
-    * Select `VirtIO SCSI controller (E:\amd64\w10\viostor.inf)` from the list and click **Next**.
-    * The disk will now be available for partitioning and formatting.
   * Complete the installation as you normally would.
   * Post-install:
     * Run the VirtIO installer (`virtio-win-gt-x64`) from the CD Drive (E:).
