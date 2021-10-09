@@ -518,6 +518,7 @@ function get_windows() {
     FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
     ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
     DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+    DOWNLOAD_SHA1=$(echo ${DOWNLOAD_INFO} | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
     DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
     DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
 
@@ -525,6 +526,17 @@ function get_windows() {
 
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+    echo "${DOWNLOAD_SHA1}  ${FILE_NAME}" > "${VM_PATH}/SHA1SUMS"
+
+    echo "Checking SHA1SUMS..."
+    cd "${VM_PATH}"
+    if ! sha1sum --check SHA1SUMS --ignore-missing --status; then
+        echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA1SUMS. Try running 'quickget' again."
+        exit 1
+    else
+        echo "All good."
+    fi
+    cd ..
 
     echo "Downloading virtio-win.iso..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
