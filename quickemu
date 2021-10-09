@@ -615,6 +615,12 @@ function vm_boot() {
     fi
   fi
 
+  # If smbd is available and ~/Public is present export it to the guest via samba
+  if [[ -e "/usr/sbin/smbd" && -n ${PUBLIC} ]]; then
+      NET="${NET},smb=${HOME}"
+      echo " - smbd:     On guest: smb://10.0.2.4/qemu"
+  fi
+
   enable_usb_passthrough
 
   # Boot the VM

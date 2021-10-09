@@ -34,6 +34,7 @@ comprehensive support for macOS and Windows**.
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
+  * Samba file sharing for Linux, macOS and Windows guests (*if `smbd` is installed on the host*)
   * VirGL acceleration
   * USB device pass-through
   * Smartcard pass-through
