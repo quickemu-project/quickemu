@@ -323,7 +323,9 @@ function vm_boot() {
       if [ "${guest_os}" == "freebsd" ]; then
         MOUSE="usb-mouse"
       fi
-      disk_size="16G"
+      if [ -z "${disk_size}" ]; then
+        disk_size="16G"
+      fi
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
@@ -373,7 +375,9 @@ function vm_boot() {
       esac
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
-      disk_size="64G"
+      if [ -z "${disk_size}" ]; then
+        disk_size="64G"
+      fi
       ;;
     windows)
       CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
@@ -381,11 +385,16 @@ function vm_boot() {
         CPU="${CPU},topoext"
       fi
       GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
-      disk_size="64G"
+      if [ -z "${disk_size}" ]; then
+        disk_size="64G"
+      fi
       ;;
     *)
       CPU="-cpu host,kvm=on"
       NET_DEVICE="rtl8139"
+      if [ -z "${disk_size}" ]; then
+        disk_size="32G"
+      fi
       echo "WARNING! Unrecognised guest OS: ${guest_os}"
       ;;
   esac
@@ -821,7 +830,7 @@ function usage() {
 boot="efi"
 cpu_cores=""
 disk_img=""
-disk_size="32G"
+disk_size=""
 fixed_iso=""
 floppy=""
 guest_os="linux"
