@@ -617,7 +617,7 @@ function vm_boot() {
 
   # If smbd is available and ~/Public is present export it to the guest via samba
   if [[ -e "/usr/sbin/smbd" && -n ${PUBLIC} ]]; then
-      NET="${NET},smb=${HOME}"
+      NET="${NET},smb=${PUBLIC}"
       echo " - smbd:     On guest: smb://10.0.2.4/qemu"
   fi
 
