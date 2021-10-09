@@ -5,10 +5,10 @@ function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
     # Remove any EFI vars, but not for macOS
-    rm "${VMDIR}/OVMF_VARS_4M.fd" >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}/OVMF_VARS_4M.fd" >/dev/null 2>&1
-    rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
+    rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
+    rm "${VMDIR}"/${VMNAME}-vars.fd >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}"/${VMNAME}-vars.fd > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
