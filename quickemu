@@ -143,6 +143,8 @@ function vm_boot() {
   local BALLOON="-device virtio-balloon"
   local CPU=""
   local DISK_USED=""
+  local EFI_CODE=""
+  local EFI_VARS=""
   local GUEST_CPU_CORES=""
   local GUEST_CPU_LOGICAL_CORES=""
   local GUEST_CPU_THREADS=""
@@ -175,8 +177,8 @@ function vm_boot() {
     boot="efi"
     echo " - BOOT:     EFI (${guest_os})"
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
-      local EFI_CODE="${VMDIR}/OVMF_CODE.fd"
-      local EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+      EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+      EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
     else
       MAC_MISSING="Firmware"
     fi
@@ -196,15 +198,36 @@ function vm_boot() {
       exit 1
     fi
   elif [[ "${boot}" == *"efi"* ]]; then
-    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
+    EFI_VARS="${VMDIR}/OVMF_VARS.fd"
+
+    # Preserve backward compatibility
+    if [ -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
+      mv "${VMDIR}/${VMNAME}-vars.fd" "${EFI_VARS}"
+    elif [ -e "${VMDIR}/OVMF_VARS_4M.fd" ]; then
+      mv "${VMDIR}/OVMF_VARS_4M.fd" "${EFI_VARS}"
+    fi
+
+    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ||
+       [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ] ||
+       [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
       echo " - BOOT:     EFI (${guest_os})"
-      local EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-      local EFI_VARS="${VMDIR}/OVMF_VARS_4M.fd"
-      if [ -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
-        # Preserve backward compatibility
-        mv "${VMDIR}/${VMNAME}-vars.fd" "${EFI_VARS}"
-      elif [ ! -e "${EFI_VARS}" ]; then
-        cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+
+      if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
+        EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
+      elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
+        EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
+      elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
+        EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
+      fi
+
+      if [ ! -e "${EFI_VARS}" ]; then
+        if [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
+          cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/x64/OVMF_VARS.fd" ]; then
+          cp "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/OVMF_VARS.fd" ]; then
+          cp "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+        fi
       fi
     else
       boot="legacy"
