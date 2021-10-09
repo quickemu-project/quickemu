@@ -860,12 +860,13 @@ readonly VERSION="2.2.4"
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
 if command -v xdg-user-dir &>/dev/null; then
   PUBLIC=$(xdg-user-dir PUBLICSHARE)
-  if [ "${PUBLIC%/}" != ${HOME} ]; then
+  if [ "${PUBLIC%/}" != "${HOME}" ]; then
     if [ ! -d "${PUBLIC}" ]; then
       mkdir -p "${PUBLIC}"
     fi
     PUBLIC_TAG=$(basename ${PUBLIC})-${USER,,}
-    PUBLIC_PERMS=$(ls -ld ${PUBLIC} | cut -d' ' -f1)
+    # shellcheck disable=SC2012
+    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
   else
     PUBLIC=""
   fi
