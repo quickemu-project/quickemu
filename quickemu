@@ -864,7 +864,7 @@ if command -v xdg-user-dir &>/dev/null; then
     if [ ! -d "${PUBLIC}" ]; then
       mkdir -p "${PUBLIC}"
     fi
-    PUBLIC_TAG=$(basename ${PUBLIC})-${USER,,}
+    PUBLIC_TAG="Public-${USER,,}"
     # shellcheck disable=SC2012
     PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
   else
