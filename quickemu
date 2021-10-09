@@ -588,26 +588,26 @@ function vm_boot() {
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
-  # Find a free port to expose ssh to the guest
-  local SSH_PORT=""
-  SSH_PORT=$(get_port 22220 9)
-  if [ -n "${SSH_PORT}" ]; then
-    NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
-    echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
-  else
-    echo " - ssh:      All ssh ports have been exhausted."
-  fi
-
   # Have any port forwards been requested?
-  if (( ${#port_forwards[@]} )); then
-    echo " - PORTS:    Port forwards requested:"
-    for FORWARD in "${port_forwards[@]}"; do
-      HOST_PORT=$(echo "${FORWARD}" | cut -d':' -f1)
-      GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
-      echo "              - ${HOST_PORT} => ${GUEST_PORT}"
-      NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
-    done
-  fi
+  local NOTICE_SSH=""
+  echo " - PORTS:    Port forwards requested:"
+  for FORWARD in "${port_forwards[@]}"; do
+    RANGE_STRING=$(echo "${FORWARD}" | cut -d':' -f1)
+    PORT_START=$(echo "${RANGE_STRING}" | cut -d'-' -f1)
+    PORT_RANGE=$(echo "${RANGE_STRING}" | cut -d'-' -f2)
+    HOST_PORT=$(get_port ${PORT_START} ${PORT_RANGE})
+    GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
+    if [ -z "${HOST_PORT}" ]; then
+      echo "              - All ports for ${GUEST_PORT} have been exhausted."
+      continue
+    fi
+    echo "              - ${HOST_PORT} => ${GUEST_PORT}"
+    NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
+    if [ "${GUEST_PORT}" -eq 22 ]; then
+      NOTICE_SSH=" - ssh:      On host:  ssh user@localhost -p ${HOST_PORT}"
+    fi
+  done
+  echo "${NOTICE_SSH}"
 
   # Find a free port for spice
   local SPICE="disable-ticketing=on"
@@ -842,7 +842,7 @@ guest_os="linux"
 img=""
 iso=""
 macos_release=""
-port_forwards=()
+port_forwards=("22220-9:22")
 preallocation="off"
 ram=""
 tpm="off"
