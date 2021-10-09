@@ -587,7 +587,7 @@ function vm_boot() {
       echo " - SPICE:    Enabled"
     else
       echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
-      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}"]; then
+      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
       echo "${FULLSPICY}"
@@ -595,11 +595,11 @@ function vm_boot() {
     fi
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
-    if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}"]; then
+    if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
       echo " - WebDAV:   On guest: dav://localhost:9843/"
     fi
 
-    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}"]; then
+    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
       echo -n " - 9P:       On guest: "
       if [ "${guest_os}" == "linux" ]; then
         echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/Public"
@@ -714,7 +714,7 @@ function vm_boot() {
 
   # https://wiki.qemu.org/Documentation/9psetup
   # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
-  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}"]; then
+  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
       # shellcheck disable=SC2054
       args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
              -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
@@ -748,7 +748,7 @@ function vm_boot() {
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
-    if [ -n "${PUBLIC}"]; then
+    if [ -n "${PUBLIC}" ]; then
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
     else
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
