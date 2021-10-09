@@ -84,12 +84,12 @@ function snapshot_info() {
 
 function get_port() {
     local PORT_START=$1
-    local PORT_RANGE=$2
-    while true; do
-        local CANDIDATE=$((PORT_START + (RANDOM % PORT_RANGE)))
+    local PORT_RANGE=$((PORT_START+$2))
+    local PORT
+    for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
         (cat < /dev/null >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
         if [ ${?} -ne 0 ]; then
-            echo "${CANDIDATE}"
+            echo "${PORT}"
             break
         fi
     done
