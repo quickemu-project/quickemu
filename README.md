@@ -356,6 +356,22 @@ In the example above:
   * Port 8123 on the host is forwarded to port 8123 on the guest.
   * Port 8888 on the host is forwarded to port 80 on the guest.
 
+It is also possible to set a range of ports for port forwarding.
+In this case, the first available port in the range will be selected. 
+This is useful when running multiple guest VMs. For example:
+
+  * `port_forwards=("2220-9:22" "8880-9:80")`
+
+In the example above:
+
+  * The first available port in range 2220-2229 on the host is forwarded to port 22 on the guest.
+  * The first available port in range 8880-8889 on the host is forwarded to port 80 on the guest.
+
+Note: the port forwarding configuration overwrites the default preset:
+
+  * `port_forwards=("22220-9:22")`
+
+
 # USB redirection
 
 Quickemu supports USB redirection via SPICE pass-through and host pass-through.
