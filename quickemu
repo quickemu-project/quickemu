@@ -625,7 +625,7 @@ function vm_boot() {
     if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
       echo -n " - 9P:       On guest: "
       if [ "${guest_os}" == "linux" ]; then
-        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/Public"
+        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
       elif [ "${guest_os}" == "macos" ]; then
         # PUBLICSHARE needs to be world writeable for seamless integration with
         # macOS. Test if it is world writeable, and prompt what to do if not.
