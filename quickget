@@ -526,17 +526,21 @@ function get_windows() {
 
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
-    echo "${DOWNLOAD_SHA1}  ${FILE_NAME}" > "${VM_PATH}/SHA1SUMS"
 
-    echo "Checking SHA1SUMS..."
-    cd "${VM_PATH}"
-    if ! sha1sum --check SHA1SUMS --ignore-missing --status; then
-        echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA1SUMS. Try running 'quickget' again."
-        exit 1
-    else
-        echo "All good."
+    # Windows 10 doesn't include a SHA1 sum
+    # Only check the integrity is SHA1 is available.
+    if [ -n "${DOWNLOAD_SHA1}" ]; then
+      echo "${DOWNLOAD_SHA1}  ${FILE_NAME}" > "${VM_PATH}/SHA1SUMS"
+      echo "Checking SHA1SUMS..."
+      cd "${VM_PATH}"
+      if ! sha1sum --check SHA1SUMS --ignore-missing --status; then
+          echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA1SUMS. Try running 'quickget' again."
+          exit 1
+      else
+          echo "All good."
+      fi
+      cd ..
     fi
-    cd ..
 
     echo "Downloading virtio-win.iso..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
