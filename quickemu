@@ -849,6 +849,24 @@ function usage() {
   exit 1
 }
 
+DELETE=0
+FULLSCREEN=""
+FULLSPICY=""
+OUTPUT="sdl"
+PUBLIC=""
+PUBLIC_PERMS=""
+PUBLIC_TAG=""
+SCREEN=""
+SHORTCUT=0
+SNAPSHOT_ACTION=""
+SNAPSHOT_TAG=""
+STATUS_QUO=""
+USB_PASSTHROUGH=""
+VM=""
+VMDIR=""
+VMNAME=""
+VMPATH=""
+
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
 if command -v xdg-user-dir &>/dev/null; then
@@ -881,24 +899,6 @@ preallocation="off"
 ram=""
 tpm="off"
 usb_devices=()
-
-DELETE=0
-FULLSCREEN=""
-FULLSPICY=""
-OUTPUT="sdl"
-PUBLIC=""
-PUBLIC_PERMS=""
-PUBLIC_TAG=""
-SCREEN=""
-SHORTCUT=0
-SNAPSHOT_ACTION=""
-SNAPSHOT_TAG=""
-STATUS_QUO=""
-USB_PASSTHROUGH=""
-VM=""
-VMDIR=""
-VMNAME=""
-VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
