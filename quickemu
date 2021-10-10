@@ -656,23 +656,21 @@ function vm_boot() {
     fi
 
     SPICE=" -spice disable-ticketing=on"
-    WEBDAV=" -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-     -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0"
-
     echo " - SPICE:    "
     if [ "${OUTPUT}" == "spice-app" ]; then
       echo -n "Enabled"
     else
-      echo -n "On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
-      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
-        echo -n " --spice-shared-dir ${PUBLIC}"
-      fi
-      echo "${FULLSPICY}"
       SPICE="${SPICE},port=${SPICE_PORT} "
+      echo -n "On host:  spicy --title \"${VMNAME}\" ${FULLSPICY} --port ${SPICE_PORT}"
     fi
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+      if [ "${OUTPUT}" == "none" ]; then
+        echo -n " --spice-shared-dir ${PUBLIC}"
+      fi
+      WEBDAV=" -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+       -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0"
       echo " - WebDAV:   On guest: dav://localhost:9843/"
     fi
   fi
