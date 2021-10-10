@@ -372,7 +372,7 @@ Default preset is:
 
 * `share_folders=("PUBLIC:PUBLIC_TAG")`
 
-Note: the port forwarding configuration overwrites the default preset.
+Note: the share folders configuration overwrites the default preset.
 
 ### Windows
 
