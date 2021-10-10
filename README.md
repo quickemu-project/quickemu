@@ -356,6 +356,29 @@ In the example above:
   * Port 8123 on the host is forwarded to port 8123 on the guest.
   * Port 8888 on the host is forwarded to port 80 on the guest.
 
+# Share folders
+
+### Linux & MacOS
+
+Add an additional line to your virtual machine configuration. For example:
+
+  * `share_folders=("/home/user/Public/:Public-user")`
+
+It is also possible to set multiple shared folders. For example:
+
+  * `share_folders=("/home/user/Public/:Public-user /home/user/Projects/:Projects-user ")`
+
+Default preset is:
+
+* `share_folders=("PUBLIC:PUBLIC_TAG")`
+
+Note: the port forwarding configuration overwrites the default preset.
+
+### Windows
+
+Use SPICE with WebDAV.
+
+
 # USB redirection
 
 Quickemu supports USB redirection via SPICE pass-through and host pass-through.
