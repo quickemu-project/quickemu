@@ -366,7 +366,7 @@ Add an additional line to your virtual machine configuration. For example:
 
 It is also possible to set multiple shared folders. For example:
 
-  * `share_folders=("/home/user/Public/:Public-user /home/user/Projects/:Projects-user ")`
+  * `share_folders=("/home/user/Public/:Public-user" "/home/user/Projects/:Projects-user")`
 
 Default preset is:
 
