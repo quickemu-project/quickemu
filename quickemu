@@ -87,7 +87,7 @@ function get_port() {
     local PORT_RANGE=$((PORT_START+$2))
     local PORT
     for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
-        (echo -n "" >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
+        (echo -n "" >/dev/tcp/127.0.0.1/${PORT}) >/dev/null 2>&1
         if [ ${?} -ne 0 ]; then
             echo "${PORT}"
             break
