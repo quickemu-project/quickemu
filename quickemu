@@ -666,11 +666,11 @@ function vm_boot() {
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+      WEBDAV=" -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+       -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0"
       if [ "${OUTPUT}" == "none" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
-      WEBDAV=" -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-       -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0"
       echo " - WebDAV:   On guest: dav://localhost:9843/"
     fi
   fi
