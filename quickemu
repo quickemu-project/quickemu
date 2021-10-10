@@ -628,8 +628,7 @@ function vm_boot() {
   if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
     echo -n " - 9P:       On guest: "
     if [ "${guest_os}" == "linux" ]; then
-      echo -e ${NOTICE_MOUNT}
-      echo "              or:      sudo cat >> /etc/fstab << EOL"
+      echo ${NOTICE_MOUNT}" or: sudo cat >> /etc/fstab << EOL"
       echo -e ${NOTICE_AUTOMOUNT}
       echo "EOL"
     elif [ "${guest_os}" == "macos" ]; then
