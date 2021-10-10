@@ -644,25 +644,29 @@ function vm_boot() {
   fi
 
   # Find a free port for spice
-  local SPICE="disable-ticketing=on"
-  local SPICE_PORT=""
-  SPICE_PORT=$(get_port 5930 9)
-  if [ -z "${SPICE_PORT}" ]; then
-    echo " - SPICE:    All SPICE ports have been exhausted."
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
+  local SPICE=""
+  local WEBDAV=""
+  if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    local SPICE_PORT=""
+    SPICE_PORT=$(get_port 5930 9)
+    if [ -z "${SPICE_PORT}" ]; then
+      echo " - SPICE:    All SPICE ports have been exhausted."
       echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
       exit 1
     fi
-  else
+
+    echo " - SPICE:    "
     if [ "${OUTPUT}" == "spice-app" ]; then
-      echo " - SPICE:    Enabled"
+      echo -n "Enabled"
     else
-      echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
+      echo -n "On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
       if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
       echo "${FULLSPICY}"
-      SPICE="${SPICE},port=${SPICE_PORT}"
+      SPICE=" -spice disable-ticketing=on,port=${SPICE_PORT} "
+      WEBDAV=" -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+       -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0"
     fi
 
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
@@ -696,7 +700,7 @@ function vm_boot() {
          -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
-         -spice ${SPICE}
+         ${SPICE}
          -device virtio-serial-pci
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
@@ -764,8 +768,7 @@ function vm_boot() {
            -chardev spicevmc,id=ccid,name=smartcard
            -device ccid-card-passthru,chardev=ccid
            -device virtio-serial-pci
-           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
+           ${WEBDAV})
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
