@@ -609,6 +609,40 @@ function vm_boot() {
     done
   fi
 
+  # Have any share folders been requested? Only for 9p
+  local SHARES=""
+  local NOTICE_MOUNT=""
+  local NOTICE_AUTOMOUNT=""
+
+  echo " - FOLDERS:  Share folders requested:"
+  for i in "${!share_folders[@]}"; do
+    FOLDER=$(echo "${share_folders[i]}" | cut -d':' -f1)
+    FOLDER_TAG=$(echo "${share_folders[i]}" | cut -d':' -f2)
+    echo "              - ${FOLDER} => ${FOLDER_TAG}"
+    SHARES="${SHARES} -fsdev local,id=fsdev${i},path=${FOLDER},security_model=mapped-xattr
+     -device virtio-9p-pci,fsdev=fsdev${i},mount_tag=${FOLDER_TAG}"
+    NOTICE_MOUNT="${NOTICE_MOUNT}${NOTICE_MOUNT:+; }sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${FOLDER_TAG} ~/$(basename ${FOLDER})"
+    NOTICE_AUTOMOUNT="${NOTICE_AUTOMOUNT}${NOTICE_AUTOMOUNT:+\n}${FOLDER_TAG} ~/$(basename ${FOLDER}) 9p trans=virtio,_netdev,version=9p2000.L,msize=104857600 0 0"
+  done
+
+  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
+    echo -n " - 9P:       On guest: "
+    if [ "${guest_os}" == "linux" ]; then
+      echo -e ${NOTICE_MOUNT}
+      echo "              or:      sudo cat >> /etc/fstab << EOL"
+      echo -e ${NOTICE_AUTOMOUNT}
+      echo "EOL"
+    elif [ "${guest_os}" == "macos" ]; then
+      # PUBLICSHARE needs to be world writeable for seamless integration with
+      # macOS. Test if it is world writeable, and prompt what to do if not.
+      echo "sudo mount_9p ${PUBLIC_TAG}"
+      if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
+        echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
+        echo "             Required for macOS integration 👆"
+      fi
+    fi
+  fi
+
   # Find a free port for spice
   local SPICE="disable-ticketing=on"
   local SPICE_PORT=""
@@ -634,21 +668,6 @@ function vm_boot() {
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
       echo " - WebDAV:   On guest: dav://localhost:9843/"
-    fi
-
-    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
-      echo -n " - 9P:       On guest: "
-      if [ "${guest_os}" == "linux" ]; then
-        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
-      elif [ "${guest_os}" == "macos" ]; then
-        # PUBLICSHARE needs to be world writeable for seamless integration with
-        # macOS. Test if it is world writeable, and prompt what to do if not.
-        echo "sudo mount_9p ${PUBLIC_TAG}"
-        if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
-          echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
-          echo "             Required for macOS integration 👆"
-        fi
-      fi
     fi
   fi
 
@@ -753,8 +772,7 @@ function vm_boot() {
   # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
   if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
       # shellcheck disable=SC2054
-      args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-             -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+      args+=(${SHARES})
   fi
 
   if [ -n "${USB_PASSTHROUGH}" ]; then
@@ -831,6 +849,22 @@ function usage() {
   exit 1
 }
 
+# PUBLICSHARE is the only directory exposed to guest VMs for file
+# sharing via 9P, spice-webdavd and Samba. This path is not configurable.
+if command -v xdg-user-dir &>/dev/null; then
+  PUBLIC=$(xdg-user-dir PUBLICSHARE)
+  if [ "${PUBLIC%/}" != "${HOME}" ]; then
+    if [ ! -d "${PUBLIC}" ]; then
+      mkdir -p "${PUBLIC}"
+    fi
+    PUBLIC_TAG="Public-${USER,,}"
+    # shellcheck disable=SC2012
+    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+  else
+    PUBLIC=""
+  fi
+fi
+
 # Lowercase variables are used in the VM config file only
 boot="efi"
 cpu_cores=""
@@ -842,7 +876,7 @@ guest_os="linux"
 img=""
 iso=""
 macos_release=""
-port_forwards=()
+share_folders=("${PUBLIC}:${PUBLIC_TAG}")
 preallocation="off"
 ram=""
 tpm="off"
@@ -869,22 +903,6 @@ VMPATH=""
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="2.2.4"
-
-# PUBLICSHARE is the only directory exposed to guest VMs for file
-# sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-if command -v xdg-user-dir &>/dev/null; then
-  PUBLIC=$(xdg-user-dir PUBLICSHARE)
-  if [ "${PUBLIC%/}" != "${HOME}" ]; then
-    if [ ! -d "${PUBLIC}" ]; then
-      mkdir -p "${PUBLIC}"
-    fi
-    PUBLIC_TAG="Public-${USER,,}"
-    # shellcheck disable=SC2012
-    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-  else
-    PUBLIC=""
-  fi
-fi
 
 # TODO: Make this run the native architecture binary
 QEMU=$(which qemu-system-x86_64)
