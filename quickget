@@ -272,6 +272,16 @@ function unattended_windows() {
           <Description>Install usbdk USB sharing agent</Description>
           <Order>5</Order>
         </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>curl.exe -L -o C:\Windows\TEMP\spice-vdagent-x64.msi https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi</CommandLine>
+          <Description>Download spice-vdagent SPICE agent</Description>
+          <Order>6</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i C:\Windows\TEMP\spice-vdagent-x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-vdagent SPICE agent</Description>
+          <Order>7</Order>
+        </SynchronousCommand>
       </FirstLogonCommands>
     </component>
   </settings>
