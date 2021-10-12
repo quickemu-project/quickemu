@@ -249,8 +249,28 @@ function unattended_windows() {
       <FirstLogonCommands>
         <SynchronousCommand wcm:action="add">
           <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
-          <Description></Description>
+          <Description>Install Virtio Guest Agent</Description>
           <Order>1</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>curl.exe -L -o C:\Windows\TEMP\spice-webdavd-x64.msi https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi</CommandLine>
+          <Description>Download spice-webdavd file sharing agent</Description>
+          <Order>2</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i C:\Windows\TEMP\spice-webdavd-x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-webdavd file sharing agent</Description>
+          <Order>3</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>curl.exe -L -o C:\Windows\TEMP\usbdk-x64.msi https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi</CommandLine>
+          <Description>Download usbdk USB sharing agent</Description>
+          <Order>4</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i C:\Windows\TEMP\usbdk-x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install usbdk USB sharing agent</Description>
+          <Order>5</Order>
         </SynchronousCommand>
       </FirstLogonCommands>
     </component>

@@ -243,11 +243,7 @@ quickemu --vm windows-11.conf
 ```
 
   * Complete the installation as you normally would.
-  * Post-install:
-    * Download and install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi)
-      * Enables file sharing between the host and guest.
-    * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
-      * Enables USB SPICE pass-through between the host and guest.
+  * All relevant drivers and services should be installed automatically.
 
 ### Regional versions
 
