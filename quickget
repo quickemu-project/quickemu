@@ -216,6 +216,9 @@ function unattended_windows() {
         <PathAndCredentials wcm:action="add" wcm:keyValue="11">
           <Path>E:\viofs\w10\amd64</Path>
         </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="12">
+          <Path>E:\Balloon\w10\amd64</Path>
+        </PathAndCredentials>
       </DriverPaths>
     </component>
   </settings>
