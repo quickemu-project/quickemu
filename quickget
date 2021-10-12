@@ -187,21 +187,42 @@ function unattended_windows() {
       <!--
            This makes the VirtIO drivers available to Windows, assuming that
            the VirtIO driver disk
-           (https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/)
+           (https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
            is available as drive E:
       -->
       <DriverPaths>
         <PathAndCredentials wcm:action="add" wcm:keyValue="1">
-          <Path>E:\amd64\w10</Path>
+          <Path>E:\qemufwcfg\w10\amd64</Path>
         </PathAndCredentials>
         <PathAndCredentials wcm:action="add" wcm:keyValue="2">
-          <Path>E:\viogpudo\w10\amd64</Path>
+          <Path>E:\vioinput\w10\amd64</Path>
         </PathAndCredentials>
         <PathAndCredentials wcm:action="add" wcm:keyValue="3">
-          <Path>E:\viorng\w10\amd64</Path>
+          <Path>E:\vioscsi\w10\amd64</Path>
         </PathAndCredentials>
         <PathAndCredentials wcm:action="add" wcm:keyValue="4">
+          <Path>E:\viostor\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
+          <Path>E:\vioserial\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
+          <Path>E:\qxldod\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
+          <Path>E:\amd64\w10</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
+          <Path>E:\viogpudo\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+          <Path>E:\viorng\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
           <Path>E:\NetKVM\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
+          <Path>E:\viofs\w10\amd64</Path>
         </PathAndCredentials>
       </DriverPaths>
     </component>
@@ -230,6 +251,13 @@ function unattended_windows() {
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
       </OOBE>
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
+          <Description></Description>
+          <Order>1</Order>
+        </SynchronousCommand>
+      </FirstLogonCommands>
     </component>
   </settings>
 </unattend>

@@ -245,8 +245,6 @@ quickemu --vm windows-11.conf
 
   * Complete the installation as you normally would.
   * Post-install:
-    * Run the VirtIO installer (`virtio-win-gt-x64`) from the CD Drive (E:).
-    * Run the Guest Tools installer (`virtio-win-guest-tools`) from the CD Drive (E:).
     * Download and install [spice-webdavd](https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi)
       * Enables file sharing between the host and guest.
     * Download and install [UsbDk](https://www.spice-space.org/download/windows/usbdk/)
