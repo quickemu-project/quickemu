@@ -2,6 +2,7 @@
 
 function os_support() {
     echo freebsd \
+    fedora \
     kubuntu \
     lubuntu \
     macos \
@@ -17,6 +18,12 @@ function os_support() {
 function releases_freebsd(){
     echo 12_2 \
     13_0
+}
+
+function releases_fedora(){
+    echo 33 \
+    34 \
+    35_beta
 }
 
 function releases_macos() {
@@ -284,9 +291,12 @@ function make_vm_config() {
     if [[ "${OS}" == "freebsd" ]]; then
         GUEST="freebsd"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
+    elif [[ "${OS}" == *"fedora"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"  
     elif [ "${OS}" == "macos" ]; then
         GUEST="macos"
         IMAGE_TYPE="img"
@@ -343,6 +353,50 @@ function get_freebsd() {
 
     ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
     web_get ${URL} ${VM_PATH}
+    make_vm_dir
+    make_vm_config ${ISO}
+    start_vm_info
+}
+
+function get_fedora() {
+    # For future releases, use dvd1 iso files.
+    local URL=""
+    local VERSION=""
+
+    case ${RELEASE} in
+        33|34|35_beta) VERSION=${RELEASE};;
+        *)
+            echo "ERROR! Fedora ${RELEASE} is not a supported release."
+            releases_fedora
+            exit 1
+            ;;
+    esac
+
+    FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
+    if [[ $VERSION == *"beta"* ]]; then
+        VERSION_NUM=${VERSION%"_beta"}
+        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')   
+        ISO="Fedora-Workstation-Live-x86_64-${VERSION_NUM}_Beta-1.2.iso"
+    else
+        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq '. | select(.variant=="Workstation" and .version=="'${VERSION}'")')
+        ISO="Fedora-Workstation-Live-x86_64-${VERSION}-1.2.iso"
+    fi
+    
+    URL=$(echo ${FEDORA_RELEASE} | jq -r '.link')
+    SHA256SUM=$(echo ${FEDORA_RELEASE} | jq -r '.sha256')
+
+    web_get ${URL} ${VM_PATH}
+
+    echo "Checking SHA256SUMS..."
+    cd "${VM_PATH}"
+    if ! echo "${SHA256SUM} ${ISO}" | sha256sum --check --status; then
+        echo "ERROR! ${ISO} doesn't match ${SHA256SUM}. Try running 'quickget' again."
+        exit 1
+    else
+        echo "All good."
+    fi
+    cd ..
+        
     make_vm_dir
     make_vm_config ${ISO}
     start_vm_info
@@ -590,6 +644,8 @@ if [ "${OS}" == "macos" ]; then
     get_macos
 elif [[ "${OS}" == *"freebsd" ]]; then
     get_freebsd
+elif [[ "${OS}" == *"fedora"* ]]; then
+    get_fedora
 elif [[ "${OS}" == *"ubuntu"* ]]; then
     get_ubuntu
 elif [ "${OS}" == "windows" ]; then
