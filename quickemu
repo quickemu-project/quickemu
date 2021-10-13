@@ -635,19 +635,19 @@ function vm_boot() {
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
       echo " - WebDAV:   On guest: dav://localhost:9843/"
     fi
+  fi
 
-    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
-      echo -n " - 9P:       On guest: "
-      if [ "${guest_os}" == "linux" ]; then
-        echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
-      elif [ "${guest_os}" == "macos" ]; then
-        # PUBLICSHARE needs to be world writeable for seamless integration with
-        # macOS. Test if it is world writeable, and prompt what to do if not.
-        echo "sudo mount_9p ${PUBLIC_TAG}"
-        if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
-          echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
-          echo "             Required for macOS integration 👆"
-        fi
+  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
+    echo -n " - 9P:       On guest: "
+    if [ "${guest_os}" == "linux" ]; then
+      echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+    elif [ "${guest_os}" == "macos" ]; then
+      # PUBLICSHARE needs to be world writeable for seamless integration with
+      # macOS. Test if it is world writeable, and prompt what to do if not.
+      echo "sudo mount_9p ${PUBLIC_TAG}"
+      if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
+        echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
+        echo "             Required for macOS integration 👆"
       fi
     fi
   fi
