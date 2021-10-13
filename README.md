@@ -56,6 +56,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
 ## Requirements
 
   * [QEMU](https://www.qemu.org/) (*6.0.0 or newer*)
+  * [bash](https://www.gnu.org/software/bash/) (*4.0 or newer*)
   * [Coreutils](https://www.gnu.org/software/coreutils/)
   * [grep](https://www.gnu.org/software/grep/)
   * [jq](https://stedolan.github.io/jq/)
