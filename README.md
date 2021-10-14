@@ -16,8 +16,8 @@ want to run and Quickemu will figure out the best way to do it for you. For
 example:
 
 ```bash
-quickget ubuntu-mate hirsute
-quickemu --vm ubuntu-mate-hirsute.conf
+quickget ubuntu-mate impish
+quickemu --vm ubuntu-mate-impish.conf
 ```
 
 The original objective of the project was to enable quick testing of Linux

@@ -30,6 +30,7 @@ function releases_ubuntu() {
     echo bionic \
     focal \
     hirsute \
+    impish \
     devel
 }
 
