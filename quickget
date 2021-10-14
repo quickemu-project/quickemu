@@ -253,34 +253,19 @@ function unattended_windows() {
           <Order>1</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
-          <CommandLine>curl.exe -L -o C:\Windows\TEMP\spice-webdavd-x64.msi https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi</CommandLine>
-          <Description>Download spice-webdavd file sharing agent</Description>
+          <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-webdavd file sharing agent</Description>
           <Order>2</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i C:\Windows\TEMP\spice-webdavd-x64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install spice-webdavd file sharing agent</Description>
+          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install usbdk USB sharing agent</Description>
           <Order>3</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
-          <CommandLine>curl.exe -L -o C:\Windows\TEMP\usbdk-x64.msi https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi</CommandLine>
-          <Description>Download usbdk USB sharing agent</Description>
-          <Order>4</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i C:\Windows\TEMP\usbdk-x64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install usbdk USB sharing agent</Description>
-          <Order>5</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>curl.exe -L -o C:\Windows\TEMP\spice-vdagent-x64.msi https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi</CommandLine>
-          <Description>Download spice-vdagent SPICE agent</Description>
-          <Order>6</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i C:\Windows\TEMP\spice-vdagent-x64.msi /quiet /passive /qn</CommandLine>
+          <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
           <Description>Install spice-vdagent SPICE agent</Description>
-          <Order>7</Order>
+          <Order>4</Order>
         </SynchronousCommand>
       </FirstLogonCommands>
     </component>
@@ -611,6 +596,9 @@ function get_windows() {
             10|11)
                 echo "Making unattended.iso"
                 mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+                web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+                web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+                web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
                 unattended_windows "${VM_PATH}/unattended/autounattend.xml"
                 mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
                 ;;
