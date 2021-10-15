@@ -42,6 +42,7 @@ comprehensive support for macOS and Windows**.
   * Network port forwarding
   * Full duplex audio
   * EFI and Legacy BIOS booting
+  * Graphical user interfaces available
 
 Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
 attempts to automatically *"do the right thing"*, rather than expose exhaustive
@@ -94,6 +95,11 @@ cd quickemu
 ```
 
 # Usage
+
+While `quickemu` and `quickget` are designed for the terminal, graphical
+user interfaces are also available:
+
+  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by @marxjohnson
 
 ## Ubuntu Guest
 
