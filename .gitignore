@@ -1,0 +1,11 @@
+*.qcow2
+*.iso
+*.conf
+*.sh
+*.log
+*.fd
+*.xml
+*.permall
+.lock
+SHA*
+sha*
