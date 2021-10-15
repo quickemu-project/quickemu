@@ -70,6 +70,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
   * [swtpm](https://github.com/stefanberger/swtpm)
   * [Wget](https://www.gnu.org/software/wget/)
+  * [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
   * [zsync](http://zsync.moria.org.uk/)
 
@@ -339,6 +340,29 @@ floppy disk image in the guest. To do so add the following line to the VM
 configuration:
 
   * `floppy="/path/to/floppy.img"`
+
+# File Sharing
+
+All File Sharing options will only expose `~/Public` (or localised variations)
+for the current user to the guest VMs.
+
+## Samba 🐧 🍏 🪟
+
+If `smbd` is available on the host, Quickemu will automatically enable the
+built-in QEMU support for exposing a Samba share from the host to the guest.
+
+You can install the minimal Samba components on Ubuntu using:
+
+```bash
+sudo apt install --no-install-recommends samba
+```
+## SPICE WebDAV 🐧 🪟
+
+  * TBD
+
+## VirtIO-9P 🐧 🍏
+
+  * TBD
 
 # Network port forwarding
 
