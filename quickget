@@ -343,7 +343,7 @@ function make_vm_config() {
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
-        IMAGE_TYPE="iso"  
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "macos" ]; then
         GUEST="macos"
         IMAGE_TYPE="img"
@@ -422,13 +422,13 @@ function get_fedora() {
     FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
     if [[ $VERSION == *"beta"* ]]; then
         VERSION_NUM=${VERSION%"_beta"}
-        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')   
+        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')
         ISO="Fedora-Workstation-Live-x86_64-${VERSION_NUM}_Beta-1.2.iso"
     else
         FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq '. | select(.variant=="Workstation" and .version=="'${VERSION}'")')
         ISO="Fedora-Workstation-Live-x86_64-${VERSION}-1.2.iso"
     fi
-    
+
     URL=$(echo ${FEDORA_RELEASE} | jq -r '.link')
     SHA256SUM=$(echo ${FEDORA_RELEASE} | jq -r '.sha256')
 
