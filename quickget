@@ -399,8 +399,8 @@ function get_freebsd() {
     URL="${DL_BASE}/${VERSION}/FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
 
     ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
-    web_get ${URL} ${VM_PATH}
     make_vm_dir
+    web_get ${URL} ${VM_PATH}
     make_vm_config ${ISO}
     start_vm_info
 }
@@ -432,6 +432,8 @@ function get_fedora() {
     URL=$(echo ${FEDORA_RELEASE} | jq -r '.link')
     SHA256SUM=$(echo ${FEDORA_RELEASE} | jq -r '.sha256')
 
+    make_vm_dir
+
     web_get ${URL} ${VM_PATH}
 
     echo "Checking SHA256SUMS..."
@@ -443,8 +445,7 @@ function get_fedora() {
         echo "All good."
     fi
     cd ..
-        
-    make_vm_dir
+
     make_vm_config ${ISO}
     start_vm_info
 }
