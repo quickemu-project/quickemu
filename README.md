@@ -421,7 +421,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in `~/.local/
 quickemu --vm ubuntu-focal-desktop.conf --shortcut
 ```
 
-## Screen and window size
+## Screen and window size (Linux guests only)
 
 `qemu` will always default to the primary monitor to display the VM's window.
 
