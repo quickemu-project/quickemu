@@ -26,6 +26,14 @@ function releases_fedora(){
     35_beta
 }
 
+function releases_opensuse(){
+    echo 15_0 \
+    15_1 \
+    15_2 \
+    15_3 \
+    tumbleweed
+}
+
 function releases_macos() {
     echo high-sierra \
     mojave \
@@ -341,6 +349,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"fedora"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"opensuse"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -446,6 +457,34 @@ function get_fedora() {
     fi
     cd ..
 
+    make_vm_config ${ISO}
+    start_vm_info
+}
+
+function get_opensuse() {
+    # For future releases, use dvd1 iso files.
+    local URL=""
+    local DL_BASE="https://download.opensuse.org/"
+    local VERSION=""
+
+    case ${RELEASE} in
+        15_0|15_1|15_2|15_3|tumbleweed) VERSION=${RELEASE//_/.};;
+        *)
+            echo "ERROR! openSUSE ${RELEASE} is not a supported release."
+            releases_opensuse
+            exit 1
+            ;;
+    esac
+
+    if [ "${VERSION}" == "tumbleweed" ]; then
+        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="${DL_BASE}/tumbleweed/iso/${ISO}"
+    else
+        ISO="openSUSE-Leap-${VERSION}-DVD-x86_64.iso"
+        URL="${DL_BASE}/distribution/leap/${VERSION}/iso/${ISO}"
+    fi
+    make_vm_dir
+    web_get ${URL} ${VM_PATH}
     make_vm_config ${ISO}
     start_vm_info
 }
@@ -679,6 +718,8 @@ else
     echo "ERROR! You must specify an OS release name."
     if [ "${OS}" == "freebsd" ]; then
         releases_freebsd
+    elif [ "${OS}" == "opensuse" ]; then
+        releases_opensuse
     elif [ "${OS}" == "macos" ]; then
         releases_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
@@ -697,6 +738,8 @@ elif [[ "${OS}" == *"freebsd" ]]; then
     get_freebsd
 elif [[ "${OS}" == *"fedora"* ]]; then
     get_fedora
+elif [[ "${OS}" == *"opensuse"* ]]; then
+    get_opensuse
 elif [[ "${OS}" == *"ubuntu"* ]]; then
     get_ubuntu
 elif [ "${OS}" == "windows" ]; then
