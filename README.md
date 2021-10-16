@@ -32,6 +32,7 @@ comprehensive support for macOS and Windows**.
   * Windows 8.1, 10 and 11 including TPM 2.0
   * Ubuntu, and all the official flavours, supported by `quickget`
   * Fedora, supported by `quickget`
+  * openSUSE Leap and Tumbleweed, supported by `quickget`
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -293,6 +294,25 @@ quickemu --vm freebsd-13_0.conf
 ```bash
 quickget fedora 34
 quickemu --vm fedora-34.conf
+```
+
+## openSUSE Guest
+
+`quickemu` supports openSUSE Leap and Tumbleweed.
+
+For the installation to complete properly, on the "Installation Settings" screen,
+you need to disable the "Update NVRAM" option.
+
+On that same screen, you may also want to enable SSH, and open the SSH port.
+
+```bash
+quickget opensuse 15_3
+quickemu --vm opensuse-15_3.conf
+```
+
+```bash
+quickget opensuse tumbleweed
+quickemu --vm opensuse-tumbleweed
 ```
 
 # SPICE
