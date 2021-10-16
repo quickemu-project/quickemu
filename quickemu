@@ -489,7 +489,7 @@ function vm_boot() {
   fi
 
   # Determine a sane resolution for Linux guests.
-  if [ "${guest}" == "linux" ]; then
+  if [ "${guest_os}" == "linux" ]; then
     local X_RES=1152
     local Y_RES=648
     if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
