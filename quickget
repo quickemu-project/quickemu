@@ -4,6 +4,7 @@ function os_support() {
     echo freebsd \
     fedora \
     kubuntu \
+    linuxmint \
     lubuntu \
     macos \
     opensuse \
@@ -25,6 +26,12 @@ function releases_fedora(){
     echo 33 \
     34 \
     35_beta
+}
+
+function releases_linuxmint(){
+    echo cinnamon-20_2 \
+    mate-20_2 \
+    xfce-20-2
 }
 
 function releases_opensuse(){
@@ -350,6 +357,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"fedora"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"opensuse"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -458,6 +468,34 @@ function get_fedora() {
     fi
     cd ..
 
+    make_vm_config ${ISO}
+    start_vm_info
+}
+
+function get_linuxmint() {
+    local URL=""
+    local DL_BASE="https://mirrors.edge.kernel.org/linuxmint/stable"
+    local VERSION=""
+
+    case ${RELEASE} in
+        cinnamon-20_2|mate-20_2|xfce-20_2) VERSION=${RELEASE//_/.};;
+        *)
+            echo "ERROR! linuxmint ${RELEASE} is not a supported release."
+            releases_linuxmint
+            exit 1
+            ;;
+    esac
+
+    re='(.*)-(.*)'
+    [[ ${VERSION} =~ ${re} ]];
+    local FLAVOR=${BASH_REMATCH[1]}
+    VERSION=${BASH_REMATCH[2]}
+
+    ISO="linuxmint-${VERSION}-${FLAVOR}-64bit.iso"
+    URL="${DL_BASE}/${VERSION}/${ISO}"
+
+    make_vm_dir
+    web_get ${URL} ${VM_PATH}
     make_vm_config ${ISO}
     start_vm_info
 }
@@ -721,6 +759,8 @@ else
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
+    elif [ "${OS}" == "linuxmint" ]; then
+        releases_linuxmint
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
     elif [ "${OS}" == "macos" ]; then
@@ -741,6 +781,8 @@ elif [[ "${OS}" == *"freebsd" ]]; then
     get_freebsd
 elif [[ "${OS}" == *"fedora"* ]]; then
     get_fedora
+elif [[ "${OS}" == *"linuxmint"* ]]; then
+    get_linuxmint
 elif [[ "${OS}" == *"opensuse"* ]]; then
     get_opensuse
 elif [[ "${OS}" == *"ubuntu"* ]]; then
