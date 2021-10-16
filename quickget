@@ -679,6 +679,8 @@ else
     echo "ERROR! You must specify an OS release name."
     if [ "${OS}" == "freebsd" ]; then
         releases_freebsd
+    elif [ "${OS}" == "fedora" ]; then
+        releases_fedora
     elif [ "${OS}" == "macos" ]; then
         releases_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then

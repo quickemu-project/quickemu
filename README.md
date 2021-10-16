@@ -31,6 +31,7 @@ comprehensive support for macOS and Windows**.
   * macOS High Sierra, Mojave, Catalina and Big Sur
   * Windows 8.1, 10 and 11 including TPM 2.0
   * Ubuntu, and all the official flavours, supported by `quickget`
+  * Fedora, supported by `quickget`
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -283,6 +284,15 @@ tpm="on"
 ```bash
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
+```
+
+## Fedora Guest
+
+`quickemu` supports Fedora releases.
+
+```bash
+quickget fedora 34
+quickemu --vm fedora-34.conf
 ```
 
 # SPICE
