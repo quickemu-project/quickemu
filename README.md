@@ -32,6 +32,7 @@ comprehensive support for macOS and Windows**.
   * Windows 8.1, 10 and 11 including TPM 2.0
   * Ubuntu, and all the official flavours, supported by `quickget`
   * Fedora, supported by `quickget`
+  * linuxmint Cinnamon, MATE, and xfce, supported by `quickget`
   * openSUSE Leap and Tumbleweed, supported by `quickget`
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
@@ -294,6 +295,15 @@ quickemu --vm freebsd-13_0.conf
 ```bash
 quickget fedora 34
 quickemu --vm fedora-34.conf
+```
+
+## linuxmint Guest
+
+`quickemu` supports linuxmint releases.
+
+```bash
+quickget linuxmint mate-20_2
+quickemu --vm linuxmint-mate-20.2.conf
 ```
 
 ## openSUSE Guest
