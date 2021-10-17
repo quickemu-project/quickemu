@@ -92,7 +92,7 @@ sudo apt install quickemu
 ## Other Linux
 
 ```bash
-git clone https://github.com/wimpysworld/quickemu
+git clone --depth=1 https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
 
