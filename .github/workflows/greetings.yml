@@ -10,20 +10,28 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue-message: |
-          'Hello there!
-          You seem to have filed your first issue for the `quickemu` project. Great!
-          
-          It doesn't matter if you are just starting out and dip your feet into the GitHub water for the first time
-          or if you are you are an experienced programmer/Linux enthusiast - we are a welcoming, friendly community.
-          Consider taking a look at Wimpy's [YouTube Channel](https://www.youtube.com/channel/UChpYmMp7EFaxuogUX1eAqyw)
-          or [Discord](https://discord.gg/sNmz3uw), if you fancy chatting with us nerds 🤓
-          Hopefully your issue gets resolved soon. Bye for now!'
+          'Hello there 👋
+          Thanks for submitting your first issue to the Quickemu project 🐛
+          We'll try and take a look at your issue soon ⏲
+
+          In the meantime you might want to join the [Wimpys World Discord](https://wimpysworld.io/discord) where
+          we have a large community of Linux 🐧 enthusiasts and passionate open source
+          developers 🧑‍💻
+
+          You might also be interested in following [Wimpys World Twitch 📡 channel](https://twitch.tv/WimpysWorld)
+          where Wimpy streams let's code video, including this project, several
+          times a week. A back catalog of past live stream and other Linux related content
+          is available on [Wimpys World YouTube 📺 channel](https://youtube.com/WimpysWorld).'
         pr-message: |
-          'Hello there!
-          You seem to have filed your first Pull Request to the `quickemu` project. Great!
-          
-          It doesn't matter if you are just starting out and dip your feet into the GitHub water for the first time
-          or if you are you are an experienced programmer/Linux enthusiast - we are a welcoming, friendly community.
-          Consider taking a look at Wimpy's [YouTube Channel](https://www.youtube.com/channel/UChpYmMp7EFaxuogUX1eAqyw)
-          or [Discord](https://discord.gg/sNmz3uw), if you fancy chatting with us nerds 🤓
-          Bye for now and happy coding!'
+          'Hello there 👋
+          Thanks for submitting your first pull request to the Quickemu project 💪
+          We'll try to review your pull request soon ⏲
+
+          In the meantime you might want to join the [Wimpys World Discord](https://wimpysworld.io/discord) where
+          we have a large community of Linux 🐧 enthusiasts and passionate open source
+          developers 🧑‍💻
+
+          You might also be interested in following [Wimpys World Twitch 📡 channel](https://twitch.tv/WimpysWorld)
+          where Wimpy streams let's code video, including this project, several
+          times a week. A back catalog of past live stream and other Linux related content
+          is available on [Wimpys World YouTube 📺 channel](https://youtube.com/WimpysWorld).'
