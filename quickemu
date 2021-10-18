@@ -531,20 +531,6 @@ function vm_boot() {
     echo " - CD-ROM:   ${fixed_iso}"
   fi
 
-  # Enable TPM
-  if [ "${tpm}" == "on" ]; then
-    if command -v swtpm &>/dev/null; then
-      swtpm socket \
-        --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock" \
-        --terminate \
-        --tpmstate dir="${VMDIR}" \
-        --tpm2 &
-      echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
-    else
-      echo " - TPM:      swtpm is not installed, TPM not available!"
-    fi
-  fi
-
   # Determine a sane resolution for Linux guests.
   if [ "${guest_os}" == "linux" ]; then
     local X_RES=1152
@@ -716,6 +702,23 @@ function vm_boot() {
 
   enable_usb_passthrough
 
+  echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
+
+  # Start TPM
+  if [ "${tpm}" == "on" ]; then
+    local tpm_args=()
+    # shellcheck disable=SC2054
+    tpm_args+=(socket
+            --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock"
+            --terminate
+            --tpmstate dir="${VMDIR}"
+            --tpm2)
+    echo "${SWTPM} ${tpm_args[@]} &" >> "${VMDIR}/${VMNAME}.sh"
+    ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
+    echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
+    sleep 1
+  fi
+
   # Boot the VM
   local args=()
 
@@ -841,9 +844,7 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
 
-  echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
-
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
 
   # If output is 'none' then SPICE was requested.
@@ -1053,6 +1054,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   # Backwards compatibility for ${disk} (size)
   if [ -n "${disk}" ]; then
     disk_size="${disk}"
+  fi
+
+  if [ "${tpm}" == "on" ]; then
+    SWTPM=$(command -v swtpm)
+    if [ ! -e "${SWTPM}" ]; then
+      echo "ERROR! TPM is enabled, but swtpm was not found."
+      exit 1
+    fi
   fi
 else
   echo "ERROR! Virtual machine configuration not found."
