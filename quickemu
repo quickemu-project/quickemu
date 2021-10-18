@@ -491,7 +491,7 @@ function vm_boot() {
 
   # Enable TPM
   if [ "${tpm}" == "on" ]; then
-    if which swtpm > /dev/null; then
+    if command -v swtpm &>/dev/null; then
       swtpm socket \
         --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock" \
         --terminate \
@@ -901,8 +901,8 @@ if command -v xdg-user-dir &>/dev/null; then
 fi
 
 # TODO: Make this run the native architecture binary
-QEMU=$(which qemu-system-x86_64)
-QEMU_IMG=$(which qemu-img)
+QEMU=$(command -v qemu-system-x86_64)
+QEMU_IMG=$(command -v qemu-img)
 if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
   echo "ERROR! qemu not found. Please install qemu."
   exit 1
@@ -929,7 +929,7 @@ else
             if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
               echo "ERROR! Requested output '${OUTPUT}' is not recognised."
               exit 1
-            elif [ "${OUTPUT}" == "spice" ] && [ ! "$(which spicy)" ]; then
+            elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
               echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
               exit 1
             fi
