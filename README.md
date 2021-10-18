@@ -64,6 +64,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [Coreutils](https://www.gnu.org/software/coreutils/)
   * [grep](https://www.gnu.org/software/grep/)
   * [jq](https://stedolan.github.io/jq/)
+  * [LSB](https://wiki.linuxfoundation.org/lsb/start)
   * [procps](https://gitlab.com/procps-ng/procps)
   * [python3](https://www.python.org/)
   * [macrecovery](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
