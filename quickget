@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 function os_support() {
-    echo freebsd \
+    echo elementary \
+    freebsd \
     fedora \
     kubuntu \
     linuxmint \
@@ -15,6 +16,10 @@ function os_support() {
     ubuntu-studio \
     windows \
     xubuntu
+}
+
+function releases_elementary() {
+    echo 6_0
 }
 
 function releases_freebsd(){
@@ -352,7 +357,10 @@ function make_vm_config() {
     local GUEST=""
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [[ "${OS}" == "freebsd" ]]; then
+    if [[ "${OS}" == "elementary" ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == "freebsd" ]]; then
         GUEST="freebsd"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"fedora"* ]]; then
@@ -402,6 +410,24 @@ function start_vm_info() {
     echo "To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
+}
+
+function get_elementary() {
+    case ${RELEASE} in
+        6_0) VERSION=${RELEASE//_/.};;
+        *)
+            echo "ERROR! elementary OS ${RELEASE} is not a supported release."
+            releases_elementary
+            exit 1
+            ;;
+    esac
+
+    ISO=elementaryos-6.0-stable.20211005.iso
+    URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
+    make_vm_dir
+    web_get ${URL} ${VM_PATH}
+    make_vm_config ${ISO}
+    start_vm_info
 }
 
 function get_freebsd() {
@@ -760,7 +786,9 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
 else
     echo "ERROR! You must specify an OS release name."
-    if [ "${OS}" == "freebsd" ]; then
+    if [ "${OS}" == "elementary" ]; then
+        releases_elementary
+    elif [ "${OS}" == "freebsd" ]; then
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
@@ -780,7 +808,9 @@ fi
 
 VM_PATH="${OS}-${RELEASE}"
 
-if [ "${OS}" == "macos" ]; then
+if [ "${OS}" == "elementary" ]; then
+    get_elementary
+elif [ "${OS}" == "macos" ]; then
     get_macos
 elif [[ "${OS}" == *"freebsd" ]]; then
     get_freebsd
