@@ -44,7 +44,7 @@ comprehensive support for macOS and Windows**.
   * Automatic SSH port forwarding to guests
   * Network port forwarding
   * Full duplex audio
-  * EFI and Legacy BIOS booting
+  * EFI (with or without SecureBoot) and Legacy BIOS boot
   * Graphical user interfaces available
 
 Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
@@ -62,6 +62,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [QEMU](https://www.qemu.org/) (*6.0.0 or newer*)
   * [bash](https://www.gnu.org/software/bash/) (*4.0 or newer*)
   * [Coreutils](https://www.gnu.org/software/coreutils/)
+  * [EDK II](https://github.com/tianocore/edk2)
   * [grep](https://www.gnu.org/software/grep/)
   * [jq](https://stedolan.github.io/jq/)
   * [LSB](https://wiki.linuxfoundation.org/lsb/start)

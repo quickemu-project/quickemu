@@ -193,6 +193,7 @@ function efi_vars() {
 
 function vm_boot() {
   local BALLOON="-device virtio-balloon"
+  local BOOT_STATUS=""
   local CPU=""
   local DISK_USED=""
   local DISPLAY_DEVICE=""
@@ -322,7 +323,6 @@ function vm_boot() {
   # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
     boot="efi"
-    echo " - BOOT:     EFI (${guest_os})"
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
       EFI_CODE="${VMDIR}/OVMF_CODE.fd"
       EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
@@ -344,6 +344,7 @@ function vm_boot() {
       echo "       Use 'quickget' to download the required files."
       exit 1
     fi
+    BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
   elif [[ "${boot}" == *"efi"* ]]; then
     EFI_VARS="${VMDIR}/OVMF_VARS.fd"
 
@@ -354,35 +355,53 @@ function vm_boot() {
       mv "${VMDIR}/OVMF_VARS_4M.fd" "${EFI_VARS}"
     fi
 
-    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ||
-       [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ] ||
-       [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-      echo " - BOOT:     EFI (${guest_os})"
+    # OVMF_CODE_4M.fd is for booting guests in non-Secure Boot mode.
+    # While this image technically supports Secure Boot, it does so
+    # without requiring SMM support from QEMU
 
-      if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-      elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
-      elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
-      fi
-
-      if [ ! -e "${EFI_VARS}" ]; then
-        if [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
-          cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_VARS.fd" ]; then
-          cp "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/OVMF_VARS.fd" ]; then
-          cp "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+    # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
+    # does not support SMM.
+    case ${secureboot} in
+      on)
+        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.secboot.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE.secboot.fd" "${EFI_VARS}"
+          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" "${EFI_VARS}"
+          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        else
+          echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
+          exit 1
         fi
-      fi
-    else
-      boot="legacy"
-      echo " - BOOT:     Legacy BIOS (${guest_os}) - EFI requested but no EFI firmware found."
-    fi
+        BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
+        ;;
+      *)
+        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
+          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        else
+          BOOT_STATUS="Legacy BIOS (${guest_os^}) - EFI requested but no EFI firmware found."
+          boot="legacy"
+          secureboot="off"
+        fi
+        BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
+        ;;
+    esac
   else
-    echo " - BOOT:     Legacy BIOS (${guest_os})"
+    BOOT_STATUS="Legacy BIOS (${guest_os^})"
+    secureboot="off"
   fi
+
+  echo " - BOOT:     ${BOOT_STATUS}"
 
   # Make any OS specific adjustments
   case ${guest_os} in
@@ -926,6 +945,7 @@ macos_release=""
 port_forwards=()
 preallocation="off"
 ram=""
+secureboot="off"
 tpm="off"
 usb_devices=()
 
