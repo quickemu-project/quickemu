@@ -800,8 +800,9 @@ function vm_boot() {
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
   if [[ "${boot}" == *"efi"* ]]; then
     # shellcheck disable=SC2054
-    args+=(-drive if=pflash,format=raw,file="${EFI_CODE}",readonly=on
-           -drive if=pflash,format=raw,file="${EFI_VARS}")
+    args+=(-global driver=cfi.pflash01,property=secure,value=on
+           -drive if=pflash,format=raw,unit=0,file="${EFI_CODE}",readonly=on
+           -drive if=pflash,format=raw,unit=1,file="${EFI_VARS}")
   fi
 
   if [ -n "${floppy}" ]; then
