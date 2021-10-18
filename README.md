@@ -34,6 +34,7 @@ comprehensive support for macOS and Windows**.
   * Fedora, supported by `quickget`
   * linuxmint Cinnamon, MATE, and xfce, supported by `quickget`
   * openSUSE Leap, Tumbleweed and MicroOS, supported by `quickget`
+  * Pop!_OS, supported by `quickget` (only with SPICE)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -329,6 +330,15 @@ quickemu --vm opensuse-tumbleweed
 ```bash
 quickget opensuse microos
 quickemu --vm opensuse-microos
+```
+
+## Pop!_OS Guest
+
+`quickemu` supports Pop!_OS 21.04, but only installs with SPICE.
+
+```bash
+quickget popos 21_04
+quickemu --vm popos-21_04.conf --display spice
 ```
 
 # SPICE

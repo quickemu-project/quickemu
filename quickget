@@ -8,6 +8,7 @@ function os_support() {
     lubuntu \
     macos \
     opensuse \
+    popos \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -48,6 +49,10 @@ function releases_macos() {
     mojave \
     catalina \
     big-sur
+}
+
+function releases_popos() {
+    echo 21_04
 }
 
 function releases_ubuntu() {
@@ -364,6 +369,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"opensuse"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == "popos" ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -600,6 +608,29 @@ function get_macos() {
     start_vm_info
 }
 
+function get_popos() {
+    # For future releases, use dvd1 iso files.
+    local URL=""
+    local DL_BASE="https://pop-iso.sfo2.cdn.digitaloceanspaces.com"
+    local VERSION=""
+
+    case ${RELEASE} in
+        21_04) VERSION=${RELEASE//_/.};;
+        *)
+            echo "ERROR! Pop!_OS ${RELEASE} is not a supported release."
+            releases_popos
+            exit 1
+            ;;
+    esac
+
+    ISO="pop-os_21.04_amd64_intel_9.iso"
+    URL="${DL_BASE}/21.04/amd64/intel/9/${ISO}"
+    make_vm_dir
+    web_get ${URL} ${VM_PATH}
+    make_vm_config ${ISO}
+    start_vm_info
+}
+
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
@@ -770,6 +801,8 @@ else
         releases_opensuse
     elif [ "${OS}" == "macos" ]; then
         releases_macos
+    elif [ "${OS}" == "popos" ]; then
+        releases_popos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -790,6 +823,8 @@ elif [[ "${OS}" == *"linuxmint"* ]]; then
     get_linuxmint
 elif [[ "${OS}" == *"opensuse"* ]]; then
     get_opensuse
+elif [[ "${OS}" == "popos" ]]; then
+    get_popos
 elif [[ "${OS}" == *"ubuntu"* ]]; then
     get_ubuntu
 elif [ "${OS}" == "windows" ]; then
