@@ -33,7 +33,7 @@ comprehensive support for macOS and Windows**.
   * Ubuntu, and all the official flavours, supported by `quickget`
   * Fedora, supported by `quickget`
   * linuxmint Cinnamon, MATE, and xfce, supported by `quickget`
-  * openSUSE Leap and Tumbleweed, supported by `quickget`
+  * openSUSE Leap, Tumbleweed and MicroOS, supported by `quickget`
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -308,7 +308,7 @@ quickemu --vm linuxmint-mate-20.2.conf
 
 ## openSUSE Guest
 
-`quickemu` supports openSUSE Leap and Tumbleweed.
+`quickemu` supports openSUSE Leap, Tumbleweed and MicroOS.
 
 For the installation to complete properly, on the "Installation Settings" screen,
 you need to disable the "Update NVRAM" option.
@@ -323,6 +323,11 @@ quickemu --vm opensuse-15_3.conf
 ```bash
 quickget opensuse tumbleweed
 quickemu --vm opensuse-tumbleweed
+```
+
+```bash
+quickget opensuse microos
+quickemu --vm opensuse-microos
 ```
 
 # SPICE
