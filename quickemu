@@ -492,6 +492,11 @@ function vm_boot() {
       ;;
   esac
 
+  # Disable suspend to RAM if SecureBoot/SMM is enabled
+  if [ "${secureboot}" == "on" ] || [ "${SMM}" == "on" ]; then
+    GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
+  fi
+
   echo " - Disk:     ${disk_img} (${disk_size})"
   if [ ! -f "${disk_img}" ]; then
       # If there is no disk image, create a new image.
