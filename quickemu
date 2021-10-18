@@ -175,6 +175,22 @@ function check_cpu_flag() {
   fi
 }
 
+function efi_vars() {
+  local VARS_IN=""
+  local VARS_OUT=""
+  VARS_IN="${1}"
+  VARS_OUT="${2}"
+
+  if [ ! -e "${VARS_OUT}" ]; then
+    if [ -e "${VARS_IN}" ]; then
+      cp "${VARS_IN}" "${VARS_OUT}"
+    else
+      echo "ERROR! ${VARS_IN} was not found. Please install edk2."
+      exit 1
+    fi
+  fi
+}
+
 function vm_boot() {
   local BALLOON="-device virtio-balloon"
   local CPU=""
