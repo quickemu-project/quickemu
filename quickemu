@@ -733,7 +733,7 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO}
-           -device qemu-xhci,id=spicepass
+           -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
            -chardev spicevmc,id=usbredirchardev1,name=usbredir
            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
            -chardev spicevmc,id=usbredirchardev2,name=usbredir
