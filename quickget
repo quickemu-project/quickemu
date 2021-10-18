@@ -32,7 +32,9 @@ function releases_opensuse(){
     15_1 \
     15_2 \
     15_3 \
-    tumbleweed
+    tumbleweed \
+    microos \
+    kubic
 }
 
 function releases_macos() {
@@ -469,7 +471,7 @@ function get_opensuse() {
     local VERSION=""
 
     case ${RELEASE} in
-        15_0|15_1|15_2|15_3|tumbleweed) VERSION=${RELEASE//_/.};;
+        15_0|15_1|15_2|15_3|tumbleweed|microos|kubic ) VERSION=${RELEASE//_/.};;
         *)
             echo "ERROR! openSUSE ${RELEASE} is not a supported release."
             releases_opensuse
@@ -479,6 +481,14 @@ function get_opensuse() {
 
     if [ "${VERSION}" == "tumbleweed" ]; then
         ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="${DL_BASE}/tumbleweed/iso/${ISO}"
+    elif
+        [ "${VERSION}" == "microos" ]; then
+        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
+        URL="${DL_BASE}/tumbleweed/iso/${ISO}"
+    elif
+        [ "${VERSION}" == "kubic" ]; then
+        ISO="openSUSE-Kubic-DVD-x86_64-Current.iso"
         URL="${DL_BASE}/tumbleweed/iso/${ISO}"
     else
         ISO="openSUSE-Leap-${VERSION}-DVD-x86_64.iso"
