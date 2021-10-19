@@ -408,22 +408,22 @@ function make_vm_config() {
     local GUEST=""
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [[ "${OS}" == "elementary" ]]; then
+    if [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "freebsd" ]]; then
+    elif [ "${OS}" == "freebsd" ]; then
         GUEST="freebsd"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "fedora" ]]; then
+    elif [ "${OS}" == "fedora" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "opensuse" ]]; then
+    elif [ "${OS}" == "opensuse" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "popos" ]]; then
+    elif [ "${OS}" == "popos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
