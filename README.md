@@ -31,6 +31,7 @@ comprehensive support for macOS and Windows**.
   * **macOS** High Sierra, Mojave, Catalina and Big Sur
   * **Windows** 8.1, 10 and 11 including TPM 2.0
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
+  * [elementary OS](https://elementary.io/) (only with SPICE)
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/),[MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE)
   * [Pop!_OS](https://pop.system76.com/) (only with SPICE)
@@ -288,6 +289,15 @@ tpm="on"
   * `guest_os="windows"` instructs `quickemu` to optimise for Windows.
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
+
+## elementary OS Guest
+
+`quickemu` supports elementary OS, but only installs using SPICE.
+
+```bash
+quickget elementary 6_0
+quickemu --vm elemenrary-6_0.conf --display spice
+```
 
 ## FreeBSD Guest
 
