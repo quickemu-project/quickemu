@@ -1,6 +1,60 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+function ask_option_msrs() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  if [ ${ignore_msrs} = "N" ]; then
+    while true ; do
+    read -p "Do you wish to set ignore_msrs now? (y/N)" msrs_response
+          case $msrs_response:0:1 in
+          [yY]* ) echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs; break;;
+          * ) break ;;
+          
+      esac
+    done
+  fi 
+}
+
+function ask_persist_msrs() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  #Skip if already persisted, assuming initramfs rebuilt
+  grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm.conf >/dev/null 2>&1 || \
+    if [ ${ignore_msrs} = "Y" ]; then 
+    echo
+    echo "To make setting ignore_msrs a more persistant solution you may run the following:"
+    echo 'echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u'
+    echo
+    
+  while true ; do
+    read -p "Do you wish to set ignore_msrs at boot? (y/N)" bootrsp
+          case $bootrsp:0:1 in
+          [yY]* ) echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u ; break;;
+          * ) break ;;
+          
+      esac
+    done
+  fi
+}
+
+function ignore_msrs_alert() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  
+  if [ ${ignore_msrs} = "N" ]; then
+  # Some macos and windows installations need this to successfully boot
+    echo '
+    If you experience issues booting macos or windows like those mentioned in
+
+      https://github.com/wimpysworld/quickemu/issues/88
+
+    then you can try the provided solution as a temporary fix by executing:
+    
+        "echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"'
+      
+    echo -n "I can do that for you now.  " ; ask_option_msrs
+  fi
+  ask_persist_msrs
+}
+
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
@@ -545,6 +599,8 @@ function vm_boot() {
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
+    # offer ignore_msrs if not set
+    ignore_msrs_alert
     # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
     #  - qxl is used on Big Sur and Catalina
@@ -555,6 +611,8 @@ function vm_boot() {
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
+    # offer ignore_msrs if not set
+    ignore_msrs_alert
     DISPLAY_DEVICE="qxl-vga"
   else
     DISPLAY_DEVICE="qxl-vga"
