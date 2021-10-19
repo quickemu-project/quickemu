@@ -720,8 +720,8 @@ function get_ubuntu() {
 
     RELEASES=$(releases_ubuntu)
     if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
-        echo "ERROR! ${RELEASE} is not a supported release."
-        releases_ubuntu
+        echo "ERROR! ${RELEASE} is not a supported Ubuntu release."
+        echo "${RELEASES}"
         exit 1
     fi
 
