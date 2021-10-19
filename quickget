@@ -555,9 +555,9 @@ function get_freebsd() {
 function get_fedora() {
     local FEDORA_RELEASE=""
     local FEDORA_VERSIONS=""
+    local HASH=""
     local ISO=""
     local URL=""
-    local SHA256SUM=""
     local VERSION_NUM=""
 
     validate_release "releases_fedora"
@@ -573,21 +573,10 @@ function get_fedora() {
     fi
 
     URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
-    SHA256SUM=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
-
+    HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
-
-    echo "Checking SHA256SUMS..."
-    cd "${VM_PATH}"
-    if ! echo "${SHA256SUM} ${ISO}" | sha256sum --check --status; then
-        echo "ERROR! ${ISO} doesn't match ${SHA256SUM}. Try running 'quickget' again."
-        exit 1
-    else
-        echo "All good."
-    fi
-    cd ..
-
+    check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
     make_vm_config "${ISO}"
 }
 
@@ -707,6 +696,7 @@ function get_popos() {
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
+    local HASH=""
     local PROJECT=""
     local URL=""
 
@@ -735,20 +725,13 @@ function get_ubuntu() {
 
     web_get "${URL}/SHA256SUMS" "${VM_PATH}"
     ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
+    HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
     if [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
-        echo "Checking SHA256SUMS..."
-        cd "${VM_PATH}"
-        if ! sha256sum --check SHA256SUMS --ignore-missing --status; then
-            echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA256SUMS. Try running 'quickget' again."
-            exit 1
-        else
-            echo "All good."
-        fi
-        cd ..
+        check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
         make_vm_config "${ISO}"
     fi
 }
@@ -796,19 +779,9 @@ function get_windows() {
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
 
-    # Windows 10 doesn't include a SHA1 sum
-    # Only check the integrity is SHA1 is available.
+    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
     if [ -n "${DOWNLOAD_SHA1}" ]; then
-      echo "${DOWNLOAD_SHA1}  ${FILE_NAME}" > "${VM_PATH}/SHA1SUMS"
-
-      cd "${VM_PATH}"
-      if ! sha1sum --check SHA1SUMS --ignore-missing --status; then
-          echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA1SUMS. Try running 'quickget' again."
-          exit 1
-      else
-          echo "All good."
-      fi
-      cd ..
+      check_hash "${VM_PATH}/${FILE_NAME}" "${DOWNLOAD_SHA1}" sha1sum
     fi
 
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
