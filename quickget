@@ -96,6 +96,7 @@ function releases_macos() {
 }
 
 function releases_popos() {
+    echo 20_04 \
     echo 21_04
 }
 
@@ -680,7 +681,7 @@ function get_popos() {
     local VERSION=""
 
     case ${RELEASE} in
-        21_04) VERSION=${RELEASE//_/.};;
+        20_04|21_04) VERSION=${RELEASE//_/.};;
         *)
             echo "ERROR! Pop!_OS ${RELEASE} is not a supported release."
             releases_popos
@@ -688,8 +689,9 @@ function get_popos() {
             ;;
     esac
 
-    ISO="pop-os_21.04_amd64_intel_9.iso"
-    URL="${DL_BASE}/21.04/amd64/intel/9/${ISO}"
+    URL=$(wget -q -O- https://api.pop-os.org/builds/${VERSION}/intel | jq ".url")
+    URL="${URL//\"/}"
+    ISO=$(echo $URL|sed -e "s/.*\/\([^\/]*\)$/\1/")
     make_vm_dir
     web_get ${URL} ${VM_PATH}
     make_vm_config ${ISO}
