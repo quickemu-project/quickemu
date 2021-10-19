@@ -403,9 +403,17 @@ function check_hash() {
     local iso=""
     local hash=""
     local hash_algo=""
-    iso="${1}"
+    iso="${VM_PATH}/${1}"
     hash="${2}"
-    hash_algo="${3}"
+
+    # Guess the hash algorithm by the hash length
+    case ${#hash} in
+      32) hash_algo=md5sum;;
+      40) hash_algo=sha1sum;;
+      64) hash_algo=sha256sum;;
+       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+          return;;
+    esac
 
     echo -n "Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
