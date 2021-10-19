@@ -28,12 +28,11 @@ comprehensive support for macOS and Windows**.
 
 ## Features
 
-  * macOS High Sierra, Mojave, Catalina and Big Sur
-  * Windows 8.1, 10 and 11 including TPM 2.0
-  * Ubuntu, and all the official flavours, supported by `quickget`
-  * Fedora, supported by `quickget`
-  * linuxmint Cinnamon, MATE, and xfce, supported by `quickget`
-  * openSUSE Leap, Tumbleweed and MicroOS, supported by `quickget`
+  * **macOS** High Sierra, Mojave, Catalina and Big Sur
+  * **Windows** 8.1, 10 and 11 including TPM 2.0
+  * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
+  * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/),[MicroOS](https://microos.opensuse.org/))
+  * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -545,13 +544,6 @@ quickemu --vm vm.conf --screen 0
 The above uses the 2560x1440 screen to compute the size of the window, which
 Quickemu sizes to 2048x1152. Without the `--screen` option, Quickemu would have
 used the 1920x1080 monitor which results in a window size of 1664x936.
-
-# TODO
-
-  - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
-  - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
-  - [ ] Add discrete GPU pass-through
-  - [ ] Improve disk management
 
 # References
 
