@@ -79,14 +79,14 @@ function list_all() {
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "windows" ]; then
         for LANG in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}",
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}"
         done
       elif [ "${OS}" == "popos" ]; then
         for DRIVER in intel nvidia; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}",
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}"
         done
       else
-        echo "${DISPLAY_NAME},${OS},${RELEASE},,"
+        echo "${DISPLAY_NAME},${OS},${RELEASE},"
       fi
     done
   done
