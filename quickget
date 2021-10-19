@@ -755,14 +755,6 @@ function get_ubuntu() {
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
-    case ${RELEASE} in
-      8|10|11) true;;
-      *) echo "ERROR! Windows ${RELEASE} is not supported."
-         releases_windows
-         exit 1
-         ;;
-    esac
-
     local ARCH="x64"
     local LANG_CODE="en"
     local LATEST_WINDOWS_VERSION=""
@@ -775,6 +767,14 @@ function get_windows() {
     local DOWNLOAD_INFO=""
     local DOWNLOAD_ID=""
     local DOWNLOAD_URL=""
+    local RELEASES=""
+
+    RELEASES=$(releases_windows)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! Windows ${RELEASE} is not supported."
+        echo "${RELEASES}"
+        exit 1
+    fi
 
     echo "Getting Windows ${RELEASE} URL..."
     WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
