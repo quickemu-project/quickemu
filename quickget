@@ -473,7 +473,7 @@ EOF
         fi
 
         # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ ${RELEASE} -ge 11 ]; then
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
