@@ -469,11 +469,11 @@ function get_elementary() {
             ;;
     esac
 
-    ISO=elementaryos-6.0-stable.20211005.iso
+    ISO="elementaryos-${RELEASE}-stable.20211005.iso"
     URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
     make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
@@ -496,8 +496,8 @@ function get_freebsd() {
 
     ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
     make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
@@ -525,12 +525,11 @@ function get_fedora() {
         ISO="Fedora-Workstation-Live-x86_64-${VERSION}-1.2.iso"
     fi
 
-    URL=$(echo ${FEDORA_RELEASE} | jq -r '.link')
-    SHA256SUM=$(echo ${FEDORA_RELEASE} | jq -r '.sha256')
+    URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
+    SHA256SUM=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
 
     make_vm_dir
-
-    web_get ${URL} ${VM_PATH}
+    web_get "${URL}" "${VM_PATH}"
 
     echo "Checking SHA256SUMS..."
     cd "${VM_PATH}"
@@ -542,7 +541,7 @@ function get_fedora() {
     fi
     cd ..
 
-    make_vm_config ${ISO}
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
@@ -569,8 +568,8 @@ function get_linuxmint() {
     URL="${DL_BASE}/${VERSION}/${ISO}"
 
     make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
@@ -601,8 +600,8 @@ function get_opensuse() {
         URL="${DL_BASE}/distribution/leap/${VERSION}/iso/${ISO}"
     fi
     make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
@@ -674,7 +673,7 @@ function get_macos() {
 }
 
 function get_popos() {
-    # For future releases, use dvd1 iso files.
+    local ISO=""
     local URL=""
     local DL_BASE="https://pop-iso.sfo2.cdn.digitaloceanspaces.com"
     local VERSION=""
@@ -691,8 +690,8 @@ function get_popos() {
     ISO="pop-os_21.04_amd64_intel_9.iso"
     URL="${DL_BASE}/21.04/amd64/intel/9/${ISO}"
     make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
     start_vm_info
 }
 
