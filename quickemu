@@ -408,14 +408,14 @@ function vm_boot() {
       exit 1
     fi
 
-    # If EFI firmware path is a symlink, resolve it to a real file.
+    # If EFI_CODE references a symlink, resolve it to the real file.
     if [ -L "${EFI_CODE}" ]; then
       echo " - EFI:      WARNING! ${EFI_CODE} is a symlink."
       echo -n "             Resolving to... "
       EFI_CODE=$(realpath "${EFI_CODE}")
       echo "${EFI_CODE}"
     fi
-    BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
+    BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), SecureBoot (${secureboot})."
   else
     BOOT_STATUS="Legacy BIOS (${guest_os^})"
     secureboot="off"
