@@ -66,7 +66,7 @@ function os_support() {
 }
 
 function releases_elementary() {
-    echo 6_0
+    echo 6.0
 }
 
 function releases_freebsd(){
@@ -467,14 +467,16 @@ function start_vm_info() {
 }
 
 function get_elementary() {
-    case ${RELEASE} in
-        6_0) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! elementary OS ${RELEASE} is not a supported release."
-            releases_elementary
-            exit 1
-            ;;
-    esac
+    local ISO=""
+    local RELEASES=""
+    local URL=""
+
+    RELEASES=$(releases_elementary)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! elementary OS ${RELEASE} is not a supported release."
+        echo "${RELEASES}"
+        exit 1
+    fi
 
     ISO="elementaryos-${RELEASE}-stable.20211005.iso"
     URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
