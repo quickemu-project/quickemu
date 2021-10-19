@@ -8,6 +8,7 @@
 #  4. Add the new OS to make_vm_config()
 #  5. Create a get_newos() function that does something like this:
 #     function get_newos() {
+#         local HASH=""
 #         local ISO=""
 #         local URL=""
 #
@@ -15,6 +16,9 @@
 #         ISO="newos-${RELEASE}-amd64.iso"
 #         URL="https://www.newos.org/download/${ISO}"
 #         web_get "${URL}" "${VM_PATH}"
+#         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
+#         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+#         check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
 #         make_vm_config "${ISO}"
 #     }
 #  6. Add new OS to the argument parser at the bottom of the script
@@ -392,6 +396,24 @@ function unattended_windows() {
   </settings>
 </unattend>
 EOF
+}
+
+function check_hash() {
+    local iso=""
+    local hash=""
+    local hash_algo=""
+    iso="${1}"
+    hash="${2}"
+    hash_algo="${3}"
+
+    echo -n "Checking ${iso} with ${hash_algo}... "
+    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo "ERROR!"
+        echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+        exit 1
+    else
+        echo "Good!"
+    fi
 }
 
 function web_get() {
