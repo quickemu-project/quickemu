@@ -20,6 +20,21 @@ function pretty_name() {
   esac
   echo "${PRETTY_NAME}"
 }
+
+function validate_release() {
+  local DISPLAY_NAME=""
+  local RELEASE_GENERATOR="${1}"
+  local RELEASES=""
+
+  DISPLAY_NAME="$(pretty_name "${OS}")"
+  RELEASES=$(${RELEASE_GENERATOR})
+  if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+      echo "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+      echo "${RELEASES}"
+      exit 1
+  fi
+}
+
 function list_all() {
   local DISPLAY_NAME
   local FUNC
