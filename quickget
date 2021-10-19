@@ -854,22 +854,59 @@ if [ -n "${1}" ]; then
         list_all
     fi
 else
-    echo "ERROR! You must specify an OS:"
+    echo "ERROR! You must specify an operating system:"
     os_support
     exit 1
 fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
+    VM_PATH="${OS}-${RELEASE}"
+
+    if [ "${OS}" == "elementary" ]; then
+        get_elementary
+    elif [ "${OS}" == "macos" ]; then
+        get_macos
+    elif [ "${OS}" == "freebsd" ]; then
+        get_freebsd
+    elif [ "${OS}" == "fedora" ]; then
+        get_fedora
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+        get_linuxmint
+    elif [ "${OS}" == "opensuse" ]; then
+        get_opensuse
+    elif [ "${OS}" == "popos" ]; then
+        get_popos
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        get_ubuntu
+    elif [ "${OS}" == "windows" ]; then
+        if [ -n "${3}" ]; then
+            LANG_NAME="${3}"
+            if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
+                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                for LANG in "${LANGS[@]}"; do
+                  echo "${LANG}"
+                done
+                exit 1
+            fi
+        else
+            LANG_NAME="English International"
+        fi
+        get_windows "${LANG_NAME}"
+    else
+        echo "ERROR! ${OS} is unknown:"
+        os_support
+        exit 1
+    fi
 else
-    echo "ERROR! You must specify an OS release name."
+    echo "ERROR! You must specify a release for ${OS}:"
     if [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
-    elif [ "${OS}" == "linuxmint" ]; then
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
         releases_linuxmint
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
@@ -882,43 +919,5 @@ else
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     fi
-    exit 1
-fi
-
-VM_PATH="${OS}-${RELEASE}"
-
-if [ "${OS}" == "elementary" ]; then
-    get_elementary
-elif [ "${OS}" == "macos" ]; then
-    get_macos
-elif [[ "${OS}" == "freebsd" ]]; then
-    get_freebsd
-elif [[ "${OS}" == "fedora" ]]; then
-    get_fedora
-elif [[ "${OS}" == "linuxmint" ]]; then
-    get_linuxmint
-elif [[ "${OS}" == "opensuse" ]]; then
-    get_opensuse
-elif [[ "${OS}" == "popos" ]]; then
-    get_popos
-elif [[ "${OS}" == *"ubuntu"* ]]; then
-    get_ubuntu
-elif [ "${OS}" == "windows" ]; then
-    if [ -n "${3}" ]; then
-        LANG_NAME="${3}"
-        if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
-            echo "ERROR! ${LANG_NAME} is not a supported language:"
-            for LANG in "${LANGS[@]}"; do
-              echo "${LANG}"
-            done
-            exit 1
-        fi
-    else
-        LANG_NAME="English International"
-    fi
-    get_windows "${LANG_NAME}"
-else
-    echo "ERROR! You must specify an OS:"
-    os_support
     exit 1
 fi
