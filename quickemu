@@ -165,7 +165,6 @@ function vm_boot() {
   local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
-  local QEMU_VER=""
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
 
@@ -177,9 +176,9 @@ function vm_boot() {
     LSB_DESCRIPTION=$(lsb_release --description --short)
   fi
 
-  QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  echo "Quickemu ${VERSION} starting ${VM} on ${LSB_DESCRIPTION} ${KERNEL_NODE}"
-  echo " - QEMU:     ${QEMU} v${QEMU_VER} on ${KERNEL_NAME} ${KERNEL_VER}"
+  echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
+  echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+  echo " - Guest:    Starting ${VM} as ${VMNAME}"
 
   HOST_CPU_CORES=$(nproc --all)
   HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
@@ -803,7 +802,6 @@ function vm_boot() {
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
 
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
-  echo -e " - Process:  On host:  killall ${VMNAME}\t(if a forced kill is required)"
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
@@ -916,9 +914,10 @@ if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
   exit 1
 fi
 
-QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
-if [ "${QEMU_VER}" -lt 60 ]; then
-  echo "ERROR! Qemu 6.0.0 or newer is required, detected $(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)."
+QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
+if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
+  echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
   exit 1
 fi
 
