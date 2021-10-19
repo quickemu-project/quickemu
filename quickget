@@ -779,19 +779,18 @@ function get_windows() {
 
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
-    if [ ! -e "${VM_PATH}/unattended.iso" ]; then
-        case ${RELEASE} in
-            10|11)
-                echo "Making unattended.iso"
-                mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-                web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-                web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-                web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-                unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-                mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
-                ;;
-        esac
-    fi
+    rm -f "${VM_PATH}/unattended.iso"
+    case ${RELEASE} in
+        10|11)
+            echo "Making unattended.iso"
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
+    esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
     start_vm_info
 }
