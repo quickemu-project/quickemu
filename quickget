@@ -18,7 +18,7 @@
 #         web_get "${URL}" "${VM_PATH}"
 #         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
 #         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
-#         check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
+#         check_hash "${ISO}" "${HASH}"
 #         make_vm_config "${ISO}"
 #     }
 #  6. Add new OS to the argument parser at the bottom of the script
@@ -584,7 +584,7 @@ function get_fedora() {
     URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
     HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
     web_get "${URL}" "${VM_PATH}"
-    check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
@@ -732,7 +732,7 @@ function get_ubuntu() {
         make_vm_config "${OS}-${RELEASE}.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
-        check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
+        check_hash "${ISO}" "${HASH}"
         make_vm_config "${ISO}"
     fi
 }
@@ -780,7 +780,7 @@ function get_windows() {
 
     # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
     if [ -n "${DOWNLOAD_SHA1}" ]; then
-      check_hash "${VM_PATH}/${FILE_NAME}" "${DOWNLOAD_SHA1}" sha1sum
+      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
     fi
 
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
