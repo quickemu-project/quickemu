@@ -421,6 +421,13 @@ function make_vm_dir() {
     fi
 }
 
+function start_vm_info() {
+    echo
+    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
+    echo
+}
+
 function make_vm_config() {
     local IMAGE_FILE=""
     local ISO_FILE=""
@@ -477,13 +484,7 @@ EOF
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
-}
-
-function start_vm_info() {
-    echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
-    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
-    echo
+    start_vm_info
 }
 
 function get_elementary() {
@@ -496,7 +497,6 @@ function get_elementary() {
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_freebsd() {
@@ -509,7 +509,6 @@ function get_freebsd() {
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_fedora() {
@@ -549,7 +548,6 @@ function get_fedora() {
     cd ..
 
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_linuxmint() {
@@ -564,7 +562,6 @@ function get_linuxmint() {
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_opensuse() {
@@ -586,7 +583,6 @@ function get_opensuse() {
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_macos() {
@@ -653,7 +649,6 @@ function get_macos() {
     fi
 
     make_vm_config RecoveryImage.img
-    start_vm_info
 }
 
 function get_popos() {
@@ -666,7 +661,6 @@ function get_popos() {
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
-    start_vm_info
 }
 
 function get_ubuntu() {
@@ -716,7 +710,6 @@ function get_ubuntu() {
         cd ..
         make_vm_config "${ISO}"
     fi
-    start_vm_info
 }
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
@@ -792,7 +785,6 @@ function get_windows() {
             ;;
     esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
-    start_vm_info
 }
 
 LANGS=()
