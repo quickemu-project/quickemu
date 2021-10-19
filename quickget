@@ -65,7 +65,7 @@ function list_all() {
   local LANG
   local OS
   local RELEASE
-  echo "Display Name,OS,Release,Language"
+  echo "Display Name,OS,Release,Option"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
@@ -80,6 +80,10 @@ function list_all() {
       if [ "${OS}" == "windows" ]; then
         for LANG in "${LANGS[@]}"; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}",
+        done
+      elif [ "${OS}" == "popos" ]; then
+        for DRIVER in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}",
         done
       else
         echo "${DISPLAY_NAME},${OS},${RELEASE},,"
@@ -686,13 +690,24 @@ function get_macos() {
 }
 
 function get_popos() {
+    local DRIVER="intel"
+    local HASH=""
     local ISO=""
     local URL=""
 
+    if [ -n "${1}" ]; then
+      DRIVER="${1}"
+    fi
+
     validate_release "releases_popos"
-    ISO="pop-os_${RELEASE}_amd64_intel_9.iso"
-    URL="https://pop-iso.sfo2.cdn.digitaloceanspaces.com/${RELEASE}/amd64/intel/9/${ISO}"
+
+    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".url")
+    URL="${URL//\"/}"
+    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".sha_sum")
+    HASH="${HASH//\"/}"
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
@@ -831,7 +846,21 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "opensuse" ]; then
         get_opensuse
     elif [ "${OS}" == "popos" ]; then
-        get_popos
+        if [ -n "${3}" ]; then
+            DRIVER="${3}"
+            DRIVERS=(intel nvidia)
+            if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
+                echo "ERROR! ${DRIVER} is not a supported driver:"
+                for DRIVER in "${DRIVERS[@]}"; do
+                  echo "${DRIVER}"
+                done
+                exit 1
+            fi
+        else
+            DRIVER="intel"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DRIVER}"
+        get_popos "${DRIVER}"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
