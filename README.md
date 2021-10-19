@@ -99,10 +99,12 @@ cd quickemu
 
 # Usage
 
-While `quickemu` and `quickget` are designed for the terminal, graphical
-user interfaces are also available:
+## Graphical User Interfaces
 
-  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by @marxjohnson
+While `quickemu` and `quickget` are designed for the terminal, graphical user interfaces are also available:
+
+  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by [Mark Johnson](https://github.com/marxjohnson)
+  * [Quickgui](https://github.com/ymauray/quickgui/) by [Yannick Mauray](https://github.com/ymauray)
 
 ## Ubuntu Guest
 
