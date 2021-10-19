@@ -1,5 +1,42 @@
 #!/usr/bin/env bash
 
+function list_all() {
+  local DISPLAY_NAME
+  local FUNC
+  local LANG
+  local OS
+  local RELEASE
+  echo "Display Name,OS,Release,Language"
+  for OS in $(os_support); do
+    if [[ "${OS}" == *"ubuntu"* ]]; then
+      FUNC="ubuntu"
+    else
+      FUNC="${OS}"
+    fi
+    case ${OS} in
+      freebsd) DISPLAY_NAME="FreeBSD";;
+      linuxmint) DISPLAY_NAME="Linux Mint";;
+      macos) DISPLAY_NAME="macOS";;
+      opensuse) DISPLAY_NAME="OpenSUSE";;
+      ubuntu-budgie) DISPLAY_NAME="Ubuntu Budgie";;
+      ubuntu-kylin) DISPLAY_NAME="Ubuntu Kylin";;
+      ubuntu-mate) DISPLAY_NAME="Ubuntu MATE";;
+      ubuntu-studio) DISPLAY_NAME="Ubuntu Studio";;
+      *) DISPLAY_NAME="${OS^}";;
+    esac
+    for RELEASE in $("releases_${FUNC}"); do
+      if [ "${OS}" == "windows" ]; then
+        for LANG in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}",
+        done
+      else
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,"
+      fi
+    done
+  done
+  exit 0
+}
+
 function os_support() {
     echo elementary \
     freebsd \
@@ -44,8 +81,8 @@ function releases_opensuse(){
     15_1 \
     15_2 \
     15_3 \
-    tumbleweed \
-    microos
+    microos \
+    tumbleweed
 }
 
 function releases_macos() {
@@ -64,44 +101,44 @@ function releases_ubuntu() {
 }
 
 function languages_windows() {
-    echo Arabic \
-    Brazilian Portuguese \
-    Bulgarian \
-    Chinese \(Simplified\) \
-    Chinese \(Traditional\) \
-    Croatian \
-    Czech \
-    Danish \
-    Dutch \
-    English \
-    English International \
-    Estonian \
-    Finnish \
-    French \
-    French Canadian \
-    German \
-    Greek \
-    Hebrew \
-    Hungarian \
-    Italian \
-    Japanese \
-    Korean \
-    Latvian \
-    Lithuanian \
-    Norwegian \
-    Polish \
-    Portuguese \
-    Romanian \
-    Russian \
-    Serbian Latin \
-    Slovak \
-    Slovenian \
-    Spanish \
-    Spanish \(Mexico\) \
-    Swedish \
-    Thai \
-    Turkish \
-    Ukrainian
+    LANGS=(Arabic
+    "Brazilian Portuguese"
+    Bulgarian
+    "Chinese (Simplified)"
+    "Chinese (Traditional)"
+    Croatian
+    Czech
+    Danish
+    Dutch
+    English
+    "English International"
+    Estonian
+    Finnish
+    French
+    "French Canadian"
+    German
+    Greek
+    Hebrew
+    Hungarian
+    Italian
+    Japanese
+    Korean
+    Latvian
+    Lithuanian
+    Norwegian
+    Polish
+    Portuguese
+    Romanian
+    Russian
+    "Serbian Latin"
+    Slovak
+    Slovenian
+    Spanish
+    "Spanish (Mexico)"
+    Swedish
+    Thai
+    Turkish
+    Ukrainian)
 }
 
 
@@ -774,8 +811,14 @@ function get_windows() {
     start_vm_info
 }
 
+LANGS=()
+languages_windows
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
+    if [ "${OS}" == "list" ]; then
+        list_all
+    fi
 else
     echo "ERROR! You must specify an OS:"
     os_support
@@ -825,10 +868,11 @@ elif [[ "${OS}" == *"ubuntu"* ]]; then
 elif [ "${OS}" == "windows" ]; then
     if [ -n "${3}" ]; then
         LANG_NAME="${3}"
-        LANG_NAMES=$(languages_windows)
-        if [[ "${LANG_NAMES}" != *"${LANG_NAME}"* ]]; then
+        if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
             echo "ERROR! ${LANG_NAME} is not a supported language:"
-            languages_windows
+            for LANG in "${LANGS[@]}"; do
+              echo "${LANG}"
+            done
             exit 1
         fi
     else
