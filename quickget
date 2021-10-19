@@ -10,13 +10,18 @@ function list_all() {
   for OS in $(os_support); do
     if [[ "${OS}" == *"ubuntu"* ]]; then
       FUNC="ubuntu"
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+      FUNC="linuxmint"
     else
       FUNC="${OS}"
     fi
+
     case ${OS} in
       elementary) DISPLAY_NAME="elementary OS";;
       freebsd) DISPLAY_NAME="FreeBSD";;
-      linuxmint) DISPLAY_NAME="Linux Mint";;
+      linuxmint-cinnamon) DISPLAY_NAME="Linux Mint Cinnamon";;
+      linuxmint-mate) DISPLAY_NAME="Linux Mint MATE";;
+      linuxmint-xfce) DISPLAY_NAME="Linux Mint XFCE";;
       macos) DISPLAY_NAME="macOS";;
       opensuse) DISPLAY_NAME="OpenSUSE";;
       popos) DISPLAY_NAME="Pop!_OS";;
@@ -44,7 +49,9 @@ function os_support() {
     freebsd \
     fedora \
     kubuntu \
-    linuxmint \
+    linuxmint-cinnamon \
+    linuxmint-mate \
+    linuxmint-xfce \
     lubuntu \
     macos \
     opensuse \
@@ -74,7 +81,7 @@ function releases_fedora(){
 }
 
 function releases_linuxmint(){
-    echo cinnamon-20_2 \
+    echo 20.2
     mate-20_2 \
     xfce-20-2
 }
@@ -410,7 +417,7 @@ function make_vm_config() {
     elif [[ "${OS}" == "fedora" ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "linuxmint" ]]; then
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == "opensuse" ]]; then
@@ -546,26 +553,21 @@ function get_fedora() {
 }
 
 function get_linuxmint() {
+    local FLAVOR=""
+    local ISO=""
+    local RELEASES=""
     local URL=""
-    local DL_BASE="https://mirrors.edge.kernel.org/linuxmint/stable"
-    local VERSION=""
 
-    case ${RELEASE} in
-        cinnamon-20_2|mate-20_2|xfce-20_2) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! linuxmint ${RELEASE} is not a supported release."
-            releases_linuxmint
-            exit 1
-            ;;
-    esac
+    RELEASES=$(releases_linuxmint)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! Linux Mint ${RELEASE} is not a supported release."
+        echo "${RELEASES}"
+        exit 1
+    fi
 
-    re='(.*)-(.*)'
-    [[ ${VERSION} =~ ${re} ]];
-    local FLAVOR=${BASH_REMATCH[1]}
-    VERSION=${BASH_REMATCH[2]}
-
-    ISO="linuxmint-${VERSION}-${FLAVOR}-64bit.iso"
-    URL="${DL_BASE}/${VERSION}/${ISO}"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
+    URL="https://mirrors.edge.kernel.org/linuxmint/stable/${RELEASE}/${ISO}"
 
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
