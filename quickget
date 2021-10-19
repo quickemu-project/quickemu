@@ -70,8 +70,8 @@ function releases_elementary() {
 }
 
 function releases_freebsd(){
-    echo 12_2 \
-    13_0
+    echo 12.2 \
+    13.0
 }
 
 function releases_fedora(){
@@ -487,23 +487,20 @@ function get_elementary() {
 }
 
 function get_freebsd() {
-    # For future releases, use dvd1 iso files.
+    local ISO=""
+    local RELEASES=""
     local URL=""
-    local DL_BASE="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES"
-    local VERSION=""
 
-    case ${RELEASE} in
-        12_2|13_0) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! FreeBSD ${RELEASE} is not a supported release."
-            releases_freebsd
-            exit 1
-            ;;
-    esac
+    RELEASES=$(releases_freebsd)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! FreeBSD ${RELEASE} is not a supported release."
+        echo "${RELEASES}"
+        exit 1
+    fi
 
-    URL="${DL_BASE}/${VERSION}/FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
+    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
 
-    ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
