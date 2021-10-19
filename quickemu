@@ -394,9 +394,9 @@ function vm_boot() {
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
-          BOOT_STATUS="Legacy BIOS (${guest_os^}) - EFI requested but no EFI firmware found."
-          boot="legacy"
-          secureboot="off"
+          echo "ERROR! EFI boot requested but no EFI firmware found."
+          echo "       Please install OVMF firmware."
+          exit 1
         fi
         BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
         ;;
