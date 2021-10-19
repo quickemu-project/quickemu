@@ -101,7 +101,8 @@ function releases_macos() {
 }
 
 function releases_popos() {
-    echo 21_04
+    echo 20.04 \
+    21.04
 }
 
 function releases_ubuntu() {
@@ -669,21 +670,18 @@ function get_macos() {
 
 function get_popos() {
     local ISO=""
+    local RELEASES=""
     local URL=""
-    local DL_BASE="https://pop-iso.sfo2.cdn.digitaloceanspaces.com"
-    local VERSION=""
 
-    case ${RELEASE} in
-        21_04) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! Pop!_OS ${RELEASE} is not a supported release."
-            releases_popos
-            exit 1
-            ;;
-    esac
+    RELEASES=$(releases_popos)
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo "ERROR! Pop!_OS ${RELEASE} is not a supported release."
+        echo "${RELEASES}"
+        exit 1
+    fi
 
-    ISO="pop-os_21.04_amd64_intel_9.iso"
-    URL="${DL_BASE}/21.04/amd64/intel/9/${ISO}"
+    ISO="pop-os_${RELEASE}_amd64_intel_9.iso"
+    URL="https://pop-iso.sfo2.cdn.digitaloceanspaces.com/${RELEASE}/amd64/intel/9/${ISO}"
     make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
