@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+function pretty_name() {
+  local OS="${1}"
+  local PRETTY_NAME=""
+  case ${OS} in
+    elementary) PRETTY_NAME="elementary OS";;
+    freebsd) PRETTY_NAME="FreeBSD";;
+    linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
+    linuxmint-mate) PRETTY_NAME="Linux Mint MATE";;
+    linuxmint-xfce) PRETTY_NAME="Linux Mint XFCE";;
+    macos) PRETTY_NAME="macOS";;
+    opensuse) PRETTY_NAME="OpenSUSE";;
+    popos) PRETTY_NAME="Pop!_OS";;
+    ubuntu-budgie) PRETTY_NAME="Ubuntu Budgie";;
+    ubuntu-kylin) PRETTY_NAME="Ubuntu Kylin";;
+    ubuntu-mate) PRETTY_NAME="Ubuntu MATE";;
+    ubuntu-studio) PRETTY_NAME="Ubuntu Studio";;
+    *) PRETTY_NAME="${OS^}";;
+  esac
+  echo "${PRETTY_NAME}"
+}
 function list_all() {
   local DISPLAY_NAME
   local FUNC
@@ -8,6 +28,7 @@ function list_all() {
   local RELEASE
   echo "Display Name,OS,Release,Language"
   for OS in $(os_support); do
+    DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
@@ -16,21 +37,6 @@ function list_all() {
       FUNC="${OS}"
     fi
 
-    case ${OS} in
-      elementary) DISPLAY_NAME="elementary OS";;
-      freebsd) DISPLAY_NAME="FreeBSD";;
-      linuxmint-cinnamon) DISPLAY_NAME="Linux Mint Cinnamon";;
-      linuxmint-mate) DISPLAY_NAME="Linux Mint MATE";;
-      linuxmint-xfce) DISPLAY_NAME="Linux Mint XFCE";;
-      macos) DISPLAY_NAME="macOS";;
-      opensuse) DISPLAY_NAME="OpenSUSE";;
-      popos) DISPLAY_NAME="Pop!_OS";;
-      ubuntu-budgie) DISPLAY_NAME="Ubuntu Budgie";;
-      ubuntu-kylin) DISPLAY_NAME="Ubuntu Kylin";;
-      ubuntu-mate) DISPLAY_NAME="Ubuntu MATE";;
-      ubuntu-studio) DISPLAY_NAME="Ubuntu Studio";;
-      *) DISPLAY_NAME="${OS^}";;
-    esac
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "windows" ]; then
         for LANG in "${LANGS[@]}"; do
