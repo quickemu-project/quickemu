@@ -82,8 +82,6 @@ function releases_fedora(){
 
 function releases_linuxmint(){
     echo 20.2
-    mate-20_2 \
-    xfce-20-2
 }
 
 function releases_opensuse(){
