@@ -381,7 +381,6 @@ function vm_boot() {
           echo "       Please install OVMF firmware."
           exit 1
         fi
-        BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
         ;;
       *)
         if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
@@ -398,9 +397,26 @@ function vm_boot() {
           echo "       Please install OVMF firmware."
           exit 1
         fi
-        BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
         ;;
     esac
+
+    # Make sure EFI_VARS references an actual, writeable, file
+    if [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; then
+      echo " - EFI:      ERROR! ${EFI_VARS} is not a regular file or not writeable."
+      echo "             Deleting ${EFI_VARS}. Please re-run quickemu."
+      rm -f "${EFI_VARS}"
+      exit 1
+    fi
+
+    # If EFI firmware path is a symlink, resolve it to a real file.
+    #if [ -L "${EFI_CODE}" ]; then
+    if true; then
+      echo " - EFI:      WARNING! ${EFI_CODE} is a symlink."
+      echo -n "             Resolving to... "
+      EFI_CODE=$(realpath "${EFI_CODE}")
+      echo "${EFI_CODE}"
+    fi
+    BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
   else
     BOOT_STATUS="Legacy BIOS (${guest_os^})"
     secureboot="off"
