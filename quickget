@@ -59,7 +59,12 @@ function validate_release() {
   fi
 }
 
-function list_all() {
+function list_json() {
+  # Reference: https://stackoverflow.com/a/67359273
+  list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+  exit 0
+}
+
 function list_csv() {
   local DISPLAY_NAME
   local FUNC
@@ -823,6 +828,8 @@ if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
         list_csv
+    elif [ "${OS}" == "list_json" ]; then
+        list_json
     fi
 else
     echo "ERROR! You must specify an operating system:"
