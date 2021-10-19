@@ -14,6 +14,7 @@ function list_all() {
       FUNC="${OS}"
     fi
     case ${OS} in
+      elementary) DISPLAY_NAME="elementary OS";;
       freebsd) DISPLAY_NAME="FreeBSD";;
       linuxmint) DISPLAY_NAME="Linux Mint";;
       macos) DISPLAY_NAME="macOS";;
