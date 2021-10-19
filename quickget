@@ -24,22 +24,23 @@
 #  6. Add new OS to the argument parser at the bottom of the script
 
 function pretty_name() {
-  local OS="${1}"
+  local SIMPLE_NAME=""
   local PRETTY_NAME=""
-  case ${OS} in
-    elementary) PRETTY_NAME="elementary OS";;
-    freebsd) PRETTY_NAME="FreeBSD";;
+  SIMPLE_NAME="${1}"
+  case ${SIMPLE_NAME} in
+    elementary)         PRETTY_NAME="elementary OS";;
+    freebsd)            PRETTY_NAME="FreeBSD";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
-    linuxmint-mate) PRETTY_NAME="Linux Mint MATE";;
-    linuxmint-xfce) PRETTY_NAME="Linux Mint XFCE";;
-    macos) PRETTY_NAME="macOS";;
-    opensuse) PRETTY_NAME="OpenSUSE";;
-    popos) PRETTY_NAME="Pop!_OS";;
-    ubuntu-budgie) PRETTY_NAME="Ubuntu Budgie";;
-    ubuntu-kylin) PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate) PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-studio) PRETTY_NAME="Ubuntu Studio";;
-    *) PRETTY_NAME="${OS^}";;
+    linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
+    linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    macos)              PRETTY_NAME="macOS";;
+    opensuse)           PRETTY_NAME="OpenSUSE";;
+    popos)              PRETTY_NAME="Pop!_OS";;
+    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
+    ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
+    ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
   echo "${PRETTY_NAME}"
 }
