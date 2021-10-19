@@ -363,6 +363,8 @@ function vm_boot() {
 
     # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
     # does not support SMM.
+
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
     case ${secureboot} in
       on)
         if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
