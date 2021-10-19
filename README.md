@@ -33,6 +33,7 @@ comprehensive support for macOS and Windows**.
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/),[MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE)
+  * [Pop!_OS](https://pop.system76.com/) (only with SPICE)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -337,6 +338,15 @@ quickemu --vm opensuse-tumbleweed
 ```bash
 quickget opensuse microos
 quickemu --vm opensuse-microos
+```
+
+## Pop!_OS Guest
+
+`quickemu` supports Pop!_OS 21.04, but only installs with SPICE.
+
+```bash
+quickget popos 21_04
+quickemu --vm popos-21_04.conf --display spice
 ```
 
 # SPICE
