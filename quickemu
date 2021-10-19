@@ -677,7 +677,7 @@ function vm_boot() {
   local args=()
 
   # shellcheck disable=SC2054,SC2206,SC2140
-  args+=(-name ${VMNAME},process=${VMNAME}
+  args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
          -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
