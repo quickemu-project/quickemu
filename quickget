@@ -360,13 +360,13 @@ function make_vm_config() {
     if [[ "${OS}" == "freebsd" ]]; then
         GUEST="freebsd"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"fedora"* ]]; then
+    elif [[ "${OS}" == "fedora" ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
+    elif [[ "${OS}" == "linuxmint" ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"opensuse"* ]]; then
+    elif [[ "${OS}" == "opensuse" ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == "popos" ]]; then
@@ -815,13 +815,13 @@ VM_PATH="${OS}-${RELEASE}"
 
 if [ "${OS}" == "macos" ]; then
     get_macos
-elif [[ "${OS}" == *"freebsd" ]]; then
+elif [[ "${OS}" == "freebsd" ]]; then
     get_freebsd
-elif [[ "${OS}" == *"fedora"* ]]; then
+elif [[ "${OS}" == "fedora" ]]; then
     get_fedora
-elif [[ "${OS}" == *"linuxmint"* ]]; then
+elif [[ "${OS}" == "linuxmint" ]]; then
     get_linuxmint
-elif [[ "${OS}" == *"opensuse"* ]]; then
+elif [[ "${OS}" == "opensuse" ]]; then
     get_opensuse
 elif [[ "${OS}" == "popos" ]]; then
     get_popos
