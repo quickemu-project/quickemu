@@ -18,6 +18,7 @@ function list_all() {
       linuxmint) DISPLAY_NAME="Linux Mint";;
       macos) DISPLAY_NAME="macOS";;
       opensuse) DISPLAY_NAME="OpenSUSE";;
+      popos) DISPLAY_NAME="Pop!_OS";;
       ubuntu-budgie) DISPLAY_NAME="Ubuntu Budgie";;
       ubuntu-kylin) DISPLAY_NAME="Ubuntu Kylin";;
       ubuntu-mate) DISPLAY_NAME="Ubuntu MATE";;
