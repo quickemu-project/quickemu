@@ -378,6 +378,7 @@ function vm_boot() {
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
+          echo "       Please install OVMF firmware."
           exit 1
         fi
         BOOT_STATUS="EFI (${guest_os^}), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
