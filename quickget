@@ -60,6 +60,7 @@ function validate_release() {
 }
 
 function list_all() {
+function list_csv() {
   local DISPLAY_NAME
   local FUNC
   local LANG
@@ -820,8 +821,8 @@ languages_windows
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
-    if [ "${OS}" == "list" ]; then
-        list_all
+    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
+        list_csv
     fi
 else
     echo "ERROR! You must specify an operating system:"
