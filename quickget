@@ -426,7 +426,11 @@ function web_get() {
         FILE="${URL##*/}"
     fi
 
-    mkdir -p "${DIR}" 2>/dev/null
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
     if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
         echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
         exit 1
@@ -445,7 +449,11 @@ function zsync_get() {
         OUT="${FILE}"
     fi
 
-    mkdir -p "${DIR}" 2>/dev/null
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
     if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}"; then
         echo "ERROR! Failed to download ${URL}.zsync"
         exit 1
@@ -453,12 +461,6 @@ function zsync_get() {
 
     if [ -e "${DIR}/${FILE}.zs-old" ]; then
         rm -v "${DIR}/${FILE}.zs-old"
-    fi
-}
-
-function make_vm_dir() {
-    if ! mkdir -p "${VM_PATH}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${VM_PATH}"
     fi
 }
 
@@ -535,7 +537,6 @@ function get_elementary() {
     validate_release "releases_elementary"
     ISO="elementaryos-${RELEASE}-stable.20211005.iso"
     URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -547,7 +548,6 @@ function get_freebsd() {
     validate_release "releases_freebsd"
     ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
     URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -574,7 +574,6 @@ function get_fedora() {
 
     URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
     HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     check_hash "${VM_PATH}/${ISO}" "${HASH}" sha256sum
     make_vm_config "${ISO}"
@@ -589,7 +588,6 @@ function get_linuxmint() {
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
     URL="https://mirrors.edge.kernel.org/linuxmint/stable/${RELEASE}/${ISO}"
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -610,7 +608,6 @@ function get_opensuse() {
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
     fi
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -654,8 +651,6 @@ function get_macos() {
         exit 1
     fi
 
-    make_vm_dir
-
     # Get firmware
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2" "${VM_PATH}"
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
@@ -688,7 +683,6 @@ function get_popos() {
     validate_release "releases_popos"
     ISO="pop-os_${RELEASE}_amd64_intel_9.iso"
     URL="https://pop-iso.sfo2.cdn.digitaloceanspaces.com/${RELEASE}/amd64/intel/9/${ISO}"
-    make_vm_dir
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -720,8 +714,6 @@ function get_ubuntu() {
     else
         URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
     fi
-
-    make_vm_dir
 
     web_get "${URL}/SHA256SUMS" "${VM_PATH}"
     ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
@@ -773,8 +765,6 @@ function get_windows() {
     DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
     DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
     DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
-
-    make_vm_dir
 
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
