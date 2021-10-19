@@ -368,9 +368,9 @@ function vm_boot() {
         if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
           EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.secboot.fd"
           efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE.secboot.fd" "${EFI_VARS}"
-          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd" "${EFI_VARS}"
+          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" "${EFI_VARS}"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
@@ -384,9 +384,9 @@ function vm_boot() {
         if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
           EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
           efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.fd"
+          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
