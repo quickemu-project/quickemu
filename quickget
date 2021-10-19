@@ -455,7 +455,7 @@ function zsync_get() {
       exit 1
     fi
 
-    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}"; then
+    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
         echo "ERROR! Failed to download ${URL}.zsync"
         exit 1
     fi
