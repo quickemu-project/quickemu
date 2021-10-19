@@ -418,6 +418,7 @@ function vm_boot() {
     BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), SecureBoot (${secureboot})."
   else
     BOOT_STATUS="Legacy BIOS (${guest_os^})"
+    boot="legacy"
     secureboot="off"
   fi
 
