@@ -499,6 +499,13 @@ function vm_boot() {
     # If there is a disk image that appears to be used do not boot from installation media.
     iso=""
     img=""
+  else
+    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+      # Display MSRs alert if the disk appears unused and guest is macOS or Windows
+      # Assume that a "used" disk has a working install, therefore no alerts are
+      # required.
+      ignore_msrs_alert
+    fi
   fi
 
   # Has the status quo been requested?
@@ -574,8 +581,6 @@ function vm_boot() {
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
-    # offer ignore_msrs if not set
-    ignore_msrs_alert
     # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
     #  - qxl is used on Big Sur and Catalina
@@ -586,8 +591,6 @@ function vm_boot() {
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
-    # offer ignore_msrs if not set
-    ignore_msrs_alert
     DISPLAY_DEVICE="qxl-vga"
   else
     DISPLAY_DEVICE="qxl-vga"
