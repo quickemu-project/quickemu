@@ -873,15 +873,15 @@ function usage() {
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'"
+  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandle machine-specific registers"
+  echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --shortcut              : Create a desktop shortcut"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --version               : Print version"
   exit 1
 }
