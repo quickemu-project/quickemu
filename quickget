@@ -109,6 +109,7 @@ function os_support() {
     linuxmint-xfce \
     lubuntu \
     macos \
+    openbsd \
     opensuse \
     popos \
     ubuntu \
@@ -137,6 +138,10 @@ function releases_fedora(){
 
 function releases_linuxmint(){
     echo 20.2
+}
+
+function releases_openbsd(){
+    echo 7_0
 }
 
 function releases_opensuse(){
@@ -509,6 +514,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == "openbsd" ]]; then
+        GUEST="openbsd"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "opensuse" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -609,6 +617,29 @@ function get_linuxmint() {
     URL="https://mirrors.edge.kernel.org/linuxmint/stable/${RELEASE}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
+}
+
+function get_openbsd() {
+    local URL=""
+    local DL_BASE="https://cdn.openbsd.org/pub/OpenBSD/7.0/amd64/"
+    local VERSION=""
+
+    case ${RELEASE} in
+        7_0) VERSION=${RELEASE//_/};;
+        *)
+            echo "ERROR! OpenBSD ${RELEASE} is not a supported release."
+            releases_openbsd
+            exit 1
+            ;;
+    esac
+
+    URL="${DL_BASE}/install${VERSION}.iso"
+
+    ISO="install${VERSION}.iso"
+    make_vm_dir
+    web_get ${URL} ${VM_PATH}
+    make_vm_config ${ISO}
+    start_vm_info
 }
 
 function get_opensuse() {
@@ -902,6 +933,8 @@ else
         releases_linuxmint
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
+    elif [ "${OS}" == "openbsd" ]; then
+        releases_openbsd
     elif [ "${OS}" == "macos" ]; then
         releases_macos
     elif [ "${OS}" == "popos" ]; then

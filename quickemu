@@ -388,13 +388,16 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    freebsd|linux)
+    freebsd|linux|openbsd)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
       if [ "${guest_os}" == "freebsd" ]; then
         MOUSE="usb-mouse"
+      fi
+      if [ "${guest_os}" == "openbsd" ]; then
+	OUTPUT="gtk"
       fi
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
