@@ -4,7 +4,7 @@ export LC_ALL=C
 function ignore_msrs_always() {
   # Make sure the host has /etc/modprobe.d
   if [ -d /etc/modprobe.d ]; then
-    # Skip if already ignore_msrs is already enabled, assumes initramfs has been rebuilt
+    # Skip if ignore_msrs is already enabled, assumes initramfs has been rebuilt
     if grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
       echo "options kvm ignore_msrs=Y" | sudo tee /etc/modprobe.d/kvm-quickemu.conf
       sudo update-initramfs -k all -u
