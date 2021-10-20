@@ -613,14 +613,17 @@ function get_fedora() {
 
 function get_linuxmint() {
     local FLAVOR=""
+    local HASH=""
     local ISO=""
     local URL=""
 
     validate_release "releases_linuxmint"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
-    URL="https://mirrors.edge.kernel.org/linuxmint/stable/${RELEASE}/${ISO}"
+    HASH=$(wget -q -O- "https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
