@@ -396,9 +396,6 @@ function vm_boot() {
       if [ "${guest_os}" == "freebsd" ]; then
         MOUSE="usb-mouse"
       fi
-      if [ "${guest_os}" == "openbsd" ]; then
-	OUTPUT="gtk"
-      fi
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi

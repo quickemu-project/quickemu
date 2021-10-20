@@ -34,6 +34,7 @@ function pretty_name() {
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
     macos)              PRETTY_NAME="macOS";;
+    openbsd)            PRETTY_NAME="OpenBSD";;
     opensuse)           PRETTY_NAME="openSUSE";;
     popos)              PRETTY_NAME="Pop!_OS";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -141,7 +142,7 @@ function releases_linuxmint(){
 }
 
 function releases_openbsd(){
-    echo 7_0
+    echo 7.0
 }
 
 function releases_opensuse(){
@@ -514,7 +515,7 @@ function make_vm_config() {
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "openbsd" ]]; then
+    elif [ "${OS}" == "openbsd" ]; then
         GUEST="openbsd"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "opensuse" ]; then
@@ -543,6 +544,10 @@ ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "openbsd" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "macos" ]; then
@@ -620,26 +625,17 @@ function get_linuxmint() {
 }
 
 function get_openbsd() {
+    local HASH=""
+    local ISO=""
     local URL=""
-    local DL_BASE="https://cdn.openbsd.org/pub/OpenBSD/7.0/amd64/"
-    local VERSION=""
 
-    case ${RELEASE} in
-        7_0) VERSION=${RELEASE//_/};;
-        *)
-            echo "ERROR! OpenBSD ${RELEASE} is not a supported release."
-            releases_openbsd
-            exit 1
-            ;;
-    esac
-
-    URL="${DL_BASE}/install${VERSION}.iso"
-
-    ISO="install${VERSION}.iso"
-    make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
-    start_vm_info
+    validate_release "releases_openbsd"
+    ISO="install${RELEASE//\./}.iso"
+    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
+    HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_opensuse() {
@@ -882,6 +878,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         get_linuxmint
+    elif [ "${OS}" == "openbsd" ]; then
+        get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
         get_opensuse
     elif [ "${OS}" == "popos" ]; then
