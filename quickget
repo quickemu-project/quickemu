@@ -1,14 +1,117 @@
 #!/usr/bin/env bash
 
+# Here the quick 'n dirty guide to adding a new OS to quickget
+#
+#  1. Add the new OS, all lowercase, to os_support()
+#  2. Add a "pretty name" display name to pretty_name()
+#  3. Create a releases_newos() generator that outputs the currently supported release versions
+#  4. Add the new OS to make_vm_config()
+#  5. Create a get_newos() function that does something like this:
+#     function get_newos() {
+#         local HASH=""
+#         local ISO=""
+#         local URL=""
+#
+#         validate_release "releases_newos"
+#         ISO="newos-${RELEASE}-amd64.iso"
+#         URL="https://www.newos.org/download/${ISO}"
+#         web_get "${URL}" "${VM_PATH}"
+#         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
+#         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+#         check_hash "${ISO}" "${HASH}"
+#         make_vm_config "${ISO}"
+#     }
+#  6. Add new OS to the argument parser at the bottom of the script
+
+function pretty_name() {
+  local SIMPLE_NAME=""
+  local PRETTY_NAME=""
+  SIMPLE_NAME="${1}"
+  case ${SIMPLE_NAME} in
+    elementary)         PRETTY_NAME="elementary OS";;
+    freebsd)            PRETTY_NAME="FreeBSD";;
+    linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
+    linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
+    linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    macos)              PRETTY_NAME="macOS";;
+    opensuse)           PRETTY_NAME="openSUSE";;
+    popos)              PRETTY_NAME="Pop!_OS";;
+    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
+    ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
+    ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
+  esac
+  echo "${PRETTY_NAME}"
+}
+
+function validate_release() {
+  local DISPLAY_NAME=""
+  local RELEASE_GENERATOR="${1}"
+  local RELEASES=""
+
+  DISPLAY_NAME="$(pretty_name "${OS}")"
+  RELEASES=$(${RELEASE_GENERATOR})
+  if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+      echo "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+      echo "${RELEASES}"
+      exit 1
+  fi
+}
+
+function list_json() {
+  # Reference: https://stackoverflow.com/a/67359273
+  list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+  exit 0
+}
+
+function list_csv() {
+  local DISPLAY_NAME
+  local FUNC
+  local LANG
+  local OS
+  local RELEASE
+  echo "Display Name,OS,Release,Option"
+  for OS in $(os_support); do
+    DISPLAY_NAME="$(pretty_name "${OS}")"
+    if [[ "${OS}" == *"ubuntu"* ]]; then
+      FUNC="ubuntu"
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+      FUNC="linuxmint"
+    else
+      FUNC="${OS}"
+    fi
+
+    for RELEASE in $("releases_${FUNC}"); do
+      if [ "${OS}" == "windows" ]; then
+        for LANG in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}"
+        done
+      elif [ "${OS}" == "popos" ]; then
+        for DRIVER in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}"
+        done
+      else
+        echo "${DISPLAY_NAME},${OS},${RELEASE},"
+      fi
+    done
+  done
+  exit 0
+}
+
 function os_support() {
-    echo freebsd \
+    echo elementary \
+    freebsd \
     fedora \
     kubuntu \
-    linuxmint \
+    linuxmint-cinnamon \
+    linuxmint-mate \
+    linuxmint-xfce \
     lubuntu \
     macos \
     openbsd \
     opensuse \
+    popos \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -18,9 +121,13 @@ function os_support() {
     xubuntu
 }
 
+function releases_elementary() {
+    echo 6.0
+}
+
 function releases_freebsd(){
-    echo 12_2 \
-    13_0
+    echo 12.2 \
+    13.0
 }
 
 function releases_fedora(){
@@ -30,9 +137,7 @@ function releases_fedora(){
 }
 
 function releases_linuxmint(){
-    echo cinnamon-20_2 \
-    mate-20_2 \
-    xfce-20-2
+    echo 20.2
 }
 
 function releases_openbsd(){
@@ -40,12 +145,12 @@ function releases_openbsd(){
 }
 
 function releases_opensuse(){
-    echo 15_0 \
-    15_1 \
-    15_2 \
-    15_3 \
-    tumbleweed \
-    microos
+    echo 15.0 \
+    15.1 \
+    15.2 \
+    15.3 \
+    microos \
+    tumbleweed
 }
 
 function releases_macos() {
@@ -53,6 +158,11 @@ function releases_macos() {
     mojave \
     catalina \
     big-sur
+}
+
+function releases_popos() {
+    echo 20.04 \
+    21.04
 }
 
 function releases_ubuntu() {
@@ -64,44 +174,44 @@ function releases_ubuntu() {
 }
 
 function languages_windows() {
-    echo Arabic \
-    Brazilian Portuguese \
-    Bulgarian \
-    Chinese \(Simplified\) \
-    Chinese \(Traditional\) \
-    Croatian \
-    Czech \
-    Danish \
-    Dutch \
-    English \
-    English International \
-    Estonian \
-    Finnish \
-    French \
-    French Canadian \
-    German \
-    Greek \
-    Hebrew \
-    Hungarian \
-    Italian \
-    Japanese \
-    Korean \
-    Latvian \
-    Lithuanian \
-    Norwegian \
-    Polish \
-    Portuguese \
-    Romanian \
-    Russian \
-    Serbian Latin \
-    Slovak \
-    Slovenian \
-    Spanish \
-    Spanish \(Mexico\) \
-    Swedish \
-    Thai \
-    Turkish \
-    Ukrainian
+    LANGS=(Arabic
+    "Brazilian Portuguese"
+    Bulgarian
+    "Chinese (Simplified)"
+    "Chinese (Traditional)"
+    Croatian
+    Czech
+    Danish
+    Dutch
+    English
+    "English International"
+    Estonian
+    Finnish
+    French
+    "French Canadian"
+    German
+    Greek
+    Hebrew
+    Hungarian
+    Italian
+    Japanese
+    Korean
+    Latvian
+    Lithuanian
+    Norwegian
+    Polish
+    Portuguese
+    Romanian
+    Russian
+    "Serbian Latin"
+    Slovak
+    Slovenian
+    Spanish
+    "Spanish (Mexico)"
+    Swedish
+    Thai
+    Turkish
+    Ukrainian)
 }
 
 
@@ -304,6 +414,32 @@ function unattended_windows() {
 EOF
 }
 
+function check_hash() {
+    local iso=""
+    local hash=""
+    local hash_algo=""
+    iso="${VM_PATH}/${1}"
+    hash="${2}"
+
+    # Guess the hash algorithm by the hash length
+    case ${#hash} in
+      32) hash_algo=md5sum;;
+      40) hash_algo=sha1sum;;
+      64) hash_algo=sha256sum;;
+       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+          return;;
+    esac
+
+    echo -n "Checking ${iso} with ${hash_algo}... "
+    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo "ERROR!"
+        echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+        exit 1
+    else
+        echo "Good!"
+    fi
+}
+
 function web_get() {
     local DIR="${2}"
     local FILE=""
@@ -314,7 +450,11 @@ function web_get() {
         FILE="${URL##*/}"
     fi
 
-    mkdir -p "${DIR}" 2>/dev/null
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
     if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
         echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
         exit 1
@@ -333,8 +473,12 @@ function zsync_get() {
         OUT="${FILE}"
     fi
 
-    mkdir -p "${DIR}" 2>/dev/null
-    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}"; then
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
+    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
         echo "ERROR! Failed to download ${URL}.zsync"
         exit 1
     fi
@@ -344,10 +488,11 @@ function zsync_get() {
     fi
 }
 
-function make_vm_dir() {
-    if ! mkdir -p "${VM_PATH}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${VM_PATH}"
-    fi
+function start_vm_info() {
+    echo
+    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
+    echo
 }
 
 function make_vm_config() {
@@ -357,10 +502,13 @@ function make_vm_config() {
     local GUEST=""
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [[ "${OS}" == "freebsd" ]]; then
+    if [ "${OS}" == "elementary" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "freebsd" ]; then
         GUEST="freebsd"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"fedora"* ]]; then
+    elif [ "${OS}" == "fedora" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
@@ -369,7 +517,10 @@ function make_vm_config() {
     elif [[ "${OS}" == "openbsd" ]]; then
         GUEST="openbsd"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"opensuse"* ]]; then
+    elif [ "${OS}" == "opensuse" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "popos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
@@ -399,114 +550,73 @@ EOF
         fi
 
         # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ ${RELEASE} -ge 11 ]; then
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
+    start_vm_info
 }
 
-function start_vm_info() {
-    echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
-    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
-    echo
+function get_elementary() {
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_elementary"
+    ISO="elementaryos-${RELEASE}-stable.20211005.iso"
+    URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
 }
 
 function get_freebsd() {
-    # For future releases, use dvd1 iso files.
+    local ISO=""
     local URL=""
-    local DL_BASE="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES"
-    local VERSION=""
 
-    case ${RELEASE} in
-        12_2|13_0) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! FreeBSD ${RELEASE} is not a supported release."
-            releases_freebsd
-            exit 1
-            ;;
-    esac
-
-    URL="${DL_BASE}/${VERSION}/FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
-
-    ISO="FreeBSD-${VERSION}-RELEASE-amd64-dvd1.iso"
-    make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
-    start_vm_info
+    validate_release "releases_freebsd"
+    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
 }
 
 function get_fedora() {
-    # For future releases, use dvd1 iso files.
+    local FEDORA_RELEASE=""
+    local FEDORA_VERSIONS=""
+    local HASH=""
+    local ISO=""
     local URL=""
-    local VERSION=""
+    local VERSION_NUM=""
 
-    case ${RELEASE} in
-        33|34|35_beta) VERSION=${RELEASE};;
-        *)
-            echo "ERROR! Fedora ${RELEASE} is not a supported release."
-            releases_fedora
-            exit 1
-            ;;
-    esac
+    validate_release "releases_fedora"
 
     FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
-    if [[ $VERSION == *"beta"* ]]; then
-        VERSION_NUM=${VERSION%"_beta"}
-        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')
+    if [[ "${RELEASE}" == *"beta"* ]]; then
+        VERSION_NUM=${RELEASE%"_beta"}
+        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')
         ISO="Fedora-Workstation-Live-x86_64-${VERSION_NUM}_Beta-1.2.iso"
     else
-        FEDORA_RELEASE=$(echo ${FEDORA_VERSIONS} | jq '. | select(.variant=="Workstation" and .version=="'${VERSION}'")')
-        ISO="Fedora-Workstation-Live-x86_64-${VERSION}-1.2.iso"
+        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq '. | select(.variant=="Workstation" and .version=="'${RELEASE}'")')
+        ISO="Fedora-Workstation-Live-x86_64-${RELEASE}-1.2.iso"
     fi
 
-    URL=$(echo ${FEDORA_RELEASE} | jq -r '.link')
-    SHA256SUM=$(echo ${FEDORA_RELEASE} | jq -r '.sha256')
-
-    make_vm_dir
-
-    web_get ${URL} ${VM_PATH}
-
-    echo "Checking SHA256SUMS..."
-    cd "${VM_PATH}"
-    if ! echo "${SHA256SUM} ${ISO}" | sha256sum --check --status; then
-        echo "ERROR! ${ISO} doesn't match ${SHA256SUM}. Try running 'quickget' again."
-        exit 1
-    else
-        echo "All good."
-    fi
-    cd ..
-
-    make_vm_config ${ISO}
-    start_vm_info
+    URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
+    HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_linuxmint() {
+    local FLAVOR=""
+    local ISO=""
     local URL=""
-    local DL_BASE="https://mirrors.edge.kernel.org/linuxmint/stable"
-    local VERSION=""
 
-    case ${RELEASE} in
-        cinnamon-20_2|mate-20_2|xfce-20_2) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! linuxmint ${RELEASE} is not a supported release."
-            releases_linuxmint
-            exit 1
-            ;;
-    esac
-
-    re='(.*)-(.*)'
-    [[ ${VERSION} =~ ${re} ]];
-    local FLAVOR=${BASH_REMATCH[1]}
-    VERSION=${BASH_REMATCH[2]}
-
-    ISO="linuxmint-${VERSION}-${FLAVOR}-64bit.iso"
-    URL="${DL_BASE}/${VERSION}/${ISO}"
-
-    make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
-    start_vm_info
+    validate_release "releases_linuxmint"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
+    URL="https://mirrors.edge.kernel.org/linuxmint/stable/${RELEASE}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
 }
 
 function get_openbsd() {
@@ -533,35 +643,23 @@ function get_openbsd() {
 }
 
 function get_opensuse() {
-    # For future releases, use dvd1 iso files.
+    local ISO=""
+    local RELEASES=""
     local URL=""
-    local DL_BASE="https://download.opensuse.org/"
-    local VERSION=""
 
-    case ${RELEASE} in
-        15_0|15_1|15_2|15_3|tumbleweed|microos) VERSION=${RELEASE//_/.};;
-        *)
-            echo "ERROR! openSUSE ${RELEASE} is not a supported release."
-            releases_opensuse
-            exit 1
-            ;;
-    esac
-
-    if [ "${VERSION}" == "tumbleweed" ]; then
+    validate_release "releases_opensuse"
+    if [ "${RELEASE}" == "tumbleweed" ]; then
         ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
-        URL="${DL_BASE}/tumbleweed/iso/${ISO}"
-    elif
-        [ "${VERSION}" == "microos" ]; then
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+    elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
-        URL="${DL_BASE}/tumbleweed/iso/${ISO}"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
     else
-        ISO="openSUSE-Leap-${VERSION}-DVD-x86_64.iso"
-        URL="${DL_BASE}/distribution/leap/${VERSION}/iso/${ISO}"
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
     fi
-    make_vm_dir
-    web_get ${URL} ${VM_PATH}
-    make_vm_config ${ISO}
-    start_vm_info
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
 }
 
 function get_macos() {
@@ -603,8 +701,6 @@ function get_macos() {
         exit 1
     fi
 
-    make_vm_dir
-
     # Get firmware
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2" "${VM_PATH}"
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
@@ -628,14 +724,35 @@ function get_macos() {
     fi
 
     make_vm_config RecoveryImage.img
-    start_vm_info
+}
+
+function get_popos() {
+    local DRIVER="intel"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    if [ -n "${1}" ]; then
+      DRIVER="${1}"
+    fi
+
+    validate_release "releases_popos"
+
+    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".url")
+    URL="${URL//\"/}"
+    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".sha_sum")
+    HASH="${HASH//\"/}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
+    local HASH=""
     local PROJECT=""
-    local RELEASES=""
     local URL=""
 
     case ${OS} in
@@ -646,11 +763,11 @@ function get_ubuntu() {
       ubuntu-studio)
         PROJECT="ubuntustudio"
         DEVEL="dvd";;
-      *)
-        echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
-        exit 1;;
+      *) echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
+         exit 1;;
     esac
 
+    validate_release "releases_ubuntu"
     if [ "${RELEASE}" == "devel" ]; then
         URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
     elif [ "${PROJECT}" == "ubuntu" ]; then
@@ -659,51 +776,21 @@ function get_ubuntu() {
         URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
     fi
 
-    RELEASES=$(releases_ubuntu)
-    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
-        echo "ERROR! ${RELEASE} is not a supported release."
-        releases_ubuntu
-        exit 1
-    fi
-
-    make_vm_dir
-
-    echo "Downloading SHA256SUMS..."
     web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-
     ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-
-    echo "Downloading "${URL}/${ISO}"..."
+    HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
     if [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
-        echo "Checking SHA256SUMS..."
-        cd "${VM_PATH}"
-        if ! sha256sum --check SHA256SUMS --ignore-missing --status; then
-            echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA256SUMS. Try running 'quickget' again."
-            exit 1
-        else
-            echo "All good."
-        fi
-        cd ..
+        check_hash "${ISO}" "${HASH}"
         make_vm_config "${ISO}"
     fi
-
-    start_vm_info
 }
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
-    case ${RELEASE} in
-      8|10|11) true;;
-      *) echo "ERROR! Windows ${RELEASE} is not supported."
-         releases_windows
-         exit 1
-         ;;
-    esac
-
     local ARCH="x64"
     local LANG_CODE="en"
     local LATEST_WINDOWS_VERSION=""
@@ -716,6 +803,8 @@ function get_windows() {
     local DOWNLOAD_INFO=""
     local DOWNLOAD_ID=""
     local DOWNLOAD_URL=""
+
+    validate_release "releases_windows"
 
     echo "Getting Windows ${RELEASE} URL..."
     WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
@@ -738,64 +827,109 @@ function get_windows() {
     DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
     DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
 
-    make_vm_dir
-
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
 
-    # Windows 10 doesn't include a SHA1 sum
-    # Only check the integrity is SHA1 is available.
+    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
     if [ -n "${DOWNLOAD_SHA1}" ]; then
-      echo "${DOWNLOAD_SHA1}  ${FILE_NAME}" > "${VM_PATH}/SHA1SUMS"
-      echo "Checking SHA1SUMS..."
-      cd "${VM_PATH}"
-      if ! sha1sum --check SHA1SUMS --ignore-missing --status; then
-          echo "ERROR! ${ISO} doesn't match ${VM_PATH}/SHA1SUMS. Try running 'quickget' again."
-          exit 1
-      else
-          echo "All good."
-      fi
-      cd ..
+      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
     fi
 
-    echo "Downloading virtio-win.iso..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
-    if [ ! -e "${VM_PATH}/unattended.iso" ]; then
-        case ${RELEASE} in
-            10|11)
-                echo "Making unattended.iso"
-                mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-                web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-                web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-                web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-                unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-                mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
-                ;;
-        esac
-    fi
+    rm -f "${VM_PATH}/unattended.iso"
+    case ${RELEASE} in
+        10|11)
+            echo "Making unattended.iso"
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
+    esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
-
-    start_vm_info
 }
+
+LANGS=()
+languages_windows
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
+    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
+        list_csv
+    elif [ "${OS}" == "list_json" ]; then
+        list_json
+    fi
 else
-    echo "ERROR! You must specify an OS:"
+    echo "ERROR! You must specify an operating system:"
     os_support
     exit 1
 fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
+    VM_PATH="${OS}-${RELEASE}"
+
+    if [ "${OS}" == "elementary" ]; then
+        get_elementary
+    elif [ "${OS}" == "macos" ]; then
+        get_macos
+    elif [ "${OS}" == "freebsd" ]; then
+        get_freebsd
+    elif [ "${OS}" == "fedora" ]; then
+        get_fedora
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+        get_linuxmint
+    elif [ "${OS}" == "opensuse" ]; then
+        get_opensuse
+    elif [ "${OS}" == "popos" ]; then
+        if [ -n "${3}" ]; then
+            DRIVER="${3}"
+            DRIVERS=(intel nvidia)
+            if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
+                echo "ERROR! ${DRIVER} is not a supported driver:"
+                for DRIVER in "${DRIVERS[@]}"; do
+                  echo "${DRIVER}"
+                done
+                exit 1
+            fi
+        else
+            DRIVER="intel"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DRIVER}"
+        get_popos "${DRIVER}"
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        get_ubuntu
+    elif [ "${OS}" == "windows" ]; then
+        if [ -n "${3}" ]; then
+            LANG_NAME="${3}"
+            if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
+                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                for LANG in "${LANGS[@]}"; do
+                  echo "${LANG}"
+                done
+                exit 1
+            fi
+        else
+            LANG_NAME="English International"
+        fi
+        get_windows "${LANG_NAME}"
+    else
+        echo "ERROR! ${OS} is unknown:"
+        os_support
+        exit 1
+    fi
 else
-    echo "ERROR! You must specify an OS release name."
-    if [ "${OS}" == "freebsd" ]; then
+    echo "ERROR! You must specify a release for ${OS}:"
+    if [ "${OS}" == "elementary" ]; then
+        releases_elementary
+    elif [ "${OS}" == "freebsd" ]; then
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
-    elif [ "${OS}" == "linuxmint" ]; then
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
         releases_linuxmint
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
@@ -803,45 +937,12 @@ else
         releases_openbsd
     elif [ "${OS}" == "macos" ]; then
         releases_macos
+    elif [ "${OS}" == "popos" ]; then
+        releases_popos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     fi
-    exit 1
-fi
-
-VM_PATH="${OS}-${RELEASE}"
-
-if [ "${OS}" == "macos" ]; then
-    get_macos
-elif [[ "${OS}" == *"freebsd" ]]; then
-    get_freebsd
-elif [[ "${OS}" == *"fedora"* ]]; then
-    get_fedora
-elif [[ "${OS}" == *"linuxmint"* ]]; then
-    get_linuxmint
-elif [[ "${OS}" == *"openbsd" ]]; then
-    get_openbsd
-elif [[ "${OS}" == *"opensuse"* ]]; then
-    get_opensuse
-elif [[ "${OS}" == *"ubuntu"* ]]; then
-    get_ubuntu
-elif [ "${OS}" == "windows" ]; then
-    if [ -n "${3}" ]; then
-        LANG_NAME="${3}"
-        LANG_NAMES=$(languages_windows)
-        if [[ "${LANG_NAMES}" != *"${LANG_NAME}"* ]]; then
-            echo "ERROR! ${LANG_NAME} is not a supported language:"
-            languages_windows
-            exit 1
-        fi
-    else
-        LANG_NAME="English International"
-    fi
-    get_windows "${LANG_NAME}"
-else
-    echo "ERROR! You must specify an OS:"
-    os_support
     exit 1
 fi

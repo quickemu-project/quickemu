@@ -28,12 +28,11 @@ comprehensive support for macOS and Windows**.
 
 ## Features
 
-  * macOS High Sierra, Mojave, Catalina and Big Sur
-  * Windows 8.1, 10 and 11 including TPM 2.0
-  * Ubuntu, and all the official flavours, supported by `quickget`
-  * Fedora, supported by `quickget`
-  * linuxmint Cinnamon, MATE, and xfce, supported by `quickget`
-  * openSUSE Leap, Tumbleweed and MicroOS, supported by `quickget`
+  * **macOS** High Sierra, Mojave, Catalina and Big Sur
+  * **Windows** 8.1, 10 and 11 including TPM 2.0
+  * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
+  * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
+  * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -84,7 +83,8 @@ See this (old) video where I explain some of my motivations for creating Quickem
 ## Ubuntu
 
 Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
-includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04 (Hirsute).
+includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04 (Hirsute). To
+install Quickemu and all the dependencies run the following in a terminal:
 
 ```bash
 sudo apt-add-repository ppa:flexiondotorg/quickemu
@@ -98,16 +98,20 @@ git clone --depth=1 https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
 
+Now install all the **Requirements** documented above.
+
 # Usage
 
-While `quickemu` and `quickget` are designed for the terminal, graphical
-user interfaces are also available:
+## Graphical User Interfaces
 
-  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by @marxjohnson
+While `quickemu` and `quickget` are designed for the terminal, graphical user interfaces are also available:
+
+  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by [Mark Johnson](https://github.com/marxjohnson)
+  * [Quickgui](https://github.com/ymauray/quickgui/) by [Yannick Mauray](https://github.com/ymauray)
 
 ## Ubuntu Guest
 
-`quickget` will automatically download an Ubuntu release and also create the
+`quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
 ```bash
@@ -148,7 +152,19 @@ preferred flavour.
   * `ubuntu-studio`
   * `xubuntu`
 
-## Linux Guest
+## Other Linux Guests
+
+`quickget` also supports:
+
+  * `elementary`
+  * `fedora`
+  * `linuxmint-cinnamon`
+  * `linuxmint-mate`
+  * `linuxmint-xfce`
+  * `opensuse`
+  * `popos`
+
+Or you can download a Linux image and manually create a VM configuration.
 
   * Download a .iso image of a Linux distribution
   * Create a VM configuration file; for example `debian-bullseye.conf`
@@ -249,6 +265,13 @@ and [Windows 11](https://www.microsoft.com/en-gb/software-download/windows11)
 along with the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
+**During the Windows install network interfaces are completely disabled!** This
+is to allow those users who want to create local accounts to do so. A side affect
+is that the first time **Windows boots with the QEMU network enabled it will blue
+screen, automatically restart and then start normally with fully functioning
+networking**.
+
+
 ```bash
 quickget windows 11
 quickemu --vm windows-11.conf
@@ -282,53 +305,11 @@ tpm="on"
 
 ## FreeBSD Guest
 
-`quickemu` supports FreeBSD production releases. FreeBSD support is maintained by `<kai@potabi.com>`.
+`quickemu` supports FreeBSD production releases.
 
 ```bash
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
-```
-
-## Fedora Guest
-
-`quickemu` supports Fedora releases.
-
-```bash
-quickget fedora 34
-quickemu --vm fedora-34.conf
-```
-
-## linuxmint Guest
-
-`quickemu` supports linuxmint releases.
-
-```bash
-quickget linuxmint mate-20_2
-quickemu --vm linuxmint-mate-20.2.conf
-```
-
-## openSUSE Guest
-
-`quickemu` supports openSUSE Leap, Tumbleweed and MicroOS.
-
-For the installation to complete properly, on the "Installation Settings" screen,
-you need to disable the "Update NVRAM" option.
-
-On that same screen, you may also want to enable SSH, and open the SSH port.
-
-```bash
-quickget opensuse 15_3
-quickemu --vm opensuse-15_3.conf
-```
-
-```bash
-quickget opensuse tumbleweed
-quickemu --vm opensuse-tumbleweed
-```
-
-```bash
-quickget opensuse microos
-quickemu --vm opensuse-microos
 ```
 
 # SPICE
@@ -538,13 +519,6 @@ quickemu --vm vm.conf --screen 0
 The above uses the 2560x1440 screen to compute the size of the window, which
 Quickemu sizes to 2048x1152. Without the `--screen` option, Quickemu would have
 used the 1920x1080 monitor which results in a window size of 1664x936.
-
-# TODO
-
-  - [ ] Add `spice-app` support via `virt-viewer`; *requires `virt-viewer` 8.0 or newer*
-  - [ ] Add support for `ignore_msrs` for macOS. `echo "options kvm ignore_msrs=Y" >> /etc/modprobe.d/kvm.conf && update-initramfs -k all -u`
-  - [ ] Add discrete GPU pass-through
-  - [ ] Improve disk management
 
 # References
 

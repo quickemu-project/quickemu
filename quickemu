@@ -1,6 +1,60 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+function ask_option_msrs() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  if [ ${ignore_msrs} = "N" ]; then
+    while true ; do
+    read -p "Do you wish to set ignore_msrs now? (y/N)" msrs_response
+          case $msrs_response:0:1 in
+          [yY]* ) echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs; break;;
+          * ) break ;;
+          
+      esac
+    done
+  fi 
+}
+
+function ask_persist_msrs() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  #Skip if already persisted, assuming initramfs rebuilt
+  grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm.conf >/dev/null 2>&1 || \
+    if [ ${ignore_msrs} = "Y" ]; then 
+    echo
+    echo "To make setting ignore_msrs a more persistant solution you may run the following:"
+    echo 'echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u'
+    echo
+    
+  while true ; do
+    read -p "Do you wish to set ignore_msrs at boot? (y/N)" bootrsp
+          case $bootrsp:0:1 in
+          [yY]* ) echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u ; break;;
+          * ) break ;;
+          
+      esac
+    done
+  fi
+}
+
+function ignore_msrs_alert() {
+  ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
+  
+  if [ ${ignore_msrs} = "N" ]; then
+  # Some macos and windows installations need this to successfully boot
+    echo '
+    If you experience issues booting macos or windows like those mentioned in
+
+      https://github.com/wimpysworld/quickemu/issues/88
+
+    then you can try the provided solution as a temporary fix by executing:
+    
+        "echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"'
+      
+    echo -n "I can do that for you now.  " ; ask_option_msrs
+  fi
+  ask_persist_msrs
+}
+
 function disk_delete() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
@@ -165,7 +219,6 @@ function vm_boot() {
   local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
-  local QEMU_VER=""
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
 
@@ -177,9 +230,9 @@ function vm_boot() {
     LSB_DESCRIPTION=$(lsb_release --description --short)
   fi
 
-  QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-  echo "Quickemu ${VERSION} starting ${VM} on ${LSB_DESCRIPTION} ${KERNEL_NODE}"
-  echo " - QEMU:     ${QEMU} v${QEMU_VER} on ${KERNEL_NAME} ${KERNEL_VER}"
+  echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
+  echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+  echo " - Guest:    Starting ${VM} as ${VMNAME}"
 
   HOST_CPU_CORES=$(nproc --all)
   HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
@@ -548,6 +601,8 @@ function vm_boot() {
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
+    # offer ignore_msrs if not set
+    ignore_msrs_alert
     # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
     #  - qxl is used on Big Sur and Catalina
@@ -558,6 +613,8 @@ function vm_boot() {
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
+    # offer ignore_msrs if not set
+    ignore_msrs_alert
     DISPLAY_DEVICE="qxl-vga"
   else
     DISPLAY_DEVICE="qxl-vga"
@@ -681,7 +738,7 @@ function vm_boot() {
   local args=()
 
   # shellcheck disable=SC2054,SC2206,SC2140
-  args+=(-name ${VMNAME},process=${VMNAME}
+  args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
          -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
@@ -690,7 +747,6 @@ function vm_boot() {
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
          -device ${MOUSE},bus=input.0
-         -device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic
          -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
@@ -702,6 +758,15 @@ function vm_boot() {
          -object rng-random,id=rng0,filename=/dev/urandom
          -monitor none
          -serial mon:stdio)
+
+  # Disables network interface during Windows install.
+  # See https://github.com/wimpysworld/quickemu/issues/115
+  if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
+    args+=(-nic none)
+  else
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
+  fi
 
   # Add the disks
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
@@ -798,7 +863,6 @@ function vm_boot() {
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
 
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
-  echo -e " - Process:  On host:  killall ${VMNAME}\t(if a forced kill is required)"
 
   # If output is 'none' then SPICE was requested.
   if [ ${OUTPUT} == "none" ]; then
@@ -911,9 +975,10 @@ if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
   exit 1
 fi
 
-QEMU_VER=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
-if [ "${QEMU_VER}" -lt 60 ]; then
-  echo "ERROR! Qemu 6.0.0 or newer is required, detected $(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)."
+QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
+if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
+  echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
   exit 1
 fi
 
