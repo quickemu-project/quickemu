@@ -782,16 +782,16 @@ function vm_boot() {
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
       args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
-             -drive id=RecoveryImage,if=none,format=raw,file="${img}",cache=none,aio=native)
+             -drive id=RecoveryImage,if=none,format=raw,file="${img}")
     fi
 
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO})
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}",cache=none,aio=native ${STATUS_QUO}
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO}
            -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
            -chardev spicevmc,id=usbredirchardev1,name=usbredir
            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
