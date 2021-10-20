@@ -984,7 +984,7 @@ else
             FULLSCREEN="-full-screen"
             FULLSPICY="--full-screen"
             shift;;
-          -ignore-msrs-always|0-ignore-msrs-always)
+          -ignore-msrs-always|--ignore-msrs-always)
             ignore_msrs_always
             exit;;
           -screen|--screen)
