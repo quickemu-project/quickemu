@@ -977,9 +977,17 @@ else
             fi
             shift
             shift;;
+          -fullscreen|--fullscreen|-full-screen|--full-screen)
+            FULLSCREEN="-full-screen"
+            FULLSPICY="--full-screen"
+            shift;;
           -ignore-msrs-always|0-ignore-msrs-always)
             ignore_msrs_always
             exit;;
+          -screen|--screen)
+            SCREEN="${2}"
+            shift
+            shift;;
           -snapshot|--snapshot)
             SNAPSHOT_ACTION="${2}"
             if [ -z "${SNAPSHOT_ACTION}" ]; then
@@ -997,20 +1005,12 @@ else
           -status-quo|--status-quo)
             STATUS_QUO="-snapshot"
             shift;;
-          -fullscreen|--fullscreen|-full-screen|--full-screen)
-            FULLSCREEN="-full-screen"
-            FULLSPICY="--full-screen"
+          -shortcut|--shortcut)
+            SHORTCUT=1
             shift;;
           -vm|--vm)
             VM="${2}"
             shift
-            shift;;
-          -screen|--screen)
-            SCREEN="${2}"
-            shift
-            shift;;
-          -shortcut|--shortcut)
-            SHORTCUT=1
             shift;;
           -version|--version)
             echo "${VERSION}"
