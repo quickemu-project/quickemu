@@ -9,28 +9,28 @@ function ask_option_msrs() {
           case $msrs_response:0:1 in
           [yY]* ) echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs; break;;
           * ) break ;;
-          
+
       esac
     done
-  fi 
+  fi
 }
 
 function ask_persist_msrs() {
   ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
   #Skip if already persisted, assuming initramfs rebuilt
   grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm.conf >/dev/null 2>&1 || \
-    if [ ${ignore_msrs} = "Y" ]; then 
+    if [ ${ignore_msrs} = "Y" ]; then
     echo
     echo "To make setting ignore_msrs a more persistant solution you may run the following:"
     echo 'echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u'
     echo
-    
+
   while true ; do
     read -p "Do you wish to set ignore_msrs at boot? (y/N)" bootrsp
           case $bootrsp:0:1 in
           [yY]* ) echo "options kvm ignore_msrs=Y" | sudo tee -a /etc/modprobe.d/kvm.conf && sudo update-initramfs -k all -u ; break;;
           * ) break ;;
-          
+
       esac
     done
   fi
@@ -38,7 +38,7 @@ function ask_persist_msrs() {
 
 function ignore_msrs_alert() {
   ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
-  
+
   if [ ${ignore_msrs} = "N" ]; then
   # Some macos and windows installations need this to successfully boot
     echo '
@@ -47,9 +47,9 @@ function ignore_msrs_alert() {
       https://github.com/wimpysworld/quickemu/issues/88
 
     then you can try the provided solution as a temporary fix by executing:
-    
+
         "echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"'
-      
+
     echo -n "I can do that for you now.  " ; ask_option_msrs
   fi
   ask_persist_msrs
