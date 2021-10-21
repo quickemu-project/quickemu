@@ -582,7 +582,6 @@ function get_freebsd() {
     validate_release "releases_freebsd"
     ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
     HASH=$(wget -q -O- "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep '('"${ISO}"')' | cut -d' ' -f4)
-    echo "${HASH}"
     URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
