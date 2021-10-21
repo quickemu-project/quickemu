@@ -9,10 +9,14 @@ Copyright (c) 2019, vit9696
 from __future__ import print_function
 
 import argparse
+import binascii
 import datetime
+import hashlib
 import json
+import linecache
 import os
 import random
+import struct
 import sys
 import textwrap
 import time
@@ -78,6 +82,54 @@ def mlb_from_eeee(eeee):
     sys.exit(1)
 
   return '00000000000' + eeee + '00'
+
+def int_from_unsigned_bytes(bytes, byteorder):
+  if byteorder == 'little': bytes = bytes[::-1]
+  encoded = binascii.hexlify(bytes)
+  return int(encoded, 16)
+
+# zhangyoufu https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7#gistcomment-3061078 2021-10-08
+Apple_EFI_ROM_public_key_1 = 0xC3E748CAD9CD384329E10E25A91E43E1A762FF529ADE578C935BDDF9B13F2179D4855E6FC89E9E29CA12517D17DFA1EDCE0BEBF0EA7B461FFE61D94E2BDF72C196F89ACD3536B644064014DAE25A15DB6BB0852ECBD120916318D1CCDEA3C84C92ED743FC176D0BACA920D3FCF3158AFF731F88CE0623182A8ED67E650515F75745909F07D415F55FC15A35654D118C55A462D37A3ACDA08612F3F3F6571761EFCCBCC299AEE99B3A4FD6212CCFFF5EF37A2C334E871191F7E1C31960E010A54E86FA3F62E6D6905E1CD57732410A3EB0C6B4DEFDABE9F59BF1618758C751CD56CEF851D1C0EAA1C558E37AC108DA9089863D20E2E7E4BF475EC66FE6B3EFDCF
+
+ChunkListHeader = struct.Struct('<4sIBBBxQQQ')
+assert ChunkListHeader.size == 0x24
+
+Chunk = struct.Struct('<I32s')
+assert Chunk.size == 0x24
+
+def verify_chunklist(cnkpath):
+    with open(cnkpath, 'rb') as f:
+        hash_ctx = hashlib.sha256()
+        data = f.read(ChunkListHeader.size)
+        hash_ctx.update(data)
+        magic, header_size, file_version, chunk_method, signature_method, chunk_count, chunk_offset, signature_offset = ChunkListHeader.unpack(data)
+        assert magic == b'CNKL'
+        assert header_size == ChunkListHeader.size
+        assert file_version == 1
+        assert chunk_method == 1
+        assert signature_method in [1, 2]
+        assert chunk_count > 0
+        assert chunk_offset == 0x24
+        assert signature_offset == chunk_offset + Chunk.size * chunk_count
+        for i in range(chunk_count):
+            data = f.read(Chunk.size)
+            hash_ctx.update(data)
+            chunk_size, chunk_sha256 = Chunk.unpack(data)
+            yield chunk_size, chunk_sha256
+        digest = hash_ctx.digest()
+        if signature_method == 1:
+            data = f.read(256)
+            assert len(data) == 256
+            signature = int_from_unsigned_bytes(data, 'little')
+            plaintext = 0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d0609608648016503040201050004200000000000000000000000000000000000000000000000000000000000000000 | int_from_unsigned_bytes(digest, 'big')
+            assert pow(signature, 0x10001, Apple_EFI_ROM_public_key_1) == plaintext
+        elif signature_method == 2:
+            data = f.read(32)
+            assert data == digest
+            raise RuntimeError('Chunklist missing digital signature')
+        else:
+            raise NotImplementedError
+        assert f.read(1) == b''
 
 def get_session(args):
   headers = {
@@ -173,6 +225,26 @@ def save_image(url, sess, filename='', dir=''):
       sys.stdout.flush()
     print('\rDownload complete!')
 
+  return os.path.join(dir, os.path.basename(filename))
+
+def verify_image(dmgpath, cnkpath):
+  print('Verifying image with chunklist...')
+
+  with open (dmgpath, 'rb') as dmgf:
+    cnkcount = 0
+    for cnksize, cnkhash in verify_chunklist(cnkpath):
+      cnkcount += 1
+      print('\rChunk {} ({} bytes)'.format(cnkcount, cnksize), end='')
+      sys.stdout.flush()
+      cnk = dmgf.read(cnksize)
+      if len(cnk) != cnksize:
+        raise RuntimeError('Invalid chunk {} size: expected {}, read {}'.format(cnkcount, cnksize, len(cnk)))
+      if hashlib.sha256(cnk).digest() != cnkhash:
+        raise RuntimeError('Invalid chunk {}: hash mismatch'.format(cnkcount)) 
+    if dmgf.read(1) != b'':
+      raise RuntimeError('Invalid image: larger than chunklist')
+    print('\rImage verification complete!')
+
 def action_download(args):
   """
   Reference information for queries:
@@ -208,10 +280,23 @@ def action_download(args):
     print(info)
   print('Downloading ' + info[INFO_PRODUCT] + '...')
   dmgname = '' if args.basename == '' else args.basename + '.dmg'
-  save_image(info[INFO_IMAGE_LINK], info[INFO_IMAGE_SESS], dmgname, args.outdir)
+  dmgpath = save_image(info[INFO_IMAGE_LINK], info[INFO_IMAGE_SESS], dmgname, args.outdir)
   cnkname = '' if args.basename == '' else args.basename + '.chunklist'
-  save_image(info[INFO_SIGN_LINK], info[INFO_SIGN_SESS], cnkname, args.outdir)
-  return 0
+  cnkpath = save_image(info[INFO_SIGN_LINK], info[INFO_SIGN_SESS], cnkname, args.outdir)
+  try:
+    verify_image(dmgpath, cnkpath)
+    return 0
+  except Exception as err:
+    if isinstance(err, AssertionError) and str(err)=='':
+      try:
+        tb = sys.exc_info()[2]
+        while tb.tb_next:
+          tb = tb.tb_next
+        err = linecache.getline(tb.tb_frame.f_code.co_filename, tb.tb_lineno, tb.tb_frame.f_globals).strip()
+      except:
+        err = "Invalid chunklist"
+    print('\rImage verification failed. ({})'.format(err))
+    return 1
 
 def action_selfcheck(args):
   """
