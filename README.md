@@ -34,6 +34,7 @@ comprehensive support for macOS and Windows**.
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
+  * [Kali](https://www.kali.org/) 
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -311,6 +312,15 @@ tpm="on"
 ```bash
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
+```
+
+## Kali Guest
+
+`quickemu` supports Kali production releases.
+
+```bash
+quickget kali 2021_3
+quickemu --vm kali-2021_3.conf
 ```
 
 # SPICE
