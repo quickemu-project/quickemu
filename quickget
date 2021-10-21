@@ -23,6 +23,12 @@
 #     }
 #  6. Add new OS to the argument parser at the bottom of the script
 
+if ((BASH_VERSINFO[0] < 4))
+then
+  echo "Sorry, you need bash 4.0 or newer to run this script."
+  exit 1
+fi
+
 function pretty_name() {
   local SIMPLE_NAME=""
   local PRETTY_NAME=""
