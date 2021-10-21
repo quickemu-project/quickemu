@@ -427,6 +427,7 @@ function check_hash() {
       32) hash_algo=md5sum;;
       40) hash_algo=sha1sum;;
       64) hash_algo=sha256sum;;
+      128) hash_algo=sha512sum;;
        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
           return;;
     esac
@@ -574,13 +575,17 @@ function get_elementary() {
 }
 
 function get_freebsd() {
+    local HASH=""
     local ISO=""
     local URL=""
 
     validate_release "releases_freebsd"
     ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    HASH=$(wget -q -O- "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep '('"${ISO}"')' | cut -d' ' -f4)
+    echo "${HASH}"
     URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
