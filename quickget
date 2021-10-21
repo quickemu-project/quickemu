@@ -171,7 +171,8 @@ function releases_ubuntu() {
     focal \
     hirsute \
     impish \
-    devel
+    devel \
+    canary
 }
 
 function languages_windows() {
@@ -775,6 +776,12 @@ function get_ubuntu() {
     esac
 
     validate_release "releases_ubuntu"
+
+    if [ "${RELEASE}" == "canary" ]; then
+        RELEASE="devel"
+        DEVEL="daily-canary"
+    fi
+
     if [ "${RELEASE}" == "devel" ]; then
         URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
     elif [ "${PROJECT}" == "ubuntu" ]; then
