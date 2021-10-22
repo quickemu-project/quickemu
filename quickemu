@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+if ((BASH_VERSINFO[0] < 4))
+then
+  echo "Sorry, you need bash 4.0 or newer to run this script."
+  exit 1
+fi
+
 function ignore_msrs_always() {
   # Make sure the host has /etc/modprobe.d
   if [ -d /etc/modprobe.d ]; then
