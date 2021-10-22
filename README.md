@@ -317,10 +317,11 @@ quickemu --vm freebsd-13_0.conf
 ## Kali Guest
 
 `quickemu` supports Kali production releases.
+While testing best performance shown with gtk display settings.
 
 ```bash
-quickget kali 2021_3
-quickemu --vm kali-2021_3.conf
+quickget kali 2021.3
+quickemu --vm kali-2021.3.conf --display gtk
 ```
 
 # SPICE
