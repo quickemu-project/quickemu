@@ -146,7 +146,7 @@ function releases_fedora(){
 }
 
 function releases_kali() {
-    echo 2021.3
+    echo latest
 }
 
 function releases_linuxmint(){
@@ -632,13 +632,13 @@ function get_fedora() {
 }
 
 function get_kali() {
-    #local HASH=""
+    local HASH=""
     local ISO=""
     local URL=""
     validate_release "releases_kali"
-    ISO="kali-linux-${RELEASE}-installer-amd64.iso"
-    HASH=$(wget -q -O- "https://cdimage.kali.org/kali-${RELEASE}/SHA256SUMS" | grep '('"${ISO}"')' | cut -d' ' -f1)
-    URL="https://cdimage.kali.org/kali-${RELEASE}/${ISO}"
+    ISO=$(wget -q -O- "https://cdimage.kali.org/current/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
+    HASH=$(wget -q -O- "https://cdimage.kali.org/current/SHA256SUMS" | grep '('"${ISO}"')' | cut -d' ' -f1)
+    URL="https://cdimage.kali.org/current/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
