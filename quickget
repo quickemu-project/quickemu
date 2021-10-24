@@ -40,6 +40,9 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    nisos-gnome)        PRETTY_NAME="NixOS Gnome";;
+    nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
+    nixos-minimal)      PRETTY_NAME="Nixos Minimal";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
     opensuse)           PRETTY_NAME="openSUSE";;
@@ -116,6 +119,9 @@ function os_support() {
     linuxmint-cinnamon \
     linuxmint-mate \
     linuxmint-xfce \
+    nixos-gnome \
+    nixos-plasma5 \
+    nixos-minimal \
     lubuntu \
     macos \
     openbsd \
@@ -152,6 +158,10 @@ function releases_kali() {
 
 function releases_linuxmint(){
     echo 20.2
+}
+
+function releases_nixos(){
+    echo 21.05
 }
 
 function releases_openbsd(){
@@ -460,6 +470,7 @@ function web_get() {
     local DIR="${2}"
     local FILE=""
     local URL="${1}"
+
     if [ -n "${3}" ]; then
         FILE="${3}"
     else
@@ -531,6 +542,9 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"nixos"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "openbsd" ]; then
@@ -668,7 +682,21 @@ function get_linuxmint() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+function get_nixos() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
 
+    validate_release "releases_nixos"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
+    URL="https://channels.nixos.org/nixos-${RELEASE}/${ISO}"
+    HASH=$(wget -q -O- "https://channels.nixos.org/nixos-${RELEASE}/${ISO}.sha256" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 function get_openbsd() {
     local HASH=""
     local ISO=""
@@ -935,6 +963,8 @@ if [ -n "${2}" ]; then
         get_kali
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         get_linuxmint
+    elif [[ "${OS}" == *"nixos"* ]]; then
+        get_nixos
     elif [ "${OS}" == "openbsd" ]; then
         get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
@@ -988,6 +1018,8 @@ else
         releases_kali
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         releases_linuxmint
+    elif [[ "${OS}" == *"nixos"* ]]; then 
+        releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
     elif [ "${OS}" == "openbsd" ]; then
