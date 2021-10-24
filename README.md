@@ -320,8 +320,8 @@ quickemu --vm freebsd-13_0.conf
 While testing best performance shown with gtk display settings.
 
 ```bash
-quickget kali 2021.3
-quickemu --vm kali-2021.3.conf --display gtk
+quickget kali latest
+quickemu --vm kali-latest.conf --display gtk
 ```
 
 # SPICE
