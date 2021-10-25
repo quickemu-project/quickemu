@@ -796,9 +796,8 @@ function get_ubuntu() {
         URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
     fi
 
-    web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-    ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-    HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
     if [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
