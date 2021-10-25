@@ -43,8 +43,8 @@ function disk_delete() {
     # Remove any EFI vars, but not for macOS
     rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
     rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
-    rm "${VMDIR}"/${VMNAME}-vars.fd >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}"/${VMNAME}-vars.fd > /dev/null 2>&1
+    rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
@@ -782,7 +782,7 @@ function vm_boot() {
             --terminate
             --tpmstate dir="${VMDIR}"
             --tpm2)
-    echo "${SWTPM} ${tpm_args[@]} &" >> "${VMDIR}/${VMNAME}.sh"
+    echo "${SWTPM} ${tpm_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
     ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
     echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
     sleep 1
