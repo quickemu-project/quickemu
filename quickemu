@@ -211,7 +211,7 @@ function vm_boot() {
   local KERNEL_NAME="Unknown"
   local KERNEL_NODE=""
   local KERNEL_VER="?"
-  local LSB_DESCRIPTION=""
+  local LSB_DESCRIPTION="Unknown OS"
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
@@ -229,6 +229,8 @@ function vm_boot() {
 
   if command -v lsb_release &>/dev/null; then
     LSB_DESCRIPTION=$(lsb_release --description --short)
+  elif [ -e /etc/os-release ]; then
+    LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
   fi
 
   echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
