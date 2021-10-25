@@ -218,7 +218,6 @@ function vm_boot() {
   local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
-  local QEMU_VER=""
   local SMM="off"
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
@@ -683,7 +682,11 @@ function vm_boot() {
   fi
 
   if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
-    DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
+      DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
+    else
+      DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    fi
     echo ", GL (${GL}), VirGL (on)"
   else
     echo ", GL (${GL}), VirGL (off)"
