@@ -928,17 +928,14 @@ function vm_boot() {
 }
 
 function shortcut_create {
-  local VMNAME=""
-  VMNAME=$(basename "${VM}" .conf)
-  local LAUNCHER_DIR=""
-  LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
   local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
   cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0
 Type=Application
-Terminal=true
-Exec=${LAUNCHER_DIR}/${LAUNCHER} --vm ${VM}
+Terminal=false
+Exec=${0} --vm ${VM}
+Path=${VMPATH}
 Name=${VMNAME}
 Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
 EOF
