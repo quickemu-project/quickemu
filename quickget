@@ -36,7 +36,6 @@ function pretty_name() {
   case ${SIMPLE_NAME} in
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
-    kali)               PRETTY_NAME="Kali";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
@@ -538,7 +537,7 @@ function make_vm_config() {
     elif [ "${OS}" == "fedora" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"kali"* ]]; then
+    elif [ "${OS}" == "kali" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
