@@ -34,6 +34,7 @@ comprehensive support for macOS and Windows**.
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
+  * [Kali](https://www.kali.org/) 
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -165,6 +166,9 @@ preferred flavour.
   * `linuxmint-xfce`
   * `opensuse`
   * `popos`
+  * `NixOS-Gnome`
+  * `NixOS-KDE`
+  * `NixOS-minimal`
 
 Or you can download a Linux image and manually create a VM configuration.
 
@@ -312,6 +316,16 @@ tpm="on"
 ```bash
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
+```
+
+## Kali Guest
+
+`quickemu` supports Kali production releases.
+While testing best performance shown with gtk display settings.
+
+```bash
+quickget kali latest
+quickemu --vm kali-latest.conf --display gtk
 ```
 
 # SPICE
