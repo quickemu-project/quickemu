@@ -60,7 +60,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
 
 ## Requirements
 
-  * [QEMU](https://www.qemu.org/) (*6.0.0 or newer*)
+  * [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL, SPICE & VirtFS support**
   * [bash](https://www.gnu.org/software/bash/) (*4.0 or newer*)
   * [Coreutils](https://www.gnu.org/software/coreutils/)
   * [EDK II](https://github.com/tianocore/edk2)
