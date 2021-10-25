@@ -34,7 +34,7 @@ comprehensive support for macOS and Windows**.
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
-  * [Kali](https://www.kali.org/) 
+  * [Kali](https://www.kali.org/) & [NixOS](https://nixos.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
