@@ -1114,8 +1114,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   fi
 
   VMDIR=$(dirname "${disk_img}")
-  VMNAME=$(basename "${VM}" .conf)
-  VMPATH=$(dirname "${VM}")
+  VMNAME=$(basename "${VM}.conf")
+  VMPATH=$(realpath "$(dirname "${VM}")")
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
