@@ -526,6 +526,8 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
+    local SEC_BOOT=""
+
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     if [ "${OS}" == "elementary" ]; then
@@ -588,6 +590,13 @@ EOF
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            # Only force SecureBoot on for non-Debian/Ubuntu distros.
+            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
+              SEC_BOOT="off"
+            else
+              SEC_BOOT="on"
+            fi
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
     start_vm_info
