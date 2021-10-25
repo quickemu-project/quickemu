@@ -784,7 +784,7 @@ function vm_boot() {
     echo "${SWTPM} ${tpm_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
     ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
     echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
-    sleep 1
+    sleep 0.25
   fi
 
   # Boot the VM
