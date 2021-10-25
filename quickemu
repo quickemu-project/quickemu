@@ -49,8 +49,7 @@ function disk_delete() {
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
-  local VMNAME=""
-  VMNAME=$(basename "${VM}" .conf)
+
   local SHORTCUT_DIR="${HOME}/.local/share/applications/"
   if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
     rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
