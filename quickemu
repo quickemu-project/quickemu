@@ -692,10 +692,13 @@ function vm_boot() {
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
+  echo -n "" > "${VMDIR}/${VMNAME}.ports"
+
   # Find a free port to expose ssh to the guest
   local SSH_PORT=""
   SSH_PORT=$(get_port 22220 9)
   if [ -n "${SSH_PORT}" ]; then
+    echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
     echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
   else
@@ -727,6 +730,7 @@ function vm_boot() {
     if [ "${OUTPUT}" == "spice-app" ]; then
       echo " - SPICE:    Enabled"
     else
+      echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
       echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
       if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
