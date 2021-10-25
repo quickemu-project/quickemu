@@ -954,7 +954,7 @@ function usage() {
   echo "  --delete                : Delete the disk image."
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandle machine-specific registers"
+  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --shortcut              : Create a desktop shortcut"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
