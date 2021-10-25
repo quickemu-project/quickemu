@@ -197,6 +197,7 @@ function vm_boot() {
   local CPU=""
   local DISK_USED=""
   local DISPLAY_DEVICE=""
+  local DISPLAY_RENDER=""
   local EFI_CODE=""
   local EFI_VARS=""
   local GUEST_CPU_CORES=""
@@ -630,7 +631,7 @@ function vm_boot() {
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
     case ${OUTPUT} in
-      spice) DISPLAY_DEVICE="qxl-vga";;
+      none|spice) DISPLAY_DEVICE="qxl-vga";;
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
@@ -651,10 +652,6 @@ function vm_boot() {
 
   echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
 
-  if [ "${OUTPUT}" == "spice" ]; then
-    OUTPUT="none"
-  fi
-
   # Build the video configuration
   VIDEO="-device ${DISPLAY_DEVICE}"
 
@@ -669,17 +666,20 @@ function vm_boot() {
   fi
   VIDEO="${VIDEO} ${FULLSCREEN}"
 
-  if [ "${OUTPUT}" == "gtk" ]; then
-    OUTPUT="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
-    # GL is not working with GTK and virtio-vga
-    if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-      GL="off"
-    fi
-  fi
-
-  if [ "${OUTPUT}" != "none" ]; then
-    OUTPUT="${OUTPUT},gl=${GL}"
-  fi
+  # Map Quickemu OUTPUT to QEMU -display
+  case ${OUTPUT} in
+    gtk)
+      DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
+      # GL is not working with GTK and virtio-vga
+      if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+        GL="off"
+      fi
+      ;;
+    none|spice)
+      DISPLAY_RENDER="none";;
+    *)
+      DISPLAY_RENDER="${OUTPUT},gl=${GL}";;
+  esac
 
   if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
     if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
@@ -725,7 +725,7 @@ function vm_boot() {
   SPICE_PORT=$(get_port 5930 9)
   if [ -z "${SPICE_PORT}" ]; then
     echo " - SPICE:    All SPICE ports have been exhausted."
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
       echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
       exit 1
     fi
@@ -797,7 +797,7 @@ function vm_boot() {
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
-         ${VIDEO} -display ${OUTPUT}
+         ${VIDEO} -display ${DISPLAY_RENDER}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
          -device ${MOUSE},bus=input.0
@@ -918,12 +918,15 @@ function vm_boot() {
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
 
   # If output is 'none' then SPICE was requested.
-  if [ ${OUTPUT} == "none" ]; then
+  if [ "${OUTPUT}" == "spice" ]; then
     if [ -n "${PUBLIC}" ]; then
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
     else
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
     fi
+  elif [ "${OUTPUT}" == "none" ]; then
+    sleep 0.25
+    echo " - PID:      ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
   fi
 }
 
@@ -949,7 +952,7 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'"
+  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandle machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
@@ -1046,7 +1049,7 @@ else
             shift;;
           -display|--display)
             OUTPUT="${2}"
-            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
               echo "ERROR! Requested output '${OUTPUT}' is not recognised."
               exit 1
             elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then

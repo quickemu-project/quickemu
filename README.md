@@ -475,7 +475,7 @@ Usage
 
 You can also pass optional parameters
   --delete                : Delete the disk image.
-  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'
+  --display               : Select display backend. 'sdl' (default), 'gtk', 'none' or 'spice'
   --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)
   --ignore-msrs-always    : Configure KVM to always ignore unhandle machine-specific registers
   --screen <screen>       : Use specified screen to determine the window size.
