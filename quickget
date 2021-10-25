@@ -716,7 +716,7 @@ function get_macos() {
     fi
 
     # Get firmware
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2" "${VM_PATH}"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
     if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
         web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
