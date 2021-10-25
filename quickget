@@ -959,9 +959,9 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "kali" ]; then
         get_kali
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
-    elif [[ "${OS}" == *"nixos"* ]]; then
+    elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
         get_openbsd
@@ -1005,7 +1005,7 @@ if [ -n "${2}" ]; then
         exit 1
     fi
 else
-    echo "ERROR! You must specify a release for ${OS}:"
+    echo -n "ERROR! You must specify a release: "
     if [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
@@ -1014,9 +1014,9 @@ else
         releases_fedora
     elif [ "${OS}" == "kali" ]; then
         releases_kali
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
-    elif [[ "${OS}" == *"nixos"* ]]; then 
+    elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
@@ -1030,6 +1030,9 @@ else
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
         releases_windows
+    else
+        echo "${OS} is unknown"
+        os_support
     fi
     exit 1
 fi
