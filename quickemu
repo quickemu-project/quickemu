@@ -816,6 +816,9 @@ function vm_boot() {
   # See https://github.com/wimpysworld/quickemu/issues/115
   if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
     args+=(-nic none)
+  elif [ -n "${bridge}" ]; then
+    # Enable bridge mode networking
+    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
@@ -967,6 +970,7 @@ function usage() {
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
+bridge=""
 cpu_cores=""
 disk_img=""
 disk_size=""
