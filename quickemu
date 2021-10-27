@@ -234,7 +234,6 @@ function vm_boot() {
 
   echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
   echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
-  echo " - Guest:    Starting ${VM} as ${VMNAME}"
 
   HOST_CPU_CORES=$(nproc --all)
   HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
@@ -312,7 +311,7 @@ function vm_boot() {
   fi
   echo ", ${RAM_VM} RAM"
 
-  if [ ${RAM_VM//G/} -lt 4 ]; then
+  if [ "${RAM_VM//G/}" -lt 4 ]; then
     if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
         echo "ERROR! You have insufficient RAM to run ${guest_os} in a VM"
         exit 1
@@ -470,7 +469,7 @@ function vm_boot() {
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
-        big-sur)
+        big-sur|monterey)
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
@@ -640,7 +639,7 @@ function vm_boot() {
     #  - VGA is used on Mojave, although available resolutions are all 4:3
     #  - High Sierra will run at the default 1920x1080 only.
     case ${macos_release} in
-      catalina|big-sur) DISPLAY_DEVICE="qxl";;
+      catalina|big-sur|monterey) DISPLAY_DEVICE="qxl";;
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
@@ -926,10 +925,9 @@ function vm_boot() {
     else
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
     fi
-  elif [ "${OUTPUT}" == "none" ]; then
-    sleep 0.25
-    echo " - PID:      ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
   fi
+  sleep 0.25
+  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
 }
 
 function shortcut_create {
@@ -1007,7 +1005,7 @@ VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.2.7"
+readonly VERSION="2.2.8"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.

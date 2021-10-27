@@ -180,7 +180,8 @@ function releases_macos() {
     echo high-sierra \
     mojave \
     catalina \
-    big-sur
+    big-sur \
+    monterey
 }
 
 function releases_popos() {
@@ -509,8 +510,8 @@ function zsync_get() {
         exit 1
     fi
 
-    if [ -e "${DIR}/${FILE}.zs-old" ]; then
-        rm -v "${DIR}/${FILE}.zs-old"
+    if [ -e "${DIR}/${OUT}.zs-old" ]; then
+        rm "${DIR}/${OUT}.zs-old"
     fi
 }
 
@@ -526,6 +527,8 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
+    local SEC_BOOT=""
+
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     if [ "${OS}" == "elementary" ]; then
@@ -588,6 +591,13 @@ EOF
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            # Only force SecureBoot on for non-Debian/Ubuntu distros.
+            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
+              SEC_BOOT="off"
+            else
+              SEC_BOOT="on"
+            fi
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
     start_vm_info
@@ -735,8 +745,10 @@ function get_opensuse() {
 }
 
 function get_macos() {
+    local BOARD_ID=""
     local CWD=""
     local MACRECOVERY=""
+    local MLB=""
 
     case ${RELEASE} in
         high-sierra)
@@ -749,7 +761,10 @@ function get_macos() {
             BOARD_ID="Mac-CFF7D910A743CAAF"
             MLB="00000000000PHCD00";;
         big-sur)
-            BOARD_ID="Mac-E43C1C25D4880AD6"
+            BOARD_ID="Mac-35C1E88140C3E6CF"
+            MLB="00000000000000000";;
+        monterey)
+            BOARD_ID="Mac-06F11F11946D27C5"
             MLB="00000000000000000";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
@@ -757,19 +772,18 @@ function get_macos() {
     esac
 
     # Use a bundled macrecovery if possible
-    CWD="$(dirname ${0})"
+    CWD="$(dirname "${0}")"
     if [ -x "${CWD}/macrecovery" ]; then
         MACRECOVERY="${CWD}/macrecovery"
     elif [ -x /usr/bin/macrecovery ]; then
         MACRECOVERY="/usr/bin/macrecovery"
     else
-        web_get "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py" "${HOME}/.quickemu"
-        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery.py"
-        sed -i 's/\<env python\>/env python3/g' "${MACRECOVERY}"
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
     fi
 
     if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery.py."
+        echo "ERROR! Can not find a usable macrecovery."
         exit 1
     fi
 
@@ -839,14 +853,17 @@ function get_ubuntu() {
          exit 1;;
     esac
 
-    validate_release "releases_ubuntu"
-
-    if [ "${RELEASE}" == "canary" ]; then
-        RELEASE="devel"
-        DEVEL="daily-canary"
+    if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
+      echo "ERROR! Canary is currently only available for Ubuntu."
+      exit 1
+    else
+      validate_release "releases_ubuntu"
     fi
 
-    if [ "${RELEASE}" == "devel" ]; then
+    if [ "${RELEASE}" == "canary" ]; then
+        DEVEL="daily-canary"
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${RELEASE}" == "devel" ]; then
         URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
     elif [ "${PROJECT}" == "ubuntu" ]; then
         URL="http://releases.ubuntu.com/${RELEASE}"
@@ -856,7 +873,7 @@ function get_ubuntu() {
 
     HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
     ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-    if [ "${RELEASE}" == "devel" ]; then
+    if [ "${RELEASE}" == "canary" ] || [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
     else

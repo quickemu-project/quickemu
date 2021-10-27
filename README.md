@@ -28,7 +28,7 @@ comprehensive support for macOS and Windows**.
 
 ## Features
 
-  * **macOS** High Sierra, Mojave, Catalina and Big Sur
+  * **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
   * **Windows** 8.1, 10 and 11 including TPM 2.0
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
@@ -91,6 +91,7 @@ install Quickemu and all the dependencies run the following in a terminal:
 
 ```bash
 sudo apt-add-repository ppa:flexiondotorg/quickemu
+sudo apt update
 sudo apt install quickemu
 ```
 
@@ -202,15 +203,15 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina` and `big-sur` are supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur` and `monterey` are supported.
 
   * Use cursor keys and enter key to select the **macOS Base System**
   * From **macOS Utilities**
     * Click **Disk Utility** and **Continue**
-      * On macOS Catalina and Big Sur
+      * On macOS Catalina, Big Sur & Monterey
         * Select `Apple Inc. VirtIO Block Media` from the list and click **Erase**.
       * On macOS Mojave and High Sierra
-        * Select `QEMU HARDDISK Media` (~68.72GB) from the list and click **Erase**.
+        * Select `QEMU HARDDISK Media` (~103.08GB) from the list and click **Erase**.
     * Enter a `Name:` for the disk and click **Erase**.
     * Click **Done**.
     * Close Disk Utility
@@ -231,7 +232,7 @@ macos_release="catalina"
 
   * `guest_os="macos"` instructs Quickemu to optimise for macOS.
   * `macos_release="catalina"` instructs Quickemu to optimise for a particular macOS release.
-    * For example VirtIO Network and Memory Ballooning are available in Big Sur, but not previous releases.
+    * For example VirtIO Network and Memory Ballooning are available in Big Sur and newer, but not previous releases.
     * And VirtIO Block Media (disks) are supported/stable in Catalina and newer.
 
 ### macOS compatibility
@@ -245,18 +246,19 @@ There are some considerations when running macOS via Quickemu.
     * Mojave
     * Catalina **(Recommended)**
     * Big Sur
+    * Monterey
   * Optimised by default
     * Host CPU vendor is detected and guest CPU is optimised accordingly.
     * [VirtIO Block Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
-    * VirtIO Network (`virtio-net`) is supported and enabled on macOS Big Sur but previous releases use `vmxnet3`.
-    * VirtIO Memory Ballooning is supported and enabled on macOS Big Sur but disabled for other support macOS releases.
+    * VirtIO Network (`virtio-net`) is supported and enabled on macOS Big Sur and newer but previous releases use `vmxnet3`.
+    * VirtIO Memory Ballooning is supported and enabled on macOS Big Sur and newer but disabled for other support macOS releases.
   * USB host pass-through is:
     * UHCI (USB 2.0) on macOS Catalina and earlier.
-    * XHCI (USB 3.0) on macOS Big Sur.
+    * XHCI (USB 3.0) on macOS Big Sur and newer.
   * Display resolution can only be changed via macOS System Preferences.
   * Full Duplex audio works on macOS High Sierra, Mojave and Catalina.
-      * **macOS Big Sur has no audio at all**.
+      * **macOS Big Sur and Monterey have no audio at all**.
   * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
   * **SPICE has limited support on macOS**:
     * Copy/paste via SPICE agent is not available.
