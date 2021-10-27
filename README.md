@@ -443,6 +443,13 @@ In the example above:
   * Port 8123 on the host is forwarded to port 8123 on the guest.
   * Port 8888 on the host is forwarded to port 80 on the guest.
 
+# Bridged networking
+
+Connect your virtual machine to a preconfigured network bridge.
+Add an additional line to your virtual machine configuration
+
+  * `bridge="br0"`
+
 # USB redirection
 
 Quickemu supports USB redirection via SPICE pass-through and host pass-through.
