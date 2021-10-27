@@ -23,6 +23,8 @@
 #     }
 #  6. Add new OS to the argument parser at the bottom of the script
 
+trap 'kill $(jobs -p)' EXIT
+
 if ((BASH_VERSINFO[0] < 4))
 then
   echo "Sorry, you need bash 4.0 or newer to run this script."
