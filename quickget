@@ -770,7 +770,7 @@ function get_macos() {
     esac
 
     # Use a bundled macrecovery if possible
-    CWD="$(dirname ${0})"
+    CWD="$(dirname "${0}")"
     if [ -x "${CWD}/macrecovery" ]; then
         MACRECOVERY="${CWD}/macrecovery"
     elif [ -x /usr/bin/macrecovery ]; then
