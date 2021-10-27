@@ -609,7 +609,7 @@ function get_elementary() {
 
     validate_release "releases_elementary"
     ISO="elementaryos-${RELEASE}-stable.20211005.iso"
-    URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
+    URL="https://ams3.dl.elementary.io/download/MTYzNTM1NDc4OQ==/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
