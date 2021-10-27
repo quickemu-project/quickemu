@@ -97,9 +97,9 @@ function list_csv() {
 
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ ${RELEASE} == "canary" ]; then
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
         DOWNLOADER="zsync"
-      elif [[ "${OS}" == *"ubuntu"* ]] && [ ${RELEASE} == "devel" ]; then
+      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="zsync"
       else
         DOWNLOADER="wget"
