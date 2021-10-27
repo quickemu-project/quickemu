@@ -180,7 +180,8 @@ function releases_macos() {
     echo high-sierra \
     mojave \
     catalina \
-    big-sur
+    big-sur \
+    monterey
 }
 
 function releases_popos() {
@@ -759,6 +760,9 @@ function get_macos() {
             MLB="00000000000PHCD00";;
         big-sur)
             BOARD_ID="Mac-E43C1C25D4880AD6"
+            MLB="00000000000000000";;
+        monterey)
+            BOARD_ID="Mac-06F11F11946D27C5"
             MLB="00000000000000000";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos

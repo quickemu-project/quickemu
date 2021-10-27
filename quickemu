@@ -469,7 +469,7 @@ function vm_boot() {
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
-        big-sur)
+        big-sur|monterey)
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
@@ -639,7 +639,7 @@ function vm_boot() {
     #  - VGA is used on Mojave, although available resolutions are all 4:3
     #  - High Sierra will run at the default 1920x1080 only.
     case ${macos_release} in
-      catalina|big-sur) DISPLAY_DEVICE="qxl";;
+      catalina|big-sur|monterey) DISPLAY_DEVICE="qxl";;
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
