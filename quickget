@@ -778,13 +778,12 @@ function get_macos() {
     elif [ -x /usr/bin/macrecovery ]; then
         MACRECOVERY="/usr/bin/macrecovery"
     else
-        web_get "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py" "${HOME}/.quickemu"
-        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery.py"
-        sed -i 's/\<env python\>/env python3/g' "${MACRECOVERY}"
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
     fi
 
     if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery.py."
+        echo "ERROR! Can not find a usable macrecovery."
         exit 1
     fi
 
