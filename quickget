@@ -94,7 +94,6 @@ function list_csv() {
     fi
 
     for RELEASE in $("releases_${FUNC}"); do
-
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
       elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
