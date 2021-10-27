@@ -853,14 +853,17 @@ function get_ubuntu() {
          exit 1;;
     esac
 
-    validate_release "releases_ubuntu"
-
-    if [ "${RELEASE}" == "canary" ]; then
-        RELEASE="devel"
-        DEVEL="daily-canary"
+    if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
+      echo "ERROR! Canary is currently only available for Ubuntu."
+      exit 1
+    else
+      validate_release "releases_ubuntu"
     fi
 
-    if [ "${RELEASE}" == "devel" ]; then
+    if [ "${RELEASE}" == "canary" ]; then
+        DEVEL="daily-canary"
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${RELEASE}" == "devel" ]; then
         URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
     elif [ "${PROJECT}" == "ubuntu" ]; then
         URL="http://releases.ubuntu.com/${RELEASE}"
@@ -870,7 +873,7 @@ function get_ubuntu() {
 
     HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
     ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-    if [ "${RELEASE}" == "devel" ]; then
+    if [ "${RELEASE}" == "canary" ] || [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
     else
