@@ -6,6 +6,7 @@
 *.iso
 *.lock
 *.log
+*.msi
 *.permall
 *.pid
 *.ports
