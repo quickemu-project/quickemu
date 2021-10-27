@@ -1,4 +1,7 @@
+*.chunklist
+*.dmg
 *.qcow2
+*.img
 *.iso
 *.conf
 *.sh
@@ -6,6 +9,8 @@
 *.fd
 *.xml
 *.permall
+*.pid
+*.ports
 .lock
 SHA*
 sha*
