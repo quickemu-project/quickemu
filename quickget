@@ -510,8 +510,8 @@ function zsync_get() {
         exit 1
     fi
 
-    if [ -e "${DIR}/${FILE}.zs-old" ]; then
-        rm -v "${DIR}/${FILE}.zs-old"
+    if [ -e "${DIR}/${OUT}.zs-old" ]; then
+        rm "${DIR}/${OUT}.zs-old"
     fi
 }
 
