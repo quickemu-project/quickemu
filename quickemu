@@ -901,9 +901,9 @@ function vm_boot() {
           ${USB_PASSTHROUGH})
   fi
 
-  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}.swtpm-sock" ]; then
+  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}-swtpm.sock" ]; then
       # shellcheck disable=SC2054
-      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}-swtpm.sock"
             -tpmdev emulator,id=tpm0,chardev=chrtpm
             -device tpm-tis,tpmdev=tpm0)
   fi
