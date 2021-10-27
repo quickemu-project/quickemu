@@ -804,6 +804,8 @@ function vm_boot() {
          -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
          -device virtio-serial-pci
+         -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
+         -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
          -device virtio-rng-pci,rng=rng0
