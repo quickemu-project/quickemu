@@ -745,8 +745,10 @@ function get_opensuse() {
 }
 
 function get_macos() {
+    local BOARD_ID=""
     local CWD=""
     local MACRECOVERY=""
+    local MLB=""
 
     case ${RELEASE} in
         high-sierra)
