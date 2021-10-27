@@ -759,7 +759,7 @@ function get_macos() {
             BOARD_ID="Mac-CFF7D910A743CAAF"
             MLB="00000000000PHCD00";;
         big-sur)
-            BOARD_ID="Mac-E43C1C25D4880AD6"
+            BOARD_ID="Mac-35C1E88140C3E6CF"
             MLB="00000000000000000";;
         monterey)
             BOARD_ID="Mac-06F11F11946D27C5"
