@@ -79,7 +79,7 @@ function list_csv() {
   local DISPLAY_NAME
   local DOWNLOADER
   local FUNC
-  local LANG
+  local OPTION
   local OS
   local RELEASE
   echo "Display Name,OS,Release,Option,Downloader"
@@ -106,12 +106,12 @@ function list_csv() {
       fi
 
       if [ "${OS}" == "windows" ]; then
-        for LANG in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER}"
+        for OPTION in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       elif [ "${OS}" == "popos" ]; then
-        for DRIVER in intel nvidia; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER},${DOWNLOADER}"
+        for OPTION in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       else
         echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER}"
