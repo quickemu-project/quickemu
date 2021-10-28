@@ -109,10 +109,17 @@ Now install all the **Requirements** documented above.
 
 ## Graphical User Interfaces
 
-While `quickemu` and `quickget` are designed for the terminal, graphical user interfaces are also available:
+While `quickemu` and `quickget` are designed for the terminal, a graphical user interfaces is also available:
 
-  * [Quickemu GUI](https://github.com/marxjohnson/quickemu_gui) by [Mark Johnson](https://github.com/marxjohnson)
-  * [Quickgui](https://github.com/ymauray/quickgui/) by [Yannick Mauray](https://github.com/ymauray)
+  * [Quickgui](https://github.com/quickgui/quickgui) by [Mark Johnson](https://github.com/marxjohnson) and [Yannick Mauray](https://github.com/ymauray).
+
+### Quickgui for Ubuntu
+
+```bash
+sudo add-apt-repository ppa:yannick-mauray/quickgui
+sudo apt update
+sudo apt install quickgui
+```
 
 ## Ubuntu Guest
 
