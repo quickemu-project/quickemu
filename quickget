@@ -91,6 +91,8 @@ function list_csv() {
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
       FUNC="linuxmint"
+    elif [[ "${OS}" == *"nixos"* ]]; then
+      FUNC="nixos"
     else
       FUNC="${OS}"
     fi
