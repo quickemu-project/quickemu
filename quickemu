@@ -43,14 +43,13 @@ function disk_delete() {
     # Remove any EFI vars, but not for macOS
     rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
     rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
-    rm "${VMDIR}"/${VMNAME}-vars.fd >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}"/${VMNAME}-vars.fd > /dev/null 2>&1
+    rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
+    rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
-  local VMNAME=""
-  VMNAME=$(basename "${VM}" .conf)
+
   local SHORTCUT_DIR="${HOME}/.local/share/applications/"
   if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
     rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
@@ -175,11 +174,29 @@ function check_cpu_flag() {
   fi
 }
 
+function efi_vars() {
+  local VARS_IN=""
+  local VARS_OUT=""
+  VARS_IN="${1}"
+  VARS_OUT="${2}"
+
+  if [ ! -e "${VARS_OUT}" ]; then
+    if [ -e "${VARS_IN}" ]; then
+      cp "${VARS_IN}" "${VARS_OUT}"
+    else
+      echo "ERROR! ${VARS_IN} was not found. Please install edk2."
+      exit 1
+    fi
+  fi
+}
+
 function vm_boot() {
   local BALLOON="-device virtio-balloon"
+  local BOOT_STATUS=""
   local CPU=""
   local DISK_USED=""
   local DISPLAY_DEVICE=""
+  local DISPLAY_RENDER=""
   local EFI_CODE=""
   local EFI_VARS=""
   local GUEST_CPU_CORES=""
@@ -194,13 +211,14 @@ function vm_boot() {
   local KERNEL_NAME="Unknown"
   local KERNEL_NODE=""
   local KERNEL_VER="?"
-  local LSB_DESCRIPTION=""
+  local LSB_DESCRIPTION="Unknown OS"
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
   local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
+  local SMM="off"
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
 
@@ -210,11 +228,12 @@ function vm_boot() {
 
   if command -v lsb_release &>/dev/null; then
     LSB_DESCRIPTION=$(lsb_release --description --short)
+  elif [ -e /etc/os-release ]; then
+    LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
   fi
 
   echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
   echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
-  echo " - Guest:    Starting ${VM} as ${VMNAME}"
 
   HOST_CPU_CORES=$(nproc --all)
   HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
@@ -292,7 +311,7 @@ function vm_boot() {
   fi
   echo ", ${RAM_VM} RAM"
 
-  if [ ${RAM_VM//G/} -lt 4 ]; then
+  if [ "${RAM_VM//G/}" -lt 4 ]; then
     if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
         echo "ERROR! You have insufficient RAM to run ${guest_os} in a VM"
         exit 1
@@ -306,7 +325,6 @@ function vm_boot() {
   # Always Boot macOS using EFI
   if [ "${guest_os}" == "macos" ]; then
     boot="efi"
-    echo " - BOOT:     EFI (${guest_os})"
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
       EFI_CODE="${VMDIR}/OVMF_CODE.fd"
       EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
@@ -328,6 +346,7 @@ function vm_boot() {
       echo "       Use 'quickget' to download the required files."
       exit 1
     fi
+    BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
   elif [[ "${boot}" == *"efi"* ]]; then
     EFI_VARS="${VMDIR}/OVMF_VARS.fd"
 
@@ -338,35 +357,72 @@ function vm_boot() {
       mv "${VMDIR}/OVMF_VARS_4M.fd" "${EFI_VARS}"
     fi
 
-    if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] ||
-       [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ] ||
-       [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-      echo " - BOOT:     EFI (${guest_os})"
+    # OVMF_CODE_4M.fd is for booting guests in non-Secure Boot mode.
+    # While this image technically supports Secure Boot, it does so
+    # without requiring SMM support from QEMU
 
-      if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-      elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
-      elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-        EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
-      fi
+    # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
+    # does not support SMM.
 
-      if [ ! -e "${EFI_VARS}" ]; then
-        if [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
-          cp "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_VARS.fd" ]; then
-          cp "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/OVMF_VARS.fd" ]; then
-          cp "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
+    case ${secureboot} in
+      on)
+        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.secboot.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
+          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd"
+          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        else
+          echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
+          echo "       Please install OVMF firmware."
+          exit 1
         fi
-      fi
-    else
-      boot="legacy"
-      echo " - BOOT:     Legacy BIOS (${guest_os}) - EFI requested but no EFI firmware found."
+        ;;
+      *)
+        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.fd"
+          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
+          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        else
+          echo "ERROR! EFI boot requested but no EFI firmware found."
+          echo "       Please install OVMF firmware."
+          exit 1
+        fi
+        ;;
+    esac
+
+    # Make sure EFI_VARS references an actual, writeable, file
+    if [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; then
+      echo " - EFI:      ERROR! ${EFI_VARS} is not a regular file or not writeable."
+      echo "             Deleting ${EFI_VARS}. Please re-run quickemu."
+      rm -f "${EFI_VARS}"
+      exit 1
     fi
+
+    # If EFI_CODE references a symlink, resolve it to the real file.
+    if [ -L "${EFI_CODE}" ]; then
+      echo " - EFI:      WARNING! ${EFI_CODE} is a symlink."
+      echo -n "             Resolving to... "
+      EFI_CODE=$(realpath "${EFI_CODE}")
+      echo "${EFI_CODE}"
+    fi
+    BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), SecureBoot (${secureboot})."
   else
-    echo " - BOOT:     Legacy BIOS (${guest_os})"
+    BOOT_STATUS="Legacy BIOS (${guest_os^})"
+    boot="legacy"
+    secureboot="off"
   fi
+
+  echo " - BOOT:     ${BOOT_STATUS}"
 
   # Make any OS specific adjustments
   case ${guest_os} in
@@ -413,7 +469,7 @@ function vm_boot() {
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
-        big-sur)
+        big-sur|monterey)
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
@@ -431,7 +487,7 @@ function vm_boot() {
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
       if [ -z "${disk_size}" ]; then
-        disk_size="64G"
+        disk_size="96G"
       fi
       ;;
     windows)
@@ -443,6 +499,7 @@ function vm_boot() {
       if [ -z "${disk_size}" ]; then
         disk_size="64G"
       fi
+      SMM="on"
       ;;
     *)
       CPU="-cpu host,kvm=on"
@@ -453,6 +510,11 @@ function vm_boot() {
       echo "WARNING! Unrecognised guest OS: ${guest_os}"
       ;;
   esac
+
+  # Disable suspend to RAM if SecureBoot/SMM is enabled
+  if [ "${secureboot}" == "on" ] || [ "${SMM}" == "on" ]; then
+    GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
+  fi
 
   echo " - Disk:     ${disk_img} (${disk_size})"
   if [ ! -f "${disk_img}" ]; then
@@ -505,13 +567,11 @@ function vm_boot() {
     # If there is a disk image that appears to be used do not boot from installation media.
     iso=""
     img=""
-  else
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
-      # Display MSRs alert if the disk appears unused and guest is macOS or Windows
-      # Assume that a "used" disk has a working install, therefore no alerts are
-      # required.
-      ignore_msrs_alert
-    fi
+  fi
+
+  if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+    # Display MSRs alert if the guest is macOS
+    ignore_msrs_alert
   fi
 
   # Has the status quo been requested?
@@ -529,20 +589,6 @@ function vm_boot() {
 
   if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
     echo " - CD-ROM:   ${fixed_iso}"
-  fi
-
-  # Enable TPM
-  if [ "${tpm}" == "on" ]; then
-    if command -v swtpm &>/dev/null; then
-      swtpm socket \
-        --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock" \
-        --terminate \
-        --tpmstate dir="${VMDIR}" \
-        --tpm2 &
-      echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
-    else
-      echo " - TPM:      swtpm is not installed, TPM not available!"
-    fi
   fi
 
   # Determine a sane resolution for Linux guests.
@@ -583,7 +629,7 @@ function vm_boot() {
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
     case ${OUTPUT} in
-      spice) DISPLAY_DEVICE="qxl-vga";;
+      none|spice) DISPLAY_DEVICE="qxl-vga";;
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
@@ -593,7 +639,7 @@ function vm_boot() {
     #  - VGA is used on Mojave, although available resolutions are all 4:3
     #  - High Sierra will run at the default 1920x1080 only.
     case ${macos_release} in
-      catalina|big-sur) DISPLAY_DEVICE="qxl";;
+      catalina|big-sur|monterey) DISPLAY_DEVICE="qxl";;
       *) DISPLAY_DEVICE="VGA";;
     esac
   elif [ "${guest_os}" == "windows" ]; then
@@ -603,10 +649,6 @@ function vm_boot() {
   fi
 
   echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
-
-  if [ "${OUTPUT}" == "spice" ]; then
-    OUTPUT="none"
-  fi
 
   # Build the video configuration
   VIDEO="-device ${DISPLAY_DEVICE}"
@@ -622,20 +664,27 @@ function vm_boot() {
   fi
   VIDEO="${VIDEO} ${FULLSCREEN}"
 
-  if [ "${OUTPUT}" == "gtk" ]; then
-    OUTPUT="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
-    # GL is not working with GTK and virtio-vga
-    if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-      GL="off"
-    fi
-  fi
-
-  if [ "${OUTPUT}" != "none" ]; then
-    OUTPUT="${OUTPUT},gl=${GL}"
-  fi
+  # Map Quickemu OUTPUT to QEMU -display
+  case ${OUTPUT} in
+    gtk)
+      DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
+      # GL is not working with GTK and virtio-vga
+      if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
+        GL="off"
+      fi
+      ;;
+    none|spice)
+      DISPLAY_RENDER="none";;
+    *)
+      DISPLAY_RENDER="${OUTPUT},gl=${GL}";;
+  esac
 
   if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
-    DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
+      DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
+    else
+      DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    fi
     echo ", GL (${GL}), VirGL (on)"
   else
     echo ", GL (${GL}), VirGL (off)"
@@ -644,10 +693,13 @@ function vm_boot() {
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
+  echo -n "" > "${VMDIR}/${VMNAME}.ports"
+
   # Find a free port to expose ssh to the guest
   local SSH_PORT=""
   SSH_PORT=$(get_port 22220 9)
   if [ -n "${SSH_PORT}" ]; then
+    echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
     echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
   else
@@ -671,7 +723,7 @@ function vm_boot() {
   SPICE_PORT=$(get_port 5930 9)
   if [ -z "${SPICE_PORT}" ]; then
     echo " - SPICE:    All SPICE ports have been exhausted."
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
       echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
       exit 1
     fi
@@ -679,6 +731,7 @@ function vm_boot() {
     if [ "${OUTPUT}" == "spice-app" ]; then
       echo " - SPICE:    Enabled"
     else
+      echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
       echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
       if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
@@ -716,16 +769,33 @@ function vm_boot() {
 
   enable_usb_passthrough
 
+  echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
+
+  # Start TPM
+  if [ "${tpm}" == "on" ]; then
+    local tpm_args=()
+    # shellcheck disable=SC2054
+    tpm_args+=(socket
+            --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock"
+            --terminate
+            --tpmstate dir="${VMDIR}"
+            --tpm2)
+    echo "${SWTPM} ${tpm_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
+    ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
+    echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
+    sleep 0.25
+  fi
+
   # Boot the VM
   local args=()
 
   # shellcheck disable=SC2054,SC2206,SC2140
   args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
-         -enable-kvm -machine q35,vmport=off ${GUEST_TWEAKS}
+         -enable-kvm -machine q35,smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
-         ${VIDEO} -display ${OUTPUT}
+         ${VIDEO} -display ${DISPLAY_RENDER}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
          -device ${MOUSE},bus=input.0
@@ -734,6 +804,8 @@ function vm_boot() {
          -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
          -device virtio-serial-pci
+         -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
+         -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
          -device virtio-rng-pci,rng=rng0
@@ -745,6 +817,9 @@ function vm_boot() {
   # See https://github.com/wimpysworld/quickemu/issues/115
   if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
     args+=(-nic none)
+  elif [ -n "${bridge}" ]; then
+    # Enable bridge mode networking
+    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
@@ -754,8 +829,9 @@ function vm_boot() {
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
   if [[ "${boot}" == *"efi"* ]]; then
     # shellcheck disable=SC2054
-    args+=(-drive if=pflash,format=raw,file="${EFI_CODE}",readonly=on
-           -drive if=pflash,format=raw,file="${EFI_VARS}")
+    args+=(-global driver=cfi.pflash01,property=secure,value=on
+           -drive if=pflash,format=raw,unit=0,file="${EFI_CODE}",readonly=on
+           -drive if=pflash,format=raw,unit=1,file="${EFI_VARS}")
   fi
 
   if [ -n "${floppy}" ]; then
@@ -827,9 +903,9 @@ function vm_boot() {
           ${USB_PASSTHROUGH})
   fi
 
-  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}.swtpm-sock" ]; then
+  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}-swtpm.sock" ]; then
       # shellcheck disable=SC2054
-      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}-swtpm.sock"
             -tpmdev emulator,id=tpm0,chardev=chrtpm
             -device tpm-tis,tpmdev=tpm0)
   fi
@@ -841,33 +917,30 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
 
-  echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
-
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
 
   # If output is 'none' then SPICE was requested.
-  if [ ${OUTPUT} == "none" ]; then
+  if [ "${OUTPUT}" == "spice" ]; then
     if [ -n "${PUBLIC}" ]; then
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
     else
       spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
     fi
   fi
+  sleep 0.25
+  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
 }
 
 function shortcut_create {
-  local VMNAME=""
-  VMNAME=$(basename "${VM}" .conf)
-  local LAUNCHER_DIR=""
-  LAUNCHER_DIR="$(dirname "$(realpath "$0")")"
   local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
   cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0
 Type=Application
-Terminal=true
-Exec=${LAUNCHER_DIR}/${LAUNCHER} --vm ${VM}
+Terminal=false
+Exec=${0} --vm ${VM}
+Path=${VMPATH}
 Name=${VMNAME}
 Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
 EOF
@@ -881,9 +954,9 @@ function usage() {
   echo
   echo "You can also pass optional parameters"
   echo "  --delete                : Delete the disk image."
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk' or 'spice'"
+  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandle machine-specific registers"
+  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --shortcut              : Create a desktop shortcut"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
@@ -897,6 +970,7 @@ function usage() {
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
+bridge=""
 cpu_cores=""
 disk_img=""
 disk_size=""
@@ -909,6 +983,7 @@ macos_release=""
 port_forwards=()
 preallocation="off"
 ram=""
+secureboot="off"
 tpm="off"
 usb_devices=()
 
@@ -932,7 +1007,7 @@ VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.2.6"
+readonly VERSION="2.2.8"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
@@ -977,7 +1052,7 @@ else
             shift;;
           -display|--display)
             OUTPUT="${2}"
-            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
               echo "ERROR! Requested output '${OUTPUT}' is not recognised."
               exit 1
             elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
@@ -1043,7 +1118,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
 
   VMDIR=$(dirname "${disk_img}")
   VMNAME=$(basename "${VM}" .conf)
-  VMPATH=$(dirname "${VM}")
+  VMPATH=$(realpath "$(dirname "${VM}")")
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
@@ -1053,6 +1128,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   # Backwards compatibility for ${disk} (size)
   if [ -n "${disk}" ]; then
     disk_size="${disk}"
+  fi
+
+  if [ "${tpm}" == "on" ]; then
+    SWTPM=$(command -v swtpm)
+    if [ ! -e "${SWTPM}" ]; then
+      echo "ERROR! TPM is enabled, but swtpm was not found."
+      exit 1
+    fi
   fi
 else
   echo "ERROR! Virtual machine configuration not found."

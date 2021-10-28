@@ -23,6 +23,8 @@
 #     }
 #  6. Add new OS to the argument parser at the bottom of the script
 
+trap 'kill $(jobs -p)' EXIT
+
 if ((BASH_VERSINFO[0] < 4))
 then
   echo "Sorry, you need bash 4.0 or newer to run this script."
@@ -40,6 +42,9 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
+    nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
+    nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
     opensuse)           PRETTY_NAME="openSUSE";;
@@ -75,11 +80,12 @@ function list_json() {
 
 function list_csv() {
   local DISPLAY_NAME
+  local DOWNLOADER
   local FUNC
-  local LANG
+  local OPTION
   local OS
   local RELEASE
-  echo "Display Name,OS,Release,Option"
+  echo "Display Name,OS,Release,Option,Downloader"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
@@ -91,16 +97,26 @@ function list_csv() {
     fi
 
     for RELEASE in $("releases_${FUNC}"); do
+      if [ "${OS}" == "macos" ]; then
+        DOWNLOADER="macrecovery"
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
+        DOWNLOADER="zsync"
+      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
+        DOWNLOADER="zsync"
+      else
+        DOWNLOADER="wget"
+      fi
+
       if [ "${OS}" == "windows" ]; then
-        for LANG in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}"
+        for OPTION in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       elif [ "${OS}" == "popos" ]; then
-        for DRIVER in intel nvidia; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}"
+        for OPTION in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       else
-        echo "${DISPLAY_NAME},${OS},${RELEASE},"
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER}"
       fi
     done
   done
@@ -112,10 +128,14 @@ function os_support() {
     elementary \
     freebsd \
     fedora \
+    kali \
     kubuntu \
     linuxmint-cinnamon \
     linuxmint-mate \
     linuxmint-xfce \
+    nixos-gnome \
+    nixos-plasma5 \
+    nixos-minimal \
     lubuntu \
     macos \
     openbsd \
@@ -149,8 +169,17 @@ function releases_fedora(){
     35_beta
 }
 
+function releases_kali() {
+    echo latest \
+    weekly
+}
+
 function releases_linuxmint(){
     echo 20.2
+}
+
+function releases_nixos(){
+    echo 21.05
 }
 
 function releases_openbsd(){
@@ -170,7 +199,8 @@ function releases_macos() {
     echo high-sierra \
     mojave \
     catalina \
-    big-sur
+    big-sur \
+    monterey
 }
 
 function releases_popos() {
@@ -459,6 +489,7 @@ function web_get() {
     local DIR="${2}"
     local FILE=""
     local URL="${1}"
+
     if [ -n "${3}" ]; then
         FILE="${3}"
     else
@@ -498,8 +529,8 @@ function zsync_get() {
         exit 1
     fi
 
-    if [ -e "${DIR}/${FILE}.zs-old" ]; then
-        rm -v "${DIR}/${FILE}.zs-old"
+    if [ -e "${DIR}/${OUT}.zs-old" ]; then
+        rm "${DIR}/${OUT}.zs-old"
     fi
 }
 
@@ -515,6 +546,8 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
+    local SEC_BOOT=""
+
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     if [ "${OS}" == "archlinux" ]; then
@@ -529,7 +562,13 @@ function make_vm_config() {
     elif [ "${OS}" == "fedora" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "kali" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"nixos"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "openbsd" ]; then
@@ -574,6 +613,13 @@ EOF
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            # Only force SecureBoot on for non-Debian/Ubuntu distros.
+            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
+              SEC_BOOT="off"
+            else
+              SEC_BOOT="on"
+            fi
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
         fi
     fi
     start_vm_info
@@ -598,10 +644,14 @@ function get_archlinux() {
 function get_elementary() {
     local ISO=""
     local URL=""
+    local B66tim=""
+
 
     validate_release "releases_elementary"
+    B66tim=$(date +%s | base64 )
     ISO="elementaryos-${RELEASE}-stable.20211005.iso"
-    URL="https://ams3.dl.elementary.io/download/MTYzNDU5MDA5NA==/${ISO}"
+    # TODO:  derive region from geoIP 
+    URL="https://ams3.dl.elementary.io/download/${B66tim}=/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -647,6 +697,27 @@ function get_fedora() {
     make_vm_config "${ISO}"
 }
 
+function get_kali() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local SUBDIR=""
+    validate_release "releases_kali"
+
+    if [[ "${RELEASE}" == "latest" ]]; then
+        SUBDIR="current"
+    else
+        SUBDIR="kali-weeekly"
+    fi
+
+    ISO=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
+    HASH=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    URL="https://cdimage.kali.org/${SUBDIR}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_linuxmint() {
     local FLAVOR=""
     local HASH=""
@@ -662,7 +733,21 @@ function get_linuxmint() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+function get_nixos() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
 
+    validate_release "releases_nixos"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
+    URL="https://channels.nixos.org/nixos-${RELEASE}/${ISO}"
+    HASH=$(wget -q -O- "https://channels.nixos.org/nixos-${RELEASE}/${ISO}.sha256" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 function get_openbsd() {
     local HASH=""
     local ISO=""
@@ -702,8 +787,10 @@ function get_opensuse() {
 }
 
 function get_macos() {
+    local BOARD_ID=""
     local CWD=""
     local MACRECOVERY=""
+    local MLB=""
 
     case ${RELEASE} in
         high-sierra)
@@ -716,7 +803,10 @@ function get_macos() {
             BOARD_ID="Mac-CFF7D910A743CAAF"
             MLB="00000000000PHCD00";;
         big-sur)
-            BOARD_ID="Mac-E43C1C25D4880AD6"
+            BOARD_ID="Mac-35C1E88140C3E6CF"
+            MLB="00000000000000000";;
+        monterey)
+            BOARD_ID="Mac-06F11F11946D27C5"
             MLB="00000000000000000";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
@@ -724,24 +814,23 @@ function get_macos() {
     esac
 
     # Use a bundled macrecovery if possible
-    CWD="$(dirname ${0})"
+    CWD="$(dirname "${0}")"
     if [ -x "${CWD}/macrecovery" ]; then
         MACRECOVERY="${CWD}/macrecovery"
     elif [ -x /usr/bin/macrecovery ]; then
         MACRECOVERY="/usr/bin/macrecovery"
     else
-        web_get "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py" "${HOME}/.quickemu"
-        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery.py"
-        sed -i 's/\<env python\>/env python3/g' "${MACRECOVERY}"
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
     fi
 
     if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery.py."
+        echo "ERROR! Can not find a usable macrecovery."
         exit 1
     fi
 
     # Get firmware
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore-Catalina/OpenCore.qcow2" "${VM_PATH}"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
     if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
         web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
@@ -806,14 +895,17 @@ function get_ubuntu() {
          exit 1;;
     esac
 
-    validate_release "releases_ubuntu"
-
-    if [ "${RELEASE}" == "canary" ]; then
-        RELEASE="devel"
-        DEVEL="daily-canary"
+    if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
+      echo "ERROR! Canary is currently only available for Ubuntu."
+      exit 1
+    else
+      validate_release "releases_ubuntu"
     fi
 
-    if [ "${RELEASE}" == "devel" ]; then
+    if [ "${RELEASE}" == "canary" ]; then
+        DEVEL="daily-canary"
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${RELEASE}" == "devel" ]; then
         URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
     elif [ "${PROJECT}" == "ubuntu" ]; then
         URL="http://releases.ubuntu.com/${RELEASE}"
@@ -821,10 +913,9 @@ function get_ubuntu() {
         URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
     fi
 
-    web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-    ISO=$(grep 'desktop\|dvd' "${VM_PATH}/SHA256SUMS" | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-    HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
-    if [ "${RELEASE}" == "devel" ]; then
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
+    if [ "${RELEASE}" == "canary" ] || [ "${RELEASE}" == "devel" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
         make_vm_config "${OS}-${RELEASE}.iso"
     else
@@ -927,8 +1018,12 @@ if [ -n "${2}" ]; then
         get_freebsd
     elif [ "${OS}" == "fedora" ]; then
         get_fedora
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
+    elif [ "${OS}" == "kali" ]; then
+        get_kali
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
+    elif [[ "${OS}" == *"nixos-"* ]]; then
+        get_nixos
     elif [ "${OS}" == "openbsd" ]; then
         get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
@@ -971,7 +1066,7 @@ if [ -n "${2}" ]; then
         exit 1
     fi
 else
-    echo "ERROR! You must specify a release for ${OS}:"
+    echo -n "ERROR! You must specify a release: "
     if [ "${OS}" == "archlinux" ]; then
         releases_archlinux
     elif [ "${OS}" == "elementary" ]; then
@@ -980,8 +1075,12 @@ else
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
+    elif [ "${OS}" == "kali" ]; then
+        releases_kali
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
+    elif [[ "${OS}" == *"nixos-"* ]]; then
+        releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
     elif [ "${OS}" == "openbsd" ]; then
@@ -994,6 +1093,9 @@ else
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
         releases_windows
+    else
+        echo "${OS} is unknown"
+        os_support
     fi
     exit 1
 fi
