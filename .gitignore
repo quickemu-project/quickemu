@@ -12,5 +12,6 @@
 *.ports
 *.qcow2
 *.sh
+*.sock
 *.xml
 *.zs-old
