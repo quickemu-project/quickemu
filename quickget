@@ -919,7 +919,7 @@ function get_windows() {
 
     echo "Getting Windows ${RELEASE} URL..."
     WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))[0]')
+    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))[1]')
 
     WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
     VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
