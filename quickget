@@ -583,13 +583,14 @@ function get_archlinux() {
     local HASH=""
     local ISO=""
     local URL=""
+    local VERSION=""
 
     validate_release "releases_archlinux"
-    web_get "https://mirror.rackspace.com/archlinux/iso/latest/sha1sums.txt" "${VM_PATH}"
-    HASH=$(head -1 "${VM_PATH}/sha1sums.txt" | cut -d' ' -f1)
-    ISO=$(head -1 "${VM_PATH}/sha1sums.txt" | cut -d' ' -f3)
-    URL="https://mirror.rackspace.com/archlinux/iso/latest/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
+    VERSION=$(curl -s 'https://archlinux.org/releng/releases/json/' | jq '.latest_version' | cut -d "\"" -f 2)
+    URL="https://mirror.rackspace.com/archlinux/iso/$VERSION"
+    ISO="archlinux-$VERSION-x86_64.iso"
+    HASH=$(curl -s 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
