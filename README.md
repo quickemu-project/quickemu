@@ -38,6 +38,7 @@ comprehensive support for macOS and Windows**.
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
+  * [QEMU Guest Agent support](https://wiki.qemu.org/Features/GuestAgent); provides access to a system-level agent via standard QMP commands
   * Samba file sharing for Linux, macOS and Windows guests (*if `smbd` is installed on the host*)
   * VirGL acceleration
   * USB device pass-through
@@ -442,6 +443,13 @@ In the example above:
 
   * Port 8123 on the host is forwarded to port 8123 on the guest.
   * Port 8888 on the host is forwarded to port 80 on the guest.
+
+# Bridged networking
+
+Connect your virtual machine to a preconfigured network bridge.
+Add an additional line to your virtual machine configuration
+
+  * `bridge="br0"`
 
 # USB redirection
 

@@ -804,6 +804,8 @@ function vm_boot() {
          -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
          -device virtio-serial-pci
+         -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
+         -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
          -device virtio-rng-pci,rng=rng0
@@ -815,6 +817,9 @@ function vm_boot() {
   # See https://github.com/wimpysworld/quickemu/issues/115
   if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
     args+=(-nic none)
+  elif [ -n "${bridge}" ]; then
+    # Enable bridge mode networking
+    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
@@ -898,9 +903,9 @@ function vm_boot() {
           ${USB_PASSTHROUGH})
   fi
 
-  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}.swtpm-sock" ]; then
+  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}-swtpm.sock" ]; then
       # shellcheck disable=SC2054
-      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}-swtpm.sock"
             -tpmdev emulator,id=tpm0,chardev=chrtpm
             -device tpm-tis,tpmdev=tpm0)
   fi
@@ -965,6 +970,7 @@ function usage() {
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
+bridge=""
 cpu_cores=""
 disk_img=""
 disk_size=""

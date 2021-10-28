@@ -77,11 +77,12 @@ function list_json() {
 
 function list_csv() {
   local DISPLAY_NAME
+  local DOWNLOADER
   local FUNC
-  local LANG
+  local OPTION
   local OS
   local RELEASE
-  echo "Display Name,OS,Release,Option"
+  echo "Display Name,OS,Release,Option,Downloader"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
@@ -93,16 +94,26 @@ function list_csv() {
     fi
 
     for RELEASE in $("releases_${FUNC}"); do
+      if [ "${OS}" == "macos" ]; then
+        DOWNLOADER="macrecovery"
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
+        DOWNLOADER="zsync"
+      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
+        DOWNLOADER="zsync"
+      else
+        DOWNLOADER="wget"
+      fi
+
       if [ "${OS}" == "windows" ]; then
-        for LANG in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG}"
+        for OPTION in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       elif [ "${OS}" == "popos" ]; then
-        for DRIVER in intel nvidia; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${DRIVER}"
+        for OPTION in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
         done
       else
-        echo "${DISPLAY_NAME},${OS},${RELEASE},"
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER}"
       fi
     done
   done
