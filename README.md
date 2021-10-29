@@ -168,6 +168,7 @@ preferred flavour.
 
 `quickget` also supports:
 
+  * `archlinux`
   * `elementary`
   * `fedora`
   * `linuxmint-cinnamon`

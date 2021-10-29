@@ -34,6 +34,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
+    archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
@@ -123,7 +124,8 @@ function list_csv() {
 }
 
 function os_support() {
-    echo elementary \
+    echo archlinux \
+    elementary \
     freebsd \
     fedora \
     kali \
@@ -146,6 +148,10 @@ function os_support() {
     ubuntu-studio \
     windows \
     xubuntu
+}
+
+function releases_archlinux() {
+    echo latest
 }
 
 function releases_elementary() {
@@ -544,7 +550,10 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "elementary" ]; then
+    if [ "${OS}" == "archlinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "freebsd" ]; then
@@ -614,6 +623,22 @@ EOF
         fi
     fi
     start_vm_info
+}
+
+function get_archlinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_archlinux"
+    VERSION=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.latest_version' | cut -d "\"" -f 2)
+    URL="https://mirror.rackspace.com/archlinux/iso/$VERSION"
+    ISO="archlinux-$VERSION-x86_64.iso"
+    HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_elementary() {
@@ -997,7 +1022,9 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
 
-    if [ "${OS}" == "elementary" ]; then
+    if [ "${OS}" == "archlinux" ]; then
+        get_archlinux
+    elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
         get_macos
@@ -1054,7 +1081,9 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "elementary" ]; then
+    if [ "${OS}" == "archlinux" ]; then
+        releases_archlinux
+    elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
         releases_freebsd
