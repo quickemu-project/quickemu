@@ -176,9 +176,9 @@ preferred flavour.
   * `linuxmint-xfce`
   * `opensuse`
   * `popos`
-  * `NixOS-Gnome`
-  * `NixOS-KDE`
-  * `NixOS-minimal`
+  * `nixos-gnome`
+  * `nixos-plasma5`
+  * `nixos-minimal`
 
 Or you can download a Linux image and manually create a VM configuration.
 
