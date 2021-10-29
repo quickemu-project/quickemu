@@ -33,8 +33,8 @@ comprehensive support for macOS and Windows**.
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
+  * [Arch Linux](https://www.archlinux.org/), [Kali](https://www.kali.org/) & [NixOS](https://nixos.org/)
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
-  * [Kali](https://www.kali.org/) & [NixOS](https://nixos.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -171,6 +171,7 @@ preferred flavour.
   * `archlinux`
   * `elementary`
   * `fedora`
+  * `kali`
   * `linuxmint-cinnamon`
   * `linuxmint-mate`
   * `linuxmint-xfce`
@@ -320,23 +321,13 @@ tpm="on"
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
 
-## FreeBSD Guest
+## BSD Guests
 
-`quickemu` supports FreeBSD production releases.
+`quickemu` supports FreeBSD and OpenBSD.
 
 ```bash
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
-```
-
-## Kali Guest
-
-`quickemu` supports Kali production releases.
-While testing best performance shown with gtk display settings.
-
-```bash
-quickget kali latest
-quickemu --vm kali-latest.conf --display gtk
 ```
 
 # SPICE
