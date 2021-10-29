@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src=".github/logo.png" alt="Quickemu" />
+  <img src=".github/logo.png" alt="Quickemu" width="256" />
   <br />
   Quickemu
 </h1>
