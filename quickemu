@@ -1,5 +1,1041 @@
 #!/usr/bin/env bash
-export LC_ALL=C
+
+# Here the quick 'n dirty guide to adding a new OS to quickget
+#
+#  1. Add the new OS, all lowercase, to os_support()
+#  2. Add a "pretty name" display name to pretty_name()
+#  3. Create a releases_newos() generator that outputs the currently supported release versions
+#  4. Add the new OS to make_vm_config()
+#  5. Create a get_newos() function that does something like this:
+#     function get_newos() {
+#         local HASH=""
+#         local ISO=""
+#         local URL=""
+#
+#         validate_release "releases_newos"
+#         ISO="newos-${RELEASE}-amd64.iso"
+#         URL="https://www.newos.org/download/${ISO}"
+#         web_get "${URL}" "${VM_PATH}"
+#         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
+#         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+#         check_hash "${ISO}" "${HASH}"
+#         make_vm_config "${ISO}"
+#     }
+#  6. Add new OS to the argument parser at the bottom of the script
+
+function cleanup() {
+  if [ -n "$(jobs -p)" ]; then
+    kill $(jobs -p)
+  fi
+}
+
+function pretty_name() {
+  local SIMPLE_NAME=""
+  local PRETTY_NAME=""
+  SIMPLE_NAME="${1}"
+  case ${SIMPLE_NAME} in
+    android)            PRETTY_NAME="Android X86" ;;
+    archlinux)          PRETTY_NAME="Arch Linux";;
+    elementary)         PRETTY_NAME="elementary OS";;
+    freebsd)            PRETTY_NAME="FreeBSD";;
+    linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
+    linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
+    linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
+    nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
+    nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
+    macos)              PRETTY_NAME="macOS";;
+    openbsd)            PRETTY_NAME="OpenBSD";;
+    opensuse)           PRETTY_NAME="openSUSE";;
+    popos)              PRETTY_NAME="Pop!_OS";;
+    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
+    ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
+    ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
+  esac
+  echo "${PRETTY_NAME}"
+}
+
+function validate_release() {
+  local DISPLAY_NAME=""
+  local RELEASE_GENERATOR="${1}"
+  local RELEASES=""
+
+  DISPLAY_NAME="$(pretty_name "${OS}")"
+  RELEASES=$(${RELEASE_GENERATOR})
+  if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+      echo "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+      echo "${RELEASES}"
+      exit 1
+  fi
+}
+
+function list_json() {
+  # Reference: https://stackoverflow.com/a/67359273
+  list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+  exit 0
+}
+
+function list_csv() {
+  local DISPLAY_NAME
+  local DOWNLOADER
+  local FUNC
+  local OPTION
+  local OS
+  local RELEASE
+  echo "Display Name,OS,Release,Option,Downloader"
+  for OS in $(os_support); do
+    DISPLAY_NAME="$(pretty_name "${OS}")"
+    if [[ "${OS}" == *"ubuntu"* ]]; then
+      FUNC="ubuntu"
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+      FUNC="linuxmint"
+    elif [[ "${OS}" == *"nixos"* ]]; then
+      FUNC="nixos"
+    else
+      FUNC="${OS}"
+    fi
+
+    for RELEASE in $("releases_${FUNC}"); do
+      if [ "${OS}" == "macos" ]; then
+        DOWNLOADER="macrecovery"
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
+        DOWNLOADER="zsync"
+      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
+        DOWNLOADER="zsync"
+      else
+        DOWNLOADER="wget"
+      fi
+
+      if [ "${OS}" == "windows" ]; then
+        for OPTION in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
+        done
+      elif [ "${OS}" == "popos" ]; then
+        for OPTION in intel nvidia; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
+        done
+      else
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER}"
+      fi
+    done
+  done
+  exit 0
+}
+
+function os_support() {
+    echo android \
+    archlinux \
+    elementary \
+    freebsd \
+    fedora \
+    kali \
+    kubuntu \
+    linuxmint-cinnamon \
+    linuxmint-mate \
+    linuxmint-xfce \
+    nixos-gnome \
+    nixos-plasma5 \
+    nixos-minimal \
+    lubuntu \
+    macos \
+    openbsd \
+    opensuse \
+    popos \
+    ubuntu \
+    ubuntu-budgie \
+    ubuntu-kylin \
+    ubuntu-mate \
+    ubuntu-studio \
+    windows \
+    xubuntu
+}
+
+function releases_android() {
+  echo 8.1 \
+  7.1 \
+  9.0 \
+  6.0 \
+  5.1 \
+  4.4 \
+  4.0 \
+  2.2
+}
+
+function releases_archlinux() {
+    echo latest
+}
+
+function releases_elementary() {
+    echo 6.0
+}
+
+function releases_freebsd(){
+    echo 12.2 \
+    13.0
+}
+
+function releases_fedora(){
+    echo 33 \
+    34 \
+    35_beta
+}
+
+function releases_kali() {
+    echo latest \
+    weekly
+}
+
+function releases_linuxmint(){
+    echo 20.2
+}
+
+function releases_nixos(){
+    echo 21.05
+}
+
+function releases_openbsd(){
+    echo 7.0
+}
+
+function releases_opensuse(){
+    echo 15.0 \
+    15.1 \
+    15.2 \
+    15.3 \
+    microos \
+    tumbleweed
+}
+
+function releases_macos() {
+    echo high-sierra \
+    mojave \
+    catalina \
+    big-sur \
+    monterey
+}
+
+function releases_popos() {
+    echo 20.04 \
+    21.04
+}
+
+function releases_ubuntu() {
+    echo bionic \
+    focal \
+    hirsute \
+    impish \
+    devel \
+    canary
+}
+
+function languages_windows() {
+    LANGS=(Arabic
+    "Brazilian Portuguese"
+    Bulgarian
+    "Chinese (Simplified)"
+    "Chinese (Traditional)"
+    Croatian
+    Czech
+    Danish
+    Dutch
+    English
+    "English International"
+    Estonian
+    Finnish
+    French
+    "French Canadian"
+    German
+    Greek
+    Hebrew
+    Hungarian
+    Italian
+    Japanese
+    Korean
+    Latvian
+    Lithuanian
+    Norwegian
+    Polish
+    Portuguese
+    Romanian
+    Russian
+    "Serbian Latin"
+    Slovak
+    Slovenian
+    Spanish
+    "Spanish (Mexico)"
+    Swedish
+    Thai
+    Turkish
+    Ukrainian)
+}
+
+
+function releases_windows() {
+    echo 8 \
+    10 \
+    11
+}
+
+function unattended_windows() {
+    cat << 'EOF' > "${1}"
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend"
+  xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!--
+       For documentation on components:
+       http://technet.microsoft.com/en-us/library/ff699038.aspx
+  -->
+
+  <settings pass="generalize">
+    <!--
+         The PersistAllDeviceInstalls setting indicates whether all plug and
+         play devices on the destination computer remain installed during the
+         generalize configuration pass.
+    -->
+    <component name="Microsoft-Windows-PnPSysprep"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS">
+      <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+    </component>
+  </settings>
+
+  <settings pass="windowsPE">
+    <component name="Microsoft-Windows-Setup" processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <DiskConfiguration>
+        <Disk wcm:action="add">
+          <DiskID>0</DiskID>
+          <WillWipeDisk>true</WillWipeDisk>
+          <CreatePartitions>
+            <CreatePartition wcm:action="add">
+              <Order>1</Order>
+              <Type>EFI</Type>
+              <Size>100</Size>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>2</Order>
+              <Type>MSR</Type>
+              <Size>512</Size>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>3</Order>
+              <Type>Primary</Type>
+              <Extend>true</Extend>
+            </CreatePartition>
+          </CreatePartitions>
+          <ModifyPartitions>
+            <ModifyPartition wcm:action="add">
+              <Order>1</Order>
+              <PartitionID>1</PartitionID>
+              <Label>System</Label>
+              <Format>FAT32</Format>
+            </ModifyPartition>
+            <ModifyPartition wcm:action="add">
+              <Order>2</Order>
+              <PartitionID>3</PartitionID>
+              <Label>Windows</Label>
+              <Letter>C</Letter>
+              <Format>NTFS</Format>
+            </ModifyPartition>
+          </ModifyPartitions>
+        </Disk>
+        <WillShowUI>OnError</WillShowUI>
+      </DiskConfiguration>
+      <ImageInstall>
+        <OSImage>
+          <WillShowUI>OnError</WillShowUI>
+          <InstallTo>
+            <DiskID>0</DiskID>
+            <PartitionID>3</PartitionID>
+          </InstallTo>
+          </OSImage>
+      </ImageInstall>
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <ProductKey>
+          <key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</key>
+          <WillShowUI>Never</WillShowUI>
+        </ProductKey>
+      </UserData>
+      <DynamicUpdate>
+        <Enable>true</Enable>
+        <WillShowUI>Never</WillShowUI>
+      </DynamicUpdate>
+    </component>
+
+    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
+      publicKeyToken="31bf3856ad364e35" language="neutral"
+      versionScope="nonSxS" processorArchitecture="amd64">
+
+      <!--
+           This makes the VirtIO drivers available to Windows, assuming that
+           the VirtIO driver disk
+           (https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
+           is available as drive E:
+      -->
+      <DriverPaths>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+          <Path>E:\qemufwcfg\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="2">
+          <Path>E:\vioinput\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="3">
+          <Path>E:\vioscsi\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="4">
+          <Path>E:\viostor\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
+          <Path>E:\vioserial\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
+          <Path>E:\qxldod\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
+          <Path>E:\amd64\w10</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
+          <Path>E:\viogpudo\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+          <Path>E:\viorng\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
+          <Path>E:\NetKVM\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
+          <Path>E:\viofs\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="12">
+          <Path>E:\Balloon\w10\amd64</Path>
+        </PathAndCredentials>
+      </DriverPaths>
+    </component>
+  </settings>
+
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <ComputerName>*</ComputerName>
+      <OEMInformation>
+        <Manufacturer>Wimpys World</Manufacturer>
+        <Model>Quickemu</Model>
+        <SupportHours>24/7</SupportHours>
+        <SupportPhone></SupportPhone>
+        <SupportProvider>Wimpys World</SupportProvider>
+        <SupportURL>https://github.com/wimpysworld/quickemu/issues</SupportURL>
+      </OEMInformation>
+      <OEMName>Wimpys World</OEMName>
+    </component>
+  </settings>
+
+  <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <OOBE>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+      </OOBE>
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install Virtio Guest Agent</Description>
+          <Order>1</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-webdavd file sharing agent</Description>
+          <Order>2</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install usbdk USB sharing agent</Description>
+          <Order>3</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-vdagent SPICE agent</Description>
+          <Order>4</Order>
+        </SynchronousCommand>
+      </FirstLogonCommands>
+    </component>
+  </settings>
+</unattend>
+EOF
+}
+
+function check_hash() {
+    local iso=""
+    local hash=""
+    local hash_algo=""
+    iso="${VM_PATH}/${1}"
+    hash="${2}"
+
+    # Guess the hash algorithm by the hash length
+    case ${#hash} in
+      32) hash_algo=md5sum;;
+      40) hash_algo=sha1sum;;
+      64) hash_algo=sha256sum;;
+      128) hash_algo=sha512sum;;
+       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+          return;;
+    esac
+
+    echo -n "Checking ${iso} with ${hash_algo}... "
+    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo "ERROR!"
+        echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+        exit 1
+    else
+        echo "Good!"
+    fi
+}
+
+function web_get() {
+    local DIR="${2}"
+    local FILE=""
+    local URL="${1}"
+
+    if [ -n "${3}" ]; then
+        FILE="${3}"
+    else
+        FILE="${URL##*/}"
+    fi
+
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
+    if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+        echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
+        exit 1
+    fi
+}
+
+function zsync_get() {
+    local DIR="${2}"
+    local FILE=""
+    local OUT=""
+    local URL="${1}"
+    FILE="${URL##*/}"
+    if [ -n "${3}" ]; then
+        OUT="${3}"
+    else
+        OUT="${FILE}"
+    fi
+
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
+    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+        echo "ERROR! Failed to download ${URL}.zsync"
+        exit 1
+    fi
+
+    if [ -e "${DIR}/${OUT}.zs-old" ]; then
+        rm "${DIR}/${OUT}.zs-old"
+    fi
+}
+
+function start_vm_info() {
+    echo
+    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
+    echo
+}
+
+function make_vm_config() {
+    local IMAGE_FILE=""
+    local ISO_FILE=""
+    local IMAGE_TYPE=""
+    local GUEST=""
+    local SEC_BOOT=""
+
+    IMAGE_FILE="${1}"
+    ISO_FILE="${2}"
+    if [ "${OS}" == "archlinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "elementary" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "freebsd" ]; then
+        GUEST="freebsd"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "fedora" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "kali" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"nixos"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "openbsd" ]; then
+        GUEST="openbsd"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "opensuse" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "popos" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "macos" ]; then
+        GUEST="macos"
+        IMAGE_TYPE="img"
+    elif [ "${OS}" == "windows" ]; then
+        GUEST="windows"
+        IMAGE_TYPE="iso"
+    fi
+
+    if [ ! -e "${OS}-${RELEASE}.conf" ]; then
+        echo "Making VM configuration for ${OS}-${RELEASE}..."
+        cat << EOF > "${OS}-${RELEASE}.conf"
+guest_os="${GUEST}"
+disk_img="${VM_PATH}/disk.qcow2"
+${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
+EOF
+        if [ -n "${ISO_FILE}" ]; then
+            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "openbsd" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "macos" ]; then
+            echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        # Enable TPM for Windows 11
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
+            echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            # Only force SecureBoot on for non-Debian/Ubuntu distros.
+            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
+              SEC_BOOT="off"
+            else
+              SEC_BOOT="on"
+            fi
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+    fi
+    start_vm_info
+}
+
+function get_android() {
+  local HASH=""
+  local ISO=""
+  local URL=""
+
+  validate_release "releases_android"
+  fosshubVerionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
+  verison="android-x86-${RELEASE}"
+  releaseJson=$(echo ${fosshubVerionInfo:16} | jq --arg ver "${verison}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+
+  HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
+  ISO=$(echo "${releaseJson}" | jq -r .n)
+
+  baseurl="https://mirrors.gigenet.com/OSDN/android-x86/"
+
+  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E [0-9]{5} | uniq)
+  for item in $releaseFolders; do
+    file=$(wget -O - -q ${baseurl}${item} | grep "${ISO}")
+    if [[ $file != "" ]]; then
+      URL="${baseurl}${item}/${ISO}"
+      break
+    fi
+  done
+  web_get "${URL}" "${VM_PATH}"
+  check_hash "${ISO}" "${HASH}"
+  make_vm_config "${ISO}"
+}
+
+function get_archlinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_archlinux"
+    VERSION=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.latest_version' | cut -d "\"" -f 2)
+    URL="https://mirror.rackspace.com/archlinux/iso/${VERSION}"
+    ISO="archlinux-${VERSION}-x86_64.iso"
+    HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_elementary() {
+    local ISO=""
+    local URL=""
+    local B66tim=""
+
+
+    validate_release "releases_elementary"
+    B66tim=$(date +%s | base64 )
+    ISO="elementaryos-${RELEASE}-stable.20211005.iso"
+    # TODO:  derive region from geoIP
+    URL="https://ams3.dl.elementary.io/download/${B66tim}=/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
+}
+
+function get_freebsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_freebsd"
+    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    HASH=$(wget -q -O- "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep '('"${ISO}"')' | cut -d' ' -f4)
+    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_fedora() {
+    local FEDORA_RELEASE=""
+    local FEDORA_VERSIONS=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION_NUM=""
+
+    validate_release "releases_fedora"
+
+    FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
+    if [[ "${RELEASE}" == *"beta"* ]]; then
+        VERSION_NUM=${RELEASE%"_beta"}
+        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')
+        ISO="Fedora-Workstation-Live-x86_64-${VERSION_NUM}_Beta-1.2.iso"
+    else
+        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq '. | select(.variant=="Workstation" and .version=="'${RELEASE}'")')
+        ISO="Fedora-Workstation-Live-x86_64-${RELEASE}-1.2.iso"
+    fi
+
+    URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
+    HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_kali() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local SUBDIR=""
+    validate_release "releases_kali"
+
+    if [[ "${RELEASE}" == "latest" ]]; then
+        SUBDIR="current"
+    else
+        SUBDIR="kali-weeekly"
+    fi
+
+    ISO=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
+    HASH=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    URL="https://cdimage.kali.org/${SUBDIR}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_linuxmint() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_linuxmint"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
+    HASH=$(wget -q -O- "https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+function get_nixos() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_nixos"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
+    URL="https://channels.nixos.org/nixos-${RELEASE}/${ISO}"
+    HASH=$(wget -q -O- "https://channels.nixos.org/nixos-${RELEASE}/${ISO}.sha256" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+function get_openbsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_openbsd"
+    ISO="install${RELEASE//\./}.iso"
+    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
+    HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_opensuse() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_opensuse"
+    if [ "${RELEASE}" == "tumbleweed" ]; then
+        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    elif [ "${RELEASE}" == "microos" ]; then
+        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    else
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    fi
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_macos() {
+    local BOARD_ID=""
+    local CWD=""
+    local MACRECOVERY=""
+    local MLB=""
+
+    case ${RELEASE} in
+        high-sierra)
+            BOARD_ID="Mac-7BA5B2D9E42DDD94"
+            MLB="00000000000J80300";;
+        mojave)
+            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
+            MLB="00000000000KXPG00";;
+        catalina)
+            BOARD_ID="Mac-CFF7D910A743CAAF"
+            MLB="00000000000PHCD00";;
+        big-sur)
+            BOARD_ID="Mac-35C1E88140C3E6CF"
+            MLB="00000000000000000";;
+        monterey)
+            BOARD_ID="Mac-06F11F11946D27C5"
+            MLB="00000000000000000";;
+        *) echo "ERROR! Unknown release: ${RELEASE}"
+           releases_macos
+           exit 1;;
+    esac
+
+    # Use a bundled macrecovery if possible
+    CWD="$(dirname "${0}")"
+    if [ -x "${CWD}/macrecovery" ]; then
+        MACRECOVERY="${CWD}/macrecovery"
+    elif [ -x /usr/bin/macrecovery ]; then
+        MACRECOVERY="/usr/bin/macrecovery"
+    else
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
+    fi
+
+    if [ -z "${MACRECOVERY}" ]; then
+        echo "ERROR! Can not find a usable macrecovery."
+        exit 1
+    fi
+
+    # Get firmware
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+    if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
+    fi
+
+    if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+        echo "Downloading ${RELEASE}..."
+        ${MACRECOVERY} \
+            --board-id "${BOARD_ID}" \
+            --mlb "${MLB}" \
+            --basename RecoveryImage \
+            --outdir "${VM_PATH}" \
+            download
+    fi
+
+    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+        echo "Converting RecoveryImage..."
+        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img"
+    fi
+
+    make_vm_config RecoveryImage.img
+}
+
+function get_popos() {
+    local DRIVER="intel"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    if [ -n "${1}" ]; then
+      DRIVER="${1}"
+    fi
+
+    validate_release "releases_popos"
+
+    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".url")
+    URL="${URL//\"/}"
+    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".sha_sum")
+    HASH="${HASH//\"/}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_ubuntu() {
+    local DEVEL="daily-live"
+    local ISO=""
+    local HASH=""
+    local PROJECT=""
+    local URL=""
+
+    case ${OS} in
+      kubuntu|lubuntu|ubuntu|ubuntu-budgie|ubuntu-mate|xubuntu)
+        PROJECT="${OS}";;
+      ubuntu-kylin)
+        PROJECT="ubuntukylin";;
+      ubuntu-studio)
+        PROJECT="ubuntustudio"
+        DEVEL="dvd";;
+      *) echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
+         exit 1;;
+    esac
+
+    if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
+      echo "ERROR! Canary is currently only available for Ubuntu."
+      exit 1
+    else
+      validate_release "releases_ubuntu"
+    fi
+
+    if [ "${RELEASE}" == "canary" ]; then
+        DEVEL="daily-canary"
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${RELEASE}" == "devel" ]; then
+        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
+    elif [ "${PROJECT}" == "ubuntu" ]; then
+        URL="http://releases.ubuntu.com/${RELEASE}"
+    else
+        URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
+    fi
+
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
+    if [ "${RELEASE}" == "canary" ] || [ "${RELEASE}" == "devel" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
+        make_vm_config "${OS}-${RELEASE}.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
+}
+
+# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
+function get_windows() {
+    local ARCH="x64"
+    local INDEX=0
+    local LANG_CODE="en"
+    local LATEST_WINDOWS_VERSION=""
+    local WINDOWS_NAME=""
+    local VERSION_ID=""
+    local EDITION_ID=""
+    local LANGUAGE_ID=""
+    local FILE_NAME=""
+    local ARCH_ID=""
+    local DOWNLOAD_INFO=""
+    local DOWNLOAD_ID=""
+    local DOWNLOAD_URL=""
+
+    validate_release "releases_windows"
+
+    # Ignore the most recent Windows 10 release for now.
+    if [ ${RELEASE} -eq 10 ]; then
+      INDEX=1
+    fi
+
+    echo "Getting Windows ${RELEASE} URL..."
+    WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
+    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
+
+    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
+    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
+
+    case ${RELEASE} in
+        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
+        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
+    esac
+
+    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
+    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
+    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
+    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
+    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
+    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
+    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+
+    echo "Downloading ${WINDOWS_NAME}..."
+    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+
+    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
+    if [ -n "${DOWNLOAD_SHA1}" ]; then
+      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+    fi
+
+    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+
+    rm -f "${VM_PATH}/unattended.iso"
+    case ${RELEASE} in
+        10|11)
+            echo "Making unattended.iso"
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
+    esac
+    make_vm_config "${FILE_NAME}" "virtio-win.iso"
+}
+
+trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
 then
@@ -7,1172 +1043,116 @@ then
   exit 1
 fi
 
-function ignore_msrs_always() {
-  # Make sure the host has /etc/modprobe.d
-  if [ -d /etc/modprobe.d ]; then
-    # Skip if ignore_msrs is already enabled, assumes initramfs has been rebuilt
-    if grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
-      echo "options kvm ignore_msrs=Y" | sudo tee /etc/modprobe.d/kvm-quickemu.conf
-      sudo update-initramfs -k all -u
+LANGS=()
+languages_windows
+
+if [ -n "${1}" ]; then
+    OS="${1,,}"
+    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
+        list_csv
+    elif [ "${OS}" == "list_json" ]; then
+        list_json
     fi
-  else
-    echo "ERROR! /etc/modprobe.d was not found, I don't know how to configure this system."
-    exit 1
-  fi
-}
-
-function ignore_msrs_alert() {
-  local ignore_msrs=""
-  if [ -e /sys/module/kvm/parameters/ignore_msrs ]; then
-    ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
-    if [ "${ignore_msrs}" == "N" ]; then
-      echo " - MSR:      WARNING! Ignoring unhandled Model-Specific Registers is disabled."
-      echo
-      echo "             echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs"
-      echo
-      echo "             If you are unable to run macOS or Windows VMs then run the above 👆"
-      echo "             This will enable ignoring of unhandled MSRs until you reboot the host."
-      echo "             You can make this change permenant by running: 'quickemu --ignore-msrs-always'"
-    fi
-  fi
-}
-
-function disk_delete() {
-  if [ -e "${disk_img}" ]; then
-    rm "${disk_img}"
-    # Remove any EFI vars, but not for macOS
-    rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
-    rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
-    rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
-    echo "SUCCESS! Deleted ${disk_img}"
-  else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
-  fi
-
-  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
-  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
-    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
-    echo "Deleted ${VM} desktop shortcut"
-  fi
-}
-
-function snapshot_apply() {
-  local TAG="${1}"
-  if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
-    exit
-  fi
-
-  if [ -e "${disk_img}" ]; then
-    if ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"; then
-      echo "SUCCESS! Applied snapshot ${TAG} to ${disk_img}"
-    else
-      echo "ERROR! Failed to apply snapshot ${TAG} to ${disk_img}"
-    fi
-  else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
-  fi
-}
-
-function snapshot_create() {
-  local TAG="${1}"
-  if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
-    exit
-  fi
-
-  if [ -e "${disk_img}" ]; then
-    if ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"; then
-      echo "SUCCESS! Created snapshot ${TAG} of ${disk_img}"
-    else
-      echo "ERROR! Failed to create snapshot ${TAG} of ${disk_img}"
-    fi
-  else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
-  fi
-}
-
-function snapshot_delete() {
-  local TAG="${1}"
-  if [ -z "${TAG}" ]; then
-    echo "ERROR! No snapshot tag provided."
-    exit
-  fi
-
-  if [ -e "${disk_img}" ]; then
-    if ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"; then
-      echo "SUCCESS! Deleted snapshot ${TAG} of ${disk_img}"
-    else
-      echo "ERROR! Failed to delete snapshot ${TAG} of ${disk_img}"
-    fi
-  else
-    echo "NOTE! ${disk_img} not found. Doing nothing."
-  fi
-}
-
-function snapshot_info() {
-  if [ -e "${disk_img}" ]; then
-    ${QEMU_IMG} info "${disk_img}"
-  fi
-}
-
-function get_port() {
-    local PORT_START=$1
-    local PORT_RANGE=$((PORT_START+$2))
-    local PORT
-    for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
-        (echo -n "" >/dev/tcp/127.0.0.1/"${PORT}") >/dev/null 2>&1
-        if [ ${?} -ne 0 ]; then
-            echo "${PORT}"
-            break
-        fi
-    done
-}
-
-function enable_usb_passthrough() {
-  local DEVICE=""
-  local USB_BUS=""
-  local USB_DEV=""
-  local USB_NAME=""
-  local VENDOR_ID=""
-  local PRODUCT_ID=""
-  local USB_NOT_READY=0
-
-  # Have any USB devices been requested for pass-through?
-  if (( ${#usb_devices[@]} )); then
-    echo " - USB:      Host pass-through requested:"
-    for DEVICE in "${usb_devices[@]}"; do
-      VENDOR_ID=$(echo "${DEVICE}" | cut -d':' -f1)
-      PRODUCT_ID=$(echo "${DEVICE}" | cut -d':' -f2)
-      USB_BUS=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f2)
-      USB_DEV=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f4 | cut -d':' -f1)
-      USB_NAME=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f7-)
-      if [ -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
-        echo "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
-      else
-        echo "             x ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} needs permission changes:"
-        echo "               sudo chown -v root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}"
-        USB_NOT_READY=1
-      fi
-      USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,bus=hostpass.0,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID}"
-    done
-
-    if [ "${USB_NOT_READY}" -eq 1 ]; then
-        echo "               ERROR! USB permission changes are required 👆"
-      exit 1
-    fi
-  fi
-}
-
-function check_cpu_flag() {
-  local HOST_CPU_FLAG="${1}"
-  if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-function efi_vars() {
-  local VARS_IN=""
-  local VARS_OUT=""
-  VARS_IN="${1}"
-  VARS_OUT="${2}"
-
-  if [ ! -e "${VARS_OUT}" ]; then
-    if [ -e "${VARS_IN}" ]; then
-      cp "${VARS_IN}" "${VARS_OUT}"
-    else
-      echo "ERROR! ${VARS_IN} was not found. Please install edk2."
-      exit 1
-    fi
-  fi
-}
-
-function vm_boot() {
-  local BALLOON="-device virtio-balloon"
-  local BOOT_STATUS=""
-  local CPU=""
-  local DISK_USED=""
-  local DISPLAY_DEVICE=""
-  local DISPLAY_RENDER=""
-  local EFI_CODE=""
-  local EFI_VARS=""
-  local GUEST_CPU_CORES=""
-  local GUEST_CPU_LOGICAL_CORES=""
-  local GUEST_CPU_THREADS=""
-  local HOST_CPU_CORES=""
-  local HOST_CPU_SMT=""
-  local HOST_CPU_SOCKETS=""
-  local HOST_CPU_VENDOR=""
-  local GL="on"
-  local GUEST_TWEAKS=""
-  local KERNEL_NAME="Unknown"
-  local KERNEL_NODE=""
-  local KERNEL_VER="?"
-  local LSB_DESCRIPTION="Unknown OS"
-  local MAC_BOOTLOADER=""
-  local MAC_MISSING=""
-  local MAC_DISK_DEV="ide-hd,bus=ahci.2"
-  local MOUSE="usb-tablet"
-  local NET_DEVICE="virtio-net"
-  local OSK=""
-  local SMM="off"
-  local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
-  local VIDEO=""
-
-  KERNEL_NAME=$(uname --kernel-name)
-  KERNEL_NODE="($(uname --nodename))"
-  KERNEL_VER=$(uname --kernel-release | cut -d'.' -f1-2)
-
-  if command -v lsb_release &>/dev/null; then
-    LSB_DESCRIPTION=$(lsb_release --description --short)
-  elif [ -e /etc/os-release ]; then
-    LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
-  fi
-
-  echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
-  echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
-
-  HOST_CPU_CORES=$(nproc --all)
-  HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
-  HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
-  HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
-
-  # A CPU with Intel VT-x / AMD SVM support is required
-  if [ "${HOST_CPU_VENDOR}" == "AuthenticIntel" ]; then
-    if ! check_cpu_flag vmx; then
-      echo "ERROR! Intel VT-x support is required."
-      exit 1
-    fi
-  elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-    if ! check_cpu_flag svm; then
-      echo "ERROR! AMD SVM support is required."
-      exit 1
-    fi
-  fi
-
-  if [ -z "${cpu_cores}" ]; then
-      if [ "${HOST_CPU_CORES}" -ge 32 ]; then
-        GUEST_CPU_CORES="16"
-      elif [ "${HOST_CPU_CORES}" -ge 16 ]; then
-        GUEST_CPU_CORES="8"
-      elif [ "${HOST_CPU_CORES}" -ge 8 ]; then
-        GUEST_CPU_CORES="4"
-      elif [ "${HOST_CPU_CORES}" -ge 4 ]; then
-        GUEST_CPU_CORES="2"
-      else
-        GUEST_CPU_CORES="1"
-      fi
-  else
-      GUEST_CPU_CORES="${cpu_cores}"
-  fi
-
-  # Account for Hyperthreading/SMT.
-  if [ -e /sys/devices/system/cpu/smt/control ] && [ "${GUEST_CPU_CORES}" -ge 2 ]; then
-    HOST_CPU_SMT=$(cat /sys/devices/system/cpu/smt/control)
-    case ${HOST_CPU_SMT} in
-      on)
-        GUEST_CPU_THREADS=2
-        GUEST_CPU_LOGICAL_CORES=$(( GUEST_CPU_CORES / GUEST_CPU_THREADS ))
-        ;;
-      *)
-        GUEST_CPU_THREADS=1
-        GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
-        ;;
-    esac
-  else
-    GUEST_CPU_THREADS=1
-    GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
-  fi
-
-  local SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
-  echo " - CPU:      ${HOST_CPU_MODEL}"
-  echo -n " - CPU VM:   ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
-
-  local RAM_VM="2G"
-  if [ -z "${ram}" ]; then
-      local RAM_HOST=""
-      RAM_HOST=$(free --mega -h | grep Mem | cut -d':' -f2 | cut -d'G' -f1 | sed 's/ //g')
-      #Round up - https://github.com/wimpysworld/quickemu/issues/11
-      RAM_HOST=$(printf '%.*f\n' 0 "${RAM_HOST}")
-      if [ "${RAM_HOST}" -ge 128 ]; then
-        RAM_VM="32G"
-      elif [ "${RAM_HOST}" -ge 64 ]; then
-        RAM_VM="16G"
-      elif [ "${RAM_HOST}" -ge 16 ]; then
-        RAM_VM="8G"
-      elif [ "${RAM_HOST}" -ge 8 ]; then
-        RAM_VM="4G"
-      fi
-  else
-      RAM_VM="${ram}"
-  fi
-  echo ", ${RAM_VM} RAM"
-
-  if [ "${RAM_VM//G/}" -lt 4 ]; then
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
-        echo "ERROR! You have insufficient RAM to run ${guest_os} in a VM"
-        exit 1
-    fi
-  fi
-
-  # Force to lowercase.
-  boot=${boot,,}
-  guest_os=${guest_os,,}
-
-  # Always Boot macOS using EFI
-  if [ "${guest_os}" == "macos" ]; then
-    boot="efi"
-    if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
-      EFI_CODE="${VMDIR}/OVMF_CODE.fd"
-      EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
-    else
-      MAC_MISSING="Firmware"
-    fi
-
-    if [ -e "${VMDIR}/OpenCore.qcow2" ]; then
-      MAC_BOOTLOADER="${VMDIR}/OpenCore.qcow2"
-    elif [ -e "${VMDIR}/ESP.qcow2" ]; then
-      # Backwards compatibility for Clover
-      MAC_BOOTLOADER="${VMDIR}/ESP.qcow2"
-    else
-      MAC_MISSING="Bootloader"
-    fi
-
-    if [ -n "${MAC_MISSING}" ]; then
-      echo "ERROR! macOS ${MAC_MISSING} was not found."
-      echo "       Use 'quickget' to download the required files."
-      exit 1
-    fi
-    BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
-  elif [[ "${boot}" == *"efi"* ]]; then
-    EFI_VARS="${VMDIR}/OVMF_VARS.fd"
-
-    # Preserve backward compatibility
-    if [ -e "${VMDIR}/${VMNAME}-vars.fd" ]; then
-      mv "${VMDIR}/${VMNAME}-vars.fd" "${EFI_VARS}"
-    elif [ -e "${VMDIR}/OVMF_VARS_4M.fd" ]; then
-      mv "${VMDIR}/OVMF_VARS_4M.fd" "${EFI_VARS}"
-    fi
-
-    # OVMF_CODE_4M.fd is for booting guests in non-Secure Boot mode.
-    # While this image technically supports Secure Boot, it does so
-    # without requiring SMM support from QEMU
-
-    # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
-    # does not support SMM.
-
-    # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
-    case ${secureboot} in
-      on)
-        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.secboot.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
-          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd"
-          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        else
-          echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
-          echo "       Please install OVMF firmware."
-          exit 1
-        fi
-        ;;
-      *)
-        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.fd"
-          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
-          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        else
-          echo "ERROR! EFI boot requested but no EFI firmware found."
-          echo "       Please install OVMF firmware."
-          exit 1
-        fi
-        ;;
-    esac
-
-    # Make sure EFI_VARS references an actual, writeable, file
-    if [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; then
-      echo " - EFI:      ERROR! ${EFI_VARS} is not a regular file or not writeable."
-      echo "             Deleting ${EFI_VARS}. Please re-run quickemu."
-      rm -f "${EFI_VARS}"
-      exit 1
-    fi
-
-    # If EFI_CODE references a symlink, resolve it to the real file.
-    if [ -L "${EFI_CODE}" ]; then
-      echo " - EFI:      WARNING! ${EFI_CODE} is a symlink."
-      echo -n "             Resolving to... "
-      EFI_CODE=$(realpath "${EFI_CODE}")
-      echo "${EFI_CODE}"
-    fi
-    BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), SecureBoot (${secureboot})."
-  else
-    BOOT_STATUS="Legacy BIOS (${guest_os^})"
-    boot="legacy"
-    secureboot="off"
-  fi
-
-  echo " - BOOT:     ${BOOT_STATUS}"
-
-  # Make any OS specific adjustments
-  case ${guest_os} in
-    freebsd|linux|openbsd)
-      CPU="-cpu host,kvm=on"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      if [ "${guest_os}" == "freebsd" ]; then
-        MOUSE="usb-mouse"
-      fi
-      if [ -z "${disk_size}" ]; then
-        disk_size="16G"
-      fi
-      ;;
-    macos)
-      #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
-      # A CPU with SSE4.1 support is required for >= macOS Sierra
-      # A CPU with AVX2 support is required for >= macOS Mojave
-      if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
-        case ${HOST_CPU_VENDOR} in
-          AuthenticIntel)
-            CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
-          AuthenticAMD|*)
-            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec
-            # Warn on AMD:           +fma4,+pcid
-            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
-        esac
-      else
-        echo "ERROR! macOS requires a CPU with SSE 4.1 and AVX2 support."
-        exit 1
-      fi
-
-      # Tune Qemu optimisations based on the macOS release, or fallback to lowest
-      # common supported options if none is specified.
-      #   * VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)
-      #   * VirtIO Network is supported in Big Sur
-      #   * VirtIO Memory Balloning is supported in Big Sur (https://pmhahn.github.io/virtio-balloon/)
-      #   * VirtIO RNG is supported in Big Sur, but exposed to all guests.
-      case ${macos_release} in
-        catalina)
-          BALLOON=""
-          MAC_DISK_DEV="virtio-blk-pci"
-          NET_DEVICE="vmxnet3"
-          USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
-          ;;
-        big-sur|monterey)
-          BALLOON="-device virtio-balloon"
-          MAC_DISK_DEV="virtio-blk-pci"
-          NET_DEVICE="virtio-net"
-          USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
-          ;;
-        *)
-          # Backwards compatibility if no macos_release is specified.
-          # Also safe catch all for High Sierra and Mojave
-          BALLOON=""
-          MAC_DISK_DEV="ide-hd,bus=ahci.2"
-          NET_DEVICE="vmxnet3"
-          USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
-          ;;
-      esac
-      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
-      GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
-      if [ -z "${disk_size}" ]; then
-        disk_size="96G"
-      fi
-      ;;
-    windows)
-      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
-      if [ -z "${disk_size}" ]; then
-        disk_size="64G"
-      fi
-      SMM="on"
-      ;;
-    *)
-      CPU="-cpu host,kvm=on"
-      NET_DEVICE="rtl8139"
-      if [ -z "${disk_size}" ]; then
-        disk_size="32G"
-      fi
-      echo "WARNING! Unrecognised guest OS: ${guest_os}"
-      ;;
-  esac
-
-  # Disable suspend to RAM if SecureBoot/SMM is enabled
-  if [ "${secureboot}" == "on" ] || [ "${SMM}" == "on" ]; then
-    GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
-  fi
-
-  echo " - Disk:     ${disk_img} (${disk_size})"
-  if [ ! -f "${disk_img}" ]; then
-      # If there is no disk image, create a new image.
-      mkdir -p "${VMDIR}" 2>/dev/null
-      case ${preallocation} in
-        off|metadata|falloc|full) true;;
-        *)
-          echo "ERROR! ${preallocation} is an unsupported disk preallocation option."
-          exit 1;;
-      esac
-
-      # https://blog.programster.org/qcow2-performance
-      if ! ${QEMU_IMG} create -q -f qcow2 -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk_size}"; then
-        echo "ERROR! Failed to create ${disk_img}"
-        exit 1
-      fi
-
-      if [ -z "${iso}" ] && [ -z "${img}" ]; then
-        echo "ERROR! You haven't specified a .iso or .img image to boot from."
-        exit 1
-      fi
-      echo "             Just created, booting from ${iso}${img}"
-      DISK_USED="no"
-  elif [ -e "${disk_img}" ]; then
-    # Check there isn't already a process attached to the disk image.
-    if ! ${QEMU_IMG} info "${disk_img}" >/dev/null; then
-      echo "             Failed to get \"write\" lock. Is another process using the disk?"
-      exit 1
-    else
-      # Only check disk image size if preallocation is off
-      if [ "${preallocation}" == "off" ]; then
-        DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
-        if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
-          echo "             Looks unused, booting from ${iso}${img}"
-          if [ -z "${iso}" ] && [ -z "${img}" ]; then
-            echo "ERROR! You haven't specified a .iso or .img image to boot from."
-            exit 1
-          fi
-        else
-          DISK_USED="yes"
-        fi
-      else
-        DISK_USED="yes"
-      fi
-    fi
-  fi
-
-  if [ "${DISK_USED}" == "yes" ]; then
-    # If there is a disk image that appears to be used do not boot from installation media.
-    iso=""
-    img=""
-  fi
-
-  if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
-    # Display MSRs alert if the guest is macOS
-    ignore_msrs_alert
-  fi
-
-  # Has the status quo been requested?
-  if [ "${STATUS_QUO}" == "-snapshot" ]; then
-    if [ -z "${img}" ] && [ -z "${iso}" ]; then
-      echo "             Existing disk state will be preserved, no writes will be committed."
-    fi
-  fi
-
-  if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-    echo " - Boot ISO: ${iso}"
-  elif [ -n "${img}" ] && [ -e "${img}" ]; then
-    echo " - Recovery: ${img}"
-  fi
-
-  if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
-    echo " - CD-ROM:   ${fixed_iso}"
-  fi
-
-  # Determine a sane resolution for Linux guests.
-  if [ "${guest_os}" == "linux" ]; then
-    local X_RES=1152
-    local Y_RES=648
-    if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-      local LOWEST_WIDTH=""
-      if [ -z "${SCREEN}" ]; then
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-      else
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-      fi
-      if [ "${FULLSCREEN}" ]; then
-        if [ -z "${SCREEN}" ]; then
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-        else
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
-        fi
-      elif [ "${LOWEST_WIDTH}" -ge 3840 ]; then
-        X_RES=3200
-        Y_RES=1800
-      elif [ "${LOWEST_WIDTH}" -ge 2560 ]; then
-        X_RES=2048
-        Y_RES=1152
-      elif [ "${LOWEST_WIDTH}" -ge 1920 ]; then
-        X_RES=1664
-        Y_RES=936
-      elif [ "${LOWEST_WIDTH}" -ge 1280 ]; then
-        X_RES=1152
-        Y_RES=648
-      fi
-    fi
-  fi
-
-  # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
-  if [ "${guest_os}" == "linux" ]; then
-    case ${OUTPUT} in
-      none|spice) DISPLAY_DEVICE="qxl-vga";;
-      *) DISPLAY_DEVICE="virtio-vga";;
-    esac
-  elif [ "${guest_os}" == "macos" ]; then
-    # Tweak video device based on the guest macOS release.
-    # Displays in System Preferences can be used to select a resolution if:
-    #  - qxl is used on Big Sur and Catalina
-    #  - VGA is used on Mojave, although available resolutions are all 4:3
-    #  - High Sierra will run at the default 1920x1080 only.
-    case ${macos_release} in
-      catalina|big-sur|monterey) DISPLAY_DEVICE="qxl";;
-      *) DISPLAY_DEVICE="VGA";;
-    esac
-  elif [ "${guest_os}" == "windows" ]; then
-    DISPLAY_DEVICE="qxl-vga"
-  else
-    DISPLAY_DEVICE="qxl-vga"
-  fi
-
-  echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
-
-  # Build the video configuration
-  VIDEO="-device ${DISPLAY_DEVICE}"
-
-  # Try and coerce the display resolution for Linux guests only.
-  if [ "${guest_os}" == "linux" ]; then
-    VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
-  fi
-
-  # Allocate VRAM to VGA devices
-  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
-    VIDEO="${VIDEO},vgamem_mb=128"
-  fi
-  VIDEO="${VIDEO} ${FULLSCREEN}"
-
-  # Map Quickemu OUTPUT to QEMU -display
-  case ${OUTPUT} in
-    gtk)
-      DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
-      # GL is not working with GTK and virtio-vga
-      if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        GL="off"
-      fi
-      ;;
-    none|spice)
-      DISPLAY_RENDER="none";;
-    *)
-      DISPLAY_RENDER="${OUTPUT},gl=${GL}";;
-  esac
-
-  if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
-    if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
-      DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
-    else
-      DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
-    fi
-    echo ", GL (${GL}), VirGL (on)"
-  else
-    echo ", GL (${GL}), VirGL (off)"
-  fi
-
-  # Set the hostname of the VM
-  local NET="user,hostname=${VMNAME}"
-
-  echo -n "" > "${VMDIR}/${VMNAME}.ports"
-
-  # Find a free port to expose ssh to the guest
-  local SSH_PORT=""
-  SSH_PORT=$(get_port 22220 9)
-  if [ -n "${SSH_PORT}" ]; then
-    echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
-    NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
-    echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
-  else
-    echo " - ssh:      All ssh ports have been exhausted."
-  fi
-
-  # Have any port forwards been requested?
-  if (( ${#port_forwards[@]} )); then
-    echo " - PORTS:    Port forwards requested:"
-    for FORWARD in "${port_forwards[@]}"; do
-      HOST_PORT=$(echo "${FORWARD}" | cut -d':' -f1)
-      GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
-      echo "              - ${HOST_PORT} => ${GUEST_PORT}"
-      NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
-    done
-  fi
-
-  # Find a free port for spice
-  local SPICE="disable-ticketing=on"
-  local SPICE_PORT=""
-  SPICE_PORT=$(get_port 5930 9)
-  if [ -z "${SPICE_PORT}" ]; then
-    echo " - SPICE:    All SPICE ports have been exhausted."
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
-      echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
-      exit 1
-    fi
-  else
-    if [ "${OUTPUT}" == "spice-app" ]; then
-      echo " - SPICE:    Enabled"
-    else
-      echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
-      echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
-      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
-        echo -n " --spice-shared-dir ${PUBLIC}"
-      fi
-      echo "${FULLSPICY}"
-      SPICE="${SPICE},port=${SPICE_PORT}"
-    fi
-
-    # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
-    if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
-      echo " - WebDAV:   On guest: dav://localhost:9843/"
-    fi
-  fi
-
-  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
-    echo -n " - 9P:       On guest: "
-    if [ "${guest_os}" == "linux" ]; then
-      echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
-    elif [ "${guest_os}" == "macos" ]; then
-      # PUBLICSHARE needs to be world writeable for seamless integration with
-      # macOS. Test if it is world writeable, and prompt what to do if not.
-      echo "sudo mount_9p ${PUBLIC_TAG}"
-      if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
-        echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
-        echo "             Required for macOS integration 👆"
-      fi
-    fi
-  fi
-
-  # If smbd is available and ~/Public is present export it to the guest via samba
-  if [[ -e "/usr/sbin/smbd" && -n ${PUBLIC} ]]; then
-      NET="${NET},smb=${PUBLIC}"
-      echo " - smbd:     On guest: smb://10.0.2.4/qemu"
-  fi
-
-  enable_usb_passthrough
-
-  echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
-
-  # Start TPM
-  if [ "${tpm}" == "on" ]; then
-    local tpm_args=()
-    # shellcheck disable=SC2054
-    tpm_args+=(socket
-            --ctrl type=unixio,path="${VMDIR}/${VMNAME}.swtpm-sock"
-            --terminate
-            --tpmstate dir="${VMDIR}"
-            --tpm2)
-    echo "${SWTPM} ${tpm_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
-    ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
-    echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
-    sleep 0.25
-  fi
-
-  # Boot the VM
-  local args=()
-
-  # shellcheck disable=SC2054,SC2206,SC2140
-  args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
-         -enable-kvm -machine q35,smm=${SMM},vmport=off ${GUEST_TWEAKS}
-         ${CPU} ${SMP}
-         -m ${RAM_VM} ${BALLOON}
-         -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
-         ${VIDEO} -display ${DISPLAY_RENDER}
-         -device usb-ehci,id=input
-         -device usb-kbd,bus=input.0
-         -device ${MOUSE},bus=input.0
-         -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
-         -device intel-hda -device hda-duplex,audiodev=audio0
-         -rtc base=localtime,clock=host,driftfix=slew
-         -spice ${SPICE}
-         -device virtio-serial-pci
-         -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
-         -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
-         -chardev spicevmc,id=vdagent0,name=vdagent
-         -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
-         -device virtio-rng-pci,rng=rng0
-         -object rng-random,id=rng0,filename=/dev/urandom
-         -monitor none
-         -serial mon:stdio)
-
-  # Disables network interface during Windows install.
-  # See https://github.com/wimpysworld/quickemu/issues/115
-  if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
-    args+=(-nic none)
-  elif [ -n "${bridge}" ]; then
-    # Enable bridge mode networking
-    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
-  else
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
-  fi
-
-  # Add the disks
-  # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
-  if [[ "${boot}" == *"efi"* ]]; then
-    # shellcheck disable=SC2054
-    args+=(-global driver=cfi.pflash01,property=secure,value=on
-           -drive if=pflash,format=raw,unit=0,file="${EFI_CODE}",readonly=on
-           -drive if=pflash,format=raw,unit=1,file="${EFI_VARS}")
-  fi
-
-  if [ -n "${floppy}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive if=floppy,format=raw,file="${floppy}")
-  fi
-
-  if [ -n "${iso}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=0,file="${iso}")
-  fi
-
-  if [ -n "${fixed_iso}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-  fi
-
-  # Attach the unattended configuration to Windows guests when booting from ISO
-  if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
-  fi
-
-  if [ "${guest_os}" == "macos" ]; then
-    # shellcheck disable=SC2054
-    args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
-           -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
-
-    if [ -n "${img}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
-             -drive id=RecoveryImage,if=none,format=raw,file="${img}")
-    fi
-
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  else
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO}
-           -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
-           -chardev spicevmc,id=usbredirchardev1,name=usbredir
-           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-           -chardev spicevmc,id=usbredirchardev2,name=usbredir
-           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-           -chardev spicevmc,id=usbredirchardev3,name=usbredir
-           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-           -device usb-ccid
-           -chardev spicevmc,id=ccid,name=smartcard
-           -device ccid-card-passthru,chardev=ccid
-           -device virtio-serial-pci
-           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
-  fi
-
-  # https://wiki.qemu.org/Documentation/9psetup
-  # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
-  if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-             -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
-  fi
-
-  if [ -n "${USB_PASSTHROUGH}" ]; then
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=hostpass
-          ${USB_PASSTHROUGH})
-  fi
-
-  if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}-swtpm.sock" ]; then
-      # shellcheck disable=SC2054
-      args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}-swtpm.sock"
-            -tpmdev emulator,id=tpm0,chardev=chrtpm
-            -device tpm-tis,tpmdev=tpm0)
-  fi
-
-  # The OSK parameter contains parenthesis, they need to be escaped in the shell scripts
-  # The vendor name, Wimpys World, contains a space. It needs to be double-quoted.
-  SHELL_ARGS="${args[*]}"
-  SHELL_ARGS="${SHELL_ARGS//(/\\(}"
-  SHELL_ARGS="${SHELL_ARGS//)/\\)}"
-  SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
-
-  echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
-  ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
-
-  # If output is 'none' then SPICE was requested.
-  if [ "${OUTPUT}" == "spice" ]; then
-    if [ -n "${PUBLIC}" ]; then
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
-    else
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
-    fi
-  fi
-  sleep 0.25
-  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
-}
-
-function shortcut_create {
-  local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
-  cat << EOF > "${filename}"
-[Desktop Entry]
-Version=1.0
-Type=Application
-Terminal=false
-Exec=${0} --vm ${VM}
-Path=${VMPATH}
-Name=${VMNAME}
-Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
-EOF
-  echo "Created ${VMNAME}.desktop file"
-}
-
-function usage() {
-  echo
-  echo "Usage"
-  echo "  ${LAUNCHER} --vm ubuntu.conf"
-  echo
-  echo "You can also pass optional parameters"
-  echo "  --delete                : Delete the disk image."
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
-  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
-  echo "  --screen <screen>       : Use specified screen to determine the window size."
-  echo "  --shortcut              : Create a desktop shortcut"
-  echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
-  echo "  --snapshot create <tag> : Create a snapshot."
-  echo "  --snapshot delete <tag> : Delete a snapshot."
-  echo "  --snapshot info         : Show disk/snapshot info."
-  echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --version               : Print version"
-  exit 1
-}
-
-# Lowercase variables are used in the VM config file only
-boot="efi"
-bridge=""
-cpu_cores=""
-disk_img=""
-disk_size=""
-fixed_iso=""
-floppy=""
-guest_os="linux"
-img=""
-iso=""
-macos_release=""
-port_forwards=()
-preallocation="off"
-ram=""
-secureboot="off"
-tpm="off"
-usb_devices=()
-
-DELETE=0
-FULLSCREEN=""
-FULLSPICY=""
-OUTPUT="sdl"
-PUBLIC=""
-PUBLIC_PERMS=""
-PUBLIC_TAG=""
-SCREEN=""
-SHORTCUT=0
-SNAPSHOT_ACTION=""
-SNAPSHOT_TAG=""
-STATUS_QUO=""
-USB_PASSTHROUGH=""
-VM=""
-VMDIR=""
-VMNAME=""
-VMPATH=""
-
-readonly LAUNCHER=$(basename "${0}")
-readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.3.1"
-
-# PUBLICSHARE is the only directory exposed to guest VMs for file
-# sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-if command -v xdg-user-dir &>/dev/null; then
-  PUBLIC=$(xdg-user-dir PUBLICSHARE)
-  if [ "${PUBLIC%/}" != "${HOME}" ]; then
-    if [ ! -d "${PUBLIC}" ]; then
-      mkdir -p "${PUBLIC}"
-    fi
-    PUBLIC_TAG="Public-${USER,,}"
-    # shellcheck disable=SC2012
-    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-  else
-    PUBLIC=""
-  fi
-fi
-
-# TODO: Make this run the native architecture binary
-QEMU=$(command -v qemu-system-x86_64)
-QEMU_IMG=$(command -v qemu-img)
-if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! qemu not found. Please install qemu."
-  exit 1
-fi
-
-QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
-if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
-  echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
-  exit 1
-fi
-
-# Take command line arguments
-if [ $# -lt 1 ]; then
-    usage
-    exit 0
 else
-    while [ $# -gt 0 ]; do
-        case "${1}" in
-          -delete|--delete)
-            DELETE=1
-            shift;;
-          -display|--display)
-            OUTPUT="${2}"
-            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
-              echo "ERROR! Requested output '${OUTPUT}' is not recognised."
-              exit 1
-            elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
-              echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
-              exit 1
-            fi
-            shift
-            shift;;
-          -fullscreen|--fullscreen|-full-screen|--full-screen)
-            FULLSCREEN="-full-screen"
-            FULLSPICY="--full-screen"
-            shift;;
-          -ignore-msrs-always|--ignore-msrs-always)
-            ignore_msrs_always
-            exit;;
-          -screen|--screen)
-            SCREEN="${2}"
-            shift
-            shift;;
-          -snapshot|--snapshot)
-            SNAPSHOT_ACTION="${2}"
-            if [ -z "${SNAPSHOT_ACTION}" ]; then
-              echo "ERROR! No snapshot action provided."
-              exit 1
-            fi
-            shift
-            SNAPSHOT_TAG="${2}"
-            if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
-              echo "ERROR! No snapshot tag provided."
-              exit 1
-            fi
-            shift
-            shift;;
-          -status-quo|--status-quo)
-            STATUS_QUO="-snapshot"
-            shift;;
-          -shortcut|--shortcut)
-            SHORTCUT=1
-            shift;;
-          -vm|--vm)
-            VM="${2}"
-            shift
-            shift;;
-          -version|--version)
-            echo "${VERSION}"
-            exit;;
-          -h|--h|-help|--help)
-            usage;;
-          *)
-            echo "ERROR! \"${1}\" is not a supported parameter."
-            usage;;
-        esac
-    done
-fi
-
-if [ -n "${VM}" ] && [ -e "${VM}" ]; then
-  # shellcheck source=/dev/null
-  source "${VM}"
-  if [ -z "${disk_img}" ]; then
-    echo "ERROR! No disk_img defined."
+    echo "ERROR! You must specify an operating system:"
+    os_support
     exit 1
-  fi
+fi
 
-  VMDIR=$(dirname "${disk_img}")
-  VMNAME=$(basename "${VM}" .conf)
-  VMPATH=$(realpath "$(dirname "${VM}")")
+if [ -n "${2}" ]; then
+    RELEASE="${2,,}"
+    VM_PATH="${OS}-${RELEASE}"
 
-  # Backwards compatibility for ${driver_iso}
-  if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
-    fixed_iso="${driver_iso}"
-  fi
-
-  # Backwards compatibility for ${disk} (size)
-  if [ -n "${disk}" ]; then
-    disk_size="${disk}"
-  fi
-
-  if [ "${tpm}" == "on" ]; then
-    SWTPM=$(command -v swtpm)
-    if [ ! -e "${SWTPM}" ]; then
-      echo "ERROR! TPM is enabled, but swtpm was not found."
-      exit 1
+    if [ "${OS}" == "android" ]; then
+        get_android
+    elif [ "${OS}" == "archlinux" ]; then
+        get_archlinux
+    elif [ "${OS}" == "elementary" ]; then
+        get_elementary
+    elif [ "${OS}" == "macos" ]; then
+        get_macos
+    elif [ "${OS}" == "freebsd" ]; then
+        get_freebsd
+    elif [ "${OS}" == "fedora" ]; then
+        get_fedora
+    elif [ "${OS}" == "kali" ]; then
+        get_kali
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
+        get_linuxmint
+    elif [[ "${OS}" == *"nixos-"* ]]; then
+        get_nixos
+    elif [ "${OS}" == "openbsd" ]; then
+        get_openbsd
+    elif [ "${OS}" == "opensuse" ]; then
+        get_opensuse
+    elif [ "${OS}" == "popos" ]; then
+        if [ -n "${3}" ]; then
+            DRIVER="${3}"
+            DRIVERS=(intel nvidia)
+            if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
+                echo "ERROR! ${DRIVER} is not a supported driver:"
+                for DRIVER in "${DRIVERS[@]}"; do
+                  echo "${DRIVER}"
+                done
+                exit 1
+            fi
+        else
+            DRIVER="intel"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DRIVER}"
+        get_popos "${DRIVER}"
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        get_ubuntu
+    elif [ "${OS}" == "windows" ]; then
+        if [ -n "${3}" ]; then
+            LANG_NAME="${3}"
+            if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
+                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                for LANG in "${LANGS[@]}"; do
+                  echo "${LANG}"
+                done
+                exit 1
+            fi
+        else
+            LANG_NAME="English International"
+        fi
+        get_windows "${LANG_NAME}"
+    else
+        echo "ERROR! ${OS} is unknown:"
+        os_support
+        exit 1
     fi
-  fi
 else
-  echo "ERROR! Virtual machine configuration not found."
-  usage
+    echo -n "ERROR! You must specify a release: "
+    if [ "${OS}" == "archlinux" ]; then
+        releases_archlinux
+    elif [ "${OS}" == "elementary" ]; then
+        releases_elementary
+    elif [ "${OS}" == "freebsd" ]; then
+        releases_freebsd
+    elif [ "${OS}" == "fedora" ]; then
+        releases_fedora
+    elif [ "${OS}" == "kali" ]; then
+        releases_kali
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
+        releases_linuxmint
+    elif [[ "${OS}" == *"nixos-"* ]]; then
+        releases_nixos
+    elif [ "${OS}" == "opensuse" ]; then
+        releases_opensuse
+    elif [ "${OS}" == "openbsd" ]; then
+        releases_openbsd
+    elif [ "${OS}" == "macos" ]; then
+        releases_macos
+    elif [ "${OS}" == "popos" ]; then
+        releases_popos
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        releases_ubuntu
+    elif [ "${OS}" == "windows" ]; then
+        releases_windows
+    else
+        echo "${OS} is unknown"
+        os_support
+    fi
+    exit 1
 fi
-
-if [ ${DELETE} -eq 1 ]; then
-  disk_delete
-  exit
-fi
-
-if [ -n "${SNAPSHOT_ACTION}" ]; then
-  case ${SNAPSHOT_ACTION} in
-    apply)
-      snapshot_apply "${SNAPSHOT_TAG}"
-      snapshot_info
-      exit;;
-    create)
-      snapshot_create "${SNAPSHOT_TAG}"
-      snapshot_info
-      exit;;
-    delete)
-      snapshot_delete "${SNAPSHOT_TAG}"
-      snapshot_info
-      exit;;
-    info)
-      snapshot_info
-      exit;;
-    *)
-      echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
-      usage;;
-  esac
-fi
-
-if [ ${SHORTCUT} -eq 1 ]; then
-  shortcut_create
-  exit
-fi
-
-vm_boot
