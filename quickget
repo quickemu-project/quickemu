@@ -34,6 +34,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
+    android)            PRETTY_NAME="Android X86" ;;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
@@ -124,7 +125,8 @@ function list_csv() {
 }
 
 function os_support() {
-    echo archlinux \
+    echo android \
+    archlinux \
     elementary \
     freebsd \
     fedora \
@@ -148,6 +150,17 @@ function os_support() {
     ubuntu-studio \
     windows \
     xubuntu
+}
+
+function releases_android() {
+  echo 8.1 \
+  7.1 \
+  9.0 \
+  6.0 \
+  5.1 \
+  4.4 \
+  4.0 \
+  2.2
 }
 
 function releases_archlinux() {
@@ -625,6 +638,34 @@ EOF
     start_vm_info
 }
 
+function get_android() {
+  local HASH=""
+  local ISO=""
+  local URL=""
+
+  validate_release "releases_android"
+  fosshubVerionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
+  verison="android-x86-${RELEASE}"
+  releaseJson=$(echo ${fosshubVerionInfo:16} | jq --arg ver "${verison}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+
+  HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
+  ISO=$(echo "${releaseJson}" | jq -r .n)
+
+  baseurl="https://mirrors.gigenet.com/OSDN/android-x86/"
+
+  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E [0-9]{5} | uniq)
+  for item in $releaseFolders; do
+    file=$(wget -O - -q ${baseurl}${item} | grep "${ISO}")
+    if [[ $file != "" ]]; then
+      URL="${baseurl}${item}/${ISO}"
+      break
+    fi
+  done
+  web_get "${URL}" "${VM_PATH}"
+  check_hash "${ISO}" "${HASH}"
+  make_vm_config "${ISO}"
+}
+
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -1022,7 +1063,9 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
 
-    if [ "${OS}" == "archlinux" ]; then
+    if [ "${OS}" == "android" ]; then
+        get_android
+    elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
