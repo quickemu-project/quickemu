@@ -633,8 +633,8 @@ function get_archlinux() {
 
     validate_release "releases_archlinux"
     VERSION=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.latest_version' | cut -d "\"" -f 2)
-    URL="https://mirror.rackspace.com/archlinux/iso/$VERSION"
-    ISO="archlinux-$VERSION-x86_64.iso"
+    URL="https://mirror.rackspace.com/archlinux/iso/${VERSION}"
+    ISO="archlinux-${VERSION}-x86_64.iso"
     HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
