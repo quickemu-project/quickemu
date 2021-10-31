@@ -52,6 +52,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
   echo "${PRETTY_NAME}"
@@ -149,7 +150,8 @@ function os_support() {
     ubuntu-mate \
     ubuntu-studio \
     windows \
-    xubuntu
+    xubuntu \
+    zorin
 }
 
 function releases_android() {
@@ -276,6 +278,12 @@ function releases_windows() {
     echo 8 \
     10 \
     11
+}
+
+function releases_zorin() {
+    echo 16core64 \
+    15lite64 \
+    15lite32
 }
 
 function unattended_windows() {
@@ -602,6 +610,9 @@ function make_vm_config() {
     elif [ "${OS}" == "windows" ]; then
         GUEST="windows"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "zorin" ]; then
+        GUEST="zorin"
+        IMAGE_TYPE="iso"
     fi
 
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
@@ -803,6 +814,22 @@ function get_openbsd() {
     make_vm_config "${ISO}"
 }
 
+function get_zorin() {
+    #local HASH="" no hash provided
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_zorin"
+    
+    URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2) 
+    ISO=$(echo ${URL}| awk -F\/ ' {print $NF}') 
+    web_get "${URL}" "${VM_PATH}"
+    #check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+
+}
+
+
 function get_opensuse() {
     local HASH=""
     local ISO=""
@@ -916,7 +943,11 @@ function get_popos() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
+# https://zrn.co/16core64
+#https://zrn.co/15lite64 -> https://zorin.com/os/download/15/lite/64/
+#https://zrn.co/15lite32 - https://zorin.com/os/download/15/lite/32/
+#(curl -s https://zrn.co/15lite32 |cut -d\" -f2) 
+#
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
@@ -1117,6 +1148,8 @@ if [ -n "${2}" ]; then
             LANG_NAME="English International"
         fi
         get_windows "${LANG_NAME}"
+    elif [ "${OS}" == "zorin" ]; then
+        get_zorin
     else
         echo "ERROR! ${OS} is unknown:"
         os_support
@@ -1150,6 +1183,8 @@ else
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
         releases_windows
+    elif [ "${OS}" == "zorin" ]; then
+        releases_zorin        
     else
         echo "${OS} is unknown"
         os_support
