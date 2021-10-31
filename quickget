@@ -1138,14 +1138,14 @@ if [ -n "${2}" ]; then
             ISOTYPE="${3}"
             ISOTYPES=(minimal dvd1 boot)
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
-                echo "iso ${ISOTYPE} not supported:"
+                echo "iso ${ISOTYPE} is not supported:"
                 for ISOTYPE in "${ISOTYPES[@]}"; do
                   echo "${ISOTYPE}"
                 done
                 exit 1
             fi
         else
-            DRIVER="dvd1"
+            ISOTYPE="dvd1"
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_rocky "${ISOTYPE}"
