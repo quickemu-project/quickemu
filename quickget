@@ -614,7 +614,7 @@ function make_vm_config() {
         GUEST="windows"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "zorin" ]; then
-        GUEST="zorin"
+        GUEST="linux"
         IMAGE_TYPE="iso"
     fi
 
