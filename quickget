@@ -818,18 +818,15 @@ function get_openbsd() {
 }
 
 function get_zorin() {
-    #local HASH="" no hash provided
     local ISO=""
     local URL=""
 
     validate_release "releases_zorin"
-    
+    # their redirector returns an href so we need to get that and parse out the iso   
     URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2) 
     ISO=$(echo ${URL}| awk -F\/ ' {print $NF}') 
     web_get "${URL}" "${VM_PATH}"
-    #check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
-
 }
 
 
@@ -946,11 +943,7 @@ function get_popos() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-# https://zrn.co/16core64
-#https://zrn.co/15lite64 -> https://zorin.com/os/download/15/lite/64/
-#https://zrn.co/15lite32 - https://zorin.com/os/download/15/lite/32/
-#(curl -s https://zrn.co/15lite32 |cut -d\" -f2) 
-#
+
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
