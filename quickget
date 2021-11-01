@@ -34,7 +34,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
-    android)            PRETTY_NAME="Android X86" ;;
+    android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
@@ -155,9 +155,9 @@ function os_support() {
 }
 
 function releases_android() {
-  echo 8.1 \
+  echo 9.0 \
+  8.1 \
   7.1 \
-  9.0 \
   6.0 \
   5.1 \
   4.4 \
