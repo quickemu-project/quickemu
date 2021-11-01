@@ -48,6 +48,7 @@ function pretty_name() {
     openbsd)            PRETTY_NAME="OpenBSD";;
     opensuse)           PRETTY_NAME="openSUSE";;
     popos)              PRETTY_NAME="Pop!_OS";;
+    regolith)           PRETTY_NAME="Regolith Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -143,6 +144,7 @@ function os_support() {
     openbsd \
     opensuse \
     popos \
+    regolith \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -220,6 +222,14 @@ function releases_popos() {
     echo 20.04 \
     21.04
 }
+
+function releases_regolith() {
+    echo 1.6.0_hirsute \
+    1.6.0_focal \
+    2.0.0_impish \
+    2.0.0_hirsute
+}
+
 
 function releases_ubuntu() {
     echo bionic \
@@ -593,6 +603,9 @@ function make_vm_config() {
     elif [ "${OS}" == "popos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+ elif [ "${OS}" == "regolith" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -917,6 +930,39 @@ function get_popos() {
     make_vm_config "${ISO}"
 }
 
+
+function get_regolith() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local GHDL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/"
+
+
+    validate_release "releases_regolith"
+
+    URL="${GHDL}"
+    #release-release-hirsute-hirsute_standard-1.6.0/"""${RELEASE}/
+    case ${RELEASE} in
+      1.6.0_focal)
+        URL="${URL}release-release-focal-focal_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1);;
+      1.6.0_hirsute)
+        URL="${URL}release-release-hirsute-hirsute_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1);;
+      2.0.0_impish)
+        URL="${URL}regolith-linux-2.0-impish-latest";;
+      2.0.0_hirsute)
+        URL="${URL}regolith-linux-2.0-hirsute-latest";;
+    esac
+    ISO="Regolith_"${RELEASE}".iso"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    if [ -n $HASH ]; then
+      check_hash "${ISO}" "${HASH}"
+    fi
+    make_vm_config "${ISO}"
+}
+
+
 function get_ubuntu() {
     local DEVEL="daily-live"
     local ISO=""
@@ -1101,6 +1147,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${DRIVER}"
         get_popos "${DRIVER}"
+    elif  [ "${OS}" == "regolith" ]; then
+        get_regolith
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -1146,6 +1194,8 @@ else
         releases_macos
     elif [ "${OS}" == "popos" ]; then
         releases_popos
+    elif [ "${OS}" == "regolith" ]; then
+        releases_regolith
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
