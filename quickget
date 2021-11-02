@@ -145,11 +145,8 @@ function os_support() {
     openbsd \
     opensuse \
     popos \
-<<<<<<< HEAD
     regolith \
-=======
     rockylinux \
->>>>>>> upstream/master
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -228,7 +225,6 @@ function releases_popos() {
     21.04
 }
 
-<<<<<<< HEAD
 function releases_regolith() {
     echo 1.6.0_hirsute \
     1.6.0_focal \
@@ -237,7 +233,6 @@ function releases_regolith() {
 }
 
 
-=======
 function releases_rockylinux() {
     echo 8.4 \
     8.3 \
@@ -246,7 +241,6 @@ function releases_rockylinux() {
     8.0
 }
 
->>>>>>> upstream/master
 function releases_ubuntu() {
     echo bionic \
     focal \
@@ -619,11 +613,10 @@ function make_vm_config() {
     elif [ "${OS}" == "popos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-<<<<<<< HEAD
- elif [ "${OS}" == "regolith" ]; then
-=======
+    elif [ "${OS}" == "regolith" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "rockylinux" ]; then
->>>>>>> upstream/master
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
@@ -1186,10 +1179,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${DRIVER}"
         get_popos "${DRIVER}"
-<<<<<<< HEAD
     elif  [ "${OS}" == "regolith" ]; then
         get_regolith
-=======
     elif [ "${OS}" == "rockylinux" ]; then
         if [ -n "${3}" ]; then
             ISOTYPE="${3}"
@@ -1206,7 +1197,6 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_rocky "${ISOTYPE}"
->>>>>>> upstream/master
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
