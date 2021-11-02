@@ -657,8 +657,8 @@ EOF
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
-        if [ "${OS}" == "garuda"  ]; then 
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"  
+        if [ "${OS}" == "garuda"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         # Enable TPM for Windows 11
@@ -1031,8 +1031,8 @@ function get_garuda() {
     local HASH_URL=""
     local GLDL="https://mirrors.fossho.st/garuda/iso"
 
-
     validate_release "releases_garuda"
+
     # Part of the path is different for a couple of community releases vs the supported garuda ones
     case ${RELEASE} in
       mate|cinnamon)
@@ -1040,7 +1040,8 @@ function get_garuda() {
       *)
         REL_TYPE="garuda";;
     esac
-    # need to follow daily releases and use contents of SHA sums file 
+
+    # need to follow daily releases and use contents of SHA sums file
     # to derive the filename and date
     LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
     HASH_URL="$(wget -q -O- ${LATEST_URL})"
@@ -1048,8 +1049,9 @@ function get_garuda() {
     HASH=$(echo ${HASH_URL} | cut -d\  -f1)
     LDATE=$(echo "${ISO}" | cut -d'-' -f5|cut -d'.' -f1)
     URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
+
     web_get "${URL}/${ISO}" "${VM_PATH}"
-    # there is a ...iso.zsync but zsync fails ??
+    ### there is a ...iso.zsync but zsync fails ??
     #zsync_get "${URL}/${ISO}" "${VM_PATH}"
     if [ -n $HASH ]; then
       check_hash "${ISO}" "${HASH}"
