@@ -644,6 +644,9 @@ EOF
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+        if [ "${OS}]" == "garuda"  ]; then 
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"  
+        fi
 
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
@@ -1008,7 +1011,6 @@ function get_garuda() {
     # need to follow daily releases and use contents of SHA sums file 
     # to derive the filename and date
     LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
-    echo "DEBUG: LATEST_URL=${LATEST_URL}"
     HASH_URL="$(wget -q -O- ${LATEST_URL})"
     ISO=$(echo ${HASH_URL} | cut -d\  -f2)
     HASH=$(echo ${HASH_URL} | cut -d\  -f1)
