@@ -998,15 +998,15 @@ function get_garuda() {
 
 
     validate_release "releases_garuda"
-
+    # Part of the path is different for a couple of community releases vs the supported garuda ones
     case ${RELEASE} in
       mate|cinnamon)
         REL_TYPE="community";;
       *)
         REL_TYPE="garuda";;
     esac
-    # echo "DEBUG: REL_TYPE=${REL_TYPE}"
-    # echo "DEBUG: GLDL=${GLDL}"
+    # need to follow daily releases and use contents of SHA sums file 
+    # to derive the filename and date
     LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
     echo "DEBUG: LATEST_URL=${LATEST_URL}"
     HASH_URL="$(wget -q -O- ${LATEST_URL})"
@@ -1014,10 +1014,6 @@ function get_garuda() {
     HASH=$(echo ${HASH_URL} | cut -d\  -f1)
     LDATE=$(echo "${ISO}" | cut -d'-' -f5|cut -d'.' -f1)
     URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
-    # echo "DEBUG: HASH_URL=${HASH_URL}"
-    # echo "DEBUG: HASH=${HASH}"
-    # echo "DEBUG: ISO=${ISO}"
-    # echo "DEBUG: LDATE=${LDATE}"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     # there is a ...iso.zsync but zsync fails ??
     #zsync_get "${URL}/${ISO}" "${VM_PATH}"
