@@ -181,7 +181,7 @@ function releases_freebsd(){
 function releases_fedora(){
     echo 33 \
     34 \
-    35_beta
+    35
 }
 
 function releases_kali() {
