@@ -954,7 +954,12 @@ function vm_boot() {
 }
 
 function shortcut_create {
+  local dirname="${HOME}/.local/share/applications"
   local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
+
+  if [ ! -d ${dirname} ]; then
+    mkdir -p ${dirname}
+  fi
   cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0
