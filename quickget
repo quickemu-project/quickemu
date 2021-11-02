@@ -34,7 +34,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
-    android)            PRETTY_NAME="Android X86" ;;
+    android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
@@ -49,6 +49,7 @@ function pretty_name() {
     opensuse)           PRETTY_NAME="openSUSE";;
     popos)              PRETTY_NAME="Pop!_OS";;
     regolith)           PRETTY_NAME="Regolith Linux";;
+    rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -144,7 +145,11 @@ function os_support() {
     openbsd \
     opensuse \
     popos \
+<<<<<<< HEAD
     regolith \
+=======
+    rockylinux \
+>>>>>>> upstream/master
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -155,9 +160,9 @@ function os_support() {
 }
 
 function releases_android() {
-  echo 8.1 \
+  echo 9.0 \
+  8.1 \
   7.1 \
-  9.0 \
   6.0 \
   5.1 \
   4.4 \
@@ -223,6 +228,7 @@ function releases_popos() {
     21.04
 }
 
+<<<<<<< HEAD
 function releases_regolith() {
     echo 1.6.0_hirsute \
     1.6.0_focal \
@@ -231,6 +237,16 @@ function releases_regolith() {
 }
 
 
+=======
+function releases_rockylinux() {
+    echo 8.4 \
+    8.3 \
+    8.2 \
+    8.1 \
+    8.0
+}
+
+>>>>>>> upstream/master
 function releases_ubuntu() {
     echo bionic \
     focal \
@@ -603,7 +619,11 @@ function make_vm_config() {
     elif [ "${OS}" == "popos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+<<<<<<< HEAD
  elif [ "${OS}" == "regolith" ]; then
+=======
+    elif [ "${OS}" == "rockylinux" ]; then
+>>>>>>> upstream/master
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
@@ -815,6 +835,25 @@ function get_openbsd() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_rocky() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    local arch="x86_64"
+    local baseurl="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/${arch}"
+
+    validate_release "releases_rockylinux"
+    ISO="Rocky-${RELEASE}-${arch}-${ISOTYPE}.iso"
+    URL="${baseurl}/${ISO}"
+    HASH=$(wget -q -O- "${baseurl}/CHECKSUM" | grep "SHA256 (${ISO})" | grep -E -i -w -o '[0-9a-z]{64}')
+
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 
 function get_opensuse() {
     local HASH=""
@@ -1147,8 +1186,27 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${DRIVER}"
         get_popos "${DRIVER}"
+<<<<<<< HEAD
     elif  [ "${OS}" == "regolith" ]; then
         get_regolith
+=======
+    elif [ "${OS}" == "rockylinux" ]; then
+        if [ -n "${3}" ]; then
+            ISOTYPE="${3}"
+            ISOTYPES=(minimal dvd1 boot)
+            if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
+                echo "iso ${ISOTYPE} is not supported:"
+                for ISOTYPE in "${ISOTYPES[@]}"; do
+                  echo "${ISOTYPE}"
+                done
+                exit 1
+            fi
+        else
+            ISOTYPE="dvd1"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
+        get_rocky "${ISOTYPE}"
+>>>>>>> upstream/master
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
