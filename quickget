@@ -106,6 +106,8 @@ function list_csv() {
         DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="zsync"
+      elif [ "${OS}" == "garuda" ]; then
+        DOWNLOADER="zsync"
       else
         DOWNLOADER="wget"
       fi
@@ -1029,7 +1031,7 @@ function get_garuda() {
     local REL_TYPE=""
     local LATEST_URL=""
     local HASH_URL=""
-    local GLDL="https://mirrors.fossho.st/garuda/iso"
+    local GLDL="http://mirrors.fossho.st/garuda/iso"
 
     validate_release "releases_garuda"
 
@@ -1050,13 +1052,12 @@ function get_garuda() {
     LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) # 
     URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
 
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    ### there is a ...iso.zsync but zsync fails ??
-    #zsync_get "${URL}/${ISO}" "${VM_PATH}"
-    if [ -n "${HASH}" ]; then
-      check_hash "${ISO}" "${HASH}"
-    fi
-    make_vm_config "${ISO}"
+    #web_get "${URL}/${ISO}" "${VM_PATH}"
+    zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
+    #if [ -n "${HASH}" ]; then
+    #  check_hash "${ISO}" "${HASH}"
+    #fi
+    make_vm_config "${OS}-${RELEASE}.iso"
 }
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
