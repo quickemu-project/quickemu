@@ -38,6 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    garuda)            PRETTY_NAME="Garuda Linux";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
@@ -130,6 +131,7 @@ function os_support() {
     elementary \
     freebsd \
     fedora \
+    garuda \
     kali \
     kubuntu \
     linuxmint-cinnamon \
@@ -180,6 +182,23 @@ function releases_fedora(){
     echo 33 \
     34 \
     35_beta
+}
+
+function releases_garuda() {
+    echo bspwm \
+    dr460nized \
+    dr460nized-blackarch \
+    dr460nized-gaming \
+    gnome \
+    i3 \
+    kde-barebones \
+    lxqt-kwin \
+    qtile \
+    sway \
+    wayfire \
+    xfce \
+    mate \
+    cinnamon
 }
 
 function releases_kali() {
@@ -578,6 +597,9 @@ function make_vm_config() {
     elif [ "${OS}" == "kali" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "garuda" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -965,6 +987,45 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+function get_garuda() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local REL_TYPE=""
+    local LATEST_URL=""
+    local HASH_URL=""
+    local GLDL="https://mirrors.fossho.st/garuda/iso"
+
+
+    validate_release "releases_garuda"
+
+    case ${RELEASE} in
+      mate|cinnamon)
+        REL_TYPE="community";;
+      *)
+        REL_TYPE="garuda";;
+    esac
+    # echo "DEBUG: REL_TYPE=${REL_TYPE}"
+    # echo "DEBUG: GLDL=${GLDL}"
+    LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
+    echo "DEBUG: LATEST_URL=${LATEST_URL}"
+    HASH_URL="$(wget -q -O- ${LATEST_URL})"
+    ISO=$(echo ${HASH_URL} | cut -d\  -f2)
+    HASH=$(echo ${HASH_URL} | cut -d\  -f1)
+    LDATE=$(echo "${ISO}" | cut -d'-' -f5|cut -d'.' -f1)
+    URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
+    # echo "DEBUG: HASH_URL=${HASH_URL}"
+    # echo "DEBUG: HASH=${HASH}"
+    # echo "DEBUG: ISO=${ISO}"
+    # echo "DEBUG: LDATE=${LDATE}"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    # there is a ...iso.zsync but zsync fails ??
+    #zsync_get "${URL}/${ISO}" "${VM_PATH}"
+    if [ -n $HASH ]; then
+      check_hash "${ISO}" "${HASH}"
+    fi
+    make_vm_config "${ISO}"
+}
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
@@ -1075,6 +1136,8 @@ if [ -n "${2}" ]; then
         get_freebsd
     elif [ "${OS}" == "fedora" ]; then
         get_fedora
+    elif [ "${OS}" == "garuda" ]; then
+        get_garuda
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
@@ -1132,6 +1195,8 @@ else
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
+    elif [ "${OS}" == "garuda" ]; then
+        releases_garuda
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
