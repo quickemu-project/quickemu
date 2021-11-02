@@ -969,11 +969,9 @@ function get_regolith() {
     local URL=""
     local GHDL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/"
 
-
     validate_release "releases_regolith"
 
     URL="${GHDL}"
-    #release-release-hirsute-hirsute_standard-1.6.0/"""${RELEASE}/
     case ${RELEASE} in
       1.6.0_focal)
         URL="${URL}release-release-focal-focal_standard-1.6.0"
