@@ -396,7 +396,7 @@ function vm_boot() {
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
-	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd"
+	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
 	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! EFI boot requested but no EFI firmware found."
