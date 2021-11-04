@@ -1085,7 +1085,8 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "list_json" ]; then
         list_json
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-      quickemu_version=$( ./quickemu --version)
+      whereIam=$(dirname "${BASH_SOURCE[0]}") 
+      quickemu_version=$( ${whereIam}/quickemu --version)
       echo "Quickemu Version: ${quickemu_version}"
       exit 0 
     fi
