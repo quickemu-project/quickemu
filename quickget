@@ -1084,6 +1084,10 @@ if [ -n "${1}" ]; then
         list_csv
     elif [ "${OS}" == "list_json" ]; then
         list_json
+    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
+      quickemu_version=$( ./quickemu --version)
+      echo "Quickemu Version: ${quickemu_version}"
+      exit 0 
     fi
 else
     echo "ERROR! You must specify an operating system:"
