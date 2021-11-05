@@ -657,9 +657,9 @@ function get_android() {
   local URL=""
 
   validate_release "releases_android"
-  fosshubVerionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
-  verison="android-x86-${RELEASE}"
-  releaseJson=$(echo ${fosshubVerionInfo:16} | jq --arg ver "${verison}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+  fosshubVersionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
+  version="android-x86-${RELEASE}"
+  releaseJson=$(echo ${fosshubVersionInfo:16} | jq --arg ver "${version}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
 
   HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
   ISO=$(echo "${releaseJson}" | jq -r .n)
@@ -761,7 +761,7 @@ function get_kali() {
     if [[ "${RELEASE}" == "latest" ]]; then
         SUBDIR="current"
     else
-        SUBDIR="kali-weeekly"
+        SUBDIR="kali-weekly"
     fi
 
     ISO=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
