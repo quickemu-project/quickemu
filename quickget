@@ -38,6 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    kdeneon)           PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
@@ -132,6 +133,7 @@ function os_support() {
     freebsd \
     fedora \
     kali \
+    kdeneon \
     kubuntu \
     linuxmint-cinnamon \
     linuxmint-mate \
@@ -187,6 +189,13 @@ function releases_fedora(){
 function releases_kali() {
     echo latest \
     weekly
+}
+
+function releases_kdeneon() {
+    echo user \
+    testing \
+    unstable \
+    developer
 }
 
 function releases_linuxmint(){
@@ -588,6 +597,9 @@ function make_vm_config() {
     elif [ "${OS}" == "kali" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "kdeneon" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -768,6 +780,21 @@ function get_kali() {
     HASH=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
     URL="https://cdimage.kali.org/${SUBDIR}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_kdeneon() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_kdeneon"
+    
+    ISO="neon-${RELEASE}-current.iso"
+    URL="https://files.kde.org/neon/images/${RELEASE}/current/${ISO}"
+    zsync_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- "https://files.kde.org/neon/images/${RELEASE}/current/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1109,6 +1136,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "kali" ]; then
         get_kali
+    elif [ "${OS}" == "kdeneon" ]; then
+        get_kdeneon
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
     elif [[ "${OS}" == *"nixos-"* ]]; then
