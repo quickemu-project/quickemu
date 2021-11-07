@@ -813,11 +813,7 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  # Disables network interface during Windows install.
-  # See https://github.com/wimpysworld/quickemu/issues/115
-  if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
-    args+=(-nic none)
-  elif [ -n "${bridge}" ]; then
+  if [ -n "${bridge}" ]; then
     # Enable bridge mode networking
     args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
@@ -839,20 +835,38 @@ function vm_boot() {
     args+=(-drive if=floppy,format=raw,file="${floppy}")
   fi
 
-  if [ -n "${iso}" ]; then
+  if [ "${guest_os}" == "windows" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=0,file="${iso}")
+    args+=(-device ahci,id=ahci)
+  fi
+
+  if [ -n "${iso}" ]; then
+    if [ "${guest_os}" == "windows" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive id=iso,if=none,media=cdrom,file="${iso}"
+            -device ide-cd,drive=iso,bus=ahci.1,bootindex=1)
+    else
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=0,file="${iso}")
+    fi
   fi
 
   if [ -n "${fixed_iso}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+    if [ "${guest_os}" == "windows" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive id=fixed_iso,if=none,media=cdrom,file="${fixed_iso}"
+            -device ide-cd,drive=fixed_iso,bus=ahci.2)
+    else
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+    fi
   fi
 
   # Attach the unattended configuration to Windows guests when booting from ISO
   if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
+    args+=(-drive id=unattended,if=none,media=cdrom,file="${VMDIR}/unattended.iso"
+          -device ide-cd,drive=unattended,bus=ahci.3)
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -870,11 +884,18 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  else
+  elif [ "${guest_os}" == "windows" ]; then
     # shellcheck disable=SC2054,SC2206
+    args+=(-device ide-hd,drive=SystemDisk,bus=ahci.0,bootindex=0
+          -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  else
     args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO}
-           -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  fi
+
+  if [ "${guest_os}" != "macos" ]; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
            -chardev spicevmc,id=usbredirchardev1,name=usbredir
            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
            -chardev spicevmc,id=usbredirchardev2,name=usbredir
