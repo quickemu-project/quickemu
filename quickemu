@@ -447,18 +447,17 @@ function vm_boot() {
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       # A CPU with SSE4.1 support is required for >= macOS Sierra
-      # A CPU with AVX2 support is required for >= macOS Mojave
-      if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
+      if check_cpu_flag sse4_1; then
         case ${HOST_CPU_VENDOR} in
           AuthenticIntel)
             CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
           AuthenticAMD|*)
-            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec
+            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
             # Warn on AMD:           +fma4,+pcid
-            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
+            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
         esac
       else
-        echo "ERROR! macOS requires a CPU with SSE 4.1 and AVX2 support."
+        echo "ERROR! macOS requires a CPU with SSE 4.1 support."
         exit 1
       fi
 
