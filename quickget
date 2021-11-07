@@ -38,6 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    kdeneon)           PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
@@ -50,6 +51,7 @@ function pretty_name() {
     popos)              PRETTY_NAME="Pop!_OS";;
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    solus)              PRETTY_NAME="Solus";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -134,6 +136,7 @@ function os_support() {
     freebsd \
     fedora \
     kali \
+    kdeneon \
     kubuntu \
     linuxmint-cinnamon \
     linuxmint-mate \
@@ -148,6 +151,7 @@ function os_support() {
     popos \
     regolith \
     rockylinux \
+    solus \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -191,6 +195,13 @@ function releases_fedora(){
 function releases_kali() {
     echo latest \
     weekly
+}
+
+function releases_kdeneon() {
+    echo user \
+    testing \
+    unstable \
+    developer
 }
 
 function releases_linuxmint(){
@@ -241,6 +252,13 @@ function releases_rockylinux() {
     8.2 \
     8.1 \
     8.0
+}
+
+function releases_solus() {
+    echo 4.3-budgie \
+    4.3-gnome \
+    4.3-mate \
+    4.3-plasma
 }
 
 function releases_ubuntu() {
@@ -609,6 +627,9 @@ function make_vm_config() {
     elif [ "${OS}" == "kali" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "kdeneon" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -628,6 +649,9 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "rockylinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "solus" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
@@ -690,9 +714,9 @@ function get_android() {
   local URL=""
 
   validate_release "releases_android"
-  fosshubVerionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
-  verison="android-x86-${RELEASE}"
-  releaseJson=$(echo ${fosshubVerionInfo:16} | jq --arg ver "${verison}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+  fosshubVersionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
+  version="android-x86-${RELEASE}"
+  releaseJson=$(echo ${fosshubVersionInfo:16} | jq --arg ver "${version}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
 
   HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
   ISO=$(echo "${releaseJson}" | jq -r .n)
@@ -794,7 +818,7 @@ function get_kali() {
     if [[ "${RELEASE}" == "latest" ]]; then
         SUBDIR="current"
     else
-        SUBDIR="kali-weeekly"
+        SUBDIR="kali-weekly"
     fi
 
     ISO=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
@@ -802,6 +826,20 @@ function get_kali() {
     URL="https://cdimage.kali.org/${SUBDIR}/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_kdeneon() {
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_kdeneon"
+    ISO="neon-${RELEASE}-current.iso"
+    # Get the URL of the mirror closest to the user's location
+    URL=$(wget -q -O- "https://files.kde.org/neon/images/${RELEASE}/current/neon-${RELEASE}-current.iso.zsync.mirrorlist" | \
+          grep "neon-${RELEASE}-current.iso.zsync" | grep '>1.<' | cut -d\" -f 6 | sed 's/https/http/g' | xargs dirname)
+    zsync_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "$(wget -q -O- "https://files.kde.org/neon/images/${RELEASE}/current/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)"
     make_vm_config "${ISO}"
 }
 
@@ -879,6 +917,30 @@ function get_rocky() {
     make_vm_config "${ISO}"
 }
 
+function get_solus() {
+    local RELNUM=""
+    local RELTYPE=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_solus"
+    RELNUM=$(echo "${RELEASE}" | cut -d'-' -f1)
+    RELTYPE=$(echo "${RELEASE}" | cut -d'-' -f2)
+    case ${RELTYPE} in
+      mate|gnome)
+        RELTYPE=${RELTYPE^^};;
+      *)
+        RELTYPE=${RELTYPE^};;
+    esac
+
+    ISO="Solus-${RELNUM}-${RELTYPE}.iso"
+    URL="https://mirrors.rit.edu/solus/images/${RELNUM}/${ISO}"
+    HASH=$(wget -q -O- "${URL}.sha256sum" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 
 function get_opensuse() {
     local HASH=""
@@ -1190,6 +1252,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "kali" ]; then
         get_kali
+    elif [ "${OS}" == "kdeneon" ]; then
+        get_kdeneon
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
     elif [[ "${OS}" == *"nixos-"* ]]; then
@@ -1198,7 +1262,7 @@ if [ -n "${2}" ]; then
         get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
         get_opensuse
-    elif [ "${OS}" == "popos" ]; then
+  elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
@@ -1232,6 +1296,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_rocky "${ISOTYPE}"
+    elif [ "${OS}" == "solus" ]; then
+        get_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -1281,6 +1347,8 @@ else
         releases_popos
     elif [ "${OS}" == "regolith" ]; then
         releases_regolith
+    elif [ "${OS}" == "solus" ]; then
+        releases_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
