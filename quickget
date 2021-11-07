@@ -50,6 +50,7 @@ function pretty_name() {
     opensuse)           PRETTY_NAME="openSUSE";;
     popos)              PRETTY_NAME="Pop!_OS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    solus)              PRETTY_NAME="Solus";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -148,6 +149,7 @@ function os_support() {
     opensuse \
     popos \
     rockylinux \
+    solus \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
@@ -240,6 +242,13 @@ function releases_rockylinux() {
     8.2 \
     8.1 \
     8.0
+}
+
+function releases_solus() {
+    echo 4.3-budgie \
+    4.3-gnome \
+    4.3-mate \
+    4.3-plasma
 }
 
 function releases_ubuntu() {
@@ -629,6 +638,9 @@ function make_vm_config() {
     elif [ "${OS}" == "rockylinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "solus" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -892,6 +904,30 @@ function get_rocky() {
     make_vm_config "${ISO}"
 }
 
+function get_solus() {
+    local RELNUM=""
+    local RELTYPE=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_solus"
+    RELNUM=$(echo "${RELEASE}" | cut -d'-' -f1)
+    RELTYPE=$(echo "${RELEASE}" | cut -d'-' -f2)
+    case ${RELTYPE} in
+      mate|gnome)
+        RELTYPE=${RELTYPE^^};;
+      *)
+        RELTYPE=${RELTYPE^};;
+    esac
+
+    ISO="Solus-${RELNUM}-${RELTYPE}.iso"
+    URL="https://mirrors.rit.edu/solus/images/${RELNUM}/${ISO}"
+    HASH=$(wget -q -O- "${URL}.sha256sum" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 
 function get_opensuse() {
     local HASH=""
@@ -1182,7 +1218,7 @@ if [ -n "${2}" ]; then
         get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
         get_opensuse
-    elif [ "${OS}" == "popos" ]; then
+  elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
@@ -1214,6 +1250,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_rocky "${ISOTYPE}"
+    elif [ "${OS}" == "solus" ]; then
+        get_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -1261,6 +1299,8 @@ else
         releases_macos
     elif [ "${OS}" == "popos" ]; then
         releases_popos
+    elif [ "${OS}" == "solus" ]; then
+        releases_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
