@@ -54,6 +54,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
   echo "${PRETTY_NAME}"
@@ -153,7 +154,8 @@ function os_support() {
     ubuntu-mate \
     ubuntu-studio \
     windows \
-    xubuntu
+    xubuntu \
+    zorin
 }
 
 function releases_android() {
@@ -183,7 +185,7 @@ function releases_freebsd(){
 function releases_fedora(){
     echo 33 \
     34 \
-    35_beta
+    35
 }
 
 function releases_kali() {
@@ -296,6 +298,15 @@ function releases_windows() {
     echo 8 \
     10 \
     11
+}
+
+function releases_zorin() {
+    echo 16core64 \
+    15lite64 \
+    15lite32 \
+    15education64 \
+    15edulite64 \
+    15edulite32
 }
 
 function unattended_windows() {
@@ -628,6 +639,9 @@ function make_vm_config() {
     elif [ "${OS}" == "windows" ]; then
         GUEST="windows"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "zorin" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     fi
 
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
@@ -647,6 +661,12 @@ EOF
 
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+        if [ "${OS}" == "zorin"  ]; then 
+            case  ${RELEASE} in
+              15education64|15edulite64|15edulite32)
+                echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
+            esac  
         fi
 
         # Enable TPM for Windows 11
@@ -826,6 +846,18 @@ function get_openbsd() {
     HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_zorin() {
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_zorin"
+    # their redirector returns an href so we need to get that and parse out the iso   
+    URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2) 
+    ISO=$(echo ${URL}| awk -F\/ ' {print $NF}') 
+    web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
 
@@ -1128,6 +1160,11 @@ if [ -n "${1}" ]; then
         list_csv
     elif [ "${OS}" == "list_json" ]; then
         list_json
+    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
+      whereIam=$(dirname "${BASH_SOURCE[0]}") 
+      quickemu_version=$( ${whereIam}/quickemu --version)
+      echo "Quickemu Version: ${quickemu_version}"
+      exit 0 
     fi
 else
     echo "ERROR! You must specify an operating system:"
@@ -1211,6 +1248,8 @@ if [ -n "${2}" ]; then
             LANG_NAME="English International"
         fi
         get_windows "${LANG_NAME}"
+    elif [ "${OS}" == "zorin" ]; then
+        get_zorin
     else
         echo "ERROR! ${OS} is unknown:"
         os_support
@@ -1246,6 +1285,8 @@ else
         releases_ubuntu
     elif [ "${OS}" == "windows" ]; then
         releases_windows
+    elif [ "${OS}" == "zorin" ]; then
+        releases_zorin        
     else
         echo "${OS} is unknown"
         os_support
