@@ -110,7 +110,7 @@ function list_csv() {
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="zsync"
       elif [ "${OS}" == "garuda" ]; then
-        DOWNLOADER="zsync"      
+        DOWNLOADER="zsync"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="zsync"
       else
@@ -651,7 +651,7 @@ function make_vm_config() {
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "garuda" ]; then
         GUEST="linux"
-        IMAGE_TYPE="iso"    
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -1190,7 +1190,7 @@ function get_garuda() {
     HASH_URL="$(wget -q -O- ${LATEST_URL})"
     ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
     HASH=$(echo ${HASH_URL} | cut -d\  -f1)
-    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) # 
+    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) #
     URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
 
     #web_get "${URL}/${ISO}" "${VM_PATH}"
