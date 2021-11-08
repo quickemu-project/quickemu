@@ -1033,6 +1033,16 @@ function usage() {
   exit 1
 }
 
+function display_param_check() {
+  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+    echo "ERROR! Requested output '${OUTPUT}' is not recognised."
+    exit 1
+  elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
+    echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
+    exit 1
+  fi
+}
+
 # Lowercase variables are used in the VM config file only
 boot="efi"
 bridge=""
@@ -1056,7 +1066,7 @@ DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
-OUTPUT="sdl"
+OUTPUT=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
@@ -1121,13 +1131,7 @@ else
             shift;;
           -display|--display)
             OUTPUT="${2}"
-            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
-              echo "ERROR! Requested output '${OUTPUT}' is not recognised."
-              exit 1
-            elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
-              echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
-              exit 1
-            fi
+            display_param_check
             shift
             shift;;
           -fullscreen|--fullscreen|-full-screen|--full-screen)
@@ -1197,6 +1201,15 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   # Backwards compatibility for ${disk} (size)
   if [ -n "${disk}" ]; then
     disk_size="${disk}"
+  fi
+
+  if [ -z "${OUTPUT}" ]; then
+    if [ -z "${display}" ]; then
+      OUTPUT="sdl"
+    else
+      OUTPUT="${display}"
+      display_param_check
+    fi
   fi
 
   if [ "${tpm}" == "on" ]; then
