@@ -108,6 +108,8 @@ function list_csv() {
         DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="zsync"
+      elif [[ "${OS}" == *"kdeneon"* ]]; then
+        DOWNLOADER="zsync"
       else
         DOWNLOADER="wget"
       fi
