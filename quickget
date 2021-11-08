@@ -38,6 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    garuda)             PRETTY_NAME="Garuda Linux";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
@@ -108,6 +109,8 @@ function list_csv() {
         DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="zsync"
+      elif [ "${OS}" == "garuda" ]; then
+        DOWNLOADER="zsync"      
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="zsync"
       else
@@ -136,6 +139,7 @@ function os_support() {
     elementary \
     freebsd \
     fedora \
+    garuda \
     kali \
     kdeneon \
     kubuntu \
@@ -191,6 +195,23 @@ function releases_fedora(){
     echo 33 \
     34 \
     35
+}
+
+function releases_garuda() {
+    echo bspwm \
+    dr460nized \
+    dr460nized-blackarch \
+    dr460nized-gaming \
+    gnome \
+    i3 \
+    kde-barebones \
+    lxqt-kwin \
+    qtile \
+    sway \
+    wayfire \
+    xfce \
+    mate \
+    cinnamon
 }
 
 function releases_kali() {
@@ -628,6 +649,9 @@ function make_vm_config() {
     elif [ "${OS}" == "kali" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "garuda" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"    
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -687,6 +711,8 @@ EOF
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+        if [ "${OS}" == "garuda"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         if [ "${OS}" == "zorin"  ]; then
             case  ${RELEASE} in
               15education64|15edulite64|15edulite32)
@@ -1136,6 +1162,41 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+function get_garuda() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local REL_TYPE=""
+    local LATEST_URL=""
+    local HASH_URL=""
+    local GLDL="http://mirrors.fossho.st/garuda/iso"
+
+    validate_release "releases_garuda"
+
+    # Part of the path is different for a couple of community releases vs the supported garuda ones
+    case ${RELEASE} in
+      mate|cinnamon)
+        REL_TYPE="community";;
+      *)
+        REL_TYPE="garuda";;
+    esac
+
+    # need to follow daily releases and use contents of SHA sums file
+    # to derive the filename and date
+    LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
+    HASH_URL="$(wget -q -O- ${LATEST_URL})"
+    ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
+    HASH=$(echo ${HASH_URL} | cut -d\  -f1)
+    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) # 
+    URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
+
+    #web_get "${URL}/${ISO}" "${VM_PATH}"
+    zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
+    #if [ -n "${HASH}" ]; then
+    #  check_hash "${ISO}" "${HASH}"
+    #fi
+    make_vm_config "${OS}-${RELEASE}.iso"
+}
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
@@ -1251,6 +1312,8 @@ if [ -n "${2}" ]; then
         get_freebsd
     elif [ "${OS}" == "fedora" ]; then
         get_fedora
+    elif [ "${OS}" == "garuda" ]; then
+        get_garuda
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1332,6 +1395,8 @@ else
         releases_freebsd
     elif [ "${OS}" == "fedora" ]; then
         releases_fedora
+    elif [ "${OS}" == "garuda" ]; then
+        releases_garuda
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
