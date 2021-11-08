@@ -597,24 +597,33 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
     FILE="${URL##*/}"
-    if [ -n "${3}" ]; then
-        OUT="${3}"
-    else
-        OUT="${FILE}"
-    fi
+    local ZS=""
 
-    if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
-      exit 1
-    fi
+# check if we have a zsync installed somewhere
+  ZS="$(which zsync)"
+    if  [ -x "${ZS}" ]; then
+      if [ -n "${3}" ]; then
+          OUT="${3}"
+      else
+          OUT="${FILE}"
+      fi
 
-    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-        echo "ERROR! Failed to download ${URL}.zsync"
+      if ! mkdir -p "${DIR}" 2>/dev/null; then
+        echo "ERROR! Unable to create directory ${DIR}"
         exit 1
-    fi
+      fi
 
-    if [ -e "${DIR}/${OUT}.zs-old" ]; then
-        rm "${DIR}/${OUT}.zs-old"
+      if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+          echo "ERROR! Failed to download ${URL}.zsync"
+          exit 1
+      fi
+
+      if [ -e "${DIR}/${OUT}.zs-old" ]; then
+          rm "${DIR}/${OUT}.zs-old"
+      fi
+    else
+      echo "zsync not found so falling back to wget"
+      web_get ${ISO}
     fi
 }
 
