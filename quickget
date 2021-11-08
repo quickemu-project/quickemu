@@ -38,7 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
-    kdeneon)           PRETTY_NAME="KDE Neon";;
+    kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
@@ -674,11 +674,11 @@ EOF
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
-        if [ "${OS}" == "zorin"  ]; then 
+        if [ "${OS}" == "zorin"  ]; then
             case  ${RELEASE} in
               15education64|15edulite64|15edulite32)
                 echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
-            esac  
+            esac
         fi
 
         # Enable TPM for Windows 11
@@ -880,9 +880,9 @@ function get_zorin() {
     local URL=""
 
     validate_release "releases_zorin"
-    # their redirector returns an href so we need to get that and parse out the iso   
-    URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2) 
-    ISO=$(echo ${URL}| awk -F\/ ' {print $NF}') 
+    # their redirector returns an href so we need to get that and parse out the iso
+    URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2)
+    ISO=$(echo ${URL}| awk -F\/ ' {print $NF}')
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -1180,10 +1180,10 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "list_json" ]; then
         list_json
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-      whereIam=$(dirname "${BASH_SOURCE[0]}") 
+      whereIam=$(dirname "${BASH_SOURCE[0]}")
       quickemu_version=$( ${whereIam}/quickemu --version)
       echo "Quickemu Version: ${quickemu_version}"
-      exit 0 
+      exit 0
     fi
 else
     echo "ERROR! You must specify an operating system:"
@@ -1307,7 +1307,7 @@ else
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     elif [ "${OS}" == "zorin" ]; then
-        releases_zorin        
+        releases_zorin
     else
         echo "${OS} is unknown"
         os_support
