@@ -376,6 +376,9 @@ function vm_boot() {
         elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
+	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd"
+	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
           echo "       Please install OVMF firmware."
@@ -392,6 +395,9 @@ function vm_boot() {
         elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
+	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
+	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! EFI boot requested but no EFI firmware found."
           echo "       Please install OVMF firmware."
@@ -441,18 +447,17 @@ function vm_boot() {
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       # A CPU with SSE4.1 support is required for >= macOS Sierra
-      # A CPU with AVX2 support is required for >= macOS Mojave
-      if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
+      if check_cpu_flag sse4_1; then
         case ${HOST_CPU_VENDOR} in
           AuthenticIntel)
             CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
           AuthenticAMD|*)
-            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec
+            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
             # Warn on AMD:           +fma4,+pcid
-            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+avx2,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
+            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
         esac
       else
-        echo "ERROR! macOS requires a CPU with SSE 4.1 and AVX2 support."
+        echo "ERROR! macOS requires a CPU with SSE 4.1 support."
         exit 1
       fi
 
@@ -813,11 +818,7 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  # Disables network interface during Windows install.
-  # See https://github.com/wimpysworld/quickemu/issues/115
-  if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
-    args+=(-nic none)
-  elif [ -n "${bridge}" ]; then
+  if [ -n "${bridge}" ]; then
     # Enable bridge mode networking
     args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
@@ -839,20 +840,38 @@ function vm_boot() {
     args+=(-drive if=floppy,format=raw,file="${floppy}")
   fi
 
-  if [ -n "${iso}" ]; then
+  if [ "${guest_os}" == "windows" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=0,file="${iso}")
+    args+=(-device ahci,id=ahci)
+  fi
+
+  if [ -n "${iso}" ]; then
+    if [ "${guest_os}" == "windows" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive id=iso,if=none,media=cdrom,file="${iso}"
+            -device ide-cd,drive=iso,bus=ahci.1,bootindex=1)
+    else
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=0,file="${iso}")
+    fi
   fi
 
   if [ -n "${fixed_iso}" ]; then
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+    if [ "${guest_os}" == "windows" ]; then
+      # shellcheck disable=SC2054
+      args+=(-drive id=fixed_iso,if=none,media=cdrom,file="${fixed_iso}"
+            -device ide-cd,drive=fixed_iso,bus=ahci.2)
+    else
+      # shellcheck disable=SC2054
+      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+    fi
   fi
 
   # Attach the unattended configuration to Windows guests when booting from ISO
   if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
+    args+=(-drive id=unattended,if=none,media=cdrom,file="${VMDIR}/unattended.iso"
+          -device ide-cd,drive=unattended,bus=ahci.3)
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -870,11 +889,18 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  else
+  elif [ "${guest_os}" == "windows" ]; then
     # shellcheck disable=SC2054,SC2206
+    args+=(-device ide-hd,drive=SystemDisk,bus=ahci.0,bootindex=0
+          -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  else
     args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO}
-           -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  fi
+
+  if [ "${guest_os}" != "macos" ]; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
            -chardev spicevmc,id=usbredirchardev1,name=usbredir
            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
            -chardev spicevmc,id=usbredirchardev2,name=usbredir
@@ -933,7 +959,12 @@ function vm_boot() {
 }
 
 function shortcut_create {
+  local dirname="${HOME}/.local/share/applications"
   local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
+
+  if [ ! -d ${dirname} ]; then
+    mkdir -p ${dirname}
+  fi
   cat << EOF > "${filename}"
 [Desktop Entry]
 Version=1.0

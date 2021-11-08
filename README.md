@@ -33,7 +33,8 @@ comprehensive support for macOS and Windows**.
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
-  * [Arch Linux](https://www.archlinux.org/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/) & [NixOS](https://nixos.org/)
+  * [Arch Linux](https://www.archlinux.org/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
+  * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
@@ -178,9 +179,11 @@ preferred flavour.
   * `linuxmint-xfce`
   * `opensuse`
   * `popos`
+  * `regolith`
   * `nixos-gnome`
   * `nixos-plasma5`
   * `nixos-minimal`
+  * `zorin`
 
 Or you can download a Linux image and manually create a VM configuration.
 
@@ -283,13 +286,6 @@ There are some considerations when running macOS via Quickemu.
 and [Windows 11](https://www.microsoft.com/en-gb/software-download/windows11)
 along with the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
-
-**During the Windows install network interfaces are completely disabled!** This
-is to allow those users who want to create local accounts to do so. A side affect
-is that the first time **Windows boots with the QEMU network enabled it will blue
-screen, automatically restart and then start normally with fully functioning
-networking**.
-
 
 ```bash
 quickget windows 11
