@@ -89,6 +89,16 @@ function list_csv() {
   local OPTION
   local OS
   local RELEASE
+  local ZS=""
+  local DL=""
+
+# check if we have a zsync installed somewhere
+  ZS="$(which zsync)"
+  if  [ -x "${ZS}" ]; then
+    DL="zsync"
+  else  
+    DL="wget"
+  fi
   echo "Display Name,OS,Release,Option,Downloader"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
@@ -106,13 +116,13 @@ function list_csv() {
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
       elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       else
         DOWNLOADER="wget"
       fi
