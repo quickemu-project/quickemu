@@ -96,7 +96,7 @@ function list_csv() {
   ZS="$(which zsync)"
   if  [ -x "${ZS}" ]; then
     DL="zsync"
-  else  
+  else
     DL="wget"
   fi
   echo "Display Name,OS,Release,Option,Downloader"
