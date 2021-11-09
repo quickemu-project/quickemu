@@ -791,6 +791,15 @@ function vm_boot() {
     sleep 0.25
   fi
 
+  # Network mode
+  if [ -n "${bridge}" ]; then
+    # Enable bridge mode networking
+    NETWORK="-nic bridge,br=${bridge},model=virtio-net-pci"
+  else
+    # shellcheck disable=SC2054,SC2206
+    NETWORK="-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic"
+  fi
+
   # Boot the VM
   local args=()
 
@@ -804,6 +813,7 @@ function vm_boot() {
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
          -device ${MOUSE},bus=input.0
+         ${NETWORK}
          -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
@@ -817,14 +827,6 @@ function vm_boot() {
          -object rng-random,id=rng0,filename=/dev/urandom
          -monitor none
          -serial mon:stdio)
-
-  if [ -n "${bridge}" ]; then
-    # Enable bridge mode networking
-    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
-  else
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
-  fi
 
   # Add the disks
   # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
