@@ -905,7 +905,6 @@ function vm_boot() {
            -device usb-ccid
            -chardev spicevmc,id=ccid,name=smartcard
            -device ccid-card-passthru,chardev=ccid
-           -device virtio-serial-pci
            -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
            -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
   fi
