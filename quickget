@@ -632,8 +632,8 @@ function zsync_get() {
           rm "${DIR}/${OUT}.zs-old"
       fi
     else
-      echo "zsync not found so falling back to wget"
-      web_get ${ISO}
+      echo "INFO: zsync not found, falling back to wget"
+      web_get "${ISO}"
     fi
 }
 
