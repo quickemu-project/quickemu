@@ -494,7 +494,9 @@ function vm_boot() {
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
       fi
-      # fixme: spice problems with usb-tablet
+      # fixme: spice problems with usb-tablet - can't move mouse, clicks work
+      # working https://raw.githubusercontent.com/kholia/OSX-KVM/1cc6430f96b452cb78b9a079c34bb9933144ce18/macOS-libvirt-Catalina.xml
+      # https://github.com/wimpysworld/quickemu/issues/222
       if [ "${OUTPUT}" == "none" ]; then
         MOUSE="usb-mouse"
       fi
