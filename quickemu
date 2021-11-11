@@ -241,7 +241,7 @@ function vm_boot() {
   HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
 
   # A CPU with Intel VT-x / AMD SVM support is required
-  if [ "${HOST_CPU_VENDOR}" == "AuthenticIntel" ]; then
+  if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
     if ! check_cpu_flag vmx; then
       echo "ERROR! Intel VT-x support is required."
       exit 1
@@ -449,7 +449,7 @@ function vm_boot() {
       # A CPU with SSE4.1 support is required for >= macOS Sierra
       if check_cpu_flag sse4_1; then
         case ${HOST_CPU_VENDOR} in
-          AuthenticIntel)
+          GenuineIntel)
             CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
           AuthenticAMD|*)
             # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
@@ -493,6 +493,10 @@ function vm_boot() {
       GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
+      fi
+      # fixme: spice problems with usb-tablet
+      if [ "${OUTPUT}" == "none" ]; then
+        MOUSE="usb-mouse"
       fi
       ;;
     windows)
@@ -894,19 +898,39 @@ function vm_boot() {
   fi
 
   # shellcheck disable=SC2054,SC2206
-  args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
-         -chardev spicevmc,id=usbredirchardev1,name=usbredir
-         -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-         -chardev spicevmc,id=usbredirchardev2,name=usbredir
-         -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-         -chardev spicevmc,id=usbredirchardev3,name=usbredir
-         -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-         -device usb-ccid
-         -chardev spicevmc,id=ccid,name=smartcard
-         -device ccid-card-passthru,chardev=ccid
-         -device virtio-serial-pci
-         -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-         -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
+  if [ "${USB_HOST_PASSTHROUGH_CONTROLLER}" == "qemu-xhci" ]; then
+    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+           -chardev spicevmc,id=usbredirchardev1,name=usbredir
+           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+           -chardev spicevmc,id=usbredirchardev2,name=usbredir
+           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+           -chardev spicevmc,id=usbredirchardev3,name=usbredir
+           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+           -device usb-ccid
+           -chardev spicevmc,id=ccid,name=smartcard
+           -device ccid-card-passthru,chardev=ccid
+           -device virtio-serial-pci
+           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
+  else
+    # https://www.spice-space.org/usbredir.html
+    args+=(-device ich9-usb-ehci1,id=usb
+           -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,multifunction=on
+           -device ich9-usb-uhci2,masterbus=usb.0,firstport=2
+           -device ich9-usb-uhci3,masterbus=usb.0,firstport=4
+           -chardev spicevmc,name=usbredir,id=usbredirchardev1
+           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+           -chardev spicevmc,name=usbredir,id=usbredirchardev2
+           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+           -chardev spicevmc,name=usbredir,id=usbredirchardev3
+           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+           -device usb-ccid
+           -chardev spicevmc,id=ccid,name=smartcard
+           -device ccid-card-passthru,chardev=ccid
+           -device virtio-serial-pci
+           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
+  fi
 
   # https://wiki.qemu.org/Documentation/9psetup
   # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
