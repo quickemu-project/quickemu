@@ -893,22 +893,20 @@ function vm_boot() {
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   fi
 
-  if [ "${guest_os}" != "macos" ]; then
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
-           -chardev spicevmc,id=usbredirchardev1,name=usbredir
-           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-           -chardev spicevmc,id=usbredirchardev2,name=usbredir
-           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-           -chardev spicevmc,id=usbredirchardev3,name=usbredir
-           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-           -device usb-ccid
-           -chardev spicevmc,id=ccid,name=smartcard
-           -device ccid-card-passthru,chardev=ccid
-           -device virtio-serial-pci
-           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
-  fi
+  # shellcheck disable=SC2054,SC2206
+  args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+         -chardev spicevmc,id=usbredirchardev1,name=usbredir
+         -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+         -chardev spicevmc,id=usbredirchardev2,name=usbredir
+         -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+         -chardev spicevmc,id=usbredirchardev3,name=usbredir
+         -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+         -device usb-ccid
+         -chardev spicevmc,id=ccid,name=smartcard
+         -device ccid-card-passthru,chardev=ccid
+         -device virtio-serial-pci
+         -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+         -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
 
   # https://wiki.qemu.org/Documentation/9psetup
   # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
