@@ -739,7 +739,7 @@ function vm_boot() {
     else
       echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
       echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
-      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+      if [ -n "${PUBLIC}" ]; then
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
       echo "${FULLSPICY}"
@@ -749,6 +749,9 @@ function vm_boot() {
     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
       echo " - WebDAV:   On guest: dav://localhost:9843/"
+    else
+      echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)
+      echo " - WebDAV:   On guest: Finder>Connect to Server>http://localhost:9843/"
     fi
   fi
 
