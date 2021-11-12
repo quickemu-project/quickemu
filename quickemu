@@ -750,7 +750,7 @@ function vm_boot() {
     if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
       echo " - WebDAV:   On guest: dav://localhost:9843/"
     else
-      echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)
+      echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
       echo " - WebDAV:   On guest: Finder>Connect to Server>http://localhost:9843/"
     fi
   fi
