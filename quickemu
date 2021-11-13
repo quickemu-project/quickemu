@@ -682,9 +682,12 @@ function vm_boot() {
   fi
 
   # Allocate VRAM to VGA devices
-  if [ "${DISPLAY_DEVICE}" == "qxl-vga" ] || [ "${DISPLAY_DEVICE}" == "VGA" ]; then
-    VIDEO="${VIDEO},vgamem_mb=128"
-  fi
+  case ${DISPLAY_DEVICE} in
+    bochs-display) VIDEO="${VIDEO},vgamem=134217728";;
+    ati-vga,cirrus,cirrus-vga,qxl,qxl-vga,VGA) VIDEO="${VIDEO},vgamem_mb=128";;
+  esac
+
+  # Add fullscreen options
   VIDEO="${VIDEO} ${FULLSCREEN}"
 
   # Set the hostname of the VM
