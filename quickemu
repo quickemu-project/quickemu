@@ -393,6 +393,9 @@ function vm_boot() {
         elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.fd" ]; then
           EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.fd"
           efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
+          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
