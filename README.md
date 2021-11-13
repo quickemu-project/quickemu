@@ -253,32 +253,28 @@ macos_release="catalina"
 
 There are some considerations when running macOS via Quickemu.
 
-  * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
-    bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
   * Supported macOS releases:
     * High Sierra
     * Mojave
     * Catalina **(Recommended)**
     * Big Sur
     * Monterey
-  * Optimised by default
+  * `quickemu` will automatically download the required [OpenCore](https://github.com/acidanthera/OpenCorePkg)
+    bootloader and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
+  * Optimised by default, but no GPU acceleration is available.
     * Host CPU vendor is detected and guest CPU is optimised accordingly.
     * [VirtIO Block Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used for the system disk where supported.
     * [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used for the mouse.
     * VirtIO Network (`virtio-net`) is supported and enabled on macOS Big Sur and newer but previous releases use `vmxnet3`.
     * VirtIO Memory Ballooning is supported and enabled on macOS Big Sur and newer but disabled for other support macOS releases.
-  * USB host pass-through is:
+  * USB host and SPICE pass-through is:
     * UHCI (USB 2.0) on macOS Catalina and earlier.
     * XHCI (USB 3.0) on macOS Big Sur and newer.
   * Display resolution can only be changed via macOS System Preferences.
   * Full Duplex audio works on macOS High Sierra, Mojave and Catalina.
       * **macOS Big Sur and Monterey have no audio at all**.
-  * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup).
-  * **SPICE has limited support on macOS**:
-    * Copy/paste via SPICE agent is not available.
-    * File sharing via SPICE webdavd is not available.
-    * USB pass-through via SPICE is not available.
-    * Smartcard pass-through is not available.
+  * File sharing between guest and host is available via [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
+  * Copy/paste via SPICE agent is **not available on macOS**.
 
 ## Windows 8.1, 10 & 11 Guests
 

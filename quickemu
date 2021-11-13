@@ -740,9 +740,16 @@ function vm_boot() {
       SPICE="${SPICE},port=${SPICE_PORT}"
     fi
 
-    # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
-    if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
-      echo " - WebDAV:   On guest: dav://localhost:9843/"
+    if [ -n "${PUBLIC}" ]; then
+      case ${guest_os} in
+        macos)
+          # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
+          echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
+          echo " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
+          ;;
+        *)
+          echo " - WebDAV:   On guest: dav://localhost:9843/";;
+      esac
     fi
   fi
 
@@ -808,8 +815,21 @@ function vm_boot() {
          -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
          -chardev spicevmc,id=vdagent0,name=vdagent
          -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
+         -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+         -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
          -device virtio-rng-pci,rng=rng0
          -object rng-random,id=rng0,filename=/dev/urandom
+         -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+         -chardev spicevmc,id=usbredirchardev1,name=usbredir
+         -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+         -chardev spicevmc,id=usbredirchardev2,name=usbredir
+         -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+         -chardev spicevmc,id=usbredirchardev3,name=usbredir
+         -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+         -device pci-ohci,id=smartpass
+         -device usb-ccid
+         -chardev spicevmc,id=ccid,name=smartcard
+         -device ccid-card-passthru,chardev=ccid
          -monitor none
          -serial mon:stdio)
 
@@ -891,23 +911,6 @@ function vm_boot() {
   else
     args+=(-device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  fi
-
-  if [ "${guest_os}" != "macos" ]; then
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
-           -chardev spicevmc,id=usbredirchardev1,name=usbredir
-           -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-           -chardev spicevmc,id=usbredirchardev2,name=usbredir
-           -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-           -chardev spicevmc,id=usbredirchardev3,name=usbredir
-           -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-           -device usb-ccid
-           -chardev spicevmc,id=ccid,name=smartcard
-           -device ccid-card-passthru,chardev=ccid
-           -device virtio-serial-pci
-           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
