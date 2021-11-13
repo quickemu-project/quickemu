@@ -191,6 +191,7 @@ function efi_vars() {
 }
 
 function vm_boot() {
+  local AUDIO_DEV=""
   local BALLOON="-device virtio-balloon"
   local BOOT_STATUS=""
   local CPU=""
@@ -591,6 +592,12 @@ function vm_boot() {
     echo " - CD-ROM:   ${fixed_iso}"
   fi
 
+  # Setup the appropriate audio device based on the display output
+  case ${OUTPUT} in
+    spice|spice-app|none) AUDIO_DEV="spice,id=audio0,out.mixing-engine=off";;
+    *) AUDIO_DEV="pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}";;
+  esac
+
   # Determine a sane resolution for Linux guests.
   if [ "${guest_os}" == "linux" ]; then
     local X_RES=1152
@@ -806,7 +813,7 @@ function vm_boot() {
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
          -device ${MOUSE},bus=input.0
-         -audiodev pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}
+         -audiodev ${AUDIO_DEV}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
          -spice ${SPICE}
