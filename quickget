@@ -89,6 +89,16 @@ function list_csv() {
   local OPTION
   local OS
   local RELEASE
+  local ZS=""
+  local DL=""
+
+# check if we have a zsync installed somewhere
+  ZS="$(which zsync)"
+  if  [ -x "${ZS}" ]; then
+    DL="zsync"
+  else
+    DL="wget"
+  fi
   echo "Display Name,OS,Release,Option,Downloader"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
@@ -106,13 +116,13 @@ function list_csv() {
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
       elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
-        DOWNLOADER="zsync"
+        DOWNLOADER="${DL}"
       else
         DOWNLOADER="wget"
       fi
@@ -597,24 +607,33 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
     FILE="${URL##*/}"
-    if [ -n "${3}" ]; then
-        OUT="${3}"
-    else
-        OUT="${FILE}"
-    fi
+    local ZS=""
 
-    if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
-      exit 1
-    fi
+# check if we have a zsync installed somewhere
+  ZS="$(which zsync)"
+    if  [ -x "${ZS}" ]; then
+      if [ -n "${3}" ]; then
+          OUT="${3}"
+      else
+          OUT="${FILE}"
+      fi
 
-    if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-        echo "ERROR! Failed to download ${URL}.zsync"
+      if ! mkdir -p "${DIR}" 2>/dev/null; then
+        echo "ERROR! Unable to create directory ${DIR}"
         exit 1
-    fi
+      fi
 
-    if [ -e "${DIR}/${OUT}.zs-old" ]; then
-        rm "${DIR}/${OUT}.zs-old"
+      if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+          echo "ERROR! Failed to download ${URL}.zsync"
+          exit 1
+      fi
+
+      if [ -e "${DIR}/${OUT}.zs-old" ]; then
+          rm "${DIR}/${OUT}.zs-old"
+      fi
+    else
+      echo "INFO: zsync not found, falling back to wget"
+      web_get "${ISO}"
     fi
 }
 
@@ -634,7 +653,10 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "archlinux" ]; then
+    if [ "${OS}" == "android" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
@@ -1390,7 +1412,9 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "archlinux" ]; then
+    if [ "${OS}" == "android" ]; then
+        releases_android
+    elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
