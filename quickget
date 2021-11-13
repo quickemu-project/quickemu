@@ -653,7 +653,10 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "archlinux" ]; then
+    if [ "${OS}" == "android" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
@@ -1409,7 +1412,9 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "archlinux" ]; then
+    if [ "${OS}" == "android" ]; then
+        releases_android
+    elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
