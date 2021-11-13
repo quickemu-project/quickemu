@@ -241,7 +241,7 @@ function vm_boot() {
   HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
 
   # A CPU with Intel VT-x / AMD SVM support is required
-  if [ "${HOST_CPU_VENDOR}" == "AuthenticIntel" ]; then
+  if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
     if ! check_cpu_flag vmx; then
       echo "ERROR! Intel VT-x support is required."
       exit 1
@@ -449,7 +449,7 @@ function vm_boot() {
       # A CPU with SSE4.1 support is required for >= macOS Sierra
       if check_cpu_flag sse4_1; then
         case ${HOST_CPU_VENDOR} in
-          AuthenticIntel)
+          GenuineIntel)
             CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
           AuthenticAMD|*)
             # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
