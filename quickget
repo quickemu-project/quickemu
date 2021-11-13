@@ -88,7 +88,9 @@ function list_csv() {
   local FUNC
   local OPTION
   local OS
+  local PNG
   local RELEASE
+  local SVG
   local ZS=""
   local DL=""
 
@@ -99,7 +101,7 @@ function list_csv() {
   else
     DL="wget"
   fi
-  echo "Display Name,OS,Release,Option,Downloader"
+  echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
@@ -111,6 +113,9 @@ function list_csv() {
     else
       FUNC="${OS}"
     fi
+    PNG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
+    SVG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+
 
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
@@ -129,14 +134,14 @@ function list_csv() {
 
       if [ "${OS}" == "windows" ]; then
         for OPTION in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       elif [ "${OS}" == "popos" ]; then
         for OPTION in intel nvidia; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER}"
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       else
-        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER}"
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
       fi
     done
   done
