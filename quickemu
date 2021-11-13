@@ -647,7 +647,7 @@ function vm_boot() {
 
   echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
 
-# Map Quickemu OUTPUT to QEMU -display
+  # Map Quickemu OUTPUT to QEMU -display
   case ${OUTPUT} in
     gtk)
       DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
