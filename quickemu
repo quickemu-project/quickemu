@@ -633,15 +633,12 @@ function vm_boot() {
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
-    # Tweak video device based on the guest macOS release.
     # Displays in System Preferences can be used to select a resolution if:
-    #  - qxl is used on Big Sur and Catalina
-    #  - VGA is used on Mojave, although available resolutions are all 4:3
+    #  - Mojave only offers 4:3 resolutions
     #  - High Sierra will run at the default 1920x1080 only.
-    case ${macos_release} in
-      catalina|big-sur|monterey) DISPLAY_DEVICE="qxl";;
-      *) DISPLAY_DEVICE="VGA";;
-    esac
+    # QXL prevents seamless mouse working with a SPICE client
+    #  - https://github.com/wimpysworld/quickemu/issues/222
+    DISPLAY_DEVICE="VGA"
   elif [ "${guest_os}" == "windows" ]; then
     DISPLAY_DEVICE="qxl-vga"
   else
