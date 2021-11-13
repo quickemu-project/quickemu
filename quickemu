@@ -494,7 +494,7 @@ function vm_boot() {
           ;;
       esac
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
-      GUEST_TWEAKS="-device isa-applesmc,osk=${OSK} -no-hpet -global kvm-pit.lost_tick_policy=discard"
+      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -device isa-applesmc,osk=${OSK}"
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
       fi
