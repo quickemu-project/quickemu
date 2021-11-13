@@ -835,6 +835,7 @@ function vm_boot() {
 
   if [ -n "${bridge}" ]; then
     # Enable bridge mode networking
+    # shellcheck disable=SC2054,SC2206
     args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
   else
     # shellcheck disable=SC2054,SC2206
@@ -909,6 +910,7 @@ function vm_boot() {
     args+=(-device ide-hd,drive=SystemDisk,bus=ahci.0,bootindex=0
           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
+    # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   fi
