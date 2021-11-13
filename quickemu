@@ -693,8 +693,9 @@ function vm_boot() {
 
   # Allocate VRAM to VGA devices
   case ${DISPLAY_DEVICE} in
-    bochs-display) VIDEO="${VIDEO},vgamem=134217728";;
-    ati-vga,cirrus,cirrus-vga,qxl,qxl-vga,VGA) VIDEO="${VIDEO},vgamem_mb=128";;
+    bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
+    qxl,qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
+    ati-vga,cirrus-vga,VGA) VIDEO="${VIDEO},vgamem_mb=64";;
   esac
 
   # Add fullscreen options
