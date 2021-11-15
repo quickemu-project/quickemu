@@ -506,10 +506,9 @@ function vm_boot() {
       fi
       GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
 
-      # Disable S3 support in the VM for Arch Linux to ensure Windows can boot with SecureBoot enabled
+      # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
       #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-      #  - https://github.com/wimpysworld/quickemu/issues/220
-      if [[ "${EFI_CODE}" == *"edk2-ovmf/OVMF_CODE.secboot.fd"* ]]; then
+      if [ "${secureboot}" == "on" ]; then
         GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
       fi
 
