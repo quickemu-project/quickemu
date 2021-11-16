@@ -267,9 +267,7 @@ function releases_opensuse(){
 function releases_oraclelinux() {
     echo 8.4 \
     8.3 \
-    8.2 \
-    7.9 \
-    7.8
+    8.2
 }
 
 function releases_macos() {
@@ -1049,11 +1047,8 @@ function get_oraclelinux() {
     
     local majorver=${RELEASE::1}
     local minorver=${RELEASE:2:1}
-    
   
     local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
-    echo $baseurl
-#   local baseurl="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/${arch}"
 
     validate_release "releases_oraclelinux"
 
