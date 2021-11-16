@@ -757,6 +757,10 @@ EOF
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
+        if [ "${OS}" == "oraclelinux"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
         if [ "${OS}" == "zorin"  ]; then
             case  ${RELEASE} in
               15education64|15edulite64|15edulite32)
@@ -1044,8 +1048,8 @@ function get_oraclelinux() {
 
     local arch="x86_64"
     
-    local majorver=${RELEASE,0,1}
-    local minorver=${RELEASE,2,1}
+    local majorver=${RELEASE::1}
+    local minorver=${RELEASE:2:1}
     
     echo $RELEASE
     echo $majorver
