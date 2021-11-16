@@ -1049,15 +1049,16 @@ function get_oraclelinux() {
     local minorver=${RELEASE:2:1}
   
     local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
-
+    local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
+    
     validate_release "releases_oraclelinux"
 
     ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
     URL="${baseurl}/${ISO}"
-#    HASH=$(wget -q -O- "${baseurl}/CHECKSUM" | grep "SHA256 (${ISO})" | grep -E -i -w -o '[0-9a-z]{64}')
+    HASH=$(wget -q -O- "${hashurl}" | cut -d' ' -f1)
 
     web_get "${URL}" "${VM_PATH}"
-#    check_hash "${ISO}" "${HASH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
