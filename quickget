@@ -1055,7 +1055,7 @@ function get_oraclelinux() {
 
     ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
     URL="${baseurl}/${ISO}"
-    HASH=$(wget -q -O- "${hashurl}" | cut -d' ' -f1)
+    HASH=$(wget -q -O- "${hashurl}" | grep "${ISO}" | cut -d' ' -f1)
 
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
