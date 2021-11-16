@@ -758,7 +758,7 @@ EOF
         fi
 
         if [ "${OS}" == "oraclelinux"  ]; then
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "zorin"  ]; then
