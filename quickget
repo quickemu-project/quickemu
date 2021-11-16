@@ -1051,10 +1051,7 @@ function get_oraclelinux() {
     local majorver=${RELEASE::1}
     local minorver=${RELEASE:2:1}
     
-    echo $RELEASE
-    echo $majorver
-    echo $minorver
-    
+  
     local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
     echo $baseurl
 #   local baseurl="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/${arch}"
@@ -1062,8 +1059,7 @@ function get_oraclelinux() {
     validate_release "releases_oraclelinux"
 
     ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
-    URL="https://yum.oracle.com/ISOS/OracleLinux/OL8/u4/x86_64/OracleLinux-R8-U4-x86_64-dvd.iso"
-#    URL="${baseurl}/${ISO}"
+    URL="${baseurl}/${ISO}"
 #    HASH=$(wget -q -O- "${baseurl}/CHECKSUM" | grep "SHA256 (${ISO})" | grep -E -i -w -o '[0-9a-z]{64}')
 
     web_get "${URL}" "${VM_PATH}"
