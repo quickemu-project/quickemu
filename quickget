@@ -1251,6 +1251,10 @@ function get_windows() {
       INDEX=1
     fi
 
+    if [ "${RELEASE}" -eq 11 ]; then
+      INDEX=1
+    fi
+
     echo "Getting Windows ${RELEASE} URL..."
     WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
     LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
