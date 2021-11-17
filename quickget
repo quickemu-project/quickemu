@@ -25,7 +25,7 @@
 
 function cleanup() {
   if [ -n "$(jobs -p)" ]; then
-    kill $(jobs -p)
+    kill "$(jobs -p)"
   fi
 }
 
@@ -774,16 +774,16 @@ function get_android() {
   validate_release "releases_android"
   fosshubVersionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
   version="android-x86-${RELEASE}"
-  releaseJson=$(echo ${fosshubVersionInfo:16} | jq --arg ver "${version}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+  releaseJson=$(echo "${fosshubVersionInfo:16}" | jq --arg ver "${version}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
 
   HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
   ISO=$(echo "${releaseJson}" | jq -r .n)
 
   baseurl="https://mirrors.gigenet.com/OSDN/android-x86/"
 
-  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E [0-9]{5} | uniq)
+  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E '[0-9]{5}' | uniq)
   for item in $releaseFolders; do
-    file=$(wget -O - -q ${baseurl}${item} | grep "${ISO}")
+    file=$(wget -O - -q "${baseurl}${item}" | grep "${ISO}")
     if [[ $file != "" ]]; then
       URL="${baseurl}${item}/${ISO}"
       break
@@ -951,8 +951,8 @@ function get_zorin() {
 
     validate_release "releases_zorin"
     # their redirector returns an href so we need to get that and parse out the iso
-    URL=$(curl -s https://zrn.co/${RELEASE} |cut -d\" -f2)
-    ISO=$(echo ${URL}| awk -F\/ ' {print $NF}')
+    URL=$(curl -s "https://zrn.co/${RELEASE}" |cut -d\" -f2)
+    ISO=$(echo "${URL}"| awk -F\/ ' {print $NF}')
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
@@ -1136,9 +1136,9 @@ function get_regolith() {
       2.0.0_hirsute)
         URL="${URL}regolith-linux-2.0-hirsute-latest";;
     esac
-    ISO="Regolith_"${RELEASE}".iso"
+    ISO="Regolith_${RELEASE}.iso"
     web_get "${URL}/${ISO}" "${VM_PATH}"
-    if [ -n $HASH ]; then
+    if [ -n "${HASH}" ]; then
       check_hash "${ISO}" "${HASH}"
     fi
     make_vm_config "${ISO}"
@@ -1217,7 +1217,7 @@ function get_garuda() {
     LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
     HASH_URL="$(wget -q -O- ${LATEST_URL})"
     ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
-    HASH=$(echo ${HASH_URL} | cut -d\  -f1)
+    HASH=$(echo "${HASH_URL}" | cut -d\  -f1)
     LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) #
     URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
 
@@ -1248,7 +1248,7 @@ function get_windows() {
     validate_release "releases_windows"
 
     # Ignore the most recent Windows 10 release for now.
-    if [ ${RELEASE} -eq 10 ]; then
+    if [ "${RELEASE}" -eq 10 ]; then
       INDEX=1
     fi
 
@@ -1321,7 +1321,7 @@ if [ -n "${1}" ]; then
         list_json
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
       whereIam=$(dirname "${BASH_SOURCE[0]}")
-      quickemu_version=$( ${whereIam}/quickemu --version)
+      quickemu_version=$( "${whereIam}"/quickemu --version)
       echo "Quickemu Version: ${quickemu_version}"
       exit 0
     fi
