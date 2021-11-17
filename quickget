@@ -267,7 +267,10 @@ function releases_opensuse(){
 function releases_oraclelinux() {
     echo 8.4 \
     8.3 \
-    8.2
+    8.2 \
+    7.9 \
+    7.8 \
+    7.7
 }
 
 function releases_macos() {
@@ -1043,18 +1046,23 @@ function get_oraclelinux() {
     local HASH=""
     local ISO=""
     local URL=""
-
+    
     local arch="x86_64"
     
+    validate_release "releases_oraclelinux"
+
     local majorver=${RELEASE::1}
     local minorver=${RELEASE:2:1}
   
     local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
     local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
-    
-    validate_release "releases_oraclelinux"
 
-    ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
+    if [ "${majorver}" == "8" ]; then
+        ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
+    else
+        ISO="OracleLinux-R${majorver}-U${minorver}-Server-${arch}-dvd.iso"
+    fi
+
     URL="${baseurl}/${ISO}"
     HASH=$(wget -q -O- "${hashurl}" | grep "${ISO}" | cut -d' ' -f1)
 
