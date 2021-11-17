@@ -113,8 +113,8 @@ function list_csv() {
     else
       FUNC="${OS}"
     fi
-    PNG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
-    SVG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+    PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
+    SVG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
 
     for RELEASE in $("releases_${FUNC}"); do
