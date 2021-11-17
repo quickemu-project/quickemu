@@ -284,7 +284,8 @@ function releases_regolith() {
 
 
 function releases_rockylinux() {
-    echo 8.4 \
+    echo 8.5 \
+    8.4 \
     8.3 \
     8.2 \
     8.1 \
