@@ -31,6 +31,7 @@ comprehensive support for macOS and Windows**.
   * **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
   * **Windows** 8.1, 10 and 11 including TPM 2.0
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
+  * [Debian](https://www.debian.org/) (bullseye with all the official and non-free DE variants)
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
   * [Arch Linux](https://www.archlinux.org/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
