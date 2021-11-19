@@ -151,6 +151,7 @@ function list_csv() {
 function os_support() {
     echo android \
     archlinux \
+    debian \
     elementary \
     freebsd \
     fedora \
@@ -195,6 +196,18 @@ function releases_android() {
 
 function releases_archlinux() {
     echo latest
+}
+
+# later refactor these DE variants like languages and avoid the arch ?
+function releases_debian() {
+    echo 11.1.0-amd64-cinnamon \
+    11.1.0-amd64-gnome \
+    11.1.0-amd64-kde \
+    11.1.0-amd64-lxde \
+    11.1.0-amd64-lxqt \
+    11.1.0-amd64-mate \
+    11.1.0-amd64-standard \
+    11.1.0-amd64-xfce
 }
 
 function releases_elementary() {
@@ -665,6 +678,9 @@ function make_vm_config() {
     elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "debian" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -805,6 +821,24 @@ function get_archlinux() {
     URL="https://mirror.rackspace.com/archlinux/iso/${VERSION}"
     ISO="archlinux-${VERSION}-x86_64.iso"
     HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+
+function get_debian() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASHLINE=""
+
+    validate_release "releases_debian"
+    URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid"
+    HASHLINE=$(wget -q -O- ${URL}/SHA512SUMS |grep ${RELEASE}.iso)
+    ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
+    HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
@@ -1339,6 +1373,8 @@ if [ -n "${2}" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
+    elif [ "${OS}" == "debian" ]; then
+        get_debian
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
@@ -1426,6 +1462,8 @@ else
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
+    elif [ "${OS}" == "debian" ]; then
+        releases_debian
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
