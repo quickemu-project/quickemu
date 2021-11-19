@@ -174,6 +174,7 @@ preferred flavour.
 `quickget` also supports:
 
   * `archlinux`
+  * `debian`
   * `elementary`
   * `fedora`
   * `garuda`
