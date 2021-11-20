@@ -581,6 +581,11 @@ function unattended_windows() {
           <Description>Install spice-vdagent SPICE agent</Description>
           <Order>4</Order>
         </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
+          <Description>Disable Hibernation</Description>
+          <Order>5</Order>
+        </SynchronousCommand>
       </FirstLogonCommands>
     </component>
   </settings>
