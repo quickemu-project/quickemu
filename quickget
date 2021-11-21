@@ -39,6 +39,7 @@ function pretty_name() {
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
+    cachyos)            PRETTY_NAME="CachyOS";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
@@ -126,6 +127,8 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
         DOWNLOADER="${DL}"
+      elif [ "${OS}" == "cachyos" ]; then
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="${DL}"
       else
@@ -155,6 +158,7 @@ function os_support() {
     freebsd \
     fedora \
     garuda \
+    cachyos \
     kali \
     kdeneon \
     kubuntu \
@@ -227,6 +231,10 @@ function releases_garuda() {
     xfce \
     mate \
     cinnamon
+}
+
+function releases_cachyos() {
+    echo 2021.11.10
 }
 
 function releases_kali() {
@@ -680,6 +688,9 @@ function make_vm_config() {
     elif [ "${OS}" == "garuda" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "cachyos" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -738,6 +749,10 @@ EOF
 
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "cachyos"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "garuda"  ]; then
@@ -807,6 +822,19 @@ function get_archlinux() {
     HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_cachyos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_cachyos"
+    ISO="cachyos-cli-${RELEASE}-x86_64.iso"
+    URL="https://deac-fra.dl.sourceforge.net/project/cachyos-arch/cli-installer"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
 
@@ -1349,6 +1377,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "garuda" ]; then
         get_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        get_cachyos
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1434,6 +1464,8 @@ else
         releases_fedora
     elif [ "${OS}" == "garuda" ]; then
         releases_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        releases_cachyos
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
