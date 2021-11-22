@@ -36,10 +36,10 @@ function pretty_name() {
   case ${SIMPLE_NAME} in
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    cachyos)            PRETTY_NAME="CachyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
-    cachyos)            PRETTY_NAME="CachyOS";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
@@ -125,9 +125,9 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="${DL}"
-      elif [ "${OS}" == "garuda" ]; then
-        DOWNLOADER="${DL}"
       elif [ "${OS}" == "cachyos" ]; then
+        DOWNLOADER="${DL}"
+      elif [ "${OS}" == "garuda" ]; then
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="${DL}"
@@ -154,11 +154,11 @@ function list_csv() {
 function os_support() {
     echo android \
     archlinux \
+    cachyos \
     elementary \
     freebsd \
     fedora \
     garuda \
-    cachyos \
     kali \
     kdeneon \
     kubuntu \
@@ -201,6 +201,10 @@ function releases_archlinux() {
     echo latest
 }
 
+function releases_cachyos() {
+    echo 2021.11.10
+}
+
 function releases_elementary() {
     echo 6.0
 }
@@ -231,10 +235,6 @@ function releases_garuda() {
     xfce \
     mate \
     cinnamon
-}
-
-function releases_cachyos() {
-    echo 2021.11.10
 }
 
 function releases_kali() {
@@ -673,6 +673,9 @@ function make_vm_config() {
     elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "cachyos" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -686,9 +689,6 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "garuda" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "cachyos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
