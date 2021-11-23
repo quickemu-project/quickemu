@@ -833,7 +833,7 @@ function get_cachyos() {
 
     validate_release "releases_cachyos"
     ISO="cachyos-cli-${RELEASE}-x86_64.iso"
-    URL="https://deac-fra.dl.sourceforge.net/project/cachyos-arch/cli-installer"
+    URL="https://mirror.cachyos.org/ISO"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
