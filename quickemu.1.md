@@ -35,19 +35,19 @@ You can also pass optional parameters
   **--ignore-msrs-always**
   : Configure KVM to always ignore unhandled machine-specific registers
 
-  **--screen** <screen>
+  **--screen \<screen\>**
   : Use specified screen to determine the window size.
 
   **--shortcut**
   : Create a desktop shortcut
 
-  **--snapshot apply** <tag>
+  **--snapshot apply \<tag\>**
   : Apply/restore a snapshot.
 
-  **--snapshot create** <tag>
+  **--snapshot create \<tag\>**
   : Create a snapshot.
 
-  **--snapshot delete** <tag>
+  **--snapshot delete \<tag\>**
   : Delete a snapshot.
 
   **--snapshot info**
