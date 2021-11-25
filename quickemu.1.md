@@ -683,4 +683,4 @@ Submit bug reports online at: <https://github.com/quickemu-project/quickemu/issu
 # SEE ALSO
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickget(1), quickgui(1)
+quickemu_conf(1),quickget(1), quickgui(1)
