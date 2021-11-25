@@ -3,12 +3,12 @@ title: quickemu
 section: 1
 header: Quickemu User Manual
 footer: quickemu ${VERSION}
-date: Novemner 25, 2021
+date: November 25, 2021
 author: Martin Wimpress
 ---
 
 # NAME
-quickemu - Hello world type program for greeting someone.
+quickemu - A quick VM builder and manager
 
 # SYNOPSIS
 **quickemu** [*OPTION*]...
