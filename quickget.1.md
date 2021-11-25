@@ -1,5 +1,5 @@
 ---
-title: quickget
+title: QUICKGET
 section: 1
 header: quickget User Manual
 footer: quickget ${VERSION}

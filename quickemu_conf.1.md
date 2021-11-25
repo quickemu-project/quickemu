@@ -1,5 +1,5 @@
 ---
-title: quickemu_conf
+title: QUICKEMU_CONF
 section: 1
 header: Quickemu Configuration Manual
 footer: quickemu_conf ${VERSION}

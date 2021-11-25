@@ -1,5 +1,5 @@
 ---
-title: quickemu
+title: QUICKEMU
 section: 1
 header: Quickemu User Manual
 footer: quickemu ${VERSION}
