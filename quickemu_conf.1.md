@@ -9,7 +9,7 @@ author: Martin Wimpress
 
 # NAME
 
-quickemu_conf - Options and parameters in the quickemu <vm>.conf
+quickemu_conf - Options and parameters in the quickemu \<vm\>.conf
 
 # DESCRIPTION
 
@@ -18,8 +18,9 @@ macOS and Windows.  It uses sensible defaults, but many configuration options ca
 
 # OPTIONS
 
-These are the options and defaults for the <vm>.conf file
-```
+These are the options and defaults for the \<vm\>.conf file
+
+```bash
 # Lowercase variables are used in the VM config file only
 boot="efi"
 bridge=""
@@ -39,20 +40,6 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 ```
-<!-- /*
-CONFIGURATION
-EXIT STATUS
-RETURN VALUE
-ERRORS
-ENVIRONMENT
-FILES
-#VERSIONS
-CONFORMING TO
-NOTES
-BUGS
-AUTHORS
-SEE ALSO
-*/ -->
 
 # EXAMPLES
 
@@ -195,7 +182,6 @@ Since Quickemu 2.2.0 a software emulated TPM device can be added to guest
 virtual machines. Just add `tpm="on"` to your VM configuration. `quickget` will
 automatically add this line to Windows 11 virtual machines.
 
-
 # AUTHORS
 
 Written by Martin Wimpress.
@@ -208,4 +194,4 @@ Submit bug reports online at: <https://github.com/quickemu-project/quickemu/issu
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickget(1), quickemu(1), quickgui(1)
+quickget(1), quickemu(1), quickgui(1

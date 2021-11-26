@@ -32,6 +32,7 @@ quickget - download and prepare materials for building a quickemu VM
 if insufficient input is provided a list of missing options will be reported and the script will exit.  Variants may not apply and will be defaulted if not provided.
 
 # NOTES
+
 ## Ubuntu Guest
 
 `quickget` will automatically download an Ubuntu release and create the
@@ -210,6 +211,7 @@ tpm="on"
 quickget freebsd 13_0
 quickemu --vm freebsd-13_0.conf
 ```
+
 # AUTHORS
 
 Written by Martin Wimpress.
