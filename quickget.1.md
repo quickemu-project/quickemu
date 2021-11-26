@@ -2,8 +2,8 @@
 title: QUICKGET
 section: 1
 header: quickget User Manual
-footer: quickget ${VERSION}
-date: November 25, 2021
+footer: quickget
+date: November 26, 2021
 author: Martin Wimpress
 ---
 

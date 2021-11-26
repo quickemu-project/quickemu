@@ -2,8 +2,8 @@
 title: QUICKEMU
 section: 1
 header: Quickemu User Manual
-footer: quickemu ${VERSION}
-date: November 25, 2021
+footer: quickemu
+date: November 26, 2021
 author: Martin Wimpress
 ---
 
