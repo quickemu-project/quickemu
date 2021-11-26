@@ -30,24 +30,6 @@ quickget - download and prepare materials for building a quickemu VM
 **[OS] [Release] [Variant]**
 : specify the OS and release (and optional variant)
 if insufficient input is provided a list of missing options will be reported and the script will exit.  Variants may not apply and will be defaulted if not provided.
-<!-- /*
-
-# FILES
-: <os-version.conf>
-: configuration file for VM
-CONFIGURATION
-EXIT STATUS
-RETURN VALUE
-ERRORS
-ENVIRONMENT
-FILES
-VERSIONS
-CONFORMING TO
-NOTES
-BUGS
-AUTHORS
-SEE ALSO
-*/ -->
 
 # NOTES
 ## Ubuntu Guest
