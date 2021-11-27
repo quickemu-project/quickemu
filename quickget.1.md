@@ -17,7 +17,7 @@ quickget - download and prepare materials for building a quickemu VM
 
 # DESCRIPTION
 
-**quickget** will download the requisite materials and repare a configuration for `quickemu` to use to build and run
+**quickget** will download the requisite materials and prepare a configuration for `quickemu` to use to build and run
 
 # OPTIONS
 
