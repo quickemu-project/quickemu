@@ -38,6 +38,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    gentoo)             PRETTY_NAME="Gentoo";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
@@ -155,6 +156,7 @@ function os_support() {
     freebsd \
     fedora \
     garuda \
+    gentoo \
     kali \
     kdeneon \
     kubuntu \
@@ -210,6 +212,10 @@ function releases_fedora(){
     echo 33 \
     34 \
     35
+}
+
+function releases_gentoo(){
+    echo latest
 }
 
 function releases_garuda() {
@@ -679,6 +685,9 @@ function make_vm_config() {
     elif [ "${OS}" == "garuda" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "gentoo" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -863,6 +872,21 @@ function get_fedora() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+}
+
+function get_gentoo() {
+         local HASH=""
+         local ISO=""
+         local URL=""
+
+         validate_release "releases_gentoo"
+         ISO="gentoo-${RELEASE}-amd64.iso"
+         URL="https://www.gentoo.org/download/${ISO}"
+         web_get "${URL}" "${VM_PATH}"
+         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
+         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+         check_hash "${ISO}" "${HASH}"
+         make_vm_config "${ISO}"
 }
 
 function get_kali() {
@@ -1344,6 +1368,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "garuda" ]; then
         get_garuda
+    elif [ "${OS}" == "gentoo" ]; then
+        get_gentoo
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1429,6 +1455,8 @@ else
         releases_fedora
     elif [ "${OS}" == "garuda" ]; then
         releases_garuda
+    elif [ "${OS}" == "gentoo" ]; then
+        releases_gentoo
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
