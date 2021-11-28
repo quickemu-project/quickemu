@@ -114,8 +114,8 @@ function list_csv() {
     else
       FUNC="${OS}"
     fi
-    PNG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
-    SVG="https://lukewh.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+    PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
+    SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
 
     for RELEASE in $("releases_${FUNC}"); do
@@ -290,7 +290,8 @@ function releases_regolith() {
 
 
 function releases_rockylinux() {
-    echo 8.4 \
+    echo 8.5 \
+    8.4 \
     8.3 \
     8.2 \
     8.1 \
@@ -1272,6 +1273,10 @@ function get_windows() {
 
     # Ignore the most recent Windows 10 release for now.
     if [ ${RELEASE} -eq 10 ]; then
+      INDEX=1
+    fi
+
+    if [ "${RELEASE}" -eq 11 ]; then
       INDEX=1
     fi
 
