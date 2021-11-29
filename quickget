@@ -127,6 +127,8 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
         DOWNLOADER="${DL}"
+      elif [ "${OS}" == "gentoo" ]; then
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="${DL}"
       else
@@ -876,18 +878,24 @@ function get_fedora() {
 }
 
 function get_gentoo() {
-         local HASH=""
-         local ISO=""
-         local URL=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local LOCAT=""
+    local INSTALLMIN=""
 
-         validate_release "releases_gentoo"
-         ISO="gentoo-${RELEASE}-amd64.iso"
-         URL="https://www.gentoo.org/download/${ISO}"
-         web_get "${URL}" "${VM_PATH}"
-         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
-         check_hash "${ISO}" "${HASH}"
-         make_vm_config "${ISO}"
+    validate_release "releases_gentoo"
+    eval $( wget  -O/tmp/gentoolatest https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/${RELEASE}-iso.txt 2>&1 |grep Location | awk '{print "LOCAT="$2}' )
+    LOCAT=$(dirname ${LOCAT})
+    eval $( awk '/admincd-amd64/ {print "ADMIN="$1}; /install-amd64-minimal/ {print "INSTALLMIN="$1}' /tmp/gentoolatest )
+    URL="${LOCAT}/${INSTALLMIN}"
+    ISO=$(basename "${INSTALLMIN}" )
+
+
+    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- ${LOCAT}/${INSTALLMIN}.DIGESTS|grep -e iso|grep  -v -e CONT -e catalyst|cut -d\  -f1)
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_kali() {
