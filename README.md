@@ -177,6 +177,7 @@ preferred flavour.
   * `elementary`
   * `fedora`
   * `garuda`
+  * 'gentoo'
   * `kali`
   * `linuxmint-cinnamon`
   * `linuxmint-mate`
