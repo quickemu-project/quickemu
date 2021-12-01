@@ -1,0 +1,23 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+# AlmaLinux-8.5-x86_64-boot.iso: 773849088 bytes
+SHA256 (AlmaLinux-8.5-x86_64-boot.iso) = 65b3b4c17ce322081e2d743ee420b37b7213f4b14d2ec4f3c4f026d57aa148ec
+# AlmaLinux-8.5-x86_64-dvd.iso: 10627317760 bytes
+SHA256 (AlmaLinux-8.5-x86_64-dvd.iso) = 54b8881bebd924e4699ed12634187a82156fdb0fa57ec24058d04d70d2f033b3
+# AlmaLinux-8.5-x86_64-minimal.iso: 2085617664 bytes
+SHA256 (AlmaLinux-8.5-x86_64-minimal.iso) = fddb5646627aecc572127ecf0b5a3b2b6dd4435f1a1b5ad42013c7fa1bff8ca8
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQGcBAEBCAAGBQJhjVKlAAoJEFHWZH7CGtbq1ysL/1wk/eXeQzeJ0Gs2UMrhgmbF
+ylcbUmtGvon/OaCvXcCYyqIi8Pr4KnjFd46Uf98HYMm7X8SoZ29wRMhNCl7S6ktk
+f26+Q9HjHGzt+4FlIOhrN4vFk+az6h6wiq8YDWqqPvVud8v/QqfdwqMO2Ko+w8ur
+iM4DUv6hbsxA9xkdxMIXLegm8s25FR3XO+NYnwW2n6E7HlCD1mTqYdiMhvZz6Mfn
+BFja/L8LW8YH5THCnLFP6sgmH1K/61t5a9RRVJBMD7x36J3G3dytOMfLEmVXTrVe
+ZymCYElhQyU5smP26MBXpsv/nUzN/rhbqcjCdoLWTey91gnyDZ5BdftRPdkYmRJN
+AGzhHKDzbycpCV81f19yUSiaPvq2y127mtHFxvFSEe/IJ4HbbuWYah0tIl6v/oMI
+veJ+YRcleEIZx4E/Wr7ZBD/MT/kdaArN7A/Z1MgszWvmJGgQXWr+OR+WmrIiJe1N
+MUtH6XSIszcvTNEH8fmUAqKXmNrfCR42DW4EsE9OPg==
+=qcID
+-----END PGP SIGNATURE-----
