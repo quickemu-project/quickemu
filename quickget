@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
@@ -25,7 +26,7 @@
 
 function cleanup() {
   if [ -n "$(jobs -p)" ]; then
-    kill $(jobs -p)
+    kill "$(jobs -p)"
   fi
 }
 
@@ -34,6 +35,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
+    alma)               PRETTY_NAME="Alma Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
@@ -149,7 +151,8 @@ function list_csv() {
 }
 
 function os_support() {
-    echo android \
+    echo alma \
+    android \
     archlinux \
     elementary \
     freebsd \
@@ -180,6 +183,12 @@ function os_support() {
     windows \
     xubuntu \
     zorin
+}
+
+function releases_alma() {
+    # consider flavours for boot and dvd as well as
+    echo 8.4 \
+    8.5
 }
 
 function releases_android() {
@@ -659,7 +668,10 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "android" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "archlinux" ]; then
@@ -781,7 +793,7 @@ function get_android() {
 
   baseurl="https://mirrors.gigenet.com/OSDN/android-x86/"
 
-  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E [0-9]{5} | uniq)
+  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E "[0-9]{5}" | uniq)
   for item in $releaseFolders; do
     file=$(wget -O - -q ${baseurl}${item} | grep "${ISO}")
     if [[ $file != "" ]]; then
@@ -794,6 +806,29 @@ function get_android() {
   make_vm_config "${ISO}"
 }
 
+function get_alma() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+    local isotype=""
+
+    validate_release "releases_alma"
+
+    isotype="minimal" # fix her for now, choose minimal, boot or dvd later
+
+    # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
+    # We'll just grab the first
+
+    URL=$(wget -qq -O- https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
+
+
+    ISO=AlmaLinux-${RELEASE}-x86_64-${isotype}.iso
+    HASH="$(wget -q -O-  ${URL}/CHECKSUM|grep \(${ISO}|cut -d\   -f4)"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -1136,9 +1171,9 @@ function get_regolith() {
       2.0.0_hirsute)
         URL="${URL}regolith-linux-2.0-hirsute-latest";;
     esac
-    ISO="Regolith_"${RELEASE}".iso"
+    ISO="Regolith_${RELEASE}.iso"
     web_get "${URL}/${ISO}" "${VM_PATH}"
-    if [ -n $HASH ]; then
+    if [ -n "$HASH" ]; then
       check_hash "${ISO}" "${HASH}"
     fi
     make_vm_config "${ISO}"
@@ -1335,7 +1370,9 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
 
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+        get_alma
+    elif [ "${OS}" == "android" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
@@ -1422,7 +1459,9 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+        releases_alma
+    elif [ "${OS}" == "android" ]; then
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
