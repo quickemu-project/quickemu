@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title></title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/ico" href="/static/images/fav/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/fav/favicon-16x16.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha256-YvdLHPgkqJ8DVUxjjnGVlMMJtNimJ6dYkowFFvp4kKs="
+          crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/datatables@1.10.18/media/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            padding-top: 65px;
+            padding-bottom: 35px;
+            font-size: 16px !important;
+            color: #2c3e50;
+        }
+        .table {
+            border-color: #dee2e6;
+            border-top: 1px solid #212529;
+        }
+        .table td,
+        .table th {
+            width: 1px !important;
+        }
+        h1 {
+            font-weight: 600 !important;
+        }
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting:before,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_asc:before,
+        table.dataTable thead .sorting_asc_disabled:after,
+        table.dataTable thead .sorting_asc_disabled:before,
+        table.dataTable thead .sorting_desc:after,
+        table.dataTable thead .sorting_desc:before,
+        table.dataTable thead .sorting_desc_disabled:after,
+        table.dataTable thead .sorting_desc_disabled:before {
+            bottom: .5em;
+        }
+        @media (min-width: 1400px) {
+            .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                max-width: 1600px;
+            }
+        }
+    </style>
+
+    
+    <link rel="icon" type="image/ico" href="/static/favicon.ico">
+    
+  </head>
+  <body>
+    
+    
+    
+
+    
+    
+    <nav class="navbar navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/static/images/logo.png"
+                 alt="AlmaLinux logo"
+                 width="32"
+                 height="32"
+                 class="d-inline-block align-text-top">
+        </a>
+        <div class="navbar-nav flex-row-reverse">
+            <span class="nav-item">
+                <a class="nav-link link-secondary"
+                   href="https://github.com/AlmaLinux/"
+                   target="_blank">
+                    GitHub <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                </a>
+            </span>
+            <span class="nav-item">
+    &nbsp;
+    &nbsp;
+    &nbsp;
+</span>
+            <span class="nav-item">
+                <a class="nav-link link-secondary"
+                   href="https://bugs.almalinux.org/"
+                   target="_blank">
+                    Bugs <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                </a>
+            </span>
+            <span class="nav-item">
+    &nbsp;
+    &nbsp;
+    &nbsp;
+</span>
+            <span class="nav-item">
+                <a class="nav-link link-secondary"
+                   href="https://blog.almalinux.org/"
+                   target="_blank">
+                    Blog <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                </a>
+            </span>
+            <span class="nav-item">
+    &nbsp;
+    &nbsp;
+    &nbsp;
+</span>
+            <span class="nav-item">
+                <a class="nav-link link-secondary"
+                   href="https://almalinux.org/"
+                   target="_blank">
+                    Home <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                </a>
+            </span>
+        </div>
+    </div>
+</nav>
+
+    <!--Override old scripts-->
+    
+    
+
+    <div class="container-sm">
+        <div class="justify-content-center container-sm">
+            <div class="col-sm">
+                &nbsp;
+            </div>
+            <div class="col-sm">
+                <h1>AlmaLinux ISOs links</h1>
+                <p class="lead">
+                
+
+                
+        You can find the list of available AlmaLinux architectures and versions below.
+        <br>
+        Also you can use a BitTorrent file for downloading ISOs. It might be faster than direct downloading from the mirrors.
+        <br>
+        A .torrent file can be found on all mirrors in the folder with ISO files.
+        <br>
+        
+            <h3>The following mirrors are nearest to you:</h3>
+            <ul>
+                
+                    <li>
+                        <a href="http://mirrors.gethosted.online/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirrors.gethosted.online <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirrors.coreix.net/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirrors.coreix.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://uk.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            uk.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirror.netweaver.uk/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirror.netweaver.uk <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://lon.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            lon.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://almalinux.mirror.katapult.io/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            almalinux.mirror.katapult.io <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirrors.melbourne.co.uk/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirrors.melbourne.co.uk <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirror.cov.ukservers.com/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirror.cov.ukservers.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirror.tvk.rwth-aachen.de/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirror.tvk.rwth-aachen.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+                    <li>
+                        <a href="http://mirror.dogado.de/almalinux/8.5/isos/x86_64"
+                           target="_blank"
+                           class="link-success text-decoration-none">
+                            mirror.dogado.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                        </a>
+                        <br>
+                    </li>
+                
+            </ul>
+            <h3>You can also choose from full list of mirrors:</h3>
+        
+
+                </p>
+                <blockquote class="blockquote text-center">
+                
+                
+                </blockquote>
+                <p class="lead">
+                
+                
+                </p>
+                
+
+                
+    <table id="dtBasic" class="table table-striped table-bordered table-responsive-sm" data-order='[[ 0, "asc" ]]'>
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Links</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+                <tr>
+                    <td>NL</td>
+                    <td>
+                        
+                            <a href="http://mirror.lyrahosting.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.lyrahosting.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.nl.altushost.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.nl.altushost.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.mirror.liteserver.nl/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.mirror.liteserver.nl <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.nforce.com/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.nforce.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.mijn.host/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.mijn.host <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.previder.nl/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.previder.nl <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.wd6.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.wd6.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.mvps.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.mvps.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://nl.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                nl.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.nl.fusioned.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.nl.fusioned.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.serverion.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.serverion.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>ZA</td>
+                    <td>
+                        
+                            <a href="http://almalinux-mirror.datakeepers.co.za/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux-mirror.datakeepers.co.za <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>BD</td>
+                    <td>
+                        
+                            <a href="http://mirrors.hostever.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.hostever.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.xeonbd.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.xeonbd.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>CN</td>
+                    <td>
+                        
+                            <a href="http://mirrors.nju.edu.cn/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.nju.edu.cn <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="https://mirror.sjtu.edu.cn/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.sjtu.edu.cn <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.aliyun.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.aliyun.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>HK</td>
+                    <td>
+                        
+                            <a href="http://hkg.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                hkg.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>ID</td>
+                    <td>
+                        
+                            <a href="http://mirror.herza.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.herza.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.antmediahost.com/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.antmediahost.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.dewabiz.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.dewabiz.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.amscloud.co.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.amscloud.co.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cloudweeb.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cloudweeb.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cepatcloud.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cepatcloud.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.repository.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.repository.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.telkomuniversity.ac.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.telkomuniversity.ac.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://vpsmurah.jagoanhosting.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                vpsmurah.jagoanhosting.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://dinosaurus.fleksibel.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                dinosaurus.fleksibel.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.triputramedia.id/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.triputramedia.id <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>IL</td>
+                    <td>
+                        
+                            <a href="http://mirrors.ereznet.co.il/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.ereznet.co.il <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://alma.intercloud.co.il/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                alma.intercloud.co.il <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>IN</td>
+                    <td>
+                        
+                            <a href="http://bom.mirror.leapswitch.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                bom.mirror.leapswitch.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://repo.extreme-ix.org/alma/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                repo.extreme-ix.org <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>JP</td>
+                    <td>
+                        
+                            <a href="http://ftp.iij.ad.jp/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.iij.ad.jp <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.yz.yamagata-u.ac.jp/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.yz.yamagata-u.ac.jp <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.jaist.ac.jp/pub/Linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.jaist.ac.jp <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.riken.jp/Linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.riken.jp <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.sakura.ad.jp/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.sakura.ad.jp <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.almalinux.asia/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.almalinux.asia <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>KR</td>
+                    <td>
+                        
+                            <a href="http://ftp.yjsoft.xyz/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.yjsoft.xyz <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.misakamikoto.network/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.misakamikoto.network <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>MY</td>
+                    <td>
+                        
+                            <a href="http://mirrors.ipserverone.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.ipserverone.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://repo.shinjiru.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                repo.shinjiru.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>SG</td>
+                    <td>
+                        
+                            <a href="http://almalinux.secureax.com/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.secureax.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.soonkeat.sg/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.soonkeat.sg <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>TH</td>
+                    <td>
+                        
+                            <a href="http://mirror.kku.ac.th/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.kku.ac.th <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>TR</td>
+                    <td>
+                        
+                            <a href="http://mirror.domainhizmetleri.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.domainhizmetleri.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.hosting.com.tr/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.hosting.com.tr <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.vargonen.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.vargonen.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.verinomi.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.verinomi.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>VN</td>
+                    <td>
+                        
+                            <a href="http://mirrors.bkns.vn/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.bkns.vn <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.cloudfly.vn/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.cloudfly.vn <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.inet.vn/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.inet.vn <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>AT</td>
+                    <td>
+                        
+                            <a href="http://mirror.alwyzon.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.alwyzon.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>BE</td>
+                    <td>
+                        
+                            <a href="https://mirror.eyet.hosting/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.eyet.hosting <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>BG</td>
+                    <td>
+                        
+                            <a href="http://mirror.host.ag/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.host.ag <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.uni-ruse.bg/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.uni-ruse.bg <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>CH</td>
+                    <td>
+                        
+                            <a href="http://mirror.ch.altushost.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.ch.altushost.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://danweb2.dsteiner.ch/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                danweb2.dsteiner.ch <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>CZ</td>
+                    <td>
+                        
+                            <a href="https://mirror.karneval.cz/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.karneval.cz <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>DE</td>
+                    <td>
+                        
+                            <a href="http://almalinux.li/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.li <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://de.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                de.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.fau.de/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.fau.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.23m.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.23m.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.alpha-labs.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.alpha-labs.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.dogado.de/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.dogado.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.gwdg.de/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.gwdg.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.hs-esslingen.de/Mirrors/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.hs-esslingen.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://ftp.uni-bayreuth.de/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.uni-bayreuth.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.netzwerge.de/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.netzwerge.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://repo.almalinux.org/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                repo.almalinux.org <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.tvk.rwth-aachen.de/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.tvk.rwth-aachen.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.xtom.de/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.xtom.de <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>DK</td>
+                    <td>
+                        
+                            <a href="http://mirror.dk.team.blue/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.dk.team.blue <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.fysik.dtu.dk/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.fysik.dtu.dk <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>FI</td>
+                    <td>
+                        
+                            <a href="http://www.nic.funet.fi/pub/mirrors/almalinux.org/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                nic.funet.fi <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>FR</td>
+                    <td>
+                        
+                            <a href="http://mirror.almalinux.ikoula.com/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.almalinux.ikoula.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.crexio.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.crexio.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://alma.mirror.ate.info/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                alma.mirror.ate.info <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>GB</td>
+                    <td>
+                        
+                            <a href="http://lon.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                lon.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.mirror.katapult.io/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.mirror.katapult.io <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cov.ukservers.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cov.ukservers.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.gethosted.online/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.gethosted.online <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.netweaver.uk/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.netweaver.uk <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.coreix.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.coreix.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.melbourne.co.uk/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.melbourne.co.uk <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://uk.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                uk.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>GR</td>
+                    <td>
+                        
+                            <a href="http://mirror.ath1.fusioned.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.ath1.fusioned.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>HU</td>
+                    <td>
+                        
+                            <a href="http://ftp.bme.hu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.bme.hu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.mikrovps.hu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.mikrovps.hu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.niif.hu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.niif.hu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.sth.sze.hu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.sth.sze.hu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>IE</td>
+                    <td>
+                        
+                            <a href="http://mirror.webworld.ie/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.webworld.ie <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>NO</td>
+                    <td>
+                        
+                            <a href="http://mirror.terrahost.no/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.terrahost.no <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.uib.no/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.uib.no <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>PL</td>
+                    <td>
+                        
+                            <a href="http://almalinux.slaskdatacenter.com/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.slaskdatacenter.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>PT</td>
+                    <td>
+                        
+                            <a href="http://mirrors.pt/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.pt <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.ptisp.pt/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.ptisp.pt <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>RO</td>
+                    <td>
+                        
+                            <a href="http://ftp.lug.ro/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.lug.ro <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.chroot.ro/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.chroot.ro <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.hostico.ro/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.hostico.ro <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.layerbridge.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.layerbridge.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.selfnet.org/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.selfnet.org <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>RS</td>
+                    <td>
+                        
+                            <a href="http://almalinux.unlimited.rs/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.unlimited.rs <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>RU</td>
+                    <td>
+                        
+                            <a href="http://mirror.reconn.ru/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.reconn.ru <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.yandex.ru/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.yandex.ru <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>SI</td>
+                    <td>
+                        
+                            <a href="http://ftp.arnes.si/mirrors/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ftp.arnes.si <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.almalinux.si/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.almalinux.si <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>UA</td>
+                    <td>
+                        
+                            <a href="http://almalinux.netforce.hosting/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.netforce.hosting <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.ip-connect.info/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.ip-connect.info <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.ip-connect.vn.ua/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.ip-connect.vn.ua <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.vsys.host/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.vsys.host <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>CA</td>
+                    <td>
+                        
+                            <a href="http://dist-mirror.fibernetics.ca/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                dist-mirror.fibernetics.ca <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.csclub.uwaterloo.ca/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.csclub.uwaterloo.ca <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.esecuredata.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.esecuredata.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.12z.eu/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.12z.eu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>US</td>
+                    <td>
+                        
+                            <a href="http://ash.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                ash.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cogentco.com/pub/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cogentco.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://iad.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                iad.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.nyc.velocihost.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.nyc.velocihost.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://atl.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                atl.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://atl.mirrors.knownhost.com/linux/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                atl.mirrors.knownhost.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.gigenet.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.gigenet.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cloudpropeller.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cloudpropeller.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://dal.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                dal.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux-mirror.tpa.hivelocity.net/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux-mirror.tpa.hivelocity.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.mia.velocihost.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.mia.velocihost.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://dfw.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                dfw.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.almalinux.dal01.readydedis.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.almalinux.dal01.readydedis.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.interserver.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.interserver.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux-mirror.dal1.hivelocity.net/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux-mirror.dal1.hivelocity.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.chpc.utah.edu/pub/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.chpc.utah.edu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.nodespace.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.nodespace.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.siena.edu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.siena.edu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://la.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                la.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.hostduplex.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.hostduplex.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.mirrors.as212647.net/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.mirrors.as212647.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.team-cymru.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.team-cymru.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.steadfastnet.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.steadfastnet.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.vtti.vt.edu/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.vtti.vt.edu <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.almalinux.ams01.readydedis.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.almalinux.ams01.readydedis.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.phx1.us.spryservers.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.phx1.us.spryservers.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="https://mirrors-nyj.hawkhost.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors-nyj.hawkhost.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://nyc.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                nyc.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://nc-mirror.iwebfusion.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                nc-mirror.iwebfusion.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://phx.mirrors.clouvider.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                phx.mirrors.clouvider.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirrors.radwebhosting.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.radwebhosting.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://seattle.crazyfast.us/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                seattle.crazyfast.us <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://or-mirror.iwebfusion.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                or-mirror.iwebfusion.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>AU</td>
+                    <td>
+                        
+                            <a href="http://almalinux.mirror.digitalpacific.com.au/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.mirror.digitalpacific.com.au <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://syd.mirror.rackspace.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                syd.mirror.rackspace.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>NZ</td>
+                    <td>
+                        
+                            <a href="http://mirror.2degrees.nz/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.2degrees.nz <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="https://almalinux.ourhome.kiwi/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.ourhome.kiwi <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>AR</td>
+                    <td>
+                        
+                            <a href="http://mirrors.eze.sysarmy.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirrors.eze.sysarmy.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>BR</td>
+                    <td>
+                        
+                            <a href="http://mirror.uepg.br/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.uepg.br <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://almalinux.mirror.letscloud.io/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                almalinux.mirror.letscloud.io <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>CL</td>
+                    <td>
+                        
+                            <a href="http://mirror.netglobalis.net/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.netglobalis.net <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror-almalinux.grupocg.cl/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror-almalinux.grupocg.cl <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror1.cl.netactuate.com/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror1.cl.netactuate.com <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>EC</td>
+                    <td>
+                        
+                            <a href="http://mirror.epn.edu.ec/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.epn.edu.ec <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.cedia.org.ec/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.cedia.org.ec <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                            <a href="http://mirror.espoch.edu.ec/almalinux/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                mirror.espoch.edu.ec <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>SA</td>
+                    <td>
+                        
+                            <a href="http://mirrors.isu.net.sa/almalinuxos-mirror/8.5/isos/x86_64"
+                               class="link-success text-decoration-none"
+                               target="_blank">
+                                KACST - MAEEN <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"/>
+    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"/>
+</svg>
+                            </a>
+                            <br>
+                        
+                    </td>
+                </tr>
+            
+        </tbody>
+    </table>
+
+            </div>
+            <div class="col-sm">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+    <div class="footer fixed-bottom bg-white">
+        <div class="container-fluid">
+            <div class="row text-center">
+                <div class="col-lg-12">© 2021 AlmaLinux OS Foundation</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous">
+    </script>
+    <script type="text/javascript"
+            charset="utf8"
+            src="https://cdn.jsdelivr.net/npm/datatables@1.10.18/media/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $('#dtBasic').dataTable({
+                paging: false,
+            });
+        } );
+    </script>
+
+
+    </body>
+
+    </html>
+    
