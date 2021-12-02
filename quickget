@@ -143,8 +143,12 @@ function list_csv() {
         for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
-        elif [ "${OS}" == "debian" ]; then
+      elif [ "${OS}" == "debian" ]; then
         for OPTION in standard nonfree; do
+         echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [ "${OS}" == "alma" ]; then
+        for OPTION in minimal dvd; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       else
@@ -856,11 +860,15 @@ function get_alma() {
     local ISO=""
     local URL=""
     local VERSION=""
-    local isotype=""
+    #local isotype=""
 
     validate_release "releases_alma"
 
-    isotype="minimal" # fix her for now, choose minimal, boot or dvd later
+   # ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
+   # if [ -n "${1}" ]; then
+   #   ISOTYPE="${1}"
+   # fi
+
 
     # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
     # We'll just grab the first
@@ -868,7 +876,7 @@ function get_alma() {
     URL=$(wget -qq -O- https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
 
 
-    ISO=AlmaLinux-${RELEASE}-x86_64-${isotype}.iso
+    ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
     HASH="$(wget -q -O-  ${URL}/CHECKSUM|grep \(${ISO}|cut -d\   -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1474,7 +1482,21 @@ if [ -n "${2}" ]; then
     VM_PATH="${OS}-${RELEASE}"
 
     if [ "${OS}" == "alma" ]; then
-        get_alma
+     if [ -n "${3}" ]; then
+            ISOTYPE="${3}"
+            ISOTYPES=(minimal dvd ) # boot) # a step too far
+            if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
+                echo "iso ${ISOTYPE} is not supported:"
+                for ISOTYPE in "${ISOTYPES[@]}"; do
+                  echo "${ISOTYPE}"
+                done
+                exit 1
+            fi
+        else
+            ISOTYPE="minimal"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
+        get_alma "${ISOTYPE}"
     elif [ "${OS}" == "android" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
