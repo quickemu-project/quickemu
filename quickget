@@ -1575,6 +1575,8 @@ else
         releases_popos
     elif [ "${OS}" == "regolith" ]; then
         releases_regolith
+    elif [ "${OS}" == "rockylinux" ]; then
+        releases_rockylinux
     elif [ "${OS}" == "solus" ]; then
         releases_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
