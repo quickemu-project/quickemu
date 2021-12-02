@@ -737,6 +737,11 @@ function make_vm_config() {
         IMAGE_TYPE="iso"
     fi
 
+
+    if [ -n ${ISOTYPE} ]; then
+        RELEASE=${RELEASE}-${ISOTYPE}
+    fi
+
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
         echo "Making VM configuration for ${OS}-${RELEASE}..."
         cat << EOF > "${OS}-${RELEASE}.conf"
@@ -747,7 +752,9 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
-
+        if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
         if [ "${OS}" == "openbsd" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
@@ -819,10 +826,10 @@ function get_alma() {
 
     validate_release "releases_alma"
 
-   # ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
-   # if [ -n "${1}" ]; then
-   #   ISOTYPE="${1}"
-   # fi
+    ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
+    if [ -n "${1}" ]; then
+      ISOTYPE="${1}"
+    fi
 
 
     # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
@@ -830,7 +837,7 @@ function get_alma() {
 
     URL=$(wget -qq -O- https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
 
-
+    #VM_PATH="${VM_PATH}"-${ISOTYPE}
     ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
     HASH="$(wget -q -O-  ${URL}/CHECKSUM|grep \(${ISO}|cut -d\   -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
@@ -1380,7 +1387,7 @@ if [ -n "${2}" ]; then
 
     if [ "${OS}" == "alma" ]; then
      if [ -n "${3}" ]; then
-            ISOTYPE="${3}"
+            ISOTYPE="${3,,}"
             ISOTYPES=(minimal dvd ) # boot) # a step too far
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
                 echo "iso ${ISOTYPE} is not supported:"
