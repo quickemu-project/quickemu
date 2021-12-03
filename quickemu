@@ -1105,7 +1105,7 @@ fi
 QEMU=$(command -v qemu-system-x86_64)
 QEMU_IMG=$(command -v qemu-img)
 if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! qemu not found. Please install qemu."
+  echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
   exit 1
 fi
 
