@@ -37,7 +37,15 @@ function ignore_msrs_alert() {
   fi
 }
 
-function disk_delete() {
+function delete_shortcut() {
+  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
+  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
+    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
+    echo "Deleted ${VM} desktop shortcut"
+  fi
+}
+
+function delete_disk() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
     # Remove any EFI vars, but not for macOS
@@ -46,14 +54,20 @@ function disk_delete() {
     rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
     rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
+    delete_shortcut
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
+}
 
-  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
-  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
-    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
-    echo "Deleted ${VM} desktop shortcut"
+function delete_vm() {
+  if [ -d "${VMDIR}" ]; then
+    rm -rf "${VMDIR}"
+    rm "${VM}"
+    echo "SUCCESS! Deleted ${VM} and ${VMDIR}"
+    delete_shortcut
+  else
+    echo "NOTE! ${VMDIR} not found. Doing nothing."
   fi
 }
 
@@ -122,8 +136,9 @@ function get_port() {
     local PORT_RANGE=$((PORT_START+$2))
     local PORT
     for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
-        (echo -n "" >/dev/tcp/127.0.0.1/"${PORT}") >/dev/null 2>&1
-        if [ ${?} -ne 0 ]; then
+        # Make sure port scans do not block too long.
+        timeout 0.1s bash -c "echo >/dev/tcp/127.0.0.1/${PORT}" >/dev/null 2>&1
+        if [ ${?} -eq 1 ]; then
             echo "${PORT}"
             break
         fi
@@ -1002,7 +1017,8 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --delete                : Delete the disk image."
+  echo "  --delete-disk           : Delete the disk image and EFI variables"
+  echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
@@ -1036,7 +1052,8 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 
-DELETE=0
+DELETE_DISK=0
+DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
 OUTPUT="sdl"
@@ -1056,7 +1073,7 @@ VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.3.2"
+readonly VERSION="2.3.3"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
@@ -1096,8 +1113,11 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -delete|--delete)
-            DELETE=1
+          -delete|--delete|-delete-disk|--delete-disk)
+            DELETE_DISK=1
+            shift;;
+          -delete-vm|--delete-vm)
+            DELETE_VM=1
             shift;;
           -display|--display)
             OUTPUT="${2}"
@@ -1191,8 +1211,13 @@ else
   usage
 fi
 
-if [ ${DELETE} -eq 1 ]; then
-  disk_delete
+if [ ${DELETE_DISK} -eq 1 ]; then
+  delete_disk
+  exit
+fi
+
+if [ ${DELETE_VM} -eq 1 ]; then
+  delete_vm
   exit
 fi
 
