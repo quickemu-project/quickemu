@@ -460,7 +460,7 @@ function vm_boot() {
         MOUSE="usb-mouse"
       fi
       if [ -z "${disk_size}" ]; then
-        disk_size="16G"
+        disk_size="64G"
       fi
       ;;
     macos)
