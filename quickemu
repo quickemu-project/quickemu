@@ -136,8 +136,9 @@ function get_port() {
     local PORT_RANGE=$((PORT_START+$2))
     local PORT
     for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
-        (echo -n "" >/dev/tcp/127.0.0.1/"${PORT}") >/dev/null 2>&1
-        if [ ${?} -ne 0 ]; then
+        # Make sure port scans do not block too long.
+        timeout 0.1s bash -c "echo >/dev/tcp/127.0.0.1/${PORT}" >/dev/null 2>&1
+        if [ ${?} -eq 1 ]; then
             echo "${PORT}"
             break
         fi
