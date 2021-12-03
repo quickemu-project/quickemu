@@ -37,7 +37,15 @@ function ignore_msrs_alert() {
   fi
 }
 
-function disk_delete() {
+function delete_shortcut() {
+  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
+  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
+    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
+    echo "Deleted ${VM} desktop shortcut"
+  fi
+}
+
+function delete_disk() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
     # Remove any EFI vars, but not for macOS
@@ -46,14 +54,20 @@ function disk_delete() {
     rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
     rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
+    delete_shortcut
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
+}
 
-  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
-  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
-    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
-    echo "Deleted ${VM} desktop shortcut"
+function delete_vm() {
+  if [ -d "${VMDIR}" ]; then
+    rm -rf "${VMDIR}"
+    rm "${VM}"
+    echo "SUCCESS! Deleted ${VM} and ${VMDIR}"
+    delete_shortcut
+  else
+    echo "NOTE! ${VMDIR} not found. Doing nothing."
   fi
 }
 
@@ -1002,7 +1016,8 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --delete                : Delete the disk image."
+  echo "  --delete-disk           : Delete the disk image and EFI variables"
+  echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
@@ -1036,7 +1051,8 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 
-DELETE=0
+DELETE_DISK=0
+DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
 OUTPUT="sdl"
@@ -1096,8 +1112,11 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -delete|--delete)
-            DELETE=1
+          -delete|--delete|-delete-disk|--delete-disk)
+            DELETE_DISK=1
+            shift;;
+          -delete-vm|--delete-vm)
+            DELETE_VM=1
             shift;;
           -display|--display)
             OUTPUT="${2}"
@@ -1191,8 +1210,13 @@ else
   usage
 fi
 
-if [ ${DELETE} -eq 1 ]; then
-  disk_delete
+if [ ${DELETE_DISK} -eq 1 ]; then
+  delete_disk
+  exit
+fi
+
+if [ ${DELETE_VM} -eq 1 ]; then
+  delete_vm
   exit
 fi
 
