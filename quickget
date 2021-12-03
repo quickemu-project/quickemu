@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
@@ -34,6 +35,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
+    alma)               PRETTY_NAME="Alma Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
@@ -141,8 +143,12 @@ function list_csv() {
         for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
-        elif [ "${OS}" == "debian" ]; then
+      elif [ "${OS}" == "debian" ]; then
         for OPTION in standard nonfree; do
+         echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [ "${OS}" == "alma" ]; then
+        for OPTION in minimal dvd; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       else
@@ -154,7 +160,8 @@ function list_csv() {
 }
 
 function os_support() {
-    echo android \
+    echo alma \
+    android \
     archlinux \
     debian \
     elementary \
@@ -187,6 +194,12 @@ function os_support() {
     windows \
     xubuntu \
     zorin
+}
+
+function releases_alma() {
+    # consider flavours for boot and dvd as well as
+    echo 8.4 \
+    8.5
 }
 
 function releases_android() {
@@ -694,7 +707,10 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "android" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "archlinux" ]; then
@@ -762,6 +778,11 @@ function make_vm_config() {
         IMAGE_TYPE="iso"
     fi
 
+
+    if [ -n "${ISOTYPE}" ]; then
+        RELEASE=${RELEASE}-${ISOTYPE}
+    fi
+
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
         echo "Making VM configuration for ${OS}-${RELEASE}..."
         cat << EOF > "${OS}-${RELEASE}.conf"
@@ -772,7 +793,9 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
-
+        if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
         if [ "${OS}" == "openbsd" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
@@ -839,6 +862,33 @@ function get_android() {
   make_vm_config "${ISO}"
 }
 
+function get_alma() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+    #local isotype=""
+
+    validate_release "releases_alma"
+
+    ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
+    if [ -n "${1}" ]; then
+      ISOTYPE="${1}"
+    fi
+
+
+    # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
+    # We'll just grab the first
+
+    URL=$(wget -qq -O- https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
+
+    #VM_PATH="${VM_PATH}"-${ISOTYPE}
+    ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
+    HASH="$(wget -q -O-  ${URL}/CHECKSUM|grep \(${ISO}|cut -d\   -f4)"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -1102,14 +1152,14 @@ function get_oraclelinux() {
     local HASH=""
     local ISO=""
     local URL=""
-    
+
     local arch="x86_64"
-    
+
     validate_release "releases_oraclelinux"
 
     local majorver=${RELEASE::1}
     local minorver=${RELEASE:2:1}
-  
+
     local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
     local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
 
@@ -1438,7 +1488,23 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
 
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+     if [ -n "${3}" ]; then
+            ISOTYPE="${3,,}"
+            ISOTYPES=(minimal dvd ) # boot) # a step too far
+            if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
+                echo "iso ${ISOTYPE} is not supported:"
+                for ISOTYPE in "${ISOTYPES[@]}"; do
+                  echo "${ISOTYPE}"
+                done
+                exit 1
+            fi
+        else
+            ISOTYPE="minimal"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
+        get_alma "${ISOTYPE}"
+    elif [ "${OS}" == "android" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
@@ -1543,7 +1609,9 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "android" ]; then
+    if [ "${OS}" == "alma" ]; then
+        releases_alma
+    elif [ "${OS}" == "android" ]; then
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
