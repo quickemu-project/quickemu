@@ -550,8 +550,9 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
-  --delete                : Delete the disk image.
-  --display               : Select display backend. 'sdl' (default), 'gtk', 'none' or 'spice'
+  --delete-disk           : Delete the disk image and EFI variables
+  --delete-vm             : Delete the entire VM and it's configuration
+  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'
   --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)
   --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers
   --screen <screen>       : Use specified screen to determine the window size.
@@ -666,4 +667,4 @@ Submit bug reports online at: <https://github.com/quickemu-project/quickemu/issu
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu_conf(1),quickget(1), quickgui(1
+quickemu_conf(1), quickget(1), quickgui(1
