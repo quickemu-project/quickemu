@@ -1263,6 +1263,9 @@ function unattended_windows() {
       versionScope="nonSxS"
       xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <Diagnostics>
+        <OptIn>false</OptIn>
+      </Diagnostics>
       <DiskConfiguration>
         <Disk wcm:action="add">
           <DiskID>0</DiskID>
@@ -1325,6 +1328,10 @@ function unattended_windows() {
           </ModifyPartitions>
         </Disk>
       </DiskConfiguration>
+      <DynamicUpdate>
+        <Enable>true</Enable>
+        <WillShowUI>Never</WillShowUI>
+      </DynamicUpdate>
       <ImageInstall>
         <OSImage>
           <InstallTo>
@@ -1345,13 +1352,6 @@ function unattended_windows() {
           <WillShowUI>Never</WillShowUI>
         </ProductKey>
       </UserData>
-      <Diagnostics>
-        <OptIn>false</OptIn>
-      </Diagnostics>
-      <DynamicUpdate>
-        <Enable>true</Enable>
-        <WillShowUI>Never</WillShowUI>
-      </DynamicUpdate>
     </component>
 
     <component name="Microsoft-Windows-PnpCustomizationsWinPE"
