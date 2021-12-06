@@ -864,11 +864,7 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  # re-instate old fix for #115
-  if [ "${guest_os}" == "windows" ] && [ -n "${iso}" ]; then
-    args+=(-nic none)
-  elif [ -n "${bridge}" ]; then
-
+  if [ -n "${bridge}" ]; then
     # Enable bridge mode networking
     # shellcheck disable=SC2054,SC2206
     args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
