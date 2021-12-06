@@ -832,7 +832,7 @@ function vm_boot() {
          -enable-kvm -machine q35,smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
-         -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
+         -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
          ${VIDEO} -display ${DISPLAY_RENDER}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
@@ -945,12 +945,13 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
-  # The OSK parameter contains parenthesis, they need to be escaped in the shell scripts
-  # The vendor name, Wimpys World, contains a space. It needs to be double-quoted.
+  # The OSK parameter contains parenthesis, they need to be escaped in the shell
+  # scripts. The vendor name, Quickemu Project, contains a space. It needs to be
+  # double-quoted.
   SHELL_ARGS="${args[*]}"
   SHELL_ARGS="${SHELL_ARGS//(/\\(}"
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
-  SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
+  SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
