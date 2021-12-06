@@ -1402,11 +1402,11 @@ function get_windows() {
 
     # Ignore the most recent Windows 10 release for now.
     if [ "${RELEASE}" -eq 10 ]; then
-      INDEX=1
+      INDEX=0
     fi
 
     if [ "${RELEASE}" -eq 11 ]; then
-      INDEX=1
+      INDEX=0
     fi
 
     echo "Getting Windows ${RELEASE} URL..."
