@@ -632,8 +632,18 @@ function unattended_windows() {
       xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <HideLocalAccountScreen>false</HideLocalAccountScreen>
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <NetworkLocation>Home</NetworkLocation>
+        <ProtectYourPC>3</ProtectYourPC>
+        <SkipUserOOBE>false</SkipUserOOBE>
+        <SkipMachineOOBE>false</SkipMachineOOBE>
+        <VMModeOptimizations>
+          <SkipWinREInitialization>true</SkipWinREInitialization>
+        </VMModeOptimizations>
       </OOBE>
       <FirstLogonCommands>
         <SynchronousCommand wcm:action="add">
