@@ -880,11 +880,11 @@ function get_alma() {
     # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
     # We'll just grab the first
 
-    URL=$(wget -qq -O- https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
+    URL=$(wget -qq -O- "https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html" | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
 
     #VM_PATH="${VM_PATH}"-${ISOTYPE}
     ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
-    HASH="$(wget -q -O-  ${URL}/CHECKSUM|grep \(${ISO}|cut -d\   -f4)"
+    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \(${ISO} | cut -d\   -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
