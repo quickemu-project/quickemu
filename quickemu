@@ -891,38 +891,20 @@ function vm_boot() {
     args+=(-drive if=floppy,format=raw,file="${floppy}")
   fi
 
-  if [ "${guest_os}" == "windows" ]; then
-    # shellcheck disable=SC2054
-    args+=(-device ahci,id=ahci)
-  fi
-
   if [ -n "${iso}" ]; then
-    if [ "${guest_os}" == "windows" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive id=iso,if=none,media=cdrom,file="${iso}"
-            -device ide-cd,drive=iso,bus=ahci.1,bootindex=1)
-    else
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=0,file="${iso}")
-    fi
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=0,file="${iso}")
   fi
 
   if [ -n "${fixed_iso}" ]; then
-    if [ "${guest_os}" == "windows" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive id=fixed_iso,if=none,media=cdrom,file="${fixed_iso}"
-            -device ide-cd,drive=fixed_iso,bus=ahci.2)
-    else
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-    fi
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
   # Attach the unattended configuration to Windows guests when booting from ISO
   if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive id=unattended,if=none,media=cdrom,file="${VMDIR}/unattended.iso"
-          -device ide-cd,drive=unattended,bus=ahci.3)
+    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -940,10 +922,6 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  elif [ "${guest_os}" == "windows" ]; then
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ide-hd,drive=SystemDisk,bus=ahci.0,bootindex=0
-          -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
