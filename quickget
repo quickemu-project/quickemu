@@ -1196,11 +1196,6 @@ function unattended_windows() {
   -->
 
   <settings pass="generalize">
-    <!--
-         The PersistAllDeviceInstalls setting indicates whether all plug and
-         play devices on the destination computer remain installed during the
-         generalize configuration pass.
-    -->
     <component name="Microsoft-Windows-PnPSysprep"
       processorArchitecture="amd64"
       publicKeyToken="31bf3856ad364e35"
@@ -1220,7 +1215,7 @@ function unattended_windows() {
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <SkipAutoActivation>false</SkipAutoActivation>
     </component>
-
+    <component name="Microsoft-Windows-Shell-Setup"
     <component name="Microsoft-Windows-SQMApi"
       processorArchitecture="amd64"
       publicKeyToken="31bf3856ad364e35"
