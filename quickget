@@ -435,6 +435,28 @@ function unattended_windows() {
     </component>
   </settings>
 
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Security-SPP-UX"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <SkipAutoActivation>false</SkipAutoActivation>
+    </component>
+
+    <component name="Microsoft-Windows-SQMApi"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <CEIPEnabled>0</CEIPEnabled>
+    </component>
+  </settings>
+
   <settings pass="windowsPE">
     <component name="Microsoft-Windows-Setup"
       processorArchitecture="amd64"
