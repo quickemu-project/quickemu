@@ -298,13 +298,6 @@ and [Windows 11](https://www.microsoft.com/en-gb/software-download/windows11)
 along with the [VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
-
-**During the Windows install network interfaces are completely disabled!** This
-is to allow those users who want to create local accounts to do so. A side affect
-is that the first time **Windows boots with the QEMU network enabled it will blue
-screen, automatically restart and then start normally with fully functioning
-networking**.
-
 ```bash
 quickget windows 11
 quickemu --vm windows-11.conf
