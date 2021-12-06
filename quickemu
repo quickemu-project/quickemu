@@ -523,9 +523,7 @@ function vm_boot() {
 
       # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
       #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-      if [ "${secureboot}" == "on" ]; then
-        GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
-      fi
+      GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
 
       if [ -z "${disk_size}" ]; then
         disk_size="64G"
