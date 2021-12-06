@@ -1407,7 +1407,6 @@ function unattended_windows() {
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
         <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-        <NetworkLocation>Home</NetworkLocation>
         <ProtectYourPC>3</ProtectYourPC>
         <SkipUserOOBE>false</SkipUserOOBE>
         <SkipMachineOOBE>false</SkipMachineOOBE>
