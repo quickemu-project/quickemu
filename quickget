@@ -1334,6 +1334,10 @@ function unattended_windows() {
           <InstallToAvailablePartition>false</InstallToAvailablePartition>
         </OSImage>
       </ImageInstall>
+      <UpgradeData>
+        <Upgrade>false</Upgrade>
+        <WillShowUI>Never</WillShowUI>
+      </UpgradeData>
       <UserData>
         <AcceptEula>true</AcceptEula>
         <ProductKey>
