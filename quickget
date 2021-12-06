@@ -408,276 +408,6 @@ function releases_zorin() {
     15edulite32
 }
 
-function unattended_windows() {
-    cat << 'EOF' > "${1}"
-<?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend"
-  xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-  <!--
-       For documentation on components:
-       http://technet.microsoft.com/en-us/library/ff699038.aspx
-  -->
-
-  <settings pass="generalize">
-    <!--
-         The PersistAllDeviceInstalls setting indicates whether all plug and
-         play devices on the destination computer remain installed during the
-         generalize configuration pass.
-    -->
-    <component name="Microsoft-Windows-PnPSysprep"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS">
-      <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
-    </component>
-  </settings>
-
-  <settings pass="specialize">
-    <component name="Microsoft-Windows-Security-SPP-UX"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <SkipAutoActivation>false</SkipAutoActivation>
-    </component>
-
-    <component name="Microsoft-Windows-SQMApi"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <CEIPEnabled>0</CEIPEnabled>
-    </component>
-  </settings>
-
-  <settings pass="windowsPE">
-    <component name="Microsoft-Windows-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <DiskConfiguration>
-        <Disk wcm:action="add">
-          <DiskID>0</DiskID>
-          <WillWipeDisk>true</WillWipeDisk>
-          <CreatePartitions>
-            <!-- Windows RE Tools partition -->
-            <CreatePartition wcm:action="add">
-              <Order>1</Order>
-              <Type>Primary</Type>
-              <Size>256</Size>
-            </CreatePartition>
-            <!-- System partition (ESP) -->
-            <CreatePartition wcm:action="add">
-              <Order>2</Order>
-              <Type>EFI</Type>
-              <Size>128</Size>
-            </CreatePartition>
-            <!-- Microsoft reserved partition (MSR) -->
-            <CreatePartition wcm:action="add">
-              <Order>3</Order>
-              <Type>MSR</Type>
-              <Size>128</Size>
-            </CreatePartition>
-            <!-- Windows partition -->
-            <CreatePartition wcm:action="add">
-              <Order>4</Order>
-              <Type>Primary</Type>
-              <Extend>true</Extend>
-            </CreatePartition>
-          </CreatePartitions>
-          <ModifyPartitions>
-            <!-- Windows RE Tools partition -->
-            <ModifyPartition wcm:action="add">
-              <Order>1</Order>
-              <PartitionID>1</PartitionID>
-              <Label>WINRE</Label>
-              <Format>NTFS</Format>
-              <TypeID>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</TypeID>
-            </ModifyPartition>
-            <!-- System partition (ESP) -->
-            <ModifyPartition wcm:action="add">
-              <Order>2</Order>
-              <PartitionID>2</PartitionID>
-              <Label>System</Label>
-              <Format>FAT32</Format>
-            </ModifyPartition>
-            <!-- MSR partition does not need to be modified -->
-            <ModifyPartition wcm:action="add">
-              <Order>3</Order>
-              <PartitionID>3</PartitionID>
-            </ModifyPartition>
-            <!-- Windows partition -->
-              <ModifyPartition wcm:action="add">
-              <Order>4</Order>
-              <PartitionID>4</PartitionID>
-              <Label>Windows</Label>
-              <Letter>C</Letter>
-              <Format>NTFS</Format>
-            </ModifyPartition>
-          </ModifyPartitions>
-        </Disk>
-      </DiskConfiguration>
-      <ImageInstall>
-        <OSImage>
-          <InstallTo>
-            <DiskID>0</DiskID>
-            <PartitionID>4</PartitionID>
-          </InstallTo>
-          <InstallToAvailablePartition>false</InstallToAvailablePartition>
-        </OSImage>
-      </ImageInstall>
-      <UserData>
-        <AcceptEula>true</AcceptEula>
-        <ProductKey>
-          <key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</key>
-          <WillShowUI>Never</WillShowUI>
-        </ProductKey>
-      </UserData>
-      <DynamicUpdate>
-        <Enable>true</Enable>
-        <WillShowUI>Never</WillShowUI>
-      </DynamicUpdate>
-    </component>
-
-    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      processorArchitecture="amd64">
-
-      <!--
-           This makes the VirtIO drivers available to Windows, assuming that
-           the VirtIO driver disk
-           (https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
-           is available as drive E:
-      -->
-      <DriverPaths>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="1">
-          <Path>E:\qemufwcfg\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="2">
-          <Path>E:\vioinput\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="3">
-          <Path>E:\vioscsi\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="4">
-          <Path>E:\viostor\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
-          <Path>E:\vioserial\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
-          <Path>E:\qxldod\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
-          <Path>E:\amd64\w10</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
-          <Path>E:\viogpudo\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
-          <Path>E:\viorng\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
-          <Path>E:\NetKVM\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
-          <Path>E:\viofs\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="12">
-          <Path>E:\Balloon\w10\amd64</Path>
-        </PathAndCredentials>
-      </DriverPaths>
-    </component>
-  </settings>
-
-  <settings pass="specialize">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <ComputerName>*</ComputerName>
-      <OEMInformation>
-        <Manufacturer>Wimpys World</Manufacturer>
-        <Model>Quickemu</Model>
-        <SupportHours>24/7</SupportHours>
-        <SupportPhone></SupportPhone>
-        <SupportProvider>Wimpys World</SupportProvider>
-        <SupportURL>https://github.com/wimpysworld/quickemu/issues</SupportURL>
-      </OEMInformation>
-      <OEMName>Wimpys World</OEMName>
-    </component>
-  </settings>
-
-  <settings pass="oobeSystem">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <OOBE>
-        <HideEULAPage>true</HideEULAPage>
-        <HideLocalAccountScreen>false</HideLocalAccountScreen>
-        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
-        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-        <NetworkLocation>Home</NetworkLocation>
-        <ProtectYourPC>3</ProtectYourPC>
-        <SkipUserOOBE>false</SkipUserOOBE>
-        <SkipMachineOOBE>false</SkipMachineOOBE>
-        <VMModeOptimizations>
-          <SkipWinREInitialization>true</SkipWinREInitialization>
-        </VMModeOptimizations>
-      </OOBE>
-      <FirstLogonCommands>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install Virtio Guest Agent</Description>
-          <Order>1</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
-          <Description>Install spice-webdavd file sharing agent</Description>
-          <Order>2</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install usbdk USB sharing agent</Description>
-          <Order>3</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
-          <Description>Install spice-vdagent SPICE agent</Description>
-          <Order>4</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
-          <Description>Disable Hibernation</Description>
-          <Order>5</Order>
-        </SynchronousCommand>
-      </FirstLogonCommands>
-    </component>
-  </settings>
-</unattend>
-EOF
-}
-
 function check_hash() {
     local iso=""
     local hash=""
@@ -1453,6 +1183,277 @@ function get_garuda() {
     #fi
     make_vm_config "${OS}-${RELEASE}.iso"
 }
+
+function unattended_windows() {
+    cat << 'EOF' > "${1}"
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend"
+  xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!--
+       For documentation on components:
+       http://technet.microsoft.com/en-us/library/ff699038.aspx
+  -->
+
+  <settings pass="generalize">
+    <!--
+         The PersistAllDeviceInstalls setting indicates whether all plug and
+         play devices on the destination computer remain installed during the
+         generalize configuration pass.
+    -->
+    <component name="Microsoft-Windows-PnPSysprep"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS">
+      <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+    </component>
+  </settings>
+
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Security-SPP-UX"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <SkipAutoActivation>false</SkipAutoActivation>
+    </component>
+
+    <component name="Microsoft-Windows-SQMApi"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <CEIPEnabled>0</CEIPEnabled>
+    </component>
+  </settings>
+
+  <settings pass="windowsPE">
+    <component name="Microsoft-Windows-Setup"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <DiskConfiguration>
+        <Disk wcm:action="add">
+          <DiskID>0</DiskID>
+          <WillWipeDisk>true</WillWipeDisk>
+          <CreatePartitions>
+            <!-- Windows RE Tools partition -->
+            <CreatePartition wcm:action="add">
+              <Order>1</Order>
+              <Type>Primary</Type>
+              <Size>256</Size>
+            </CreatePartition>
+            <!-- System partition (ESP) -->
+            <CreatePartition wcm:action="add">
+              <Order>2</Order>
+              <Type>EFI</Type>
+              <Size>128</Size>
+            </CreatePartition>
+            <!-- Microsoft reserved partition (MSR) -->
+            <CreatePartition wcm:action="add">
+              <Order>3</Order>
+              <Type>MSR</Type>
+              <Size>128</Size>
+            </CreatePartition>
+            <!-- Windows partition -->
+            <CreatePartition wcm:action="add">
+              <Order>4</Order>
+              <Type>Primary</Type>
+              <Extend>true</Extend>
+            </CreatePartition>
+          </CreatePartitions>
+          <ModifyPartitions>
+            <!-- Windows RE Tools partition -->
+            <ModifyPartition wcm:action="add">
+              <Order>1</Order>
+              <PartitionID>1</PartitionID>
+              <Label>WINRE</Label>
+              <Format>NTFS</Format>
+              <TypeID>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</TypeID>
+            </ModifyPartition>
+            <!-- System partition (ESP) -->
+            <ModifyPartition wcm:action="add">
+              <Order>2</Order>
+              <PartitionID>2</PartitionID>
+              <Label>System</Label>
+              <Format>FAT32</Format>
+            </ModifyPartition>
+            <!-- MSR partition does not need to be modified -->
+            <ModifyPartition wcm:action="add">
+              <Order>3</Order>
+              <PartitionID>3</PartitionID>
+            </ModifyPartition>
+            <!-- Windows partition -->
+              <ModifyPartition wcm:action="add">
+              <Order>4</Order>
+              <PartitionID>4</PartitionID>
+              <Label>Windows</Label>
+              <Letter>C</Letter>
+              <Format>NTFS</Format>
+            </ModifyPartition>
+          </ModifyPartitions>
+        </Disk>
+      </DiskConfiguration>
+      <ImageInstall>
+        <OSImage>
+          <InstallTo>
+            <DiskID>0</DiskID>
+            <PartitionID>4</PartitionID>
+          </InstallTo>
+          <InstallToAvailablePartition>false</InstallToAvailablePartition>
+        </OSImage>
+      </ImageInstall>
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <ProductKey>
+          <key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</key>
+          <WillShowUI>Never</WillShowUI>
+        </ProductKey>
+      </UserData>
+      <DynamicUpdate>
+        <Enable>true</Enable>
+        <WillShowUI>Never</WillShowUI>
+      </DynamicUpdate>
+    </component>
+
+    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      processorArchitecture="amd64">
+
+      <!--
+           This makes the VirtIO drivers available to Windows, assuming that
+           the VirtIO driver disk
+           (https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
+           is available as drive E:
+      -->
+      <DriverPaths>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+          <Path>E:\qemufwcfg\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="2">
+          <Path>E:\vioinput\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="3">
+          <Path>E:\vioscsi\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="4">
+          <Path>E:\viostor\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
+          <Path>E:\vioserial\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
+          <Path>E:\qxldod\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
+          <Path>E:\amd64\w10</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
+          <Path>E:\viogpudo\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+          <Path>E:\viorng\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
+          <Path>E:\NetKVM\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
+          <Path>E:\viofs\w10\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="12">
+          <Path>E:\Balloon\w10\amd64</Path>
+        </PathAndCredentials>
+      </DriverPaths>
+    </component>
+  </settings>
+
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Shell-Setup"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <ComputerName>*</ComputerName>
+      <OEMInformation>
+        <Manufacturer>Wimpys World</Manufacturer>
+        <Model>Quickemu</Model>
+        <SupportHours>24/7</SupportHours>
+        <SupportPhone></SupportPhone>
+        <SupportProvider>Wimpys World</SupportProvider>
+        <SupportURL>https://github.com/wimpysworld/quickemu/issues</SupportURL>
+      </OEMInformation>
+      <OEMName>Wimpys World</OEMName>
+    </component>
+  </settings>
+
+  <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-Shell-Setup"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <HideLocalAccountScreen>false</HideLocalAccountScreen>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <NetworkLocation>Home</NetworkLocation>
+        <ProtectYourPC>3</ProtectYourPC>
+        <SkipUserOOBE>false</SkipUserOOBE>
+        <SkipMachineOOBE>false</SkipMachineOOBE>
+        <VMModeOptimizations>
+          <SkipWinREInitialization>true</SkipWinREInitialization>
+        </VMModeOptimizations>
+      </OOBE>
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install Virtio Guest Agent</Description>
+          <Order>1</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-webdavd file sharing agent</Description>
+          <Order>2</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
+          <Description>Install usbdk USB sharing agent</Description>
+          <Order>3</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
+          <Description>Install spice-vdagent SPICE agent</Description>
+          <Order>4</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
+          <Description>Disable Hibernation</Description>
+          <Order>5</Order>
+        </SynchronousCommand>
+      </FirstLogonCommands>
+    </component>
+  </settings>
+</unattend>
+EOF
+}
+
 
 function dbg_windows() {
   local DEBUG=0
