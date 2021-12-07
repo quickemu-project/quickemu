@@ -500,7 +500,8 @@ function vm_boot() {
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
-          USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+          USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
+          GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
           ;;
         *)
           # Backwards compatibility if no macos_release is specified.
