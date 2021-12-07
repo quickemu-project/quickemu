@@ -480,6 +480,9 @@ function vm_boot() {
         exit 1
       fi
 
+      # Disable S3 support in the VM to prevent macOS suspending during install
+      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
+
       # Tune Qemu optimisations based on the macOS release, or fallback to lowest
       # common supported options if none is specified.
       #   * VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)
@@ -509,7 +512,7 @@ function vm_boot() {
           ;;
       esac
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
-      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -device isa-applesmc,osk=${OSK}"
+
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
       fi
