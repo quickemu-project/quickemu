@@ -480,6 +480,7 @@ function vm_boot() {
         exit 1
       fi
 
+      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       # Disable S3 support in the VM to prevent macOS suspending during install
       GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
 
@@ -512,7 +513,6 @@ function vm_boot() {
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
       esac
-      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
 
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
