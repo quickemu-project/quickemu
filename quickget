@@ -279,7 +279,8 @@ function releases_linuxmint(){
 }
 
 function releases_nixos(){
-    echo 21.05
+    echo 21.05 \
+    21.11
 }
 
 function releases_openbsd(){
