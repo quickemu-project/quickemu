@@ -37,7 +37,15 @@ function ignore_msrs_alert() {
   fi
 }
 
-function disk_delete() {
+function delete_shortcut() {
+  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
+  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
+    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
+    echo "Deleted ${VM} desktop shortcut"
+  fi
+}
+
+function delete_disk() {
   if [ -e "${disk_img}" ]; then
     rm "${disk_img}"
     # Remove any EFI vars, but not for macOS
@@ -46,14 +54,20 @@ function disk_delete() {
     rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
     rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" > /dev/null 2>&1
     echo "SUCCESS! Deleted ${disk_img}"
+    delete_shortcut
   else
     echo "NOTE! ${disk_img} not found. Doing nothing."
   fi
+}
 
-  local SHORTCUT_DIR="${HOME}/.local/share/applications/"
-  if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
-    rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
-    echo "Deleted ${VM} desktop shortcut"
+function delete_vm() {
+  if [ -d "${VMDIR}" ]; then
+    rm -rf "${VMDIR}"
+    rm "${VM}"
+    echo "SUCCESS! Deleted ${VM} and ${VMDIR}"
+    delete_shortcut
+  else
+    echo "NOTE! ${VMDIR} not found. Doing nothing."
   fi
 }
 
@@ -122,8 +136,9 @@ function get_port() {
     local PORT_RANGE=$((PORT_START+$2))
     local PORT
     for ((PORT = PORT_START; PORT <= PORT_RANGE; PORT++)); do
-        (echo -n "" >/dev/tcp/127.0.0.1/"${PORT}") >/dev/null 2>&1
-        if [ ${?} -ne 0 ]; then
+        # Make sure port scans do not block too long.
+        timeout 0.1s bash -c "echo >/dev/tcp/127.0.0.1/${PORT}" >/dev/null 2>&1
+        if [ ${?} -eq 1 ]; then
             echo "${PORT}"
             break
         fi
@@ -465,6 +480,10 @@ function vm_boot() {
         exit 1
       fi
 
+      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
+      # Disable S3 support in the VM to prevent macOS suspending during install
+      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
+
       # Tune Qemu optimisations based on the macOS release, or fallback to lowest
       # common supported options if none is specified.
       #   * VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)
@@ -482,7 +501,8 @@ function vm_boot() {
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
-          USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+          USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
+          GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
           ;;
         *)
           # Backwards compatibility if no macos_release is specified.
@@ -493,8 +513,7 @@ function vm_boot() {
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
       esac
-      OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
-      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -device isa-applesmc,osk=${OSK}"
+
       if [ -z "${disk_size}" ]; then
         disk_size="96G"
       fi
@@ -508,9 +527,7 @@ function vm_boot() {
 
       # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
       #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-      if [ "${secureboot}" == "on" ]; then
-        GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
-      fi
+      GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
 
       if [ -z "${disk_size}" ]; then
         disk_size="64G"
@@ -819,7 +836,7 @@ function vm_boot() {
          -enable-kvm -machine q35,smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
-         -smbios type=2,manufacturer="Wimpys World",product="Quickemu",version="${VERSION}",serial="jvzclfjbeyq.pbz",location="wimpysworld.com",asset="${VMNAME}"
+         -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
          ${VIDEO} -display ${DISPLAY_RENDER}
          -device usb-ehci,id=input
          -device usb-kbd,bus=input.0
@@ -874,38 +891,20 @@ function vm_boot() {
     args+=(-drive if=floppy,format=raw,file="${floppy}")
   fi
 
-  if [ "${guest_os}" == "windows" ]; then
-    # shellcheck disable=SC2054
-    args+=(-device ahci,id=ahci)
-  fi
-
   if [ -n "${iso}" ]; then
-    if [ "${guest_os}" == "windows" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive id=iso,if=none,media=cdrom,file="${iso}"
-            -device ide-cd,drive=iso,bus=ahci.1,bootindex=1)
-    else
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=0,file="${iso}")
-    fi
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=0,file="${iso}")
   fi
 
   if [ -n "${fixed_iso}" ]; then
-    if [ "${guest_os}" == "windows" ]; then
-      # shellcheck disable=SC2054
-      args+=(-drive id=fixed_iso,if=none,media=cdrom,file="${fixed_iso}"
-            -device ide-cd,drive=fixed_iso,bus=ahci.2)
-    else
-      # shellcheck disable=SC2054
-      args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-    fi
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
   # Attach the unattended configuration to Windows guests when booting from ISO
   if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
     # shellcheck disable=SC2054
-    args+=(-drive id=unattended,if=none,media=cdrom,file="${VMDIR}/unattended.iso"
-          -device ide-cd,drive=unattended,bus=ahci.3)
+    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -923,10 +922,6 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
-  elif [ "${guest_os}" == "windows" ]; then
-    # shellcheck disable=SC2054,SC2206
-    args+=(-device ide-hd,drive=SystemDisk,bus=ahci.0,bootindex=0
-          -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
@@ -954,12 +949,13 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
-  # The OSK parameter contains parenthesis, they need to be escaped in the shell scripts
-  # The vendor name, Wimpys World, contains a space. It needs to be double-quoted.
+  # The OSK parameter contains parenthesis, they need to be escaped in the shell
+  # scripts. The vendor name, Quickemu Project, contains a space. It needs to be
+  # double-quoted.
   SHELL_ARGS="${args[*]}"
   SHELL_ARGS="${SHELL_ARGS//(/\\(}"
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
-  SHELL_ARGS="${SHELL_ARGS//Wimpys World/\"Wimpys World\"}"
+  SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
   echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
   ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
@@ -1002,7 +998,8 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --delete                : Delete the disk image."
+  echo "  --delete-disk           : Delete the disk image and EFI variables"
+  echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
@@ -1015,6 +1012,16 @@ function usage() {
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
   echo "  --version               : Print version"
   exit 1
+}
+
+function display_param_check() {
+  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+    echo "ERROR! Requested output '${OUTPUT}' is not recognised."
+    exit 1
+  elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
+    echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
+    exit 1
+  fi
 }
 
 # Lowercase variables are used in the VM config file only
@@ -1036,10 +1043,11 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 
-DELETE=0
+DELETE_DISK=0
+DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
-OUTPUT="sdl"
+OUTPUT=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
@@ -1056,7 +1064,7 @@ VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="2.3.2"
+readonly VERSION="3.11"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
@@ -1078,7 +1086,7 @@ fi
 QEMU=$(command -v qemu-system-x86_64)
 QEMU_IMG=$(command -v qemu-img)
 if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! qemu not found. Please install qemu."
+  echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
   exit 1
 fi
 
@@ -1096,18 +1104,15 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -delete|--delete)
-            DELETE=1
+          -delete|--delete|-delete-disk|--delete-disk)
+            DELETE_DISK=1
+            shift;;
+          -delete-vm|--delete-vm)
+            DELETE_VM=1
             shift;;
           -display|--display)
             OUTPUT="${2}"
-            if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
-              echo "ERROR! Requested output '${OUTPUT}' is not recognised."
-              exit 1
-            elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
-              echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
-              exit 1
-            fi
+            display_param_check
             shift
             shift;;
           -fullscreen|--fullscreen|-full-screen|--full-screen)
@@ -1179,6 +1184,15 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     disk_size="${disk}"
   fi
 
+  if [ -z "${OUTPUT}" ]; then
+    if [ -z "${display}" ]; then
+      OUTPUT="sdl"
+    else
+      OUTPUT="${display}"
+      display_param_check
+    fi
+  fi
+
   if [ "${tpm}" == "on" ]; then
     SWTPM=$(command -v swtpm)
     if [ ! -e "${SWTPM}" ]; then
@@ -1191,8 +1205,13 @@ else
   usage
 fi
 
-if [ ${DELETE} -eq 1 ]; then
-  disk_delete
+if [ ${DELETE_DISK} -eq 1 ]; then
+  delete_disk
+  exit
+fi
+
+if [ ${DELETE_VM} -eq 1 ]; then
+  delete_vm
   exit
 fi
 
