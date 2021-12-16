@@ -316,7 +316,8 @@ function releases_macos() {
 
 function releases_popos() {
     echo 20.04 \
-    21.04
+    21.04 \
+    21.10
 }
 
 function releases_regolith() {
