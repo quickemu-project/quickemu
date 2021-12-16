@@ -1046,6 +1046,7 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
+extra_args=""
 
 DELETE_DISK=0
 DELETE_VM=0
