@@ -949,6 +949,10 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
+  if [ -n "$extra_args" ]; then
+      args+=($extra_args)
+  fi
+
   # The OSK parameter contains parenthesis, they need to be escaped in the shell
   # scripts. The vendor name, Quickemu Project, contains a space. It needs to be
   # double-quoted.
