@@ -178,6 +178,7 @@ preferred flavour.
 
   * `alma`
   * `archlinux`
+  * `arcolinux`  
   * `debian`
   * `elementary`
   * `fedora`
