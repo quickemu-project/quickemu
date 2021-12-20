@@ -35,7 +35,7 @@ comprehensive support for macOS and Windows**.
   * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
   * [Alma Linux](https://almalinux.org/)
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
-  * [Arch Linux](https://www.archlinux.org/),[Arco Linux](https://www.arcolinux.info/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
+  * [Arch Linux](https://www.archlinux.org/),[ArcoLinux](https://www.arcolinux.info/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
   * [Oracle Linux](https://www.oracle.com/linux/) and [Rocky Linux](https://rockylinux.org/)
   * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
