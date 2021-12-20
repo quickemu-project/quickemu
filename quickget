@@ -38,6 +38,7 @@ function pretty_name() {
     alma)               PRETTY_NAME="Alma Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    arcolinux)          PRETTY_NAME="Arco Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -163,6 +164,7 @@ function os_support() {
     echo alma \
     android \
     archlinux \
+    arcolinux \
     debian \
     elementary \
     freebsd \
@@ -214,6 +216,10 @@ function releases_android() {
 }
 
 function releases_archlinux() {
+    echo latest
+}
+
+function releases_arcolinux() {
     echo latest
 }
 
@@ -519,6 +525,9 @@ function make_vm_config() {
     elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "arcolinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "debian" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -708,6 +717,21 @@ function get_archlinux() {
     make_vm_config "${ISO}"
 }
 
+function get_arcolinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_arcolinux"
+    VERSION=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/info' | cut -d " " -f 2)
+    URL="https://ant.seedhost.eu/arcolinux/.quick/"
+    ISO="arcolinuxl-${VERSION}-x86_64.iso"
+    HASH=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/arcolinuxl-'${VERSION}'-x86_64.iso.sha1' | cut -d " " -f 1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 
 function get_debian() {
     local HASH=""
@@ -1627,6 +1651,8 @@ if [ -n "${2}" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
+    elif [ "${OS}" == "arcolinux" ]; then
+        get_arcolinux
     elif [ "${OS}" == "debian" ]; then
      if [ -n "${3}" ]; then
             FREEDOM="${3}"
@@ -1734,6 +1760,8 @@ else
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
+    elif [ "${OS}" == "arcolinux" ]; then
+        releases_arcolinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
     elif [ "${OS}" == "elementary" ]; then
