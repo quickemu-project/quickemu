@@ -612,7 +612,6 @@ EOF
 
         if [ "${OS}" == "kolibrios" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-            echo "disk_size=\"256M\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "openbsd" ]; then
