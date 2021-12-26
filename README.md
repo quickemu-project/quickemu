@@ -39,6 +39,7 @@ comprehensive support for macOS and Windows**.
   * [Oracle Linux](https://www.oracle.com/linux/) and [Rocky Linux](https://rockylinux.org/)
   * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
+  * [Haiku](https://www.haiku-os.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
