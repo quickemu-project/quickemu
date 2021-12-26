@@ -623,6 +623,7 @@ EOF
 
         if [ "${OS}" == "haiku" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "oraclelinux"  ]; then
