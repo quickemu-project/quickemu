@@ -41,6 +41,7 @@ function pretty_name() {
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
+    haiku)              PRETTY_NAME="Haiku";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
@@ -168,6 +169,7 @@ function os_support() {
     freebsd \
     fedora \
     garuda \
+    haiku \
     kali \
     kdeneon \
     kubuntu \
@@ -260,6 +262,11 @@ function releases_garuda() {
     xfce \
     mate \
     cinnamon
+}
+
+function releases_haiku() {
+    echo r1beta3-x86_64 \
+        r1beta3-x86_gcc2h
 }
 
 function releases_kali() {
@@ -537,6 +544,9 @@ function make_vm_config() {
     elif [ "${OS}" == "garuda" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "haiku" ]; then
+        GUEST="haiku"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -609,6 +619,10 @@ EOF
 
         if [ "${OS}" == "garuda"  ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "haiku" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "oraclelinux"  ]; then
@@ -1185,6 +1199,21 @@ function get_garuda() {
     make_vm_config "${OS}-${RELEASE}.iso"
 }
 
+function get_haiku() {
+    local ISO=""
+    local URL=""
+    local HASH=""
+
+    validate_release "releases_haiku"
+
+    ISO="haiku-${RELEASE}-anyboot.iso"
+    URL="https://cdn.haiku-os.org/haiku-release/$(echo $RELEASE | awk -F '-' '{print $1}')/${ISO}"
+    HASH=$(wget -q -O- ${URL}.sha256 | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function unattended_windows() {
     cat << 'EOF' > "${1}"
 <?xml version="1.0" encoding="utf-8"?>
@@ -1653,6 +1682,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "garuda" ]; then
         get_garuda
+    elif [ "${OS}" == "haiku" ]; then
+        get_haiku
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1744,6 +1775,8 @@ else
         releases_fedora
     elif [ "${OS}" == "garuda" ]; then
         releases_garuda
+    elif [ "${OS}" == "haiku" ]; then
+        releases_haiku
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
