@@ -228,6 +228,7 @@ function vm_boot() {
   local KERNEL_NODE=""
   local KERNEL_VER="?"
   local LSB_DESCRIPTION="Unknown OS"
+  local MACHINE_TYPE="q35"
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
@@ -462,6 +463,18 @@ function vm_boot() {
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
+      ;;
+    haiku)
+      CPU="-cpu host,kvm=on"
+      MACHINE_TYPE="pc"
+      NET_DEVICE="rtl8139"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      if [ -z "${disk_size}" ]; then
+        disk_size="32G"
+      fi
+      echo "WARNING! Unrecognised guest OS: ${guest_os}"
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
@@ -833,7 +846,7 @@ function vm_boot() {
 
   # shellcheck disable=SC2054,SC2206,SC2140
   args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
-         -enable-kvm -machine q35,smm=${SMM},vmport=off ${GUEST_TWEAKS}
+         -enable-kvm -machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
