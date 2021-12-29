@@ -45,6 +45,14 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    manjaro-xfce)       PRETTY_NAME="Manjaro XFCE";;
+    manjaro-kde)        PRETTY_NAME="Manjaro KDE";;
+    manjaro-gnome)      PRETTY_NAME="Manjaro Gnome";;
+    manjaro-budgie)     PRETTY_NAME="Manjaro Budgie";;
+    manjaro-cinnamon)   PRETTY_NAME="Manjaro Cinnamon";;
+    manjaro-deepin)     PRETTY_NAME="Manjaro Deepin";;
+    manjaro-i3)         PRETTY_NAME="Manjaro i3";;
+    manjaro-mate)       PRETTY_NAME="Manjaro MATE";;
     nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
     nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
     nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
@@ -111,6 +119,8 @@ function list_csv() {
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
       FUNC="linuxmint"
+    elif [[ "${OS}" == *"manjaro"* ]]; then
+      FUNC="manjaro"
     elif [[ "${OS}" == *"nixos"* ]]; then
       FUNC="nixos"
     else
@@ -174,6 +184,14 @@ function os_support() {
     linuxmint-cinnamon \
     linuxmint-mate \
     linuxmint-xfce \
+    manjaro-xfce \
+    manjaro-kde \
+    manjaro-gnome \
+    manjaro-budgie \
+    manjaro-cinnamon \
+    manjaro-deepin \
+    manjaro-i3 \
+    manjaro-mate \
     nixos-gnome \
     nixos-plasma5 \
     nixos-minimal \
@@ -312,6 +330,16 @@ function releases_macos() {
     catalina \
     big-sur \
     monterey
+}
+
+function releases_manjaro() {
+    case ${OS} in
+    *xfce|*kde|*gnome) echo full \
+    minimal \
+    minimal-lts;;
+    *budgie|*cinnamon|*deepin|*i3|*mate) echo full \
+    minimal;;
+    esac
 }
 
 function releases_popos() {
@@ -541,6 +569,9 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"manjaro"* }}; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"nixos"* ]]; then
@@ -843,6 +874,42 @@ function get_linuxmint() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_manjaro() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VER=""
+    local DATE=""
+    local KERNEL=""
+    local KERNLTS=""
+    
+    validate_release "releases_manjaro"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    case ${FLAVOR} in
+      xfce|kde|gnome)
+        VER="21.2.0"
+        DATE="211220"
+        KERNEL="515"
+        KERNLTS="510";;
+      budgie|cinnamon|deepin|i3|mate)
+        VER="21.1.2"
+        DATE="210907"
+        KERNEL="513";;
+    esac
+    if [[ ${RELEASE} == "full" ]]; then
+        ISO="manjaro-${FLAVOR}-${VER}-${DATE}-linux${KERNEL}.iso"
+    elif [[ ${RELEASE} == "minimal" ]]; then
+        ISO="manjaro-${FLAVOR}-${VER}-minimal-${DATE}-linux${KERNEL}.iso"
+    elif [[ ${RELEASE} == "minimal-lts" ]]; then
+        ISO="manjaro-${FLAVOR}-${VER}-minimal-${DATE}-linux${KERNLTS}.iso"
+    fi
+    URL="https://download.manjaro.org/${FLAVOR}/${VER}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
+}
+
 function get_nixos() {
     local FLAVOR=""
     local HASH=""
@@ -1659,6 +1726,8 @@ if [ -n "${2}" ]; then
         get_kdeneon
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
+    elif [[ "${OS}" == *"manjaro-"* ]]; then
+        get_manjaro
     elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
@@ -1667,7 +1736,7 @@ if [ -n "${2}" ]; then
         get_opensuse
     elif [ "${OS}" == "oraclelinux" ]; then
         get_oraclelinux
-  elif [ "${OS}" == "popos" ]; then
+    elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
@@ -1748,6 +1817,8 @@ else
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
+    elif [[ "${OS}" == *"manjaro-"* ]]; then
+        releases_manjaro
     elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
