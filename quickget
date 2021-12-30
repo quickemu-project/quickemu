@@ -526,6 +526,10 @@ function make_vm_config() {
         windows )
             GUEST="windows"
             IMAGE_TYPE="iso";;
+        *)
+            echo "Undefined OS Defaulting to Guest=Linux and IMAGE_TYPE=iso"
+            GUEST="linux"
+            IMAGE_TYPE="iso";;
     esac
 
     if [ -n "${ISOTYPE}" ]; then
