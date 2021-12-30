@@ -103,7 +103,7 @@ sudo apt install quickemu
 ## Other Linux
 
 ```bash
-git clone --depth=1 https://github.com/wimpysworld/quickemu
+git clone --depth=1 https://github.com/quickemu-project/quickemu
 cd quickemu
 ```
 
@@ -115,11 +115,11 @@ Now install all the **Requirements** documented above.
 
 While `quickemu` and `quickget` are designed for the terminal, a graphical user interface is also available:
 
-  * **[Quickgui](https://github.com/quickgui/quickgui)** by [Mark Johnson](https://github.com/marxjohnson) and [Yannick Mauray](https://github.com/ymauray).
+  * **[Quickgui](https://github.com/quickemu-project/quickgui)** by [Mark Johnson](https://github.com/marxjohnson) and [Yannick Mauray](https://github.com/ymauray).
 
 Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 [Philipp Kiemle](https://github.com/daPhipz) for creating the
-**[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
+**[Quickemu icons](https://github.com/quickemu-project/quickemu-icons)** 🎨
 
 ### Quickgui for Ubuntu
 
