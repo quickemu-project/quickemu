@@ -571,7 +571,7 @@ function make_vm_config() {
     elif [[ "${OS}" == *"linuxmint"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"manjaro"* }}; then
+    elif [[ "${OS}" == *"manjaro"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"nixos"* ]]; then
