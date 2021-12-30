@@ -36,6 +36,7 @@ function pretty_name() {
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
     alma)               PRETTY_NAME="Alma Linux";;
+    alpine)        PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
@@ -161,6 +162,7 @@ function list_csv() {
 
 function os_support() {
     echo alma \
+    alpine \
     android \
     archlinux \
     debian \
@@ -200,6 +202,14 @@ function releases_alma() {
     # consider flavours for boot and dvd as well as
     echo 8.4 \
     8.5
+}
+
+function releases_alpine() {
+    echo latest \
+    3.12 \
+    3.13 \
+    3.14 \
+    3.15
 }
 
 function releases_android() {
@@ -513,6 +523,9 @@ function make_vm_config() {
     if [ "${OS}" == "alma" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "alpine" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "android" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -692,6 +705,31 @@ function get_alma() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_alpine() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+    local BRANCH=""
+    
+    validate_release "releases_alpine"
+    if [[ "${RELEASE}" == "latest" ]]; then
+      BRANCH="latest-stable"
+    else
+      BRANCH="v${RELEASE}"
+    fi
+    VERSION=$(wget -qO- 'https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/latest-releases.yaml' \
+                | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
+    ISO="alpine-virt-${VERSION}-x86_64.iso"
+    URL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -qO- 'https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/latest-releases.yaml' \
+                | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -1623,6 +1661,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_alma "${ISOTYPE}"
+    elif [ "${OS}" == "alpine" ]; then
+        get_alpine
     elif [ "${OS}" == "android" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
@@ -1730,6 +1770,8 @@ else
     echo -n "ERROR! You must specify a release: "
     if [ "${OS}" == "alma" ]; then
         releases_alma
+    elif [ "${OS}" == "alpine" ]; then
+        releases_alpine
     elif [ "${OS}" == "android" ]; then
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
