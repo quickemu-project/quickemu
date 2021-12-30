@@ -510,7 +510,7 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    case ${OS} in
+    case "${OS}" in
         alma | android | archlinux | debian | elementary | fedora | kali | garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | popos | regolith | rockylinux | solus | *ubuntu* | zorin )
             GUEST="linux"
             IMAGE_TYPE="iso";;
