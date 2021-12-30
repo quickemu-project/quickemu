@@ -36,7 +36,7 @@ function pretty_name() {
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
     alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linuxs";;
+    alpine)             PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     elementary)         PRETTY_NAME="elementary OS";;
