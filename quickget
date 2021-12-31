@@ -862,7 +862,7 @@ function get_mxlinux() {
     local HASH=""
     local ISO=""
     local URL=""
-    local BASE_URL = ""
+    local BASE_URL=""
 
     validate_release "releases_mxlinux"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
