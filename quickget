@@ -903,8 +903,8 @@ function get_manjaro() {
     fi
    
     MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${FLAVOR}.md"
-    URL=$(wget -qO- ${MANIFESTURL} | grep "${KEY}" | awk '{print $3}')
-    ISO="$(echo $URL | awk -F "/" '{print $6}' | tr -d '"')"
+    URL="$(wget -qO- ${MANIFESTURL} | grep "${KEY}" | awk '{print $3}' | tr -d '"')"
+    ISO="$(echo $URL | awk -F "/" '{print $6}')"
     HASH=$(wget -qO- ${MANIFESTURL} | grep "${HASHKEY}" | awk '{print $3}' | tr -d '"')
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
