@@ -454,9 +454,11 @@ function web_get() {
 
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
+          echo #Necessary as aria2c in suppressed mode doesnot have new lines
           echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
           exit 1
         fi
+        echo #Necessary as aria2c in suppressed mode doesnot have new lines
     else 
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
