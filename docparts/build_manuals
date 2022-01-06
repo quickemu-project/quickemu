@@ -6,12 +6,16 @@
 
 echo quickemu.1-* >quickemu.lst
 echo quickget.1-00-header.md quickemu.1-0[7-9]* quickemu.1-1[0-3]* quickget.1-09-footer.md >quickget.lst
+echo README-00-hdr.md quickemu.1-0[4-6]* README-06-Install.md quickemu.1-0[7-9]* \
+quickemu.1-1[0-3]* README-135-confoptions.md quickemu.1-1[4-9]* quickemu.1-2* > README.lst
+#
 pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../quickemu.1.md
 pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../quickget.1.md
+pandoc -s $(cat README.lst)  -f markdown -t markdown -o ../README.md
 ## Letting the makefile build from the  markdown->markdown conversion
 ## gets weird.  For now build here too as these look better
-## Possibly use m4 for consolidation prior to generation ??? 
+## Possibly use m4 for consolidation prior to generation ???
 pandoc -s $(cat quickemu.lst)  -f markdown -t man -o quickemu.1
 pandoc -s $(cat quickget.lst)  -f markdown -t man -o quickget.1
-# WARNING : these are different from those in ../ that ( cd .. && make ) 
+# WARNING : these are different from those in ../ that ( cd .. && make )
 # will generate
