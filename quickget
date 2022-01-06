@@ -490,7 +490,7 @@ function zsync_get() {
       fi
     else
       echo "INFO: zsync not found, falling back to wget"
-      web_get "${ISO}"
+      web_get "${ISO}" "${DIR}"
     fi
 }
 
