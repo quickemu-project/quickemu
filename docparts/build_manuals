@@ -1,0 +1,17 @@
+#!/bin/sh
+../quickemu  --help >quickemu.1-14-AllquickemuOptions-02generated.md
+../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep  -e buntu |sort -u  >quickemu.1-07-Ubuntus02-generated.md
+../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep -v -e OS -e bsd -e windows -e  macos -e buntu -e android|sort -u >quickemu.1-08-OtherLinuxGuests02-generated.md
+../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep  android|sort -u  >quickemu.1-13-OtherGuests02-generated.md
+
+echo quickemu.1-* >quickemu.lst
+echo quickget.1-00-header.md quickemu.1-0[7-9]* quickemu.1-1[0-3]* quickget.1-09-footer.md >quickget.lst
+pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../quickemu.1.md
+pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../quickget.1.md
+## Letting the makefile build from the  markdown->markdown conversion
+## gets weird.  For now build here too as these look better
+## Possibly use m4 for consolidation prior to generation ??? 
+pandoc -s $(cat quickemu.lst)  -f markdown -t man -o quickemu.1
+pandoc -s $(cat quickget.lst)  -f markdown -t man -o quickget.1
+# WARNING : these are different from those in ../ that ( cd .. && make ) 
+# will generate
