@@ -870,10 +870,8 @@ function vm_boot() {
 
   if [[ "${ACCESSIBLE}" == "braille" ]] || [[ "${ACCESSIBLE}" == "brl" ]]; then
     # shellcheck disable=SC2054
-      args+=(
-            '-chardev' 'braille,id=brltty'
-            '-device' 'usb-braille,id=usbbrl,chardev=brltty'
-      )
+      args+=(-chardev braille,id=brltty
+             -device usb-braille,id=usbbrl,chardev=brltty)
   fi
 
   if [ -n "${bridge}" ]; then
