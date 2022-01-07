@@ -370,6 +370,19 @@ SPICE ports the VM is connected to.
 ```bash
 cat ubuntu-focal/ubuntu-focal.ports
 ```
+# Accessibility
+
+Qemu provides support for using BrlAPI to display braille output on a real or fake device.
+
+
+```bash
+quickemu --vm ubuntu-impish.conf --accessibility braille
+```
+or even
+
+```bash
+quickemu --vm ubuntu-impish.conf --acc brl
+```
 
 # BIOS and EFI
 
