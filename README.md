@@ -566,8 +566,8 @@ elevated permission, start Quickemu with `--display spice` and then
 select `Input` -\> `Select USB Device for redirection` from the menu to
 choose which device(s) you want to attach to the guest.
 
-Host redirection
-----------------
+Host redirection **NOT Recommended**
+------------------------------------
 
 **USB host redirection is not recommended**, it is provided purely for
 backwards compatibility to older versions of Quickemu. Using SPICE is

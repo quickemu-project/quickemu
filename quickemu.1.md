@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: 'November 26, 2021'
+date: 'January 7, 2022'
 footer: quickemu
 header: Quickemu User Manual
 section: 1
