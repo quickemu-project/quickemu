@@ -1,17 +1,31 @@
-#!/bin/sh
+#!/bin/bash
+
+# First get some bits from the script versions in ../ so we build
+# docs for the options and supported VMs of this specific version
+
 ../quickemu  --help >quickemu.1-14-AllquickemuOptions-02generated.md
-../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep  -e buntu |sort -u  >quickemu.1-07-Ubuntus02-generated.md
-../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep -v -e OS -e bsd -e windows -e  macos -e buntu -e android|sort -u >quickemu.1-08-OtherLinuxGuests02-generated.md
-../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' |grep  android|sort -u  >quickemu.1-13-OtherGuests02-generated.md
+../quickget list_csv | awk -F"," '{print "* `" $2 "`"}' | \
+   tee >(grep  -e buntu |sort -u  >quickemu.1-07-05-Ubuntus02-generated.md ) \
+       >(grep -v -e OS -e bsd -e windows -e  macos -e buntu -e android|sort -u >quickemu.1-08-OtherLinuxGuests02-generated.md) \
+       | grep  android|sort -u  >quickemu.1-13-OtherGuests02-generated.md
 
+# TODO Look at including version and date info via macros or something ...
+
+# Numbers in filenames to glob into build lists - ugly but effective
 echo quickemu.1-* > quickemu.lst
+# quickget manual re-uses some of them with just a header and footer
 echo quickget.1-00-header.md quickemu.1-0[7-9]* quickemu.1-1[0-3]* quickget.1-09-footer.md > quickget.lst
-echo README-00-hdr.md quickemu.1-0[4-6]* README-06-Install.md quickemu.1-0[7-9]* \
+# The Readme pulls everything together with some extras as well
+echo README-00-hdr.md quickemu.1-0[4-6]* README-06-Install.md  README-07-02-GUI.md quickemu.1-0[7-9]* \
 quickemu.1-1[0-3]* quickemu_conf.1-01-spiceheadless.md README-135-confoptions.md quickemu.1-1[4-9]* quickemu.1-2* > README.lst
-#
+# extra config file options seperate man page
 echo quickemu_conf.1-00-hdr.md  README-135-confoptions.md quickemu_conf.1-05-footer.md > quickemu_conf.lst
-
+#
+# Now use pandoc to merge the sections together
+# which also gives an easy place to try and tweak some markdown options
 pandoc -s $(cat quickemu_conf.lst)  -f markdown -t markdown -o ../quickemu_conf.1.md
 pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../quickemu.1.md
 pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../quickget.1.md
 pandoc -s $(cat README.lst)  -f markdown -t markdown -o ../README.md
+
+# The man generation is handled in the parent dir by make
