@@ -107,7 +107,8 @@ Features
 
 -   [Linux Mint](https://linuxmint.com/) ( Cinnamon , MATE , and XFCE) ,
     [elementary OS](https://elementary.io/) ,
-    [Pop!\_OS](https://pop.system76.com/)
+    [Pop!\_OS](https://pop.system76.com/) ,
+    [ZorinOS](https://zorin.com/os/)
 
 -   [Fedora](https://getfedora.org/) , [Alma
     Linux](https://almalinux.org/) , [Oracle
@@ -118,8 +119,8 @@ Features
     [Tumbleweed](https://get.opensuse.org/tumbleweed/) ,
     [MicroOS](https://microos.opensuse.org/) )
 -   [Arch Linux](https://www.archlinux.org/) ,
-    [Kali](https://www.kali.org/) , [Garuda](https://garudalinux.org/) ,
-    [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
+    [Kali](https://www.kali.org/) , [Garuda](https://garudalinux.org/) &
+    [NixOS](https://nixos.org/)
 
 -   [Regolith Linux](https://regolith-linux.org/) ( Release 1.6 and
     latest 2.0.0 pre-release )

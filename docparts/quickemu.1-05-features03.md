@@ -10,6 +10,7 @@
     , and XFCE)
     , [elementary OS](https://elementary.io/)
     , [Pop!_OS](https://pop.system76.com/)
+    , [ZorinOS](https://zorin.com/os/)
 
 
 * [Fedora](https://getfedora.org/)
@@ -25,7 +26,6 @@
 * [Arch Linux](https://www.archlinux.org/)
     , [Kali](https://www.kali.org/)
     , [Garuda](https://garudalinux.org/)
-    , [ZorinOS](https://zorin.com/os/)
     & [NixOS](https://nixos.org/)
 
 * [Regolith Linux](https://regolith-linux.org/)
