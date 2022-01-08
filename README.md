@@ -40,16 +40,18 @@ Features
 
 -   **Windows** 8.1, 10 and 11 including TPM 2.0
 
+<!-- One Entry/Addition per line
+start with , or & or *
+provide Pretty/Well known name and URL of Distro main site
+-->
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
 -   [Debian](https://www.debian.org/) (bullseye with all the official
     and non-free DE variants)
-
 -   [Linux Mint](https://linuxmint.com/) ( Cinnamon , MATE , and XFCE) ,
     [elementary OS](https://elementary.io/) ,
     [Pop!\_OS](https://pop.system76.com/) ,
     [ZorinOS](https://zorin.com/os/)
-
 -   [Fedora](https://getfedora.org/) , [Alma
     Linux](https://almalinux.org/) , [Oracle
     Linux](https://www.oracle.com/linux/) and [Rocky
@@ -61,7 +63,6 @@ Features
 -   [Arch Linux](https://www.archlinux.org/) ,
     [Kali](https://www.kali.org/) , [Garuda](https://garudalinux.org/) &
     [NixOS](https://nixos.org/)
-
 -   [Regolith Linux](https://regolith-linux.org/) ( Release 1.6 and
     latest 2.0.0 pre-release )
 
