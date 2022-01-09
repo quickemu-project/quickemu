@@ -1004,7 +1004,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --accessible            : Select accessible facilitation. 'braille' (default)"
+  echo "  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )"
   echo "  --delete-disk           : Delete the disk image and EFI variables"
   echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
