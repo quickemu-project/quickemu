@@ -1585,6 +1585,38 @@ fi
 LANGS=()
 languages_windows
 
+# handle parameters
+
+# Take command line arguments
+#if [ $# -lt 1 ]; then
+#    usage
+#    exit 0
+#else
+    while [ $# -gt 0 ]; do
+        case "${1}" in
+          -delete|--delete|-delete-disk|--delete-disk)
+            DELETE_DISK=1
+            shift;;
+          -isodir|--isodir)
+            ISODIR="${2}"
+            shift
+            shift;;
+          -localiso|--localiso)
+            LOCALISO="${2}"
+            shift
+            shift;;
+         -h|--h|-help|--help)
+            usage
+            exit 0;;
+          testing)
+             echo "you are just testing
+             ISODIR:  ${ISODIR}
+             LOCALISO: ${LOCALISO}"
+             exit 0;;
+          *)
+
+
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
@@ -1777,4 +1809,12 @@ else
         os_support
     fi
     exit 1
+fi
+;;
+   esac
+    done
+    if [ $# == 0 ]; then
+      echo "Error: You must supply an OS!"
+      os_support
+      exit 1
 fi
