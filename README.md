@@ -376,12 +376,12 @@ Qemu provides support for using BrlAPI to display braille output on a real or fa
 
 
 ```bash
-quickemu --vm ubuntu-impish.conf --accessibility braille
+quickemu --vm ubuntu-impish.conf --accessibility braille --display sdl
 ```
 or even
 
 ```bash
-quickemu --vm ubuntu-impish.conf --acc brl
+quickemu --vm ubuntu-impish.conf --acc brl --display sdl
 ```
 
 # BIOS and EFI
