@@ -1602,7 +1602,7 @@ function get_windows() {
 function usage() {
   echo
   echo "Usage"
-  echo "  $0 <OS> <Release> (<Option>)"
+  echo "  $0 [--isodir] [--localiso] [--list | --json] <OS> <Release> (<Option>)"
   echo
   echo If you omit parameters a list of supported OS options will be provided.
   echo If you omit a Release a list of supported releases for the selected OS will be  given.
