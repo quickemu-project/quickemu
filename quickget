@@ -1599,7 +1599,25 @@ function get_windows() {
     esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
 }
-
+function usage() {
+  echo
+  echo "Usage"
+  echo "  $0 <OS> <Release> (<Option>)"
+  echo
+  echo If you omit parameters a list of supported OS options will be provided.
+  echo If you omit a Release a list of supported releases for the selected OS will be  given.
+  echo
+  echo "You can also pass optional parameters"
+  echo
+  echo "  --list                  : print a csv list of supported guest"
+  echo "  --json                  : print a json list of supported guest"
+  echo "  --isodir                : base path beneath which to find local ISO copy
+                                       if a matching file is found it will be copied to the VM directory"
+  echo "  --localiso              : local ISO filename - defaults to target filename"
+  echo "  --help                  : Print usage (this)"
+  echo "  --version               : Print version"
+  exit 1
+}
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
