@@ -436,9 +436,30 @@ function check_hash() {
     fi
 }
 
+function copy_local(){
+  if [ -n "${ISODIR}" ]; then
+    # use supplied filename or default to original distro ISO name
+      if [ -z ${LOCALISO} ]; then
+        LOCALISO=${FILE}
+      fi
+      LOCALFILE=$(find ${ISODIR} -type f -name "${LOCALISO}" -print -quit )
+      #echo got local file "${LOCALFILE}"
+      if [ -f "${DIR}/${FILE}" ]; then
+        echo "ERROR! File Exists - not copying over local file"
+        echo "Move it out of the way to replace it with a local file"
+        exit 1
+      else
+        cp -pv "${LOCALFILE}" ${DIR}/${FILE}
+      # if ! ; then echo ERROR! Failed to copy ${LOCALFILE}" to ${DIR}/${FILE}"
+      fi
+      #exit 0 # while testing
+    fi
+}
+
 function web_get() {
     local DIR="${2}"
     local FILE=""
+    local LOCALFILE=""
     local URL="${1}"
 
     if [ -n "${3}" ]; then
@@ -451,16 +472,19 @@ function web_get() {
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
     fi
+    copy_local
 
     if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
         echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
         exit 1
     fi
+
 }
 
 function zsync_get() {
     local DIR="${2}"
     local FILE=""
+    local LOCALFILE=""
     local OUT=""
     local URL="${1}"
     FILE="${URL##*/}"
@@ -479,6 +503,8 @@ function zsync_get() {
         echo "ERROR! Unable to create directory ${DIR}"
         exit 1
       fi
+
+    copy_local
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
           echo "ERROR! Failed to download ${URL}.zsync"
@@ -1595,6 +1621,8 @@ languages_windows
     while [ $# -gt 0 ]; do
         case "${1}" in
           -delete|--delete|-delete-disk|--delete-disk)
+          # This appears unused: function is present in quickemu
+          # if this was supposed to also work it needs finishing
             DELETE_DISK=1
             shift;;
           -isodir|--isodir)
@@ -1623,8 +1651,6 @@ languages_windows
              LOCALISO: ${LOCALISO}"
              exit 0;;
           *)
-
-
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
