@@ -1608,7 +1608,16 @@ languages_windows
          -h|--h|-help|--help)
             usage
             exit 0;;
-          testing)
+         -l|--l|-list|--list|list|list_csv)
+            list_csv;;
+          -j|--j|-json|--json|list_json)
+            list_json;;
+          -v|--v|-version|--version|version )
+             whereIam=$(dirname "${BASH_SOURCE[0]}")
+              quickemu_version=$( "${whereIam}"/quickemu --version)
+              echo "Quickemu Version: ${quickemu_version}"
+              exit 0;;
+          test*)
              echo "you are just testing
              ISODIR:  ${ISODIR}
              LOCALISO: ${LOCALISO}"
@@ -1619,16 +1628,6 @@ languages_windows
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
-    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
-        list_csv
-    elif [ "${OS}" == "list_json" ]; then
-        list_json
-    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-      whereIam=$(dirname "${BASH_SOURCE[0]}")
-      quickemu_version=$( "${whereIam}"/quickemu --version)
-      echo "Quickemu Version: ${quickemu_version}"
-      exit 0
-    fi
 else
     echo "ERROR! You must specify an operating system:"
     os_support
