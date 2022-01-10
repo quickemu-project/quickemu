@@ -1638,11 +1638,6 @@ languages_windows
 #else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -delete|--delete|-delete-disk|--delete-disk)
-          # This appears unused: function is present in quickemu
-          # if this was supposed to also work it needs finishing
-            DELETE_DISK=1
-            shift;;
           -isodir|--isodir)
             ISODIR="${2}"
             shift
