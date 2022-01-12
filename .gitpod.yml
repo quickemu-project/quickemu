@@ -3,7 +3,7 @@
 tasks:
   - name: build
     init: echo 'building from scratch' # runs during prebuild
-    command: sudo apt-add-repository ppa:flexiondotorg/quickemu &&
+    before: sudo apt-add-repository ppa:flexiondotorg/quickemu &&
              sudo apt update &&
              sudo apt install quickemu 
 
