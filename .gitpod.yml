@@ -1,0 +1,16 @@
+---
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - name: build
+    init: echo 'building from scratch' # runs during prebuild
+    command: sudo apt-add-repository ppa:flexiondotorg/quickemu &&
+             sudo apt update &&
+             sudo apt install quickemu 
+
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 3000
+    onOpen: open-preview
+vscode:
+  extensions:
+    - dracula-theme.theme-dracula
