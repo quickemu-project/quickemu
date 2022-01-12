@@ -942,7 +942,7 @@ function get_opensuse() {
         URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
         HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
     else
-        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
         HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
     fi
