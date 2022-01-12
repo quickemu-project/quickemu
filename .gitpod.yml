@@ -6,13 +6,15 @@ tasks:
     before: sudo apt-add-repository -y ppa:flexiondotorg/quickemu &&
              sudo apt -y update &&
              sudo apt -y install quickemu 
+    command: gp sync-await qemubuilder && echo 'YAY'
+
   - name: qemu docker
-    before: sudo docker pull qemu/x86-64 
-    init: sudo 
+    command: sudo docker pull qemu/x86-64 
+
   - name: qemu builder
     before: git clone https://gitlab.com/qemu-project/qemu.git
-    init: mkdir ./qemu/build && cd build && ../configure
-    command: make
+    init: mkdir ./qemu/build && cd build && ../configure && make
+    command: gp sync-done qemubuilder
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
