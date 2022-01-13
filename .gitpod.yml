@@ -1,25 +1,28 @@
 ---
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - name: pre build 
+  - name: running [MAIN] |
+    before: echo 'waiting for quickemu build for finish '&& gp sync-await quickemu
+    init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
+    command: echo 'this will run the envierment cmd after the wait'
+  
+  - name: qemu builder [QEMU BUILD] &
+    before: git clone https://gitlab.com/qemu-project/qemu.git
+    command: mkdir /workspace/quickemu/qemu/build && cd /workspace/quickemu/qemu/build && ../configure && make && sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&  gp sync-done qemubuilder
+    
+  - name: pre build [PRE APT SHIT] |
     init: echo 'quickemu build ' # runs during prebuild
     before: sudo apt-add-repository -y ppa:flexiondotorg/quickemu &&
              sudo apt -y update &&
-             ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
+             sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
              gp sync-done quickemu
     command: echo 'YAY'
 
 # - name: qemu docker
 #   command: sudo docker pull qemu/x86-64 
 
-  - name: qemu builder |
-    before: git clone https://gitlab.com/qemu-project/qemu.git
-    command: mkdir /workspace/quickemu/qemu/build && cd /workspace/quickemu/qemu/build && ../configure && make && ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&  gp sync-done qemubuilder
     
-  - name: running |
-    before: echo 'waiting for quickemu build for finish '&& gp sync-await quickemu
-    init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
-    command: echo 'this will run the envierment cmd after the wait'
+
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
