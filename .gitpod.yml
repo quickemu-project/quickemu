@@ -1,7 +1,7 @@
 ---
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - name: build
+  - name: build |
     init: echo 'building from scratch' # runs during prebuild
     before: sudo apt-add-repository -y ppa:flexiondotorg/quickemu &&
              sudo apt -y update &&
@@ -11,12 +11,12 @@ tasks:
 # - name: qemu docker
 #   command: sudo docker pull qemu/x86-64 
 
-  - name: qemu builder
+  - name: qemu builder |
     before: git clone https://gitlab.com/qemu-project/qemu.git
     init: mkdir ./qemu/build && cd build && ../configure && make
     command: gp sync-done qemubuilder && echo 'YAY'
 
-  - name: running
+  - name: running |
     before: echo 'waiting for quickemu build for finish '&& gp sync-await quickemu
     init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
     command: echo 'this will run the envierment cmd after the wait'
@@ -26,6 +26,7 @@ ports:
   - port: 3000
     onOpen: open-preview
   - port: 5930
+    onOpen: ignore
 vscode:
   extensions:
     - dracula-theme.theme-dracula
