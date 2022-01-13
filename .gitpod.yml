@@ -1,19 +1,20 @@
 ---
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - name: build |
-    init: echo 'building from scratch' # runs during prebuild
+  - name: pre build 
+    init: echo 'quickemu build ' # runs during prebuild
     before: sudo apt-add-repository -y ppa:flexiondotorg/quickemu &&
              sudo apt -y update &&
-             ln -s /workspace/quickemu/quickemu /usr/bin/quickemu
-    command: gp sync-done quickemu && echo 'YAY'
+             ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
+             gp sync-done quickemu
+    command: echo 'YAY'
 
 # - name: qemu docker
 #   command: sudo docker pull qemu/x86-64 
 
   - name: qemu builder |
     before: git clone https://gitlab.com/qemu-project/qemu.git
-    command: mkdir ./qemu/build && cd build && ../configure && make && ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&  gp sync-done qemubuilder && echo 'YAY'
+    command: mkdir /workspace/quickemu/qemu/build && cd /workspace/quickemu/qemu/build && ../configure && make && ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&  gp sync-done qemubuilder
     
   - name: running |
     before: echo 'waiting for quickemu build for finish '&& gp sync-await quickemu
