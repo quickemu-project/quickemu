@@ -5,7 +5,7 @@ tasks:
     init: echo 'building from scratch' # runs during prebuild
     before: sudo apt-add-repository -y ppa:flexiondotorg/quickemu &&
              sudo apt -y update &&
-             sudo apt -y install quickemu 
+             ln -s /workspace/quickemu/quickemu /usr/bin/quickemu
     command: gp sync-done quickemu && echo 'YAY'
 
 # - name: qemu docker
@@ -13,7 +13,7 @@ tasks:
 
   - name: qemu builder |
     before: git clone https://gitlab.com/qemu-project/qemu.git
-    init: mkdir ./qemu/build && cd build && ../configure && make
+    init: mkdir ./qemu/build && cd build && ../configure && make && ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64
     command: gp sync-done qemubuilder && echo 'YAY'
 
   - name: running |
