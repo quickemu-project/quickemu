@@ -393,8 +393,11 @@ function vm_boot() {
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
-	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd"
-	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+	  EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd"
+	  efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/qemu/ovmf-x86_64-smm-code.bin" ]; then
+          EFI_CODE="/usr/share/qemu/ovmf-x86_64-smm-code.bin"
+          efi_vars "/usr/share/qemu/ovmf-x86_64-smm-vars.bin" "${EFI_VARS}"
         else
           echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
           echo "       Please install OVMF firmware."
@@ -415,8 +418,11 @@ function vm_boot() {
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
-	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
-	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+	  EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
+	  efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+        elif [ -e "/usr/share/qemu/ovmf-x86_64-code.bin" ]; then
+          EFI_CODE="/usr/share/qemu/ovmf-x86_64-code.bin"
+          efi_vars "/usr/share/qemu/ovmf-x86_64-vars.bin" "${EFI_VARS}"
         else
           echo "ERROR! EFI boot requested but no EFI firmware found."
           echo "       Please install OVMF firmware."
