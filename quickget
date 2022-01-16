@@ -59,6 +59,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -191,6 +192,7 @@ function os_support() {
     ubuntu-kylin \
     ubuntu-mate \
     ubuntu-studio \
+    void \
     windows \
     xubuntu \
     zorin
@@ -350,6 +352,15 @@ function releases_ubuntu() {
     impish \
     devel \
     canary
+}
+
+function releases_void() {
+    echo i686-20210930 \
+    i686-20210930-xfce \
+    x86_64-20210930 \
+    x86_64-20210930-xfce \
+    x86_64-musl-20210930 \
+    x86_64-musl-20210930-xfce
 }
 
 function languages_windows() {
@@ -570,6 +581,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "void" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "macos" ]; then
         GUEST="macos"
         IMAGE_TYPE="img"
@@ -612,6 +626,10 @@ EOF
         fi
 
         if [ "${OS}" == "oraclelinux"  ]; then
+            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "void"  ]; then
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -842,6 +860,7 @@ function get_linuxmint() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
 function get_nixos() {
     local FLAVOR=""
@@ -857,6 +876,7 @@ function get_nixos() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
 function get_openbsd() {
     local HASH=""
@@ -868,6 +888,23 @@ function get_openbsd() {
     URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
     HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_void() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local arch="x86_64"
+    # TODO:  only one hardcoded version of void added.. Add more and make it automatic
+    if
+    validate_release "releases_void"
+    URL="https://alpha.de.repo.voidlinux.org/live/current"
+    ISO="void-live-x86_64-20210930-xfce.iso"
+    #ISO="void-live-${ARCH}${LIBC}-${VERSION}-${FLAVOR}.iso"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1149,6 +1186,7 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+
 function get_garuda() {
     local HASH=""
     local ISO=""
@@ -1480,7 +1518,6 @@ function unattended_windows() {
 EOF
 }
 
-
 function dbg_windows() {
   local DEBUG=0
   if [ ${DEBUG} -eq 1 ]; then
@@ -1627,6 +1664,8 @@ if [ -n "${2}" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
+    elif [ "${OS}" == "void" ]; then
+        get_void
     elif [ "${OS}" == "debian" ]; then
      if [ -n "${3}" ]; then
             FREEDOM="${3}"
@@ -1768,6 +1807,8 @@ else
         releases_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
+    elif [ "${OS}" == "void" ]; then
+        releases_void
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     elif [ "${OS}" == "zorin" ]; then
