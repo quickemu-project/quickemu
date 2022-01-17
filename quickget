@@ -340,7 +340,7 @@ function releases_kdeneon() {
 }
 
 function releases_kolibrios() {
-    echo latest-iso
+    echo latest
 }
 
 function releases_linuxmint(){
@@ -1043,12 +1043,14 @@ function get_kolibrios() {
     local URL=""
 
     validate_release "releases_kolibrios"
-    URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
+    #URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
+    ISO="kolibri.iso"
+    URL="https://builds.kolibrios.org/eng/${ISO}"
     web_get "${URL}" "${VM_PATH}"
-    7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
-    ISO="kolibrios-${RELEASE}.iso"
-    mv "kolibri.iso" "${VM_PATH}/${ISO}"
-    rm "${VM_PATH}/${RELEASE}.7z"
+    #7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
+    #ISO="kolibrios-${RELEASE}.iso"
+    #mv "kolibri.iso" "${VM_PATH}/${ISO}"
+    #rm "${VM_PATH}/${RELEASE}.7z"
     make_vm_config "${ISO}"
 }
 
