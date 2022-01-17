@@ -228,7 +228,7 @@ function vm_boot() {
   local KERNEL_NODE=""
   local KERNEL_VER="?"
   local LSB_DESCRIPTION="Unknown OS"
-  local MACHINETYPE="q35"
+  local MACHINE_TYPE="q35"
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
@@ -475,11 +475,22 @@ function vm_boot() {
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
-      MACHINETYPE="pc"
+      MACHINE_TYPE="pc"
       NET_DEVICE="rtl8139"
       GUEST_TWEAKS="-boot d"
       if [ -z "${disk_size}" ]; then
         disk_size="256M"
+      fi
+      ;;
+    haiku)
+      CPU="-cpu host,kvm=on"
+      MACHINE_TYPE="pc"
+      NET_DEVICE="rtl8139"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      if [ -z "${disk_size}" ]; then
+        disk_size="32G"
       fi
       ;;
     macos)
@@ -852,7 +863,7 @@ function vm_boot() {
 
   # shellcheck disable=SC2054,SC2206,SC2140
   args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
-         -enable-kvm -machine ${MACHINETYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
+         -enable-kvm -machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"

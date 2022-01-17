@@ -40,6 +40,7 @@ comprehensive support for macOS and Windows**.
   * [Oracle Linux](https://www.oracle.com/linux/) and [Rocky Linux](https://rockylinux.org/)
   * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
+  * [Haiku](https://www.haiku-os.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -335,14 +336,27 @@ tpm="on"
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
 
-## BSD Guests
+## Haiku Guests
 
-`quickemu` supports FreeBSD and OpenBSD.
+`quickemu` supports [Haiku](https://www.haiku-os.org/).
 
 ```bash
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
+quickget quickget haiku r1beta3-x86_64
+quickemu --vm haiku-r1beta3-x86_64.conf
 ```
+
+At the moment the only way to share files between host and a Haiku guest is by
+using SSH (having a SSH server running on the host):
+
+On guest:
+
+```bash
+scp example.txt user@host-local-ip:/home/user # sending a file from guest to host
+scp user@host-local-ip:/home/user/example.txt . # receiving a file from host to guest
+```
+
+`quickget` cannot automatically download and create virtual machines for Haiku
+nightly versions, but they work if the ISO and configuration are set up manually.
 
 # SPICE
 
