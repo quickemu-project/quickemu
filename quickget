@@ -40,6 +40,7 @@ function pretty_name() {
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    cachyos)            PRETTY_NAME="CachyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -143,6 +144,8 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="${DL}"
+      elif [ "${OS}" == "cachyos" ]; then
+        DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
@@ -181,6 +184,7 @@ function os_support() {
     android \
     archlinux \
     arcolinux \
+    cachyos \
     debian \
     elementary \
     freebsd \
@@ -271,6 +275,9 @@ function releases_debian() {
     11.2.0-amd64-mate \
     11.2.0-amd64-standard \
     11.2.0-amd64-xfce
+}
+function releases_cachyos() {
+    echo 2022.01.09
 }
 
 function releases_elementary() {
@@ -594,6 +601,9 @@ function make_vm_config() {
     elif [ "${OS}" == "debian" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "cachyos" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -699,6 +709,10 @@ EOF
 
         if [ "${OS}" == "macos" ]; then
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "cachyos"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "garuda"  ]; then
@@ -839,6 +853,21 @@ function get_arcolinux() {
     HASH=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/arcolinuxl-'${VERSION}'-x86_64.iso.sha1' | cut -d " " -f 1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+
+function get_cachyos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_cachyos"
+    #ISO="cachyos-cli-${RELEASE}-x86_64.iso"
+    ISO="cachyos-${RELEASE}-x86_64.iso"
+    URL="https://mirror.cachyos.org/ISO"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
 
@@ -1887,6 +1916,8 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "garuda" ]; then
         get_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        get_cachyos
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1990,6 +2021,8 @@ else
         releases_fedora
     elif [ "${OS}" == "garuda" ]; then
         releases_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        releases_cachyos
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [ "${OS}" == "kolibrios" ]; then
