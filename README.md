@@ -36,7 +36,7 @@ comprehensive support for macOS and Windows**.
   * [Alma Linux](https://almalinux.org/)
   * [Alpine Linux](https://www.alpinelinux.org/)
   * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
-  * [Arch Linux](https://www.archlinux.org/),[ArcoLinux](https://www.arcolinux.info/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
+  * [Arch Linux](https://www.archlinux.org/),[ArcoLinux](https://www.arcolinux.info/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/),[Manjaro](https://manjaro.org), [NixOS](https://nixos.org/) & [ZorinOS](https://zorin.com/os/)
   * [Oracle Linux](https://www.oracle.com/linux/) and [Rocky Linux](https://rockylinux.org/)
   * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
   * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
@@ -180,7 +180,7 @@ preferred flavour.
   * `alma`
   * `alpine`
   * `archlinux`
-  * `arcolinux`  
+  * `arcolinux`
   * `debian`
   * `elementary`
   * `fedora`
