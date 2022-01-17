@@ -56,6 +56,9 @@ function pretty_name() {
     manjaro-deepin)     PRETTY_NAME="Manjaro Deepin";;
     manjaro-i3)         PRETTY_NAME="Manjaro i3";;
     manjaro-mate)       PRETTY_NAME="Manjaro MATE";;
+    mxlinux-xfce)       PRETTY_NAME="MX Linux XFCE";;
+    mxlinux-kde)        PRETTY_NAME="MX Linux KDE";;
+    mxlinux-fluxbox)    PRETTY_NAME="MX Linux Fluxbox";;
     nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
     nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
     nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
@@ -198,6 +201,9 @@ function os_support() {
     manjaro-deepin \
     manjaro-i3 \
     manjaro-mate \
+    mxlinux-xfce \
+    mxlinux-kde \
+    mxlinux-fluxbox \
     nixos-gnome \
     nixos-plasma5 \
     nixos-minimal \
@@ -316,6 +322,10 @@ function releases_kolibrios() {
 
 function releases_linuxmint(){
     echo 20.2
+}
+
+function releases_mxlinux(){
+    echo 21
 }
 
 function releases_nixos(){
@@ -606,6 +616,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"manjaro"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"mxlinux"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"nixos"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -768,7 +781,7 @@ function get_alpine() {
     local URL=""
     local VERSION=""
     local BRANCH=""
-    
+
     validate_release "releases_alpine"
     if [[ "${RELEASE}" == "latest" ]]; then
       BRANCH="latest-stable"
@@ -970,19 +983,19 @@ function get_linuxmint() {
 function get_manjaro() {
     local FLAVOR=""
     local MANIFESTURL=""
-    local ISOKEY=""
+#    local ISOKEY=""
     local HASHKEY=""
     local HASH=""
     local ISO=""
     local URL=""
-        
+
     validate_release "releases_manjaro"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     case ${FLAVOR} in
       xfce|kde|gnome) BRANCH="official";;
       budgie|cinnamon|deepin|i3|mate) BRANCH="community";;
     esac
-    
+
     if [[ ${RELEASE} == "full" ]]; then
       KEY="Download_x64 = "
       HASHKEY="Download_x64_Checksum = "
@@ -993,12 +1006,41 @@ function get_manjaro() {
       KEY="Download_Minimal_lts = "
       HASHKEY="Download_Minimal_x64_Checksum_lts = "
     fi
-   
+
     MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${FLAVOR}.md"
     URL="$(wget -qO- ${MANIFESTURL} | grep "${KEY}" | awk '{print $3}' | tr -d '"')"
     ISO="$(echo $URL | awk -F "/" '{print $6}')"
     HASH=$(wget -qO- ${MANIFESTURL} | grep "${HASHKEY}" | awk '{print $3}' | tr -d '"')
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_mxlinux() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local BASE_URL=""
+
+    validate_release "releases_mxlinux"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+
+    if [[ "$FLAVOR" == "xfce" ]]; then
+        ISO="MX-${RELEASE}_x64.iso"
+        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/Xfce"
+    elif [[ "$FLAVOR" == "kde" ]]; then
+        ISO="MX-${RELEASE}_KDE_x64.iso"
+        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/KDE"
+    elif [[ "$FLAVOR" == "fluxbox" ]]; then
+        ISO="MX-${RELEASE}_fluxbox_x64.iso"
+        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/Fluxbox"
+    fi
+
+    URL="${BASE_URL}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    web_get "${URL}.sha256" "${VM_PATH}"
+    HASH=$(cat "${VM_PATH}/${ISO}.sha256" | cut -d' ' -f1)
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1827,6 +1869,8 @@ if [ -n "${2}" ]; then
         get_linuxmint
     elif [[ "${OS}" == *"manjaro-"* ]]; then
         get_manjaro
+    elif [[ "${OS}" == *"mxlinux-"* ]]; then
+        get_mxlinux
     elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
@@ -1924,6 +1968,8 @@ else
         releases_linuxmint
     elif [[ "${OS}" == *"manjaro-"* ]]; then
         releases_manjaro
+    elif [[ "${OS}" == *"mxlinux-"* ]]; then
+        releases_mxlinux
     elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then

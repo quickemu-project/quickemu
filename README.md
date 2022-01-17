@@ -188,6 +188,7 @@ preferred flavour.
   * `kali`
   * `kdeneon`
   * `linuxmint`
+  * `mxlinux`
   * `nixos`
   * `opensuse`
   * `oraclelinux`
