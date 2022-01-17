@@ -43,6 +43,7 @@ function pretty_name() {
     cachyos)            PRETTY_NAME="CachyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    gentoo)             PRETTY_NAME="Gentoo";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
@@ -148,6 +149,8 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
         DOWNLOADER="${DL}"
+      elif [ "${OS}" == "gentoo" ]; then
+        DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="${DL}"
       else
@@ -190,6 +193,7 @@ function os_support() {
     freebsd \
     fedora \
     garuda \
+    gentoo \
     kali \
     kdeneon \
     kolibrios \
@@ -293,6 +297,10 @@ function releases_fedora(){
     echo 33 \
     34 \
     35
+}
+
+function releases_gentoo(){
+    echo latest
 }
 
 function releases_garuda() {
@@ -617,6 +625,9 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "garuda" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "gentoo" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
@@ -951,6 +962,27 @@ function get_fedora() {
     URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
     HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_gentoo() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local LOCAT=""
+    local INSTALLMIN=""
+
+    validate_release "releases_gentoo"
+    eval $( wget  -O/tmp/gentoolatest https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/${RELEASE}-iso.txt 2>&1 |grep Location | awk '{print "LOCAT="$2}' )
+    LOCAT=$(dirname ${LOCAT})
+    eval $( awk '/admincd-amd64/ {print "ADMIN="$1}; /install-amd64-minimal/ {print "INSTALLMIN="$1}' /tmp/gentoolatest )
+    URL="${LOCAT}/${INSTALLMIN}"
+    ISO=$(basename "${INSTALLMIN}" )
+
+
+    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- ${LOCAT}/${INSTALLMIN}.DIGESTS|grep -e iso|grep  -v -e CONT -e catalyst|cut -d\  -f1)
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1918,6 +1950,8 @@ if [ -n "${2}" ]; then
         get_garuda
     elif [ "${OS}" == "cachyos" ]; then
         get_cachyos
+    elif [ "${OS}" == "gentoo" ]; then
+        get_gentoo
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -2023,6 +2057,8 @@ else
         releases_garuda
     elif [ "${OS}" == "cachyos" ]; then
         releases_cachyos
+    elif [ "${OS}" == "gentoo" ]; then
+        releases_gentoo
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [ "${OS}" == "kolibrios" ]; then
