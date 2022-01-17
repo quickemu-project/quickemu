@@ -45,6 +45,7 @@ function pretty_name() {
     freebsd)            PRETTY_NAME="FreeBSD";;
     gentoo)             PRETTY_NAME="Gentoo";;
     garuda)             PRETTY_NAME="Garuda Linux";;
+    haiku)              PRETTY_NAME="Haiku";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
@@ -194,6 +195,7 @@ function os_support() {
     fedora \
     garuda \
     gentoo \
+    haiku \
     kali \
     kdeneon \
     kolibrios \
@@ -320,6 +322,11 @@ function releases_garuda() {
     cinnamon
 }
 
+function releases_haiku() {
+    echo r1beta3-x86_64 \
+        r1beta3-x86_gcc2h
+}
+
 function releases_kali() {
     echo latest \
     weekly
@@ -333,7 +340,7 @@ function releases_kdeneon() {
 }
 
 function releases_kolibrios() {
-    echo latest-iso
+    echo latest
 }
 
 function releases_linuxmint(){
@@ -596,6 +603,9 @@ function make_vm_config() {
         freebsd )
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
+        kolibrios)
+            GUEST="kolibrios"
+            IMAGE_TYPE="iso";;
         openbsd )
             GUEST="openbsd"
             IMAGE_TYPE="iso";;
@@ -650,6 +660,11 @@ EOF
         fi
 
         if [ "${OS}" == "garuda"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "haiku" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -951,12 +966,14 @@ function get_kolibrios() {
     local URL=""
 
     validate_release "releases_kolibrios"
-    URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
+    #URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
+    ISO="kolibri.iso"
+    URL="https://builds.kolibrios.org/eng/${ISO}"
     web_get "${URL}" "${VM_PATH}"
-    7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
-    ISO="kolibrios-${RELEASE}.iso"
-    mv "kolibri.iso" "${VM_PATH}/${ISO}"
-    rm "${VM_PATH}/${RELEASE}.7z"
+    #7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
+    #ISO="kolibrios-${RELEASE}.iso"
+    #mv "kolibri.iso" "${VM_PATH}/${ISO}"
+    #rm "${VM_PATH}/${RELEASE}.7z"
     make_vm_config "${ISO}"
 }
 
@@ -1397,6 +1414,21 @@ function get_garuda() {
     #  check_hash "${ISO}" "${HASH}"
     #fi
     make_vm_config "${OS}-${RELEASE}.iso"
+}
+
+function get_haiku() {
+    local ISO=""
+    local URL=""
+    local HASH=""
+
+    validate_release "releases_haiku"
+
+    ISO="haiku-${RELEASE}-anyboot.iso"
+    URL="https://cdn.haiku-os.org/haiku-release/$(echo $RELEASE | awk -F '-' '{print $1}')/${ISO}"
+    HASH=$(wget -q -O- ${URL}.sha256 | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function unattended_windows() {
@@ -1875,6 +1907,8 @@ if [ -n "${2}" ]; then
         get_cachyos
     elif [ "${OS}" == "gentoo" ]; then
         get_gentoo
+    elif [ "${OS}" == "haiku" ]; then
+        get_haiku
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
@@ -1982,6 +2016,8 @@ else
         releases_cachyos
     elif [ "${OS}" == "gentoo" ]; then
         releases_gentoo
+    elif [ "${OS}" == "haiku" ]; then
+        releases_haiku
     elif [ "${OS}" == "kali" ]; then
         releases_kali
     elif [ "${OS}" == "kolibrios" ]; then
