@@ -1150,6 +1150,10 @@ else
             VM="${2}"
             shift
             shift;;
+                -src|--qemu)
+            QEMU="${2}"
+            shift
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
