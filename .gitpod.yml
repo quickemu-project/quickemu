@@ -3,6 +3,7 @@ image:
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
   - name: running [MAIN] |
+    openMode: tab-after	
     before: echo 'waiting for quickemu preparation'&& gp sync-await quickemu
     init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
     command: echo 'this will run the envierment cmd after the wait' '&&
@@ -10,6 +11,7 @@ tasks:
             
   
   - name: qemu builder [QEMU BUILD] |
+    openMode: tab-after	
     before: git clone https://gitlab.com/qemu-project/qemu.git
     command: mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
@@ -19,6 +21,7 @@ tasks:
              gp sync-done qemubuilder
     
   - name: pre build [PRE BUILD] |
+    openMode: tab-after	
     init: echo 'quickemu build ' # runs during prebuild
     before: sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
              gp sync-done quickemu
