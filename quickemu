@@ -1083,21 +1083,6 @@ if command -v xdg-user-dir &>/dev/null; then
   fi
 fi
 
-# TODO: Make this run the native architecture binary
-QEMU=$(command -v qemu-system-x86_64)
-QEMU_IMG=$(command -v qemu-img)
-if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
-  exit 1
-fi
-
-QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
-if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
-  echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
-  exit 1
-fi
-
 # Take command line arguments
 if [ $# -lt 1 ]; then
     usage
@@ -1166,6 +1151,24 @@ else
         esac
     done
 fi
+
+
+# TODO: Make this run the native architecture binary
+# https://www.cyberciti.biz/faq/unix-linux-bash-script-check-if-variable-is-empty/
+[ -z "${QEMU}" ] && QEMU=$(command -v qemu-system-x86_64)
+QEMU_IMG=$(command -v qemu-img)
+if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
+  echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
+  exit 1
+fi
+
+QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
+QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
+if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
+  echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
+  exit 1
+fi
+
 
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   # shellcheck source=/dev/null
