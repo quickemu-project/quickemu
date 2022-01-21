@@ -21,7 +21,7 @@ tasks:
              gp sync-done qemubuilder
     
   - name: pre build [PRE BUILD] |
-    openMode: tab-after	
+    openMode: split-left	
     init: echo 'quickemu build ' # runs during prebuild
     before: sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
              gp sync-done quickemu
