@@ -1151,7 +1151,7 @@ else
             VM="${2}"
             shift
             shift;;
-                -src|--qemu)
+          -src|--qemu)
             QEMU="${2}"
             shift
             shift;;
