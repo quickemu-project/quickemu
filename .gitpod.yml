@@ -1,0 +1,38 @@
+image:
+  file: .gitpod.Dockerfile
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - name: running [MAIN] |
+    before: echo 'waiting for quickemu preparation'&& gp sync-await quickemu
+    init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
+    command: echo 'this will run the envierment cmd after the wait' '&&
+            ./quickget ubuntu-mate impish
+            
+  
+  - name: qemu builder [QEMU BUILD] |
+    before: git clone https://gitlab.com/qemu-project/qemu.git
+    command: mkdir /workspace/quickemu/qemu/build &&
+             cd /workspace/quickemu/qemu/build && 
+             ../configure && 
+             make && 
+             sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
+             gp sync-done qemubuilder
+    
+  - name: pre build [PRE BUILD] |
+    init: echo 'quickemu build ' # runs during prebuild
+    before: sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
+             gp sync-done quickemu
+    command: echo 'YAY'
+
+    
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 3000
+    onOpen: open-preview
+  - port: 5930
+    onOpen: ignore
+vscode:
+  extensions:
+    - dracula-theme.theme-dracula
+    - ms-azuretools.vscode-docker
+    - github.vscode-pull-request-github
