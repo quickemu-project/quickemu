@@ -1005,6 +1005,7 @@ function usage() {
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --shortcut              : Create a desktop shortcut"
+  echo "  --src                   : Path to your own native qemu(--src=/path/qemu-...)."
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
