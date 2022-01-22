@@ -5,8 +5,8 @@ tasks:
   - name: running [MAIN] |
     openMode: split-right
     before: echo 'waiting for quickemu preparation'&& gp sync-await quickemu
-    init: echo 'waiting for QEMUbuilder  build for finish '&& gp sync-await qemubuilder
-    command: echo 'this will run the envierment cmd after the wait' '&&
+    init: echo 'waiting for QEMUbuilder  build for finish '&&  gp sync-await qemubuilder
+    command: echo 'this will run the envierment cmd after the wait' '&&  gp sync-await qemubuilder && gp sync-await quickemu
             ./quickget ubuntu-mate impish
             
   
@@ -24,6 +24,7 @@ tasks:
     openMode: split-left	
     init: echo 'quickemu build ' # runs during prebuild
     before: sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
+             git clone https://github.com/novnc/noVNC.git &&
              gp sync-done quickemu
     command: echo 'YAY'
 
