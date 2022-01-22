@@ -6,8 +6,9 @@ tasks:
     openMode: split-right
     before: echo 'waiting for quickemu preparation'&& gp sync-await quickemu
     init: echo 'waiting for QEMUbuilder  build for finish '&&  gp sync-await qemubuilder
-    command: echo 'this will run the envierment cmd after the wait' '&&  gp sync-await qemubuilder && gp sync-await quickemu
-            ./quickget ubuntu-mate impish
+    command: echo 'this will run the envierment cmd after the wait' '&&  gp sync-await qemubuilder && gp sync-await quickemu && /
+            ./quickget ubuntu-mate impish && /
+            ./noVNC/utils/launch.sh --vnc :5900 && /
             
   
   - name: qemu builder [QEMU BUILD] |
@@ -15,8 +16,8 @@ tasks:
     before: git clone https://gitlab.com/qemu-project/qemu.git
     command: mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
-             ../configure && 
-             make && 
+             ../configure --cc=gcc && 
+             make -j$(nproc) && 
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
              gp sync-done qemubuilder
     
