@@ -8,7 +8,7 @@ tasks:
     init: echo 'waiting for QEMUbuilder  build for finish '&&  gp sync-await qemubuilder
     command: echo 'this will run the envierment cmd after the wait' '&&  gp sync-await qemubuilder && gp sync-await quickemu && /
             ./quickget ubuntu-mate impish && /
-            ./noVNC/utils/novnc_proxy --vnc :5900 && /
+            ./noVNC/utils/novnc_proxy --vnc :5900 --listen 5959 && /
             
   
   - name: qemu builder [QEMU BUILD] |
@@ -32,10 +32,16 @@ tasks:
     
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
-  - port: 3000
-    onOpen: open-preview
-  - port: 5930
+  - port: 5900
+    description: local_vnc
+    name: vnc_internal
     onOpen: ignore
+    visibility: private
+  - port: 5959
+    description: novnc
+    name: novnc
+    onOpen: open-preview
+    visibility: private
 vscode:
   extensions:
     - dracula-theme.theme-dracula
