@@ -42,6 +42,11 @@ ports:
     name: novnc
     onOpen: open-preview
     visibility: private
+  - port: 6080
+    description: novnc_default
+    name: novnc_default
+    onOpen: open-preview
+    visibility: private
 vscode:
   extensions:
     - dracula-theme.theme-dracula
