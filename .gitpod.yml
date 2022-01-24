@@ -15,11 +15,11 @@ tasks:
   - name: qemu builder [QEMU BUILD] |
     openMode: split-left
     before: git clone https://gitlab.com/qemu-project/qemu.git
-    command: mkdir /workspace/quickemu/qemu/build &&
-             cd /workspace/quickemu/qemu/build && 
-             ../configure --cc=gcc && 
-             make -j$(nproc) x86_64-softmmu/all && 
-             sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
+    command: mkdir /workspace/quickemu/qemu/build && /
+             cd /workspace/quickemu/qemu/build && /
+             ../configure --cc=gcc && /
+             make qemu-system-x86_64 qemu-img && /
+             sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 && /
              gp sync-done qemubuilder
     
   - name: pre build [PRE BUILD] |
