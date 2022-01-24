@@ -8,8 +8,8 @@ tasks:
     openMode: split-left
     before:
             git clone https://gitlab.com/qemu-project/qemu.git &&
-            mkdir /workspace/quickemu/qemu/build &&
     init:  
+             mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
              ../configure --target-list=x86_64-softmmu && 
              make qemu-system-x86_64  && 
