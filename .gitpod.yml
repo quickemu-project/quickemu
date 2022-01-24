@@ -9,9 +9,11 @@ tasks:
     before: git clone https://gitlab.com/qemu-project/qemu.git
     init: mkdir /workspace/quickemu/qemu/build && 
              cd /workspace/quickemu/qemu/build && 
-             ../configure --cc=gcc && 
-             make qemu-system-x86_64 qemu-img && 
-             sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 && 
+             ../configure --target-list=x86_64-softmmu && 
+             make qemu-system-x86_64  && 
+             make qemu-img && 
+             sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
+             sudo ln -s /workspace/quickemu/qemu/build/qemu-img /usr/bin/qemu-img &&  
              gp sync-done qemubuilder
     
   - name: pre build [PRE BUILD] |
