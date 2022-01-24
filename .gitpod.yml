@@ -7,7 +7,7 @@ tasks:
   - name: qemu builder [QEMU BUILD] |
     openMode: split-left
     before:
-            git clone https://gitlab.com/qemu-project/qemu.git &&
+            git clone https://gitlab.com/qemu-project/qemu.git 
     init:  
              mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
