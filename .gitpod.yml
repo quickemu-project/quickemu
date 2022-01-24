@@ -1,6 +1,7 @@
 image:
   file: .gitpod.Dockerfile
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+#TODO: github prebuild . ( see gitpod-scheme.json:github)
 tasks:
   - name: running [MAIN] |
     openMode: split-right
@@ -8,8 +9,7 @@ tasks:
     init: echo 'waiting for QEMUbuilder  build for finish '&&  gp sync-await qemubuilder
     command: echo 'this will run the envierment cmd after the wait' '&&  gp sync-await qemubuilder && gp sync-await quickemu && /
             ./quickget ubuntu-mate impish && /
-            ./noVNC/utils/novnc_proxy --vnc :5900 --listen 5959 && /
-            
+            ./noVNC/utils/novnc_proxy --vnc :5900 --listen 5959 
   
   - name: qemu builder [QEMU BUILD] |
     openMode: split-left
@@ -17,7 +17,7 @@ tasks:
     command: mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
              ../configure --cc=gcc && 
-             make -j$(nproc) && 
+             make -j$(nproc) x86_64-softmmu/all && 
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
              gp sync-done qemubuilder
     
