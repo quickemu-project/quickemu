@@ -10,8 +10,8 @@ tasks:
              git clone https://gitlab.com/qemu-project/qemu.git &&
              mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
-             ../configure && 
-             make
+             ../configure --target-list=x86_64-softmmu --enable-debug && 
+            make -j$(nproc)
     init:  
              
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
