@@ -1158,22 +1158,21 @@ else
 fi
 
 
-if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  if [[ -d ${QEMU} ]]; then 
-    QEMU="${QEMU}/qemu-system-x86_64"
-    QEMU_IMG="${QEMU}/qemu-img"
-  elif [[ -x ${QEMU} ]]; then
-    echo "ERROR! src is not a Directory - please specified also the path for qemu-img with the parameter --qemu-img <path>"
+if [[ -d ${QEMU} ]]; then 
+  QEMU="${QEMU}/qemu-system-x86_64"
+  QEMU_IMG="${QEMU}/qemu-img"
+elif [[ -x ${QEMU} ]] && [ -z "${QEMU_IMG}" ]; then
+  echo "ERROR! src is not a Directory - please specified also the path for qemu-img with the parameter --qemu-img <path>"
+  exit 1
+else
+  QEMU=$(command -v qemu-system-x86_64)
+  QEMU_IMG=$(command -v qmeu-img) 
+  if [ -z "${QEMU}" ]; then   
+    echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
     exit 1
-  else
-    QEMU=$(command -v qemu-system-x86_64)
-    QEMU_IMG=$(command -v qmeu-img) 
-    if [ -z "${QEMU}" ]; then   
-      echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
-      exit 1
-    fi
   fi
 fi
+
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
 QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
