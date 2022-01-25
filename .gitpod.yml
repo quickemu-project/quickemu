@@ -12,6 +12,7 @@ tasks:
              cd /workspace/quickemu/qemu/build && 
              ../configure --target-list=x86_64-softmmu --enable-debug && 
             make -j$(nproc)
+            gp sync-done qemubuilder
     command:  
              
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
@@ -20,9 +21,10 @@ tasks:
     
   - name: pre build [PRE BUILD] |
     openMode: split-left	
+    
     before: 
              git clone https://github.com/novnc/noVNC.git &&
-             gp sync-done quickemu
+             gp sync-done novnc
     
     init: echo 'quickemu build ' # runs during prebuild
     command: echo 'YAY'
@@ -30,17 +32,19 @@ tasks:
   - name: running [MAIN] |
     openMode: split-right
     before: 
-            echo 'waiting for quickemu preparation' && 
-            gp sync-await quickemu
+            echo 'waiting for novnc preparation' && 
+            gp sync-await novnc && 
+            clear &&
+            echo 'DONE'
     init: 
-            echo 'waiting for QEMUbuilder  build for finish ' &&
+            echo 'quickget - init' &&
             ./quickget ubuntu-mate impish && 
              sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
-            gp sync-await qemubuilder
     command: 
-            echo 'this will run the envierment cmd after the wait' &&  
-            gp sync-await quickemu && 
-            ./quickemu --src /workspace/quickemu/qemu/build/qemu-system-x86_64 --vm ubuntu-mate-impish.conf && 
+            echo 'MAIN task - waiting for qemubuilder...' &&
+            gp sync-await qemubuilder &&  
+            echo ' done' &&
+            ./quickemu --src /workspace/quickemu/qemu/build/ --vm ubuntu-mate-impish.conf && 
             ./noVNC/utils/novnc_proxy --vnc :5900 --listen 5959 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
