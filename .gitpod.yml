@@ -11,8 +11,7 @@ tasks:
              mkdir /workspace/quickemu/qemu/build &&
              cd /workspace/quickemu/qemu/build && 
              ../configure && 
-             make qemu-system-x86_64  && 
-             make qemu-img 
+             make
     init:  
              
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
