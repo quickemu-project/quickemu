@@ -12,7 +12,7 @@ tasks:
              cd /workspace/quickemu/qemu/build && 
              ../configure --target-list=x86_64-softmmu && 
              make qemu-system-x86_64  && 
-             make qemu-img && 
+             make qemu-img 
     init:  
              
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
