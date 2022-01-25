@@ -1005,7 +1005,8 @@ function usage() {
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
   echo "  --shortcut              : Create a desktop shortcut"
-  echo "  --src <path>            : Path to your own native qemu(--src /path/qemu-...)."
+  echo "  --src <path>            : Path to your own native qemu, could be folder or a file (--src /path/qemu-...)"
+  echo "  --qemu-img <path>       : qemu-img binary path, MUST to use in a case of --src is a binary and not a directory.(--qemu-img /path/to/qemu-img)"
   echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
   echo "  --snapshot create <tag> : Create a snapshot."
   echo "  --snapshot delete <tag> : Delete a snapshot."
@@ -1140,6 +1141,10 @@ else
             QEMU="${2}"
             shift
             shift;;
+            --qemu-img)
+            QEMU_IMG="${2}"
+            shift
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1153,13 +1158,21 @@ else
 fi
 
 
-# TODO: Make this run the native architecture binary
-# https://www.cyberciti.biz/faq/unix-linux-bash-script-check-if-variable-is-empty/
-[ -z "${QEMU}" ] && QEMU=$(command -v qemu-system-x86_64)
-QEMU_IMG=$(command -v qemu-img)
 if [ ! -e "${QEMU}" ] && [ ! -e "${QEMU_IMG}" ]; then
-  echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
-  exit 1
+  if [[ -d ${QEMU} ]]; then 
+    QEMU="${QEMU}/qemu-system-x86_64"
+    QEMU_IMG="${QEMU}/qemu-img"
+  elif [[ -x ${QEMU} ]]; then
+    echo "ERROR! src is not a Directory - please specified also the path for qemu-img with the parameter --qemu-img <path>"
+    exit 1
+  else
+    QEMU=$(command -v qemu-system-x86_64)
+    QEMU_IMG=$(command -v qmeu-img) 
+    if [ -z "${QEMU}" ]; then   
+      echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
+      exit 1
+    fi
+  fi
 fi
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
