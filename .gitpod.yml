@@ -21,12 +21,12 @@ tasks:
     
   - name: pre build [PRE BUILD] |
     openMode: split-left	
-    init: echo 'quickemu build ' # runs during prebuild
     before: 
              sudo ln -s /workspace/quickemu/quickemu /usr/bin/quickemu &&
              git clone https://github.com/novnc/noVNC.git &&
              gp sync-done quickemu
     
+    init: echo 'quickemu build ' # runs during prebuild
     command: echo 'YAY'
 
   - name: running [MAIN] |
