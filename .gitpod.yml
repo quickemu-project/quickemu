@@ -38,7 +38,9 @@ tasks:
             echo 'waiting for QEMUbuilder  build for finish ' &&
             gp sync-await qemubuilder
     command: 
-            echo 'this will run the envierment cmd after the wait' &&  gp sync-await qemubuilder && gp sync-await quickemu && 
+            echo 'this will run the envierment cmd after the wait' &&  
+            gp sync-await qemubuilder && 
+            gp sync-await quickemu && 
             ./quickget ubuntu-mate impish && 
             ./quickemu -src /workspace/quickemu/qemu/build/qemu-system-x86_64 --vm ubuntu-mate-impish.conf && 
             ./noVNC/utils/novnc_proxy --vnc :5900 --listen 5959 
