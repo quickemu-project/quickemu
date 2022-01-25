@@ -12,7 +12,7 @@ tasks:
              cd /workspace/quickemu/qemu/build && 
              ../configure --target-list=x86_64-softmmu --enable-debug && 
             make -j$(nproc)
-    init:  
+    command:  
              
              sudo ln -s /workspace/quickemu/qemu/build/qemu-system-x86_64 /usr/bin/qemu-system-x86_64 &&
              sudo ln -s /workspace/quickemu/qemu/build/qemu-img /usr/bin/qemu-img &&  
