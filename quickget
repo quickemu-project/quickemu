@@ -273,15 +273,16 @@ function releases_arcolinux() {
 # later refactor these DE variants like languages and avoid the arch ?
 # all these are available with a "nonfree" option too
 function releases_debian() {
-    echo 11.2.0-amd64-cinnamon \
-    11.2.0-amd64-gnome \
-    11.2.0-amd64-kde \
-    11.2.0-amd64-lxde \
-    11.2.0-amd64-lxqt \
-    11.2.0-amd64-mate \
-    11.2.0-amd64-standard \
-    11.2.0-amd64-xfce
+    echo cinnamon \
+    gnome \
+    kde \
+    lxde \
+    lxqt \
+    mate \
+    standard \
+    xfce
 }
+
 function releases_cachyos() {
     echo 2022.01.09
 }
