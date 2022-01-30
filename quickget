@@ -899,7 +899,6 @@ function get_void() {
     local URL=""
     local arch="x86_64"
     # TODO:  only one hardcoded version of void added.. Add more and make it automatic
-    if
     validate_release "releases_void"
     URL="https://alpha.de.repo.voidlinux.org/live/current"
     ISO="void-live-x86_64-20210930-xfce.iso"
