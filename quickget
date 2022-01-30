@@ -130,6 +130,8 @@ function list_csv() {
       FUNC="linuxmint"
     elif [[ "${OS}" == *"manjaro"* ]]; then
       FUNC="manjaro"
+    elif [[ "${OS}" == *"mxlinux"* ]]; then
+      FUNC="mxlinux"
     elif [[ "${OS}" == *"nixos"* ]]; then
       FUNC="nixos"
     else
