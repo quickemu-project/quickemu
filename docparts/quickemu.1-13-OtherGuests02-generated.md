@@ -1,1 +1,1 @@
-* `android`
+* `android` (Android x86)

@@ -1,8 +1,8 @@
-* `kubuntu`
-* `lubuntu`
-* `ubuntu`
-* `ubuntu-budgie`
-* `ubuntu-kylin`
-* `ubuntu-mate`
-* `ubuntu-studio`
-* `xubuntu`
+* `kubuntu` (Kubuntu)
+* `lubuntu` (Lubuntu)
+* `ubuntu-budgie` (Ubuntu Budgie)
+* `ubuntu-kylin` (Ubuntu Kylin)
+* `ubuntu-mate` (Ubuntu MATE)
+* `ubuntu-studio` (Ubuntu Studio)
+* `ubuntu` (Ubuntu)
+* `xubuntu` (Xubuntu)

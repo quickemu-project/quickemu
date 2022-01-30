@@ -81,59 +81,59 @@ series.
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
 
--   `kubuntu`
--   `lubuntu`
--   `ubuntu`
--   `ubuntu-budgie`
--   `ubuntu-kylin`
--   `ubuntu-mate`
--   `ubuntu-studio`
--   `xubuntu`
+-   `kubuntu` (Kubuntu)
+-   `lubuntu` (Lubuntu)
+-   `ubuntu-budgie` (Ubuntu Budgie)
+-   `ubuntu-kylin` (Ubuntu Kylin)
+-   `ubuntu-mate` (Ubuntu MATE)
+-   `ubuntu-studio` (Ubuntu Studio)
+-   `ubuntu` (Ubuntu)
+-   `xubuntu` (Xubuntu)
 
 Other Linux Guests
 ------------------
 
 `quickget` also supports:
 
--   `alma`
--   `alpine`
--   `archlinux`
--   `arcolinux`
--   `cachyos`
--   `debian`
--   `elementary`
--   `fedora`
--   `garuda`
--   `gentoo`
--   `haiku`
--   `kali`
--   `kdeneon`
--   `kolibrios`
--   `linuxmint-cinnamon`
--   `linuxmint-mate`
--   `linuxmint-xfce`
--   `manjaro-budgie`
--   `manjaro-cinnamon`
--   `manjaro-deepin`
--   `manjaro-gnome`
--   `manjaro-i3`
--   `manjaro-kde`
--   `manjaro-mate`
--   `manjaro-xfce`
--   `mxlinux-fluxbox`
--   `mxlinux-kde`
--   `mxlinux-xfce`
--   `nixos-gnome`
--   `nixos-minimal`
--   `nixos-plasma5`
--   `opensuse`
--   `oraclelinux`
--   `popos`
--   `regolith`
--   `rockylinux`
--   `solus`
--   `tails`
--   `zorin`
+-   `alma` (Alma Linux)
+-   `alpine` (Alpine Linux)
+-   `archlinux` (Arch Linux)
+-   `arcolinux` (Arco Linux)
+-   `cachyos` (CachyOS)
+-   `debian` (Debian)
+-   `elementary` (elementary OS)
+-   `fedora` (Fedora)
+-   `garuda` (Garuda Linux)
+-   `gentoo` (Gentoo)
+-   `haiku` (Haiku)
+-   `kali` (Kali)
+-   `kdeneon` (KDE Neon)
+-   `kolibrios` (KolibriOS)
+-   `linuxmint-cinnamon` (Linux Mint Cinnamon)
+-   `linuxmint-mate` (Linux Mint MATE)
+-   `linuxmint-xfce` (Linux Mint XFCE)
+-   `manjaro-budgie` (Manjaro Budgie)
+-   `manjaro-cinnamon` (Manjaro Cinnamon)
+-   `manjaro-deepin` (Manjaro Deepin)
+-   `manjaro-gnome` (Manjaro Gnome)
+-   `manjaro-i3` (Manjaro i3)
+-   `manjaro-kde` (Manjaro KDE)
+-   `manjaro-mate` (Manjaro MATE)
+-   `manjaro-xfce` (Manjaro XFCE)
+-   `mxlinux-fluxbox` (MX Linux Fluxbox)
+-   `mxlinux-kde` (MX Linux KDE)
+-   `mxlinux-xfce` (MX Linux XFCE)
+-   `nixos-gnome` (NixOS Gnome)
+-   `nixos-minimal` (NixOS Minimal)
+-   `nixos-plasma5` (NixOS KDE)
+-   `opensuse` (openSUSE)
+-   `oraclelinux` (Oracle Linux)
+-   `popos` (Pop!\_OS)
+-   `regolith` (Regolith Linux)
+-   `rockylinux` (Rocky Linux)
+-   `solus` (Solus)
+-   `tails` (Tails)
+-   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -304,7 +304,7 @@ quickemu --vm freebsd-13_0.conf
 Other Guests
 ------------
 
--   `android`
+-   `android` (Android x86)
 
 AUTHORS
 =======
