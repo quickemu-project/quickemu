@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
@@ -216,7 +215,6 @@ function releases_android() {
 function releases_archlinux() {
     echo latest
 }
-
 # later refactor these DE variants like languages and avoid the arch ?
 # all these are available with a "nonfree" option too
 function releases_debian() {
@@ -278,6 +276,14 @@ function releases_linuxmint(){
     echo 20.2
 }
 
+function releases_macos() {
+    echo high-sierra \
+    mojave \
+    catalina \
+    big-sur \
+    monterey
+}
+
 function releases_nixos(){
     echo 21.05 \
     21.11
@@ -306,14 +312,6 @@ function releases_oraclelinux() {
     7.7
 }
 
-function releases_macos() {
-    echo high-sierra \
-    mojave \
-    catalina \
-    big-sur \
-    monterey
-}
-
 function releases_popos() {
     echo 20.04 \
     21.04
@@ -325,7 +323,6 @@ function releases_regolith() {
     2.0.0_impish \
     2.0.0_hirsute
 }
-
 
 function releases_rockylinux() {
     echo 8.5 \
@@ -351,48 +348,6 @@ function releases_ubuntu() {
     devel \
     canary
 }
-
-function languages_windows() {
-    LANGS=(Arabic
-    "Brazilian Portuguese"
-    Bulgarian
-    "Chinese (Simplified)"
-    "Chinese (Traditional)"
-    Croatian
-    Czech
-    Danish
-    Dutch
-    English
-    "English International"
-    Estonian
-    Finnish
-    French
-    "French Canadian"
-    German
-    Greek
-    Hebrew
-    Hungarian
-    Italian
-    Japanese
-    Korean
-    Latvian
-    Lithuanian
-    Norwegian
-    Polish
-    Portuguese
-    Romanian
-    Russian
-    "Serbian Latin"
-    Slovak
-    Slovenian
-    Spanish
-    "Spanish (Mexico)"
-    Swedish
-    Thai
-    Turkish
-    Ukrainian)
-}
-
 
 function releases_windows() {
     echo 8 \
@@ -637,6 +592,34 @@ EOF
     start_vm_info
 }
 
+function get_alma() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+    #local isotype=""
+
+    validate_release "releases_alma"
+
+    ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
+    if [ -n "${1}" ]; then
+      ISOTYPE="${1}"
+    fi
+
+
+    # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
+    # We'll just grab the first
+
+    URL=$(wget -qq -O- "https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html" | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
+
+    #VM_PATH="${VM_PATH}"-${ISOTYPE}
+    ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
+    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \(${ISO} | cut -d\   -f4)"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_android() {
   local HASH=""
   local ISO=""
@@ -665,33 +648,6 @@ function get_android() {
   make_vm_config "${ISO}"
 }
 
-function get_alma() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-    local VERSION=""
-    #local isotype=""
-
-    validate_release "releases_alma"
-
-    ISOTYPE="minimal" # boot is a step too far for now - needs setting install source to mirror tree ... nope
-    if [ -n "${1}" ]; then
-      ISOTYPE="${1}"
-    fi
-
-
-    # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
-    # We'll just grab the first
-
-    URL=$(wget -qq -O- "https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html" | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS=""  |grep href|cut -d\" -f2|head -1)
-
-    #VM_PATH="${VM_PATH}"-${ISOTYPE}
-    ISO=AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso
-    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \(${ISO} | cut -d\   -f4)"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -707,7 +663,6 @@ function get_archlinux() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_debian() {
     local HASH=""
@@ -793,6 +748,42 @@ function get_fedora() {
     make_vm_config "${ISO}"
 }
 
+function get_garuda() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local REL_TYPE=""
+    local LATEST_URL=""
+    local HASH_URL=""
+    local GLDL="http://mirrors.fossho.st/garuda/iso"
+
+    validate_release "releases_garuda"
+
+    # Part of the path is different for a couple of community releases vs the supported garuda ones
+    case ${RELEASE} in
+      mate|cinnamon)
+        REL_TYPE="community";;
+      *)
+        REL_TYPE="garuda";;
+    esac
+
+    # need to follow daily releases and use contents of SHA sums file
+    # to derive the filename and date
+    LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
+    HASH_URL="$(wget -q -O- ${LATEST_URL})"
+    ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
+    HASH=$(echo "${HASH_URL}" | cut -d\  -f1)
+    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) #
+    URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
+
+    #web_get "${URL}/${ISO}" "${VM_PATH}"
+    zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
+    #if [ -n "${HASH}" ]; then
+    #  check_hash "${ISO}" "${HASH}"
+    #fi
+    make_vm_config "${OS}-${RELEASE}.iso"
+}
+
 function get_kali() {
     local HASH=""
     local ISO=""
@@ -842,142 +833,7 @@ function get_linuxmint() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
-}
-function get_nixos() {
-    local FLAVOR=""
-    local HASH=""
-    local ISO=""
-    local URL=""
 
-    validate_release "releases_nixos"
-    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
-    URL="https://channels.nixos.org/nixos-${RELEASE}/${ISO}"
-    HASH=$(wget -q -O- "https://channels.nixos.org/nixos-${RELEASE}/${ISO}.sha256" |  cut -d' ' -f1)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-function get_openbsd() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    validate_release "releases_openbsd"
-    ISO="install${RELEASE//\./}.iso"
-    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
-    HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_zorin() {
-    local ISO=""
-    local URL=""
-
-    validate_release "releases_zorin"
-    # their redirector returns an href so we need to get that and parse out the iso
-    URL=$(curl -s "https://zrn.co/${RELEASE}" |cut -d\" -f2)
-    ISO=$(echo "${URL}"| awk -F\/ ' {print $NF}')
-    web_get "${URL}" "${VM_PATH}"
-    make_vm_config "${ISO}"
-}
-
-function get_rocky() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    local arch="x86_64"
-    local baseurl="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/${arch}"
-
-    validate_release "releases_rockylinux"
-    ISO="Rocky-${RELEASE}-${arch}-${ISOTYPE}.iso"
-    URL="${baseurl}/${ISO}"
-    HASH=$(wget -q -O- "${baseurl}/CHECKSUM" | grep "SHA256 (${ISO})" | grep -E -i -w -o '[0-9a-z]{64}')
-
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_solus() {
-    local RELNUM=""
-    local RELTYPE=""
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    validate_release "releases_solus"
-    RELNUM=$(echo "${RELEASE}" | cut -d'-' -f1)
-    RELTYPE=$(echo "${RELEASE}" | cut -d'-' -f2)
-    case ${RELTYPE} in
-      mate|gnome)
-        RELTYPE=${RELTYPE^^};;
-      *)
-        RELTYPE=${RELTYPE^};;
-    esac
-
-    ISO="Solus-${RELNUM}-${RELTYPE}.iso"
-    URL="https://mirrors.rit.edu/solus/images/${RELNUM}/${ISO}"
-    HASH=$(wget -q -O- "${URL}.sha256sum" |  cut -d' ' -f1)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_opensuse() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    validate_release "releases_opensuse"
-    if [ "${RELEASE}" == "tumbleweed" ]; then
-        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    elif [ "${RELEASE}" == "microos" ]; then
-        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    else
-        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
-        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    fi
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_oraclelinux() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    local arch="x86_64"
-
-    validate_release "releases_oraclelinux"
-
-    local majorver=${RELEASE::1}
-    local minorver=${RELEASE:2:1}
-
-    local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
-    local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
-
-    if [ "${majorver}" == "8" ]; then
-        ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
-    else
-        ISO="OracleLinux-R${majorver}-U${minorver}-Server-${arch}-dvd.iso"
-    fi
-
-    URL="${baseurl}/${ISO}"
-    HASH=$(wget -q -O- "${hashurl}" | grep "${ISO}" | cut -d' ' -f1)
-
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
 }
 
 function get_macos() {
@@ -1048,6 +904,89 @@ function get_macos() {
     make_vm_config RecoveryImage.img
 }
 
+function get_nixos() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_nixos"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
+    URL="https://channels.nixos.org/nixos-${RELEASE}/${ISO}"
+    HASH=$(wget -q -O- "https://channels.nixos.org/nixos-${RELEASE}/${ISO}.sha256" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_openbsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_openbsd"
+    ISO="install${RELEASE//\./}.iso"
+    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
+    HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_opensuse() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_opensuse"
+    if [ "${RELEASE}" == "tumbleweed" ]; then
+        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    elif [ "${RELEASE}" == "microos" ]; then
+        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    else
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    fi
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_oraclelinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    local arch="x86_64"
+
+    validate_release "releases_oraclelinux"
+
+    local majorver=${RELEASE::1}
+    local minorver=${RELEASE:2:1}
+
+    local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
+    local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
+
+    if [ "${majorver}" == "8" ]; then
+        ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
+    else
+        ISO="OracleLinux-R${majorver}-U${minorver}-Server-${arch}-dvd.iso"
+    fi
+
+    URL="${baseurl}/${ISO}"
+    HASH=$(wget -q -O- "${hashurl}" | grep "${ISO}" | cut -d' ' -f1)
+
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_popos() {
     local DRIVER="intel"
     local HASH=""
@@ -1069,7 +1008,6 @@ function get_popos() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_regolith() {
     local HASH=""
@@ -1100,6 +1038,48 @@ function get_regolith() {
     make_vm_config "${ISO}"
 }
 
+function get_rocky() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    local arch="x86_64"
+    local baseurl="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/${arch}"
+
+    validate_release "releases_rockylinux"
+    ISO="Rocky-${RELEASE}-${arch}-${ISOTYPE}.iso"
+    URL="${baseurl}/${ISO}"
+    HASH=$(wget -q -O- "${baseurl}/CHECKSUM" | grep "SHA256 (${ISO})" | grep -E -i -w -o '[0-9a-z]{64}')
+
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_solus() {
+    local RELNUM=""
+    local RELTYPE=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_solus"
+    RELNUM=$(echo "${RELEASE}" | cut -d'-' -f1)
+    RELTYPE=$(echo "${RELEASE}" | cut -d'-' -f2)
+    case ${RELTYPE} in
+      mate|gnome)
+        RELTYPE=${RELTYPE^^};;
+      *)
+        RELTYPE=${RELTYPE^};;
+    esac
+
+    ISO="Solus-${RELNUM}-${RELTYPE}.iso"
+    URL="https://mirrors.rit.edu/solus/images/${RELNUM}/${ISO}"
+    HASH=$(wget -q -O- "${URL}.sha256sum" |  cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 
 function get_ubuntu() {
     local DEVEL="daily-live"
@@ -1149,40 +1129,144 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
-function get_garuda() {
-    local HASH=""
+
+# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
+function get_windows() {
+    local ARCH="x64"
+    local INDEX=0
+    local LANG_CODE="en"
+    local LATEST_WINDOWS_VERSION=""
+    local WINDOWS_NAME=""
+    local VERSION_ID=""
+    local EDITION_ID=""
+    local LANGUAGE_ID=""
+    local FILE_NAME=""
+    local ARCH_ID=""
+    local DOWNLOAD_INFO=""
+    local DOWNLOAD_ID=""
+    local DOWNLOAD_URL=""
+
+    validate_release "releases_windows"
+
+    # Ignore the most recent Windows 10 release for now.
+    if [ "${RELEASE}" -eq 10 ]; then
+      INDEX=0
+    fi
+
+    if [ "${RELEASE}" -eq 11 ]; then
+      INDEX=0
+    fi
+
+    echo "Getting Windows ${RELEASE} URL..."
+    WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
+    dbg_windows "${WINDOWS_VERSIONS}"
+    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
+    dbg_windows "${LATEST_WINDOWS_VERSION}"
+
+    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
+    dbg_windows "${WINDOWS_NAME}"
+    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
+    dbg_windows "${VERSION_ID}"
+
+    case ${RELEASE} in
+        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
+        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
+    esac
+    dbg_windows "${EDITION_ID}"
+
+    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
+    dbg_windows "${LANGUAGE_ID}"
+    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
+    dbg_windows "${ARCH_INFO}"
+    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
+    dbg_windows "${FILE_NAME}"
+    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
+    dbg_windows "${ARCH_ID}"
+    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+    dbg_windows "${DOWNLOAD_INFO}"
+    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
+    dbg_windows "${DOWNLOAD_SHA1}"
+    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
+    dbg_windows "${DOWNLOAD_ID}"
+    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    dbg_windows "${DOWNLOAD_URL}"
+
+    echo "Downloading ${WINDOWS_NAME}..."
+    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+
+    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
+    if [ -n "${DOWNLOAD_SHA1}" ]; then
+      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+    fi
+
+    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+
+    rm -f "${VM_PATH}/unattended.iso"
+    case ${RELEASE} in
+        10|11)
+            echo "Making unattended.iso"
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
+    esac
+    make_vm_config "${FILE_NAME}" "virtio-win.iso"
+}
+
+function get_zorin() {
     local ISO=""
     local URL=""
-    local REL_TYPE=""
-    local LATEST_URL=""
-    local HASH_URL=""
-    local GLDL="http://mirrors.fossho.st/garuda/iso"
 
-    validate_release "releases_garuda"
+    validate_release "releases_zorin"
+    # their redirector returns an href so we need to get that and parse out the iso
+    URL=$(curl -s "https://zrn.co/${RELEASE}" |cut -d\" -f2)
+    ISO=$(echo "${URL}"| awk -F\/ ' {print $NF}')
+    web_get "${URL}" "${VM_PATH}"
+    make_vm_config "${ISO}"
+}
 
-    # Part of the path is different for a couple of community releases vs the supported garuda ones
-    case ${RELEASE} in
-      mate|cinnamon)
-        REL_TYPE="community";;
-      *)
-        REL_TYPE="garuda";;
-    esac
-
-    # need to follow daily releases and use contents of SHA sums file
-    # to derive the filename and date
-    LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
-    HASH_URL="$(wget -q -O- ${LATEST_URL})"
-    ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
-    HASH=$(echo "${HASH_URL}" | cut -d\  -f1)
-    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) #
-    URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
-
-    #web_get "${URL}/${ISO}" "${VM_PATH}"
-    zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
-    #if [ -n "${HASH}" ]; then
-    #  check_hash "${ISO}" "${HASH}"
-    #fi
-    make_vm_config "${OS}-${RELEASE}.iso"
+function languages_windows() {
+    LANGS=(Arabic
+    "Brazilian Portuguese"
+    Bulgarian
+    "Chinese (Simplified)"
+    "Chinese (Traditional)"
+    Croatian
+    Czech
+    Danish
+    Dutch
+    English
+    "English International"
+    Estonian
+    Finnish
+    French
+    "French Canadian"
+    German
+    Greek
+    Hebrew
+    Hungarian
+    Italian
+    Japanese
+    Korean
+    Latvian
+    Lithuanian
+    Norwegian
+    Polish
+    Portuguese
+    Romanian
+    Russian
+    "Serbian Latin"
+    Slovak
+    Slovenian
+    Spanish
+    "Spanish (Mexico)"
+    Swedish
+    Thai
+    Turkish
+    Ukrainian)
 }
 
 function unattended_windows() {
@@ -1480,98 +1564,11 @@ function unattended_windows() {
 EOF
 }
 
-
 function dbg_windows() {
   local DEBUG=0
   if [ ${DEBUG} -eq 1 ]; then
     echo "${1}"
   fi
-}
-
-# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
-function get_windows() {
-    local ARCH="x64"
-    local INDEX=0
-    local LANG_CODE="en"
-    local LATEST_WINDOWS_VERSION=""
-    local WINDOWS_NAME=""
-    local VERSION_ID=""
-    local EDITION_ID=""
-    local LANGUAGE_ID=""
-    local FILE_NAME=""
-    local ARCH_ID=""
-    local DOWNLOAD_INFO=""
-    local DOWNLOAD_ID=""
-    local DOWNLOAD_URL=""
-
-    validate_release "releases_windows"
-
-    # Ignore the most recent Windows 10 release for now.
-    if [ "${RELEASE}" -eq 10 ]; then
-      INDEX=0
-    fi
-
-    if [ "${RELEASE}" -eq 11 ]; then
-      INDEX=0
-    fi
-
-    echo "Getting Windows ${RELEASE} URL..."
-    WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-    dbg_windows "${WINDOWS_VERSIONS}"
-    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
-    dbg_windows "${LATEST_WINDOWS_VERSION}"
-
-    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
-    dbg_windows "${WINDOWS_NAME}"
-    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
-    dbg_windows "${VERSION_ID}"
-
-    case ${RELEASE} in
-        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
-        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
-    esac
-    dbg_windows "${EDITION_ID}"
-
-    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
-    dbg_windows "${LANGUAGE_ID}"
-    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
-    dbg_windows "${ARCH_INFO}"
-    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
-    dbg_windows "${FILE_NAME}"
-    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
-    dbg_windows "${ARCH_ID}"
-    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
-    dbg_windows "${DOWNLOAD_INFO}"
-    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
-    dbg_windows "${DOWNLOAD_SHA1}"
-    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
-    dbg_windows "${DOWNLOAD_ID}"
-    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
-    dbg_windows "${DOWNLOAD_URL}"
-
-    echo "Downloading ${WINDOWS_NAME}..."
-    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
-
-    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
-    if [ -n "${DOWNLOAD_SHA1}" ]; then
-      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
-    fi
-
-    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
-
-    rm -f "${VM_PATH}/unattended.iso"
-    case ${RELEASE} in
-        10|11)
-            echo "Making unattended.iso"
-            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
-            ;;
-    esac
-    make_vm_config "${FILE_NAME}" "virtio-win.iso"
 }
 
 trap cleanup EXIT
