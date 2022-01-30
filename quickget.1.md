@@ -96,16 +96,33 @@ Other Linux Guests
 `quickget` also supports:
 
 -   `alma`
+-   `alpine`
 -   `archlinux`
+-   `arcolinux`
+-   `cachyos`
 -   `debian`
 -   `elementary`
 -   `fedora`
 -   `garuda`
+-   `gentoo`
+-   `haiku`
 -   `kali`
 -   `kdeneon`
+-   `kolibrios`
 -   `linuxmint-cinnamon`
 -   `linuxmint-mate`
 -   `linuxmint-xfce`
+-   `manjaro-budgie`
+-   `manjaro-cinnamon`
+-   `manjaro-deepin`
+-   `manjaro-gnome`
+-   `manjaro-i3`
+-   `manjaro-kde`
+-   `manjaro-mate`
+-   `manjaro-xfce`
+-   `mxlinux-fluxbox`
+-   `mxlinux-kde`
+-   `mxlinux-xfce`
 -   `nixos-gnome`
 -   `nixos-minimal`
 -   `nixos-plasma5`
@@ -115,6 +132,7 @@ Other Linux Guests
 -   `regolith`
 -   `rockylinux`
 -   `solus`
+-   `tails`
 -   `zorin`
 
 Or you can download a Linux image and manually create a VM

@@ -1,10 +1,10 @@
 ---
 author: Martin Wimpress
 date: 'January 7, 2022'
-footer: 'quickemu\_conf'
+footer: quickemu\_conf
 header: Quickemu Configuration Manual
 section: 1
-title: 'QUICKEMU\_CONF'
+title: QUICKEMU\_CONF
 ---
 
 NAME
