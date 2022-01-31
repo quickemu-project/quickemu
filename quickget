@@ -58,6 +58,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -190,6 +191,7 @@ function os_support() {
     ubuntu-kylin \
     ubuntu-mate \
     ubuntu-studio \
+    void \
     windows \
     xubuntu \
     zorin
@@ -347,6 +349,13 @@ function releases_ubuntu() {
     impish \
     devel \
     canary
+}
+
+function releases_void() {
+    echo base \
+    musl \
+    xfce \
+    xfce-musl
 }
 
 function releases_windows() {
@@ -525,6 +534,9 @@ function make_vm_config() {
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "void" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "macos" ]; then
         GUEST="macos"
         IMAGE_TYPE="img"
@@ -535,7 +547,6 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     fi
-
 
     if [ -n "${ISOTYPE}" ]; then
         RELEASE=${RELEASE}-${ISOTYPE}
@@ -551,9 +562,11 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+
         if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
+
         if [ "${OS}" == "openbsd" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
@@ -570,13 +583,16 @@ EOF
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
+        if [ "${OS}" == "void"  ]; then
+            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
         if [ "${OS}" == "zorin"  ]; then
             case  ${RELEASE} in
               15education64|15edulite64|15edulite32)
                 echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
             esac
         fi
-
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
@@ -1130,6 +1146,39 @@ function get_ubuntu() {
     fi
 }
 
+function get_void() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASH_URL=""
+    # TODO: Choose closest mirror
+    validate_release "releases_void"
+    DATE=$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current//sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
+    URL="http://mirror.fit.cvut.cz/voidlinux/live/current"
+    case ${RELEASE} in
+      base)
+        ISO="void-live-x86_64-${DATE}.iso";;
+      musl)
+        ISO="void-live-x86_64-musl-${DATE}.iso";;
+      xfce)
+        ISO="void-live-x86_64-${DATE}-xfce.iso";;
+      xfce-musl)
+        ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+    esac
+    case ${RELEASE} in
+      base)
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
+      musl)
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+      xfce)
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
+      xfce-musl)
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+    esac
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
     local ARCH="x64"
@@ -1624,6 +1673,8 @@ if [ -n "${2}" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
+    elif [ "${OS}" == "void" ]; then
+        get_void
     elif [ "${OS}" == "debian" ]; then
      if [ -n "${3}" ]; then
             FREEDOM="${3}"
@@ -1765,6 +1816,8 @@ else
         releases_solus
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
+    elif [ "${OS}" == "void" ]; then
+        releases_void
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     elif [ "${OS}" == "zorin" ]; then
