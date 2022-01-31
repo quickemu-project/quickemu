@@ -133,6 +133,7 @@ Other Linux Guests
 -   `rockylinux` (Rocky Linux)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `void` (Void Linux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM

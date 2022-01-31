@@ -76,6 +76,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -131,7 +132,7 @@ function list_csv() {
     elif [[ "${OS}" == *"manjaro"* ]]; then
       FUNC="manjaro"
     elif [[ "${OS}" == *"mxlinux"* ]]; then
-        FUNC="mxlinux"
+      FUNC="mxlinux"
     elif [[ "${OS}" == *"nixos"* ]]; then
       FUNC="nixos"
     else
@@ -234,6 +235,7 @@ function os_support() {
     ubuntu-kylin \
     ubuntu-mate \
     ubuntu-studio \
+    void \
     windows \
     xubuntu \
     zorin
@@ -441,6 +443,13 @@ function releases_ubuntu() {
     impish \
     devel \
     canary
+}
+
+function releases_void() {
+    echo base \
+    musl \
+    xfce \
+    xfce-musl
 }
 
 function languages_windows() {
@@ -672,6 +681,10 @@ EOF
         fi
 
         if [ "${OS}" == "oraclelinux"  ]; then
+            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "void"  ]; then
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -994,6 +1007,7 @@ function get_linuxmint() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
 
 function get_manjaro() {
@@ -1075,6 +1089,7 @@ function get_nixos() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
 function get_openbsd() {
     local HASH=""
@@ -1086,6 +1101,40 @@ function get_openbsd() {
     URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
     HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_void() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASH_URL=""
+
+    validate_release "releases_void"
+    DATE=$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
+    URL="http://mirror.fit.cvut.cz/voidlinux/live/current"
+    case ${RELEASE} in
+      base)
+        ISO="void-live-x86_64-${DATE}.iso";;
+      musl)
+        ISO="void-live-x86_64-musl-${DATE}.iso";;
+      xfce)
+        ISO="void-live-x86_64-${DATE}-xfce.iso";;
+      xfce-musl)
+        ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+    esac
+    case ${RELEASE} in
+      base)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
+      musl)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+      xfce)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
+      xfce-musl)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+    esac
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1383,6 +1432,7 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+
 function get_garuda() {
     local HASH=""
     local ISO=""
@@ -1729,7 +1779,6 @@ function unattended_windows() {
 EOF
 }
 
-
 function dbg_windows() {
   local DEBUG=0
   if [ ${DEBUG} -eq 1 ]; then
@@ -1880,6 +1929,8 @@ if [ -n "${2}" ]; then
         get_archlinux
     elif [ "${OS}" == "arcolinux" ]; then
         get_arcolinux
+    elif [ "${OS}" == "void" ]; then
+        get_void
     elif [ "${OS}" == "debian" ]; then
      if [ -n "${3}" ]; then
             FREEDOM="${3}"
@@ -2053,6 +2104,8 @@ else
         releases_tails
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
+    elif [ "${OS}" == "void" ]; then
+        releases_void
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     elif [ "${OS}" == "zorin" ]; then
