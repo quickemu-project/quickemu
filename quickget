@@ -1058,13 +1058,13 @@ function get_mxlinux() {
 
     if [[ "$FLAVOR" == "xfce" ]]; then
         ISO="MX-${RELEASE}_x64.iso"
-        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/Xfce"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce/"
     elif [[ "$FLAVOR" == "kde" ]]; then
         ISO="MX-${RELEASE}_KDE_x64.iso"
-        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/KDE"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/KDE/"
     elif [[ "$FLAVOR" == "fluxbox" ]]; then
         ISO="MX-${RELEASE}_fluxbox_x64.iso"
-        BASE_URL="https://anorien.csc.warwick.ac.uk/mirrors/mxlinux/isos/MX/Final/Fluxbox"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Fluxbox/"
     fi
 
     URL="${BASE_URL}/${ISO}"
