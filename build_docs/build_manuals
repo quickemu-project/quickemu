@@ -22,4 +22,4 @@ pandoc -s $(cat quickemu_conf.lst)  -f markdown -t man -o ../docs/quickemu_conf.
 
 pandoc -s $(cat README.lst)  -f markdown -t markdown -o README_main.md
 #
-cat README-00-hdr.md README_main.md >../docs/README.md
+cat README-00-hdr.md README_main.md >../README.md

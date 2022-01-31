@@ -3,7 +3,7 @@ datadir := $(datarootdir)
 mandir := $(datarootdir)/man
 bindir :=  $(PREFIX)/bin
 
-all: ../docs/README.md
+all: ../docs/quickemu.1.md
 
 ../docs/quickemu.1.md :
 	./build_manuals
