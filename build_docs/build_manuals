@@ -12,16 +12,9 @@ quickemu.1-1[0-3]* quickemu_conf.1-01-spiceheadless.md README-135-confoptions.md
 #
 echo quickemu_conf.1-00-hdr.md  README-135-confoptions.md quickemu_conf.1-05-footer.md > quickemu_conf.lst
 
-pandoc -s $(cat quickemu_conf.lst)  -f markdown -t markdown -o ../quickemu_conf.1.md
-pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../quickemu.1.md
-pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../quickget.1.md
+pandoc -s $(cat quickemu_conf.lst)  -f markdown -t markdown -o ../docs/quickemu_conf.1.md
+pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../docs/quickemu.1.md
+pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../docs/quickget.1.md
 pandoc -s $(cat README.lst)  -f markdown -t markdown -o README_main.md
-## Letting the makefile build from the  markdown->markdown conversion
-## gets weird.  For now build here too as these look better
-## Possibly use m4 for consolidation prior to generation ???
-pandoc -s $(cat quickemu.lst)  -f markdown -t man -o quickemu.1
-pandoc -s $(cat quickget.lst)  -f markdown -t man -o quickget.1
-pandoc -s $(cat quickemu_conf.lst)  -f markdown -t man -o quickemu_conf.1
-# WARNING : these are different from those in ../ that ( cd .. && make )
-# will generate
-cat README-00-hdr.md README_main.md >../README.md
+#
+cat README-00-hdr.md README_main.md >../docs/README.md

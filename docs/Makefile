@@ -24,9 +24,9 @@ install_docs: all
 
 install_bins:
 	install -d $(DESTDIR)$(bindir)
-	install -m 755 quickget $(DESTDIR)$(bindir)
-	install -m 755 quickemu $(DESTDIR)$(bindir)
-	install -m 755 macrecovery $(DESTDIR)$(bindir)
+	install -m 755 ../quickget $(DESTDIR)$(bindir)
+	install -m 755 ../quickemu $(DESTDIR)$(bindir)
+	install -m 755 ../macrecovery $(DESTDIR)$(bindir)
 
 install: install_bins  install_docs
 
@@ -38,6 +38,5 @@ uninstall::
 	rm -f $(DESTDIR)$(bindir)/quickemu
 	rm -f $(DESTDIR)$(bindir)/macrecovery
 
-#quickgui.1
 
 .PHONY: all
