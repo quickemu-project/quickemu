@@ -355,12 +355,10 @@ function releases_ubuntu() {
 }
 
 function releases_void() {
-    echo i686-20210930 \
-    i686-20210930-xfce \
-    x86_64-20210930 \
-    x86_64-20210930-xfce \
-    x86_64-musl-20210930 \
-    x86_64-musl-20210930-xfce
+    echo base \
+    musl \
+    xfce \
+    xfce-musl
 }
 
 function languages_windows() {
