@@ -15,6 +15,11 @@ echo quickemu_conf.1-00-hdr.md  README-135-confoptions.md quickemu_conf.1-05-foo
 pandoc -s $(cat quickemu_conf.lst)  -f markdown -t markdown -o ../docs/quickemu_conf.1.md
 pandoc -s $(cat quickemu.lst)  -f markdown -t markdown -o ../docs/quickemu.1.md
 pandoc -s $(cat quickget.lst)  -f markdown -t markdown -o ../docs/quickget.1.md
+#
+pandoc -s $(cat quickemu.lst)  -f markdown -t man -o ../docs/quickemu.1
+pandoc -s $(cat quickget.lst)  -f markdown -t man -o ../docs/quickget.1
+pandoc -s $(cat quickemu_conf.lst)  -f markdown -t man -o ../docs/quickemu_conf.1
+
 pandoc -s $(cat README.lst)  -f markdown -t markdown -o README_main.md
 #
 cat README-00-hdr.md README_main.md >../docs/README.md
