@@ -38,6 +38,7 @@ function pretty_name() {
     alma)               PRETTY_NAME="Alma Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    devuan)             PRETTY_NAME="Devuan";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -164,6 +165,7 @@ function os_support() {
     android \
     archlinux \
     debian \
+    devuan \
     elementary \
     freebsd \
     fedora \
@@ -228,6 +230,14 @@ function releases_debian() {
     11.1.0-amd64-mate \
     11.1.0-amd64-standard \
     11.1.0-amd64-xfce
+}
+
+function releases_devuan() {
+    echo amd64_desktop \
+    amd64_netinstall \
+    amd64_server \
+    amd64_desktop-live \
+    amd64_minimal-live
 }
 
 function releases_elementary() {
@@ -522,6 +532,9 @@ function make_vm_config() {
     elif [ "${OS}" == "debian" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "devuan" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -598,6 +611,9 @@ EOF
         fi
         if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+        if [ "${OS}" == "devuan"  ]; then
+            echo "display=\"spice\"" >> "${OS}-${RELEASE}.conf"
         fi
         if [ "${OS}" == "openbsd" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
@@ -731,6 +747,40 @@ function get_debian() {
     HASHLINE=$(wget -q -O- ${URL}/SHA512SUMS |grep ${RELEASE}.iso)
     ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
     HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+
+function get_devuan() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASHLINE=""
+
+    validate_release "releases_devuan"
+    
+    case $RELEASE in
+      *minimal-live)  URL="https://files.devuan.org/devuan_chimaera/minimal-live" ;;
+      *desktop-live)  URL="https://files.devuan.org/devuan_chimaera/desktop-live" ;;
+      *)              URL="https://files.devuan.org/devuan_chimaera/installer-iso";;
+    esac
+    
+    case $RELEASE in
+      *minimal-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *desktop-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *)              HASHLINE=$(wget -q -O- ${URL}/SHA256SUMS | grep ${RELEASE}.iso);;
+    esac
+    
+    echo $HASHLINE
+
+    ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
+    HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
+    RELEASE="${ISO%.*}"
+    VM_PATH="${RELEASE}"
 
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1643,6 +1693,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
+    elif [ "${OS}" == "devuan" ]; then
+         get_devuan
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
@@ -1736,6 +1788,8 @@ else
         releases_archlinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
+    elif [ "${OS}" == "devuan" ]; then
+        releases_devuan
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
