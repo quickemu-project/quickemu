@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
@@ -45,6 +44,7 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    netboot)            PRETTY_NAME="netboot";;
     nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
     nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
     nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
@@ -179,6 +179,7 @@ function os_support() {
     nixos-minimal \
     lubuntu \
     macos \
+    netboot \
     openbsd \
     opensuse \
     oraclelinux \
@@ -216,7 +217,6 @@ function releases_android() {
 function releases_archlinux() {
     echo latest
 }
-
 # later refactor these DE variants like languages and avoid the arch ?
 # all these are available with a "nonfree" option too
 function releases_debian() {
@@ -314,6 +314,10 @@ function releases_macos() {
     monterey
 }
 
+function releases_netboot() {
+    echo latest
+}
+
 function releases_popos() {
     echo 20.04 \
     21.04
@@ -325,7 +329,6 @@ function releases_regolith() {
     2.0.0_impish \
     2.0.0_hirsute
 }
-
 
 function releases_rockylinux() {
     echo 8.5 \
@@ -392,7 +395,6 @@ function languages_windows() {
     Turkish
     Ukrainian)
 }
-
 
 function releases_windows() {
     echo 8 \
@@ -692,6 +694,7 @@ function get_alma() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -707,7 +710,6 @@ function get_archlinux() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_debian() {
     local HASH=""
@@ -843,6 +845,21 @@ function get_linuxmint() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_netboot() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_netboot"
+    ISO="netboot.xyz.iso"
+    URL="https://boot.netboot.xyz/ipxe/netboot.xyz.iso"
+    HASH=$(wget -q -O- "https://boot.netboot.xyz/ipxe/netboot.xyz-sha256-checksums.txt" | grep netboot.xyz.iso | cut -d' ' -f1)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_nixos() {
     local FLAVOR=""
     local HASH=""
@@ -858,6 +875,7 @@ function get_nixos() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
 function get_openbsd() {
     local HASH=""
     local ISO=""
@@ -1070,7 +1088,6 @@ function get_popos() {
     make_vm_config "${ISO}"
 }
 
-
 function get_regolith() {
     local HASH=""
     local ISO=""
@@ -1099,7 +1116,6 @@ function get_regolith() {
     fi
     make_vm_config "${ISO}"
 }
-
 
 function get_ubuntu() {
     local DEVEL="daily-live"
@@ -1149,6 +1165,7 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+
 function get_garuda() {
     local HASH=""
     local ISO=""
@@ -1480,14 +1497,12 @@ function unattended_windows() {
 EOF
 }
 
-
 function dbg_windows() {
   local DEBUG=0
   if [ ${DEBUG} -eq 1 ]; then
     echo "${1}"
   fi
 }
-
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
     local ARCH="x64"
@@ -1659,6 +1674,8 @@ if [ -n "${2}" ]; then
         get_kdeneon
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
+    elif [ "${OS}" == "netboot" ]; then
+        get_netboot
     elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
@@ -1758,6 +1775,8 @@ else
         releases_openbsd
     elif [ "${OS}" == "macos" ]; then
         releases_macos
+    elif [ "${OS}" == "netboot" ]; then
+        releases_netboot
     elif [ "${OS}" == "popos" ]; then
         releases_popos
     elif [ "${OS}" == "regolith" ]; then
