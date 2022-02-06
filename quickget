@@ -237,7 +237,11 @@ function releases_debian() {
 }
 
 function releases_devuan() {
-    echo chimaera
+    echo amd64_desktop \
+    amd64_netinstall \
+    amd64_server \
+    amd64_desktop-live \
+    amd64_minimal-live
 }
 
 function releases_elementary() {
@@ -612,6 +616,9 @@ EOF
         if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
+        if [ "${OS}" == "devuan"  ]; then
+            echo "display=\"spice\"" >> "${OS}-${RELEASE}.conf"
+        fi
         if [ "${OS}" == "openbsd" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
@@ -755,10 +762,31 @@ function get_devuan() {
     local HASH=""
     local ISO=""
     local URL=""
-# TODO: remove hardcoded last version and add all releases...
+    local HASHLINE=""
+
     validate_release "releases_devuan"
-    URL="https://mirror.leaseweb.com/devuan/devuan_chimaera/desktop-live/devuan_chimaera_4.0.0_amd64_desktop-live.iso"
-    web_get "${URL}" "${VM_PATH}"
+    
+    case $RELEASE in
+      *minimal-live)  URL="https://files.devuan.org/devuan_chimaera/minimal-live" ;;
+      *desktop-live)  URL="https://files.devuan.org/devuan_chimaera/desktop-live" ;;
+      *)              URL="https://files.devuan.org/devuan_chimaera/installer-iso";;
+    esac
+    
+    case $RELEASE in
+      *minimal-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *desktop-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *)              HASHLINE=$(wget -q -O- ${URL}/SHA256SUMS | grep ${RELEASE}.iso);;
+    esac
+    
+    echo $HASHLINE
+
+    ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
+    HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
+    RELEASE="${ISO%.*}"
+    VM_PATH="${RELEASE}"
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
