@@ -38,6 +38,7 @@ function pretty_name() {
     alma)               PRETTY_NAME="Alma Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    devuan)             PRETTY_NAME="Devuan";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -147,6 +148,10 @@ function list_csv() {
         for OPTION in standard nonfree; do
          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
+      elif [ "${OS}" == "devuan" ]; then
+        for OPTION in standard nonfree; do
+         echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
       elif [ "${OS}" == "alma" ]; then
         for OPTION in minimal dvd; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
@@ -164,6 +169,7 @@ function os_support() {
     android \
     archlinux \
     debian \
+    devuan \
     elementary \
     freebsd \
     fedora \
@@ -228,6 +234,10 @@ function releases_debian() {
     11.1.0-amd64-mate \
     11.1.0-amd64-standard \
     11.1.0-amd64-xfce
+}
+
+function releases_devuan() {
+    echo chimaera
 }
 
 function releases_elementary() {
@@ -522,6 +532,9 @@ function make_vm_config() {
     elif [ "${OS}" == "debian" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "devuan" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
@@ -692,6 +705,7 @@ function get_alma() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -733,6 +747,18 @@ function get_debian() {
     HASH=$(echo ${HASHLINE} | cut -d\  -f1)
 
     web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_devuan() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+# TODO: remove hardcoded last version and add all releases...
+    validate_release "releases_devuan"
+    URL="https://mirror.leaseweb.com/devuan/devuan_chimaera/desktop-live/devuan_chimaera_4.0.0_amd64_desktop-live.iso"
+    web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -1643,6 +1669,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
+    elif [ "${OS}" == "devuan" ]; then
+        get_devuan
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
@@ -1736,6 +1764,8 @@ else
         releases_archlinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
+    elif [ "${OS}" == "devuan" ]; then
+        releases_devuan
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
