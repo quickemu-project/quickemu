@@ -1694,7 +1694,7 @@ if [ -n "${2}" ]; then
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
     elif [ "${OS}" == "devuan" ]; then
-         get_devuan
+        get_devuan
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
