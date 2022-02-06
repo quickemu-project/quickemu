@@ -1598,9 +1598,8 @@ if [ -n "${1}" ]; then
       exit 0
     fi
 else
-    echo "ERROR! You must specify an operating system:"
-    os_support
-    exit 1
+    oslist=$(os_support | tr ' ' '\n ' | sort -r >oslist)
+    OS=$(cat oslist | fzf)
 fi
 
 if [ -n "${2}" ]; then
@@ -1727,54 +1726,7 @@ if [ -n "${2}" ]; then
         exit 1
     fi
 else
-    echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "alma" ]; then
-        releases_alma
-    elif [ "${OS}" == "android" ]; then
-        releases_android
-    elif [ "${OS}" == "archlinux" ]; then
-        releases_archlinux
-    elif [ "${OS}" == "debian" ]; then
-        releases_debian
-    elif [ "${OS}" == "elementary" ]; then
-        releases_elementary
-    elif [ "${OS}" == "freebsd" ]; then
-        releases_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        releases_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        releases_garuda
-    elif [ "${OS}" == "kali" ]; then
-        releases_kali
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
-        releases_linuxmint
-    elif [[ "${OS}" == *"nixos-"* ]]; then
-        releases_nixos
-    elif [ "${OS}" == "opensuse" ]; then
-        releases_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        releases_oraclelinux
-    elif [ "${OS}" == "openbsd" ]; then
-        releases_openbsd
-    elif [ "${OS}" == "macos" ]; then
-        releases_macos
-    elif [ "${OS}" == "popos" ]; then
-        releases_popos
-    elif [ "${OS}" == "regolith" ]; then
-        releases_regolith
-    elif [ "${OS}" == "rockylinux" ]; then
-        releases_rockylinux
-    elif [ "${OS}" == "solus" ]; then
-        releases_solus
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        releases_ubuntu
-    elif [ "${OS}" == "windows" ]; then
-        releases_windows
-    elif [ "${OS}" == "zorin" ]; then
-        releases_zorin
-    else
-        echo "${OS} is unknown"
-        os_support
-    fi
-    exit 1
+    realeases=$(releases_${OS} | tr ' ' '\n '>releaselist)
+    RELEASE=$(cat releaselist | fzf)
+    ./quickget $OS $RELEASE
 fi
