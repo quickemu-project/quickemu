@@ -91,7 +91,7 @@ function use_fzf() {
     RELEASE=
     OS=$(os_support | tr ' ' '\n ' | sort -r | fzf)
     RELEASE=$(releases_${OS} | tr ' ' '\n ' | fzf)
-    ./"$progname" "$OS" "$RELEASE"
+    "$progname" "$OS" "$RELEASE"
 }
 
 function validate_release() {
