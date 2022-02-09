@@ -2091,13 +2091,13 @@ if [ -n "${1}" ]; then
       exit 0
     fi
 else
-#    oslist=$(os_support | tr ' ' '\n ' | sort -r >oslist)
-#    OS=$(cat oslist | fzf)
     echo "ERROR! You must specify an operating system:"
+    echo
     os_support
+    echo
+    echo "Or try run: $progname fzf for fuzzy list available..."
     exit 1
 fi
-
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
@@ -2243,11 +2243,16 @@ if [ -n "${2}" ]; then
         get_zorin
     else
         echo "ERROR! ${OS} is unknown:"
+        echo
         os_support
+        echo
+        echo "Or try run: $progname fzf for fuzzy list available..."
         exit 1
     fi
 else
     echo -n "ERROR! You must specify a release: "
+    echo
+    echo
     if [ "${OS}" == "alma" ]; then
         releases_alma
     elif [ "${OS}" == "android" ]; then
@@ -2256,6 +2261,8 @@ else
         releases_archlinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
+    elif [ "${OS}" == "devuan" ]; then
+        releases_devuan
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
@@ -2296,7 +2303,10 @@ else
         releases_zorin
     else
         echo "${OS} is unknown"
+        echo
         os_support
     fi
+    echo
+    echo "Or try run: $progname fzf for fuzzy list available..."
     exit 1
 fi
