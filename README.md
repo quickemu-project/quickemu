@@ -110,7 +110,7 @@ See this (old) video where I explain some of my motivations for creating Quickem
   * [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
   * [zsync](http://zsync.moria.org.uk/)
 
-## Optional
+### Optional
 
   * [fzf](https://github.com/junegunn/fzf)
 
