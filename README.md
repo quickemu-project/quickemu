@@ -34,6 +34,7 @@ comprehensive support for macOS and Windows**.
   * [Debian](https://www.debian.org/) (bullseye with all the official and non-free DE variants)
   * [Fedora](https://getfedora.org/)
   & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
+  * [netboot](https://netboot.xyz/)
   * [Alma Linux](https://almalinux.org/)
   * [Alpine Linux](https://www.alpinelinux.org/)
   * [Android](https://www.android-x86.org/)
