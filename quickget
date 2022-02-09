@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+progname=${0##*/}
+
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
@@ -85,11 +87,11 @@ function pretty_name() {
 }
 
 function use_fzf() {
-    oslist=$(os_support | tr ' ' '\n ' | sort -r >oslist)
-    OS=$(cat oslist | fzf)
-    realeases=$(releases_${OS} | tr ' ' '\n '>releaselist)
-    RELEASE=$(cat releaselist | fzf)
-    $progname $OS $RELEASE
+    OS=
+    RELEASE=
+    OS=$(os_support | tr ' ' '\n ' | sort -r | fzf)
+    RELEASE=$(releases_${OS} | tr ' ' '\n ' | fzf)
+    ./"$progname" "$OS" "$RELEASE"
 }
 
 function validate_release() {
@@ -420,6 +422,10 @@ function releases_manjaro() {
     esac
 }
 
+function releases_netboot() {
+    echo latest
+}
+
 function releases_popos() {
     echo 20.04 \
     21.04 \
@@ -532,7 +538,15 @@ function releases_windows() {
     10 \
     11
 }
-# PROPRIETARY O.S. end here
+
+function releases_zorin() {
+    echo 16core64 \
+    15lite64 \
+    15lite32 \
+    15education64 \
+    15edulite64 \
+    15edulite32
+}
 
 function check_hash() {
     local iso=""
@@ -2048,7 +2062,7 @@ function get_windows() {
     esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
 }
-# PROPRIETARY O.S. ends here
+
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
@@ -2061,6 +2075,10 @@ LANGS=()
 languages_windows
 
 if [ -n "${1}" ]; then
+    if [ "${1,,}" = fzf ]; then
+        use_fzf
+        exit 0
+    fi
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
         list_csv
@@ -2073,12 +2091,13 @@ if [ -n "${1}" ]; then
       exit 0
     fi
 else
-    oslist=$(os_support | tr ' ' '\n ' | sort -r >oslist)
-    OS=$(cat oslist | fzf)
-#    echo "ERROR! You must specify an operating system:"
-#    os_support
-#    exit 1
+#    oslist=$(os_support | tr ' ' '\n ' | sort -r >oslist)
+#    OS=$(cat oslist | fzf)
+    echo "ERROR! You must specify an operating system:"
+    os_support
+    exit 1
 fi
+
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
@@ -2249,6 +2268,10 @@ else
         releases_kali
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
+    elif [ "${OS}" == "macos" ]; then
+        releases_macos
+    elif [ "${OS}" == "netboot" ]; then
+        releases_netboot
     elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
@@ -2257,8 +2280,6 @@ else
         releases_oraclelinux
     elif [ "${OS}" == "openbsd" ]; then
         releases_openbsd
-    elif [ "${OS}" == "macos" ]; then
-        releases_macos
     elif [ "${OS}" == "popos" ]; then
         releases_popos
     elif [ "${OS}" == "regolith" ]; then
