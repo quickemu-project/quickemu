@@ -105,8 +105,9 @@ function validate_release() {
       exit 1
   fi
 }
-# Reference: https://stackoverflow.com/a/67359273
+
 function list_json() {
+  # Reference: https://stackoverflow.com/a/67359273
   list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
   exit 0
 }
@@ -122,6 +123,7 @@ function list_csv() {
   local SVG
   local ZS=""
   local DL=""
+
 # check if we have a zsync installed somewhere
   ZS="$(which zsync)"
   if  [ -x "${ZS}" ]; then
@@ -253,8 +255,9 @@ function os_support() {
     xubuntu \
     zorin
 }
-# consider flavours for boot and dvd as well as
+
 function releases_alma() {
+    # consider flavours for boot and dvd as well as
     echo 8.4 \
     8.5
 }
@@ -531,7 +534,6 @@ function releases_windows() {
 }
 # PROPRIETARY O.S. end here
 
-# Guess the hash algorithm by the hash length
 function check_hash() {
     local iso=""
     local hash=""
@@ -539,6 +541,7 @@ function check_hash() {
     iso="${VM_PATH}/${1}"
     hash="${2}"
 
+    # Guess the hash algorithm by the hash length
     case ${#hash} in
       32) hash_algo=md5sum;;
       40) hash_algo=sha1sum;;
@@ -702,6 +705,9 @@ function make_vm_config() {
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "oraclelinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "netboot" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "popos" ]; then
@@ -1539,7 +1545,7 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
-# TODO: Choose closest mirror
+
 function get_void() {
     local HASH=""
     local ISO=""
@@ -1547,7 +1553,7 @@ function get_void() {
     local REL_TYPE=""
     local LATEST_URL=""
     local HASH_URL=""
-
+    # TODO: Choose closest mirror
     validate_release "releases_void"
     DATE=$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current//sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
     URL="http://alpha.de.repo.voidlinux.org/live/current"
@@ -2079,7 +2085,7 @@ if [ -n "${2}" ]; then
     VM_PATH="${OS}-${RELEASE}"
 
     if [ "${OS}" == "alma" ]; then
-     if [ -n "${3}" ]; then
+        if [ -n "${3}" ]; then
             ISOTYPE="${3,,}"
             ISOTYPES=(minimal dvd ) # boot) # a step too far
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
@@ -2105,7 +2111,7 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "void" ]; then
         get_void
     elif [ "${OS}" == "debian" ]; then
-     if [ -n "${3}" ]; then
+        if [ -n "${3}" ]; then
             FREEDOM="${3}"
             FREEDOMS=(standard nonfree)
             if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
