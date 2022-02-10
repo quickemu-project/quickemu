@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
 progname=${0##*/}
+c1=$(tput setaf 1) # red
+c2=$(tput setaf 2) # green
+c3=$(tput setaf 3) # yellow
+c4=$(tput setaf 4) # blue
+c=$(tput sgr0)
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
@@ -83,14 +88,15 @@ function pretty_name() {
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
-  echo "${PRETTY_NAME}"
+  echo "$c2${PRETTY_NAME}$c"
 }
 
 function use_fzf() {
     OS=
     RELEASE=
     OS=$(os_support | tr ' ' '\n ' | sort -r | fzf)
-    RELEASE=$(releases_${OS} | tr ' ' '\n ' | fzf)
+    FUZZY=$(echo $OS |cut -d'-' -f1)
+    RELEASE=$(releases_${FUZZY} | tr ' ' '\n ' | fzf)
     "$progname" "$OS" "$RELEASE"
 }
 
@@ -102,8 +108,8 @@ function validate_release() {
   DISPLAY_NAME="$(pretty_name "${OS}")"
   RELEASES=$(${RELEASE_GENERATOR})
   if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
-      echo "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-      echo "${RELEASES}"
+      echo " $c1 ERROR!$c ${DISPLAY_NAME} $c1${RELEASE}$c is not a supported release."
+      echo " $c2${RELEASES}$c"
       exit 1
   fi
 }
@@ -376,6 +382,16 @@ function releases_linuxmint(){
     echo 20.2
 }
 
+function releases_manjaro() {
+    case ${OS} in
+    *xfce|*kde|*gnome) echo full \
+    minimal \
+    minimal-lts;;
+    *budgie|*cinnamon|*deepin|*i3|*mate) echo full \
+    minimal;;
+    esac
+}
+
 function releases_mxlinux(){
     echo 21
 }
@@ -410,20 +426,6 @@ function releases_oraclelinux() {
     7.9 \
     7.8 \
     7.7
-}
-
-function releases_manjaro() {
-    case ${OS} in
-    *xfce|*kde|*gnome) echo full \
-    minimal \
-    minimal-lts;;
-    *budgie|*cinnamon|*deepin|*i3|*mate) echo full \
-    minimal;;
-    esac
-}
-
-function releases_netboot() {
-    echo latest
 }
 
 function releases_popos() {
@@ -483,7 +485,7 @@ function releases_zorin() {
     15edulite64 \
     15edulite32
 }
-# PROPRIETARY O.S. start here
+
 function releases_macos() {
     echo high-sierra \
     mojave \
@@ -492,60 +494,10 @@ function releases_macos() {
     monterey
 }
 
-function languages_windows() {
-    LANGS=(Arabic
-    "Brazilian Portuguese"
-    Bulgarian
-    "Chinese (Simplified)"
-    "Chinese (Traditional)"
-    Croatian
-    Czech
-    Danish
-    Dutch
-    English
-    "English International"
-    Estonian
-    Finnish
-    French
-    "French Canadian"
-    German
-    Greek
-    Hebrew
-    Hungarian
-    Italian
-    Japanese
-    Korean
-    Latvian
-    Lithuanian
-    Norwegian
-    Polish
-    Portuguese
-    Romanian
-    Russian
-    "Serbian Latin"
-    Slovak
-    Slovenian
-    Spanish
-    "Spanish (Mexico)"
-    Swedish
-    Thai
-    Turkish
-    Ukrainian)
-}
-
 function releases_windows() {
     echo 8 \
     10 \
     11
-}
-
-function releases_zorin() {
-    echo 16core64 \
-    15lite64 \
-    15lite32 \
-    15education64 \
-    15edulite64 \
-    15edulite32
 }
 
 function check_hash() {
@@ -561,17 +513,17 @@ function check_hash() {
       40) hash_algo=sha1sum;;
       64) hash_algo=sha256sum;;
       128) hash_algo=sha512sum;;
-       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+       *) echo " $c3 WARNING!$c Can't guess hash algorithm, not checking ${iso} hash."
           return;;
     esac
 
     echo -n "Checking ${iso} with ${hash_algo}... "
-    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
-        echo "ERROR!"
-        echo "${iso} doesn't match ${hash}. Try running ${progname} again."
+    if ! echo " ${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo " $c1 ERROR!$c"
+        echo " $c1${iso}$c doesn't match ${hash}. Try running ${progname} again."
         exit 1
     else
-        echo "Good!"
+        echo "$c2 Good!$c"
     fi
 }
 
@@ -587,12 +539,12 @@ function web_get() {
     fi
 
     if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
+      echo " $c1 ERROR!$c Unable to create directory ${DIR}"
       exit 1
     fi
 
     if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-        echo "ERROR! Failed to download ${URL}. Try running '${progname}' again."
+        echo " $c1 ERROR!$c Failed to download ${URL}. Try running '${progname}' again."
         exit 1
     fi
 }
@@ -615,12 +567,12 @@ function zsync_get() {
       fi
 
       if ! mkdir -p "${DIR}" 2>/dev/null; then
-        echo "ERROR! Unable to create directory ${DIR}"
+        echo " $c1 ERROR!$c Unable to create directory ${DIR}"
         exit 1
       fi
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-          echo "ERROR! Failed to download ${URL}.zsync"
+          echo " $c1 ERROR!$c Failed to download ${URL}.zsync"
           exit 1
       fi
 
@@ -628,14 +580,14 @@ function zsync_get() {
           rm "${DIR}/${OUT}.zs-old"
       fi
     else
-      echo "INFO: zsync not found, falling back to wget"
+      echo " $c4 INFO: zsync not found, falling back to wget"
       web_get "${ISO}"
     fi
 }
 
 function start_vm_info() {
     echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo " To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
 }
@@ -782,7 +734,7 @@ function make_vm_config() {
     fi
 
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
-        echo "Making VM configuration for ${OS}-${RELEASE}..."
+        echo " Making VM configuration for ${OS}-${RELEASE}..."
         cat << EOF > "${OS}-${RELEASE}.conf"
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
@@ -1526,12 +1478,12 @@ function get_ubuntu() {
       ubuntu-studio)
         PROJECT="ubuntustudio"
         DEVEL="dvd";;
-      *) echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
+      *) echo " $c1 ERROR!$c ${OS} is not a recognised Ubuntu flavour."
          exit 1;;
     esac
 
     if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
-      echo "ERROR! Canary is currently only available for Ubuntu."
+      echo " $c1 ERROR!$c Canary is currently only available for Ubuntu."
       exit 1
     else
       validate_release "releases_ubuntu"
@@ -1607,7 +1559,7 @@ function get_zorin() {
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
-# PROPRIETARY O.S. start here
+
 function get_macos() {
     local BOARD_ID=""
     local CWD=""
@@ -1630,7 +1582,7 @@ function get_macos() {
         monterey)
             BOARD_ID="Mac-06F11F11946D27C5"
             MLB="00000000000000000";;
-        *) echo "ERROR! Unknown release: ${RELEASE}"
+        *) echo " $c1 ERROR!$c Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
     esac
@@ -1647,7 +1599,7 @@ function get_macos() {
     fi
 
     if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery."
+        echo " $c1 ERROR!$c Can not find a usable macrecovery."
         exit 1
     fi
 
@@ -1659,7 +1611,7 @@ function get_macos() {
     fi
 
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-        echo "Downloading ${RELEASE}..."
+        echo "$c4Downloading$c ${RELEASE}..."
         ${MACRECOVERY} \
             --board-id "${BOARD_ID}" \
             --mlb "${MLB}" \
@@ -1674,6 +1626,139 @@ function get_macos() {
     fi
 
     make_vm_config RecoveryImage.img
+}
+# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
+function get_windows() {
+    local ARCH="x64"
+    local INDEX=0
+    local LANG_CODE="en"
+    local LATEST_WINDOWS_VERSION=""
+    local WINDOWS_NAME=""
+    local VERSION_ID=""
+    local EDITION_ID=""
+    local LANGUAGE_ID=""
+    local FILE_NAME=""
+    local ARCH_ID=""
+    local DOWNLOAD_INFO=""
+    local DOWNLOAD_ID=""
+    local DOWNLOAD_URL=""
+
+    validate_release "releases_windows"
+
+    # Ignore the most recent Windows 10 release for now.
+    if [ "${RELEASE}" -eq 10 ]; then
+      INDEX=0
+    fi
+
+    if [ "${RELEASE}" -eq 11 ]; then
+      INDEX=0
+    fi
+
+    echo " Getting Windows ${RELEASE} URL..."
+    WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
+    dbg_windows "${WINDOWS_VERSIONS}"
+    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
+    dbg_windows "${LATEST_WINDOWS_VERSION}"
+
+    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
+    dbg_windows "${WINDOWS_NAME}"
+    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
+    dbg_windows "${VERSION_ID}"
+
+    case ${RELEASE} in
+        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
+        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
+    esac
+    dbg_windows "${EDITION_ID}"
+
+    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
+    dbg_windows "${LANGUAGE_ID}"
+    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
+    dbg_windows "${ARCH_INFO}"
+    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
+    dbg_windows "${FILE_NAME}"
+    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
+    dbg_windows "${ARCH_ID}"
+    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+    dbg_windows "${DOWNLOAD_INFO}"
+    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
+    dbg_windows "${DOWNLOAD_SHA1}"
+    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
+    dbg_windows "${DOWNLOAD_ID}"
+    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    dbg_windows "${DOWNLOAD_URL}"
+
+    echo " $c4Downloading$c ${WINDOWS_NAME}..."
+    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+
+    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
+    if [ -n "${DOWNLOAD_SHA1}" ]; then
+      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+    fi
+
+    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+
+    rm -f "${VM_PATH}/unattended.iso"
+    case ${RELEASE} in
+        10|11)
+            echo "Making unattended.iso"
+            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
+            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
+            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            ;;
+    esac
+    make_vm_config "${FILE_NAME}" "virtio-win.iso"
+}
+
+function dbg_windows() {
+  local DEBUG=0
+  if [ ${DEBUG} -eq 1 ]; then
+    echo "${1}"
+  fi
+}
+
+function languages_windows() {
+    LANGS=(Arabic
+    "Brazilian Portuguese"
+    Bulgarian
+    "Chinese (Simplified)"
+    "Chinese (Traditional)"
+    Croatian
+    Czech
+    Danish
+    Dutch
+    English
+    "English International"
+    Estonian
+    Finnish
+    French
+    "French Canadian"
+    German
+    Greek
+    Hebrew
+    Hungarian
+    Italian
+    Japanese
+    Korean
+    Latvian
+    Lithuanian
+    Norwegian
+    Polish
+    Portuguese
+    Romanian
+    Russian
+    "Serbian Latin"
+    Slovak
+    Slovenian
+    Spanish
+    "Spanish (Mexico)"
+    Swedish
+    Thai
+    Turkish
+    Ukrainian)
 }
 
 function unattended_windows() {
@@ -1971,98 +2056,6 @@ function unattended_windows() {
 EOF
 }
 
-function dbg_windows() {
-  local DEBUG=0
-  if [ ${DEBUG} -eq 1 ]; then
-    echo "${1}"
-  fi
-}
-# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
-function get_windows() {
-    local ARCH="x64"
-    local INDEX=0
-    local LANG_CODE="en"
-    local LATEST_WINDOWS_VERSION=""
-    local WINDOWS_NAME=""
-    local VERSION_ID=""
-    local EDITION_ID=""
-    local LANGUAGE_ID=""
-    local FILE_NAME=""
-    local ARCH_ID=""
-    local DOWNLOAD_INFO=""
-    local DOWNLOAD_ID=""
-    local DOWNLOAD_URL=""
-
-    validate_release "releases_windows"
-
-    # Ignore the most recent Windows 10 release for now.
-    if [ "${RELEASE}" -eq 10 ]; then
-      INDEX=0
-    fi
-
-    if [ "${RELEASE}" -eq 11 ]; then
-      INDEX=0
-    fi
-
-    echo "Getting Windows ${RELEASE} URL..."
-    WINDOWS_VERSIONS=$(wget -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-    dbg_windows "${WINDOWS_VERSIONS}"
-    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '${RELEASE}'")))['${INDEX}']')
-    dbg_windows "${LATEST_WINDOWS_VERSION}"
-
-    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
-    dbg_windows "${WINDOWS_NAME}"
-    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
-    dbg_windows "${VERSION_ID}"
-
-    case ${RELEASE} in
-        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
-        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '${RELEASE}'").edition_id');;
-    esac
-    dbg_windows "${EDITION_ID}"
-
-    LANGUAGE_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_NAME}"'").language_id')
-    dbg_windows "${LANGUAGE_ID}"
-    ARCH_INFO=$(wget -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
-    dbg_windows "${ARCH_INFO}"
-    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
-    dbg_windows "${FILE_NAME}"
-    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
-    dbg_windows "${ARCH_ID}"
-    DOWNLOAD_INFO=$(wget -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
-    dbg_windows "${DOWNLOAD_INFO}"
-    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
-    dbg_windows "${DOWNLOAD_SHA1}"
-    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
-    dbg_windows "${DOWNLOAD_ID}"
-    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
-    dbg_windows "${DOWNLOAD_URL}"
-
-    echo "Downloading ${WINDOWS_NAME}..."
-    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
-
-    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
-    if [ -n "${DOWNLOAD_SHA1}" ]; then
-      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
-    fi
-
-    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
-
-    rm -f "${VM_PATH}/unattended.iso"
-    case ${RELEASE} in
-        10|11)
-            echo "Making unattended.iso"
-            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
-            ;;
-    esac
-    make_vm_config "${FILE_NAME}" "virtio-win.iso"
-}
-
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
@@ -2087,28 +2080,26 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
       whereIam=$(dirname "${BASH_SOURCE[0]}")
       quickemu_version=$( "${whereIam}"/quickemu --version)
-      echo "Quickemu Version: ${quickemu_version}"
+      echo " Quickemu Version: ${quickemu_version}"
       exit 0
     fi
 else
-    echo "ERROR! You must specify an operating system:"
-    echo
+    echo " $c1 ERROR! You must specify an operating system: $c"
     os_support
-    echo
-    echo "Or try run: $progname fzf for fuzzy list available..."
+    echo " $c2 Or try run: $c $progname fzf$c2 for fuzzy list available...$c"
     exit 1
 fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
-
+    func=$(get_"$OS")
     if [ "${OS}" == "alma" ]; then
         if [ -n "${3}" ]; then
             ISOTYPE="${3,,}"
             ISOTYPES=(minimal dvd ) # boot) # a step too far
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
-                echo "iso ${ISOTYPE} is not supported:"
+                echo " iso ${ISOTYPE} is not supported:"
                 for ISOTYPE in "${ISOTYPES[@]}"; do
                   echo "${ISOTYPE}"
                 done
@@ -2119,22 +2110,12 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_alma "${ISOTYPE}"
-    elif [ "${OS}" == "alpine" ]; then
-        get_alpine
-    elif [ "${OS}" == "android" ]; then
-        get_android
-    elif [ "${OS}" == "archlinux" ]; then
-        get_archlinux
-    elif [ "${OS}" == "arcolinux" ]; then
-        get_arcolinux
-    elif [ "${OS}" == "void" ]; then
-        get_void
     elif [ "${OS}" == "debian" ]; then
         if [ -n "${3}" ]; then
             FREEDOM="${3}"
             FREEDOMS=(standard nonfree)
             if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
-                echo "ERROR! ${FREEDOM} is not a supported freedom:"
+                echo " $c1 ERROR!$c ${FREEDOM} is not a supported freedom:"
                 for DRIVER in "${FREEDOMS[@]}"; do
                   echo "${FREEDOM}"
                 done
@@ -2145,52 +2126,12 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
-    elif [ "${OS}" == "devuan" ]; then
-        get_devuan
-    elif [ "${OS}" == "elementary" ]; then
-        get_elementary
-    elif [ "${OS}" == "macos" ]; then
-        get_macos
-    elif [ "${OS}" == "freebsd" ]; then
-        get_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        get_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        get_garuda
-    elif [ "${OS}" == "cachyos" ]; then
-        get_cachyos
-    elif [ "${OS}" == "gentoo" ]; then
-        get_gentoo
-    elif [ "${OS}" == "haiku" ]; then
-        get_haiku
-    elif [ "${OS}" == "kali" ]; then
-        get_kali
-    elif [ "${OS}" == "kdeneon" ]; then
-        get_kdeneon
-    elif [ "${OS}" == "kolibrios" ]; then
-        get_kolibrios
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
-        get_linuxmint
-    elif [[ "${OS}" == *"manjaro-"* ]]; then
-        get_manjaro
-    elif [[ "${OS}" == *"mxlinux-"* ]]; then
-        get_mxlinux
-    elif [ "${OS}" == "netboot" ]; then
-        get_netboot
-    elif [[ "${OS}" == *"nixos-"* ]]; then
-        get_nixos
-    elif [ "${OS}" == "openbsd" ]; then
-        get_openbsd
-    elif [ "${OS}" == "opensuse" ]; then
-        get_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        get_oraclelinux
     elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
             if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
-                echo "ERROR! ${DRIVER} is not a supported driver:"
+                echo " $c1 ERROR!$c ${DRIVER} is not a supported driver:"
                 for DRIVER in "${DRIVERS[@]}"; do
                   echo "${DRIVER}"
                 done
@@ -2201,8 +2142,6 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${DRIVER}"
         get_popos "${DRIVER}"
-    elif  [ "${OS}" == "regolith" ]; then
-        get_regolith
     elif [ "${OS}" == "rockylinux" ]; then
         if [ -n "${3}" ]; then
             ISOTYPE="${3}"
@@ -2219,17 +2158,11 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_rocky "${ISOTYPE}"
-    elif [ "${OS}" == "solus" ]; then
-        get_solus
-    elif [[ "${OS}" == "tails"* ]]; then
-        get_tails
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        get_ubuntu
     elif [ "${OS}" == "windows" ]; then
         if [ -n "${3}" ]; then
             LANG_NAME="${3}"
             if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
-                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                echo " $c1 ERROR!$c ${LANG_NAME} is not a supported language:"
                 for LANG in "${LANGS[@]}"; do
                   echo "${LANG}"
                 done
@@ -2239,74 +2172,37 @@ if [ -n "${2}" ]; then
             LANG_NAME="English International"
         fi
         get_windows "${LANG_NAME}"
-    elif [ "${OS}" == "zorin" ]; then
-        get_zorin
+
+    elif [[ "${OS}" == *"linuxmint-"* ]]; then
+        get_linuxmint
+    elif [[ "${OS}" == *"nixos-"* ]]; then
+        get_nixos
+    elif [[ "${OS}" == *"ubuntu"* ]]; then
+        get_ubuntu
+    elif [[ "${OS}" == *"manjaro"* ]]; then
+        get_manjaro
+    elif [[ "${OS}" == *"mxlinux"* ]]; then
+        get_mxlinux
+    elif [[ "${OS}" == *"nixos"* ]]; then
+        get_nixos
+
+    elif ( os_support | grep -q "${OS}" ; echo $? == 0 > /dev/null) ; then
+        get_"${OS}"
     else
-        echo "ERROR! ${OS} is unknown:"
-        echo
+        echo -n " $c1 ERROR!$c ${OS} is unknown:"
         os_support
-        echo
-        echo "Or try run: $progname fzf for fuzzy list available..."
+        echo -n " $c2 Or try run: $c $progname fzf$c2 for fuzzy list available...$c"
         exit 1
     fi
 else
-    echo -n "ERROR! You must specify a release: "
+    echo -n " $c1 ERROR! You must specify a release: $c"
     echo
-    echo
-    if [ "${OS}" == "alma" ]; then
-        releases_alma
-    elif [ "${OS}" == "android" ]; then
-        releases_android
-    elif [ "${OS}" == "archlinux" ]; then
-        releases_archlinux
-    elif [ "${OS}" == "debian" ]; then
-        releases_debian
-    elif [ "${OS}" == "devuan" ]; then
-        releases_devuan
-    elif [ "${OS}" == "elementary" ]; then
-        releases_elementary
-    elif [ "${OS}" == "freebsd" ]; then
-        releases_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        releases_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        releases_garuda
-    elif [ "${OS}" == "kali" ]; then
-        releases_kali
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
-        releases_linuxmint
-    elif [ "${OS}" == "macos" ]; then
-        releases_macos
-    elif [ "${OS}" == "netboot" ]; then
-        releases_netboot
-    elif [[ "${OS}" == *"nixos-"* ]]; then
-        releases_nixos
-    elif [ "${OS}" == "opensuse" ]; then
-        releases_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        releases_oraclelinux
-    elif [ "${OS}" == "openbsd" ]; then
-        releases_openbsd
-    elif [ "${OS}" == "popos" ]; then
-        releases_popos
-    elif [ "${OS}" == "regolith" ]; then
-        releases_regolith
-    elif [ "${OS}" == "rockylinux" ]; then
-        releases_rockylinux
-    elif [ "${OS}" == "solus" ]; then
-        releases_solus
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        releases_ubuntu
-    elif [ "${OS}" == "windows" ]; then
-        releases_windows
-    elif [ "${OS}" == "zorin" ]; then
-        releases_zorin
+    if os_support | grep -q "${OS}" ; echo $? == 0 > /dev/null ; then
+        releases_"${OS}"
     else
-        echo "${OS} is unknown"
-        echo
+        echo -n " ${OS} is unknown"
         os_support
     fi
-    echo
-    echo "Or try run: $progname fzf for fuzzy list available..."
+    echo " $c2 Or try run: $c $progname fzf$c2 for fuzzy list available...$c"
     exit 1
 fi
