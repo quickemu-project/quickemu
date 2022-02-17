@@ -286,6 +286,7 @@ function releases_debian() {
     standard \
     xfce
 }
+
 function releases_cachyos() {
     echo 2022.01.09
 }
@@ -589,7 +590,7 @@ function zsync_get() {
       fi
     else
       echo "INFO: zsync not found, falling back to wget"
-      web_get "${ISO}"
+      web_get "${ISO}" "${DIR}"
     fi
 }
 
