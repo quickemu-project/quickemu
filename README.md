@@ -160,6 +160,21 @@ cd quickemu
 
 Now install all the **Requirements** documented above.
 
+### Other sources
+
+[Repology.org](https://repology.org/) found the following releases have
+been packaged.
+
+#### Quickemu
+
+[![Packaging
+status](https://repology.org/badge/vertical-allrepos/quickemu.svg)](https://repology.org/project/quickemu/versions)
+
+#### Quickgui
+
+[![Packaging
+status](https://repology.org/badge/vertical-allrepos/quickgui.svg)](https://repology.org/project/quickgui/versions)
+
 Ubuntu Guest
 ------------
 
@@ -628,6 +643,7 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
+  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )
   --delete-disk           : Delete the disk image and EFI variables
   --delete-vm             : Delete the entire VM and it's configuration
   --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'
