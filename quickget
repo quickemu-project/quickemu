@@ -41,6 +41,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
+    devuan)             PRETTY_NAME="Devuan";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     gentoo)             PRETTY_NAME="Gentoo";;
@@ -173,6 +174,10 @@ function list_csv() {
         for OPTION in standard nonfree; do
          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
+      elif [ "${OS}" == "devuan" ]; then
+        for OPTION in standard nonfree; do
+         echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
       elif [ "${OS}" == "alma" ]; then
         for OPTION in minimal dvd; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
@@ -193,6 +198,7 @@ function os_support() {
     arcolinux \
     cachyos \
     debian \
+    devuan \
     elementary \
     freebsd \
     fedora \
@@ -285,6 +291,14 @@ function releases_debian() {
     mate \
     standard \
     xfce
+}
+
+function releases_devuan() {
+    echo amd64_desktop \
+    amd64_netinstall \
+    amd64_server \
+    amd64_desktop-live \
+    amd64_minimal-live
 }
 
 function releases_cachyos() {
@@ -646,7 +660,7 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        alma | android | archlinux | debian | elementary | fedora | kali | \
+        alma | android | archlinux | debian | devuan | elementary | fedora | kali | \
         garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | \
         popos | regolith | rockylinux | solus | *ubuntu* | zorin )
             GUEST="linux"
@@ -696,6 +710,10 @@ EOF
 
         if [ "${OS}" == "kolibrios" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "devuan"  ]; then
+            echo "display=\"spice\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "openbsd" ]; then
@@ -901,6 +919,39 @@ function get_debian() {
     HASHLINE=$(wget -q -O- ${URL}/SHA512SUMS |grep ${RELEASE}.iso)
     ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
     HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_devuan() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASHLINE=""
+
+    validate_release "releases_devuan"
+    
+    case $RELEASE in
+      *minimal-live)  URL="https://files.devuan.org/devuan_chimaera/minimal-live" ;;
+      *desktop-live)  URL="https://files.devuan.org/devuan_chimaera/desktop-live" ;;
+      *)              URL="https://files.devuan.org/devuan_chimaera/installer-iso";;
+    esac
+    
+    case $RELEASE in
+      *minimal-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *desktop-live)  HASHLINE=$(wget -q -O- ${URL}/SHASUMS.txt | grep ${RELEASE}.iso) ;;
+      *)              HASHLINE=$(wget -q -O- ${URL}/SHA256SUMS | grep ${RELEASE}.iso);;
+    esac
+    
+    echo $HASHLINE
+
+    ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
+    HASH=$(echo ${HASHLINE} | cut -d\  -f1)
+
+    RELEASE="${ISO%.*}"
+    VM_PATH="${RELEASE}"
 
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -2034,6 +2085,22 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
+    elif [ "${OS}" == "devuan" ]; then
+     if [ -n "${3}" ]; then
+            FREEDOM="${3}"
+            FREEDOMS=(standard nonfree)
+            if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
+                echo "ERROR! ${FREEDOM} is not a supported freedom:"
+                for DRIVER in "${FREEDOMS[@]}"; do
+                  echo "${FREEDOM}"
+                done
+                exit 1
+            fi
+        else
+            FREEDOM="standard"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
+        get_devuan  "${FREEDOM}"
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
@@ -2145,6 +2212,8 @@ else
         releases_arcolinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
+    elif [ "${OS}" == "devuan" ]; then
+        releases_devuan
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
