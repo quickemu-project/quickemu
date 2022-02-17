@@ -424,6 +424,19 @@ SPICE ports the VM is connected to.
 ```bash
 cat ubuntu-focal/ubuntu-focal.ports
 ```
+# Accessibility
+
+Qemu provides support for using BrlAPI to display braille output on a real or fake device.
+
+
+```bash
+quickemu --vm ubuntu-impish.conf --accessibility braille --display sdl
+```
+or even
+
+```bash
+quickemu --vm ubuntu-impish.conf --acc brl --display sdl
+```
 
 # BIOS and EFI
 
@@ -562,6 +575,7 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
+  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )"
   --delete-disk           : Delete the disk image and EFI variables
   --delete-vm             : Delete the entire VM and it's configuration
   --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'
