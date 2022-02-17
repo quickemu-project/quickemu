@@ -32,13 +32,30 @@ comprehensive support for macOS and Windows**.
   * **Windows** 8.1, 10 and 11 including TPM 2.0
   * [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
   * [Debian](https://www.debian.org/) (bullseye with all the official and non-free DE variants)
-  * [Fedora](https://getfedora.org/) & openSUSE ([Leap](https://get.opensuse.org/leap/), [Tumbleweed](https://get.opensuse.org/tumbleweed/), [MicroOS](https://microos.opensuse.org/))
+  * [Fedora](https://getfedora.org/)
+  & openSUSE ([Leap](https://get.opensuse.org/leap/)
+  , [Tumbleweed](https://get.opensuse.org/tumbleweed/)
+  , [MicroOS](https://microos.opensuse.org/))
   * [Alma Linux](https://almalinux.org/)
-  * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE), [elementary OS](https://elementary.io/), [Pop!_OS](https://pop.system76.com/)
-  * [Arch Linux](https://www.archlinux.org/), [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/), [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
-  * [Oracle Linux](https://www.oracle.com/linux/) and [Rocky Linux](https://rockylinux.org/)
+  * [Alpine Linux](https://www.alpinelinux.org/)
+  * [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE)
+  , [elementary OS](https://elementary.io/)
+  , [Pop!_OS](https://pop.system76.com/)
+  * [Arch Linux](https://www.archlinux.org/)
+  , [ArcoLinux](https://www.arcolinux.info/)
+  , [CachyOS](https://cachyos.org/)
+  , [Kali](https://www.kali.org/)
+  , [Garuda](https://garudalinux.org/)
+  , [Gentoo Linux](https://www.gentoo.org/)
+  , [Manjaro](https://manjaro.org)
+  , [NixOS](https://nixos.org/)
+  & [ZorinOS](https://zorin.com/os/)
+  * [Oracle Linux](https://www.oracle.com/linux/)
+  and [Rocky Linux](https://rockylinux.org/)
   * [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and latest 2.0.0 pre-release  )
-  * [FreeBSD](https://www.freebsd.org/) & [OpenBSD](https://www.openbsd.org/)
+  * [FreeBSD](https://www.freebsd.org/)
+  & [OpenBSD](https://www.openbsd.org/)
+  * [Haiku](https://www.haiku-os.org/)
   * Full SPICE support including host/guest clipboard sharing
   * VirtIO-webdavd file sharing for Linux and Windows guests
   * VirtIO-9p file sharing for Linux and macOS guests
@@ -177,14 +194,19 @@ preferred flavour.
 `quickget` also supports:
 
   * `alma`
+  * `alpine`
   * `archlinux`
+  * `arcolinux`
+  * `cachyos`
   * `debian`
   * `elementary`
   * `fedora`
   * `garuda`
+  * `gentoo`
   * `kali`
   * `kdeneon`
   * `linuxmint`
+  * `mxlinux`
   * `nixos`
   * `opensuse`
   * `oraclelinux`
@@ -329,14 +351,27 @@ tpm="on"
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
 
-## BSD Guests
+## Haiku Guests
 
-`quickemu` supports FreeBSD and OpenBSD.
+`quickemu` supports [Haiku](https://www.haiku-os.org/).
 
 ```bash
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
+quickget quickget haiku r1beta3-x86_64
+quickemu --vm haiku-r1beta3-x86_64.conf
 ```
+
+At the moment the only way to share files between host and a Haiku guest is by
+using SSH (having a SSH server running on the host):
+
+On guest:
+
+```bash
+scp example.txt user@host-local-ip:/home/user # sending a file from guest to host
+scp user@host-local-ip:/home/user/example.txt . # receiving a file from host to guest
+```
+
+`quickget` cannot automatically download and create virtual machines for Haiku
+nightly versions, but they work if the ISO and configuration are set up manually.
 
 # SPICE
 
