@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+progname=${0##*/}
+c1=$(tput setaf 1) # red
+c2=$(tput setaf 2) # green
+c3=$(tput setaf 3) # yellow
+c4=$(tput setaf 4) # blue
+c=$(tput sgr0)
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
@@ -80,7 +86,7 @@ function pretty_name() {
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
-  echo "${PRETTY_NAME}"
+  echo "$c2${PRETTY_NAME}$c"
 }
 
 function validate_release() {
@@ -91,8 +97,8 @@ function validate_release() {
   DISPLAY_NAME="$(pretty_name "${OS}")"
   RELEASES=$(${RELEASE_GENERATOR})
   if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
-      echo "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-      echo "${RELEASES}"
+      echo " $c1 ERROR! ${DISPLAY_NAME} $c1${RELEASE}$c is not a supported release.$c"
+      echo " $c2${RELEASES}$c"
       exit 1
   fi
 }
@@ -522,17 +528,17 @@ function check_hash() {
       40) hash_algo=sha1sum;;
       64) hash_algo=sha256sum;;
       128) hash_algo=sha512sum;;
-       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+       *) echo " $c3 WARNING! Can't guess hash algorithm, not checking ${iso} hash."
           return;;
     esac
 
     echo -n "Checking ${iso} with ${hash_algo}... "
-    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
-        echo "ERROR!"
-        echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+    if ! echo " ${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo " $c1 ERROR!"
+        echo " ${iso}$c doesn't match ${hash}. Try running ${progname} again.$c"
         exit 1
     else
-        echo "Good!"
+        echo "$c2 Good!$c"
     fi
 }
 
@@ -545,8 +551,8 @@ function copy_local(){
       LOCALFILE=$(find ${ISODIR} -type f -name "${LOCALISO}" -print -quit )
       #echo got local file "${LOCALFILE}"
       if [ -f "${DIR}/${FILE}" ]; then
-        echo "ERROR! File Exists - not copying over local file"
-        echo "Move it out of the way to replace it with a local file"
+        echo " $c1 ERROR! File Exists - not copying over local file"
+        echo "Move it out of the way to replace it with a local file$c"
         exit 1
       else
         cp -pv "${LOCALFILE}" ${DIR}/${FILE}
@@ -569,7 +575,7 @@ function web_get() {
     fi
 
     if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
+      echo " $c1 ERROR! Unable to create directory ${DIR}$c"
       exit 1
     fi
     copy_local
@@ -577,13 +583,13 @@ function web_get() {
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
           echo #Necessary as aria2c in suppressed mode doesnot have new lines
-          echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
+        echo " $c1 ERROR! Failed to download ${URL}. Try running '${progname}' again.$c"
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode doesnot have new lines
     else
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-          echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
+        echo " $c1 ERROR! Failed to download ${URL}. Try running '${progname}' again.$c"
           exit 1
         fi
     fi
@@ -609,14 +615,14 @@ function zsync_get() {
       fi
 
       if ! mkdir -p "${DIR}" 2>/dev/null; then
-        echo "ERROR! Unable to create directory ${DIR}"
+        echo " $c1 ERROR! Unable to create directory ${DIR}$c"
         exit 1
       fi
 
     copy_local
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-          echo "ERROR! Failed to download ${URL}.zsync"
+          echo " $c1 ERROR! Failed to download ${URL}.zsync$c"
           exit 1
       fi
 
@@ -624,14 +630,14 @@ function zsync_get() {
           rm "${DIR}/${OUT}.zs-old"
       fi
     else
-      echo "INFO: zsync not found, falling back to wget"
+      echo " $c4 INFO: zsync not found, falling back to wget$c"
       web_get "${ISO}" "${DIR}"
     fi
 }
 
 function start_vm_info() {
     echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
+    echo " To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
 }
@@ -680,7 +686,7 @@ function make_vm_config() {
     fi
 
     if [ ! -e "${OS}-${RELEASE}.conf" ]; then
-        echo "Making VM configuration for ${OS}-${RELEASE}..."
+        echo " Making VM configuration for ${OS}-${RELEASE}..."
         cat << EOF > "${OS}-${RELEASE}.conf"
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
@@ -1442,12 +1448,12 @@ function get_ubuntu() {
       ubuntu-studio)
         PROJECT="ubuntustudio"
         DEVEL="dvd";;
-      *) echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
+      *) echo " $c1 ERROR! ${OS} is not a recognised Ubuntu flavour.$c"
          exit 1;;
     esac
 
     if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
-      echo "ERROR! Canary is currently only available for Ubuntu."
+      echo " $c1 ERROR! Canary is currently only available for Ubuntu.$c"
       exit 1
     else
       validate_release "releases_ubuntu"
@@ -1983,7 +1989,7 @@ languages_windows
 if [ -n "${1}" ]; then
     OS="${1,,}"
 else
-    echo "ERROR! You must specify an operating system:"
+    echo "$c1 ERROR! You must specify an operating system:$c"
     os_support
     exit 1
 fi
@@ -1993,7 +1999,7 @@ if [ -n "${2}" ]; then
     VM_PATH="${OS}-${RELEASE}"
 
     if [ "${OS}" == "alma" ]; then
-     if [ -n "${3}" ]; then
+        if [ -n "${3}" ]; then
             ISOTYPE="${3,,}"
             ISOTYPES=(minimal dvd ) # boot) # a step too far
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
@@ -2023,7 +2029,7 @@ if [ -n "${2}" ]; then
             FREEDOM="${3}"
             FREEDOMS=(standard nonfree)
             if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
-                echo "ERROR! ${FREEDOM} is not a supported freedom:"
+                echo " $c1 ERROR! ${FREEDOM} is not a supported freedom:$c"
                 for DRIVER in "${FREEDOMS[@]}"; do
                   echo "${FREEDOM}"
                 done
@@ -2075,7 +2081,7 @@ if [ -n "${2}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
             if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
-                echo "ERROR! ${DRIVER} is not a supported driver:"
+                echo " $c1 ERROR! ${DRIVER} is not a supported driver:$c"
                 for DRIVER in "${DRIVERS[@]}"; do
                   echo "${DRIVER}"
                 done
@@ -2114,7 +2120,7 @@ if [ -n "${2}" ]; then
         if [ -n "${3}" ]; then
             LANG_NAME="${3}"
             if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
-                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                echo " $c1 ERROR! ${LANG_NAME} is not a supported language:$c"
                 for LANG in "${LANGS[@]}"; do
                   echo "${LANG}"
                 done
@@ -2127,12 +2133,12 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "zorin" ]; then
         get_zorin
     else
-        echo "ERROR! ${OS} is unknown:"
+        echo -n " $c1 ERROR! ${OS} is unknown:$c"
         os_support
         exit 1
     fi
 else
-    echo -n "ERROR! You must specify a release: "
+    echo -n " $c1 ERROR! You must specify a release: $c"
     if [ "${OS}" == "alma" ]; then
         releases_alma
     elif [ "${OS}" == "alpine" ]; then
@@ -2198,7 +2204,7 @@ else
     elif [ "${OS}" == "zorin" ]; then
         releases_zorin
     else
-        echo "${OS} is unknown"
+        echo -n " ${OS} is unknown"
         os_support
     fi
     exit 1
@@ -2207,7 +2213,7 @@ fi
    esac
     done
     if [ $# == 0 ]; then
-      echo "Error: You must supply an OS!"
+      echo "$c1 ERROR!: You must supply an OS:$c"
       os_support
       exit 1
 fi
