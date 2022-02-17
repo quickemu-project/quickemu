@@ -626,6 +626,12 @@ function make_vm_config() {
         freebsd )
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
+        haiku)
+            GUEST="haiku"
+            IMAGE_TYPE="iso";;
+        kolibrios)
+            GUEST="kolibrios"
+            IMAGE_TYPE="iso";;
         openbsd )
             GUEST="openbsd"
             IMAGE_TYPE="iso";;
