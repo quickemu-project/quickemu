@@ -126,6 +126,15 @@ cd quickemu
 
 Now install all the **Requirements** documented above.
 
+### Other sources
+
+[Repology.org](https://repology.org/) found the following releases have been packaged.
+
+#### Quickemu
+[![Packaging status](https://repology.org/badge/vertical-allrepos/quickemu.svg)](https://repology.org/project/quickemu/versions)
+#### Quickgui
+[![Packaging status](https://repology.org/badge/vertical-allrepos/quickgui.svg)](https://repology.org/project/quickgui/versions)
+
 # Usage
 
 ## Graphical User Interfaces
