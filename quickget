@@ -559,7 +559,7 @@ function web_get() {
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode doesnot have new lines
-    else 
+    else
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
           exit 1
@@ -620,7 +620,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        alma | android | archlinux | debian | elementary | fedora | kali | garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | popos | regolith | rockylinux | solus | *ubuntu* | zorin )
+        alma | android | archlinux | debian | elementary | fedora | kali | \
+        garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | \
+        popos | regolith | rockylinux | solus | *ubuntu* | zorin )
             GUEST="linux"
             IMAGE_TYPE="iso";;
         freebsd )
