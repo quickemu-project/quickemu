@@ -2086,21 +2086,7 @@ if [ -n "${2}" ]; then
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
     elif [ "${OS}" == "devuan" ]; then
-     if [ -n "${3}" ]; then
-            FREEDOM="${3}"
-            FREEDOMS=(standard nonfree)
-            if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
-                echo "ERROR! ${FREEDOM} is not a supported freedom:"
-                for DRIVER in "${FREEDOMS[@]}"; do
-                  echo "${FREEDOM}"
-                done
-                exit 1
-            fi
-        else
-            FREEDOM="standard"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
-        get_devuan  "${FREEDOM}"
+        get_devuan
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
