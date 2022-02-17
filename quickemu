@@ -422,8 +422,8 @@ function vm_boot() {
           EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
           efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
-	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
-	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
+          EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
+          efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
         elif [ -e "/usr/share/qemu/ovmf-x86_64-4m-code.bin" ]; then
           EFI_CODE="/usr/share/qemu/ovmf-x86_64-4m-code.bin"
           efi_vars "/usr/share/qemu/ovmf-x86_64-4m-vars.bin" "${EFI_VARS}"
