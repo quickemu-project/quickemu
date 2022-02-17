@@ -36,15 +36,32 @@ function pretty_name() {
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
     alma)               PRETTY_NAME="Alma Linux";;
+    alpine)             PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    arcolinux)          PRETTY_NAME="Arco Linux";;
+    cachyos)            PRETTY_NAME="CachyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    gentoo)             PRETTY_NAME="Gentoo";;
     garuda)             PRETTY_NAME="Garuda Linux";;
+    haiku)              PRETTY_NAME="Haiku";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
+    kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    manjaro-xfce)       PRETTY_NAME="Manjaro XFCE";;
+    manjaro-kde)        PRETTY_NAME="Manjaro KDE";;
+    manjaro-gnome)      PRETTY_NAME="Manjaro Gnome";;
+    manjaro-budgie)     PRETTY_NAME="Manjaro Budgie";;
+    manjaro-cinnamon)   PRETTY_NAME="Manjaro Cinnamon";;
+    manjaro-deepin)     PRETTY_NAME="Manjaro Deepin";;
+    manjaro-i3)         PRETTY_NAME="Manjaro i3";;
+    manjaro-mate)       PRETTY_NAME="Manjaro MATE";;
+    mxlinux-xfce)       PRETTY_NAME="MX Linux XFCE";;
+    mxlinux-kde)        PRETTY_NAME="MX Linux KDE";;
+    mxlinux-fluxbox)    PRETTY_NAME="MX Linux Fluxbox";;
     nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
     nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
     nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
@@ -59,6 +76,7 @@ function pretty_name() {
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -111,6 +129,10 @@ function list_csv() {
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
       FUNC="linuxmint"
+    elif [[ "${OS}" == *"manjaro"* ]]; then
+      FUNC="manjaro"
+    elif [[ "${OS}" == *"mxlinux"* ]]; then
+      FUNC="mxlinux"
     elif [[ "${OS}" == *"nixos"* ]]; then
       FUNC="nixos"
     else
@@ -127,7 +149,11 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
         DOWNLOADER="${DL}"
+      elif [ "${OS}" == "cachyos" ]; then
+        DOWNLOADER="${DL}"
       elif [ "${OS}" == "garuda" ]; then
+        DOWNLOADER="${DL}"
+      elif [ "${OS}" == "gentoo" ]; then
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"kdeneon"* ]]; then
         DOWNLOADER="${DL}"
@@ -161,19 +187,36 @@ function list_csv() {
 
 function os_support() {
     echo alma \
+    alpine \
     android \
     archlinux \
+    arcolinux \
+    cachyos \
     debian \
     elementary \
     freebsd \
     fedora \
     garuda \
+    gentoo \
+    haiku \
     kali \
     kdeneon \
+    kolibrios \
     kubuntu \
     linuxmint-cinnamon \
     linuxmint-mate \
     linuxmint-xfce \
+    manjaro-xfce \
+    manjaro-kde \
+    manjaro-gnome \
+    manjaro-budgie \
+    manjaro-cinnamon \
+    manjaro-deepin \
+    manjaro-i3 \
+    manjaro-mate \
+    mxlinux-xfce \
+    mxlinux-kde \
+    mxlinux-fluxbox \
     nixos-gnome \
     nixos-plasma5 \
     nixos-minimal \
@@ -186,11 +229,13 @@ function os_support() {
     regolith \
     rockylinux \
     solus \
+    tails \
     ubuntu \
     ubuntu-budgie \
     ubuntu-kylin \
     ubuntu-mate \
     ubuntu-studio \
+    void \
     windows \
     xubuntu \
     zorin
@@ -200,6 +245,14 @@ function releases_alma() {
     # consider flavours for boot and dvd as well as
     echo 8.4 \
     8.5
+}
+
+function releases_alpine() {
+    echo latest \
+    3.12 \
+    3.13 \
+    3.14 \
+    3.15
 }
 
 function releases_android() {
@@ -217,6 +270,10 @@ function releases_archlinux() {
     echo latest
 }
 
+function releases_arcolinux() {
+    echo latest
+}
+
 # later refactor these DE variants like languages and avoid the arch ?
 # all these are available with a "nonfree" option too
 function releases_debian() {
@@ -230,8 +287,12 @@ function releases_debian() {
     xfce
 }
 
+function releases_cachyos() {
+    echo 2022.01.09
+}
+
 function releases_elementary() {
-    echo 6.0
+    echo 6.1
 }
 
 function releases_freebsd(){
@@ -243,6 +304,10 @@ function releases_fedora(){
     echo 33 \
     34 \
     35
+}
+
+function releases_gentoo(){
+    echo latest
 }
 
 function releases_garuda() {
@@ -262,6 +327,11 @@ function releases_garuda() {
     cinnamon
 }
 
+function releases_haiku() {
+    echo r1beta3-x86_64 \
+        r1beta3-x86_gcc2h
+}
+
 function releases_kali() {
     echo latest \
     weekly
@@ -274,8 +344,16 @@ function releases_kdeneon() {
     developer
 }
 
+function releases_kolibrios() {
+    echo latest
+}
+
 function releases_linuxmint(){
     echo 20.2
+}
+
+function releases_mxlinux(){
+    echo 21
 }
 
 function releases_nixos(){
@@ -314,9 +392,20 @@ function releases_macos() {
     monterey
 }
 
+function releases_manjaro() {
+    case ${OS} in
+    *xfce|*kde|*gnome) echo full \
+    minimal \
+    minimal-lts;;
+    *budgie|*cinnamon|*deepin|*i3|*mate) echo full \
+    minimal;;
+    esac
+}
+
 function releases_popos() {
     echo 20.04 \
-    21.04
+    21.04 \
+    21.10
 }
 
 function releases_regolith() {
@@ -343,6 +432,10 @@ function releases_solus() {
     4.3-plasma
 }
 
+function releases_tails() {
+    echo stable
+}
+
 function releases_ubuntu() {
     echo bionic \
     focal \
@@ -350,6 +443,13 @@ function releases_ubuntu() {
     impish \
     devel \
     canary
+}
+
+function releases_void() {
+    echo base \
+    musl \
+    xfce \
+    xfce-musl
 }
 
 function languages_windows() {
@@ -513,13 +613,22 @@ function make_vm_config() {
     if [ "${OS}" == "alma" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "alpine" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "android" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "archlinux" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "arcolinux" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "debian" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "cachyos" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "elementary" ]; then
@@ -537,10 +646,25 @@ function make_vm_config() {
     elif [ "${OS}" == "garuda" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "gentoo" ]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "haiku" ]; then
+        GUEST="haiku"
+        IMAGE_TYPE="iso"
     elif [ "${OS}" == "kdeneon" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [ "${OS}" == "kolibrios" ]; then
+        GUEST="kolibrios"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"manjaro"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [[ "${OS}" == *"mxlinux"* ]]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"nixos"* ]]; then
@@ -567,7 +691,13 @@ function make_vm_config() {
     elif [ "${OS}" == "solus" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
+    elif [[ "${OS}" == "tails" ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
+        GUEST="linux"
+        IMAGE_TYPE="iso"
+    elif [ "${OS}" == "void" ]; then
         GUEST="linux"
         IMAGE_TYPE="iso"
     elif [ "${OS}" == "macos" ]; then
@@ -596,10 +726,20 @@ EOF
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
+
         if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
+
+        if [ "${OS}" == "kolibrios" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
         if [ "${OS}" == "openbsd" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "tails" ]; then
             echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -607,11 +747,24 @@ EOF
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
+        if [ "${OS}" == "cachyos"  ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
         if [ "${OS}" == "garuda"  ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
+        if [ "${OS}" == "haiku" ]; then
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
         if [ "${OS}" == "oraclelinux"  ]; then
+            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+        if [ "${OS}" == "void"  ]; then
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -692,6 +845,30 @@ function get_alma() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_alpine() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+    local BRANCH=""
+
+    validate_release "releases_alpine"
+    if [[ "${RELEASE}" == "latest" ]]; then
+      BRANCH="latest-stable"
+    else
+      BRANCH="v${RELEASE}"
+    fi
+    MANIFESTURL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/latest-releases.yaml"
+    VERSION=$(wget -qO- "${MANIFESTURL}" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
+    ISO="alpine-virt-${VERSION}-x86_64.iso"
+    URL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -qO- "${MANIFESTURL}" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_archlinux() {
     local HASH=""
     local ISO=""
@@ -708,6 +885,36 @@ function get_archlinux() {
     make_vm_config "${ISO}"
 }
 
+function get_arcolinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_arcolinux"
+    VERSION=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/info' | cut -d " " -f 2)
+    URL="https://ant.seedhost.eu/arcolinux/.quick/"
+    ISO="arcolinuxl-${VERSION}-x86_64.iso"
+    HASH=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/arcolinuxl-'${VERSION}'-x86_64.iso.sha1' | cut -d " " -f 1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+
+function get_cachyos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_cachyos"
+    #ISO="cachyos-cli-${RELEASE}-x86_64.iso"
+    ISO="cachyos-${RELEASE}-x86_64.iso"
+    URL="https://mirror.cachyos.org/ISO"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    make_vm_config "${ISO}"
+}
 
 function get_debian() {
     local HASH=""
@@ -741,11 +948,11 @@ function get_elementary() {
     local ISO=""
     local URL=""
     local B66tim=""
-
+    local isotag="20211218-rc"
 
     validate_release "releases_elementary"
     B66tim=$(date +%s | base64 )
-    ISO="elementaryos-${RELEASE}-stable.20211005.iso"
+    ISO="elementaryos-${RELEASE}-stable.${isotag}.iso"
     # TODO:  derive region from geoIP
     URL="https://ams3.dl.elementary.io/download/${B66tim}=/${ISO}"
     web_get "${URL}" "${VM_PATH}"
@@ -793,6 +1000,27 @@ function get_fedora() {
     make_vm_config "${ISO}"
 }
 
+function get_gentoo() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local LOCAT=""
+    local INSTALLMIN=""
+
+    validate_release "releases_gentoo"
+    eval $( wget  -O/tmp/gentoolatest https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/${RELEASE}-iso.txt 2>&1 |grep Location | awk '{print "LOCAT="$2}' )
+    LOCAT=$(dirname ${LOCAT})
+    eval $( awk '/admincd-amd64/ {print "ADMIN="$1}; /install-amd64-minimal/ {print "INSTALLMIN="$1}' /tmp/gentoolatest )
+    URL="${LOCAT}/${INSTALLMIN}"
+    ISO=$(basename "${INSTALLMIN}" )
+
+
+    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- ${LOCAT}/${INSTALLMIN}.DIGESTS|grep -e iso|grep  -v -e CONT -e catalyst|cut -d\  -f1)
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_kali() {
     local HASH=""
     local ISO=""
@@ -828,6 +1056,23 @@ function get_kdeneon() {
     make_vm_config "${ISO}"
 }
 
+function get_kolibrios() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_kolibrios"
+    #URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
+    ISO="kolibri.iso"
+    URL="https://builds.kolibrios.org/eng/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    #7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
+    #ISO="kolibrios-${RELEASE}.iso"
+    #mv "kolibri.iso" "${VM_PATH}/${ISO}"
+    #rm "${VM_PATH}/${RELEASE}.7z"
+    make_vm_config "${ISO}"
+}
+
 function get_linuxmint() {
     local FLAVOR=""
     local HASH=""
@@ -842,7 +1087,74 @@ function get_linuxmint() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
+
+function get_manjaro() {
+    local FLAVOR=""
+    local MANIFESTURL=""
+#    local ISOKEY=""
+    local HASHKEY=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    validate_release "releases_manjaro"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+    case ${FLAVOR} in
+      xfce|kde|gnome) BRANCH="official";;
+      budgie|cinnamon|deepin|i3|mate) BRANCH="community";;
+    esac
+
+    if [[ ${RELEASE} == "full" ]]; then
+      KEY="Download_x64 = "
+      HASHKEY="Download_x64_Checksum = "
+    elif [[ ${RELEASE} == "minimal" ]]; then
+      KEY="Download_Minimal_x64 = "
+      HASHKEY="Download_Minimal_x64_Checksum = "
+    elif [[ ${RELEASE} == "minimal" ]]; then
+      KEY="Download_Minimal_lts = "
+      HASHKEY="Download_Minimal_x64_Checksum_lts = "
+    fi
+
+    MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${FLAVOR}.md"
+    URL="$(wget -qO- ${MANIFESTURL} | grep "${KEY}" | awk '{print $3}' | tr -d '"')"
+    ISO="$(echo $URL | awk -F "/" '{print $6}')"
+    HASH=$(wget -qO- ${MANIFESTURL} | grep "${HASHKEY}" | awk '{print $3}' | tr -d '"')
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_mxlinux() {
+    local FLAVOR=""
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local BASE_URL=""
+
+    validate_release "releases_mxlinux"
+    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
+
+    if [[ "$FLAVOR" == "xfce" ]]; then
+        ISO="MX-${RELEASE}_x64.iso"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce/"
+    elif [[ "$FLAVOR" == "kde" ]]; then
+        ISO="MX-${RELEASE}_KDE_x64.iso"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/KDE/"
+    elif [[ "$FLAVOR" == "fluxbox" ]]; then
+        ISO="MX-${RELEASE}_fluxbox_x64.iso"
+        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Fluxbox/"
+    fi
+
+    URL="${BASE_URL}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    web_get "${URL}.sha256" "${VM_PATH}"
+    HASH=$(cat "${VM_PATH}/${ISO}.sha256" | cut -d' ' -f1)
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_nixos() {
     local FLAVOR=""
     local HASH=""
@@ -857,6 +1169,7 @@ function get_nixos() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+
 }
 function get_openbsd() {
     local HASH=""
@@ -868,6 +1181,40 @@ function get_openbsd() {
     URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
     HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_void() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local HASH_URL=""
+
+    validate_release "releases_void"
+    DATE=$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
+    URL="http://mirror.fit.cvut.cz/voidlinux/live/current"
+    case ${RELEASE} in
+      base)
+        ISO="void-live-x86_64-${DATE}.iso";;
+      musl)
+        ISO="void-live-x86_64-musl-${DATE}.iso";;
+      xfce)
+        ISO="void-live-x86_64-${DATE}-xfce.iso";;
+      xfce-musl)
+        ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+    esac
+    case ${RELEASE} in
+      base)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
+      musl)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+      xfce)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
+      xfce-musl)
+        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+    esac
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
@@ -941,8 +1288,12 @@ function get_opensuse() {
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
         HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    else
+    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    else
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
         HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
     fi
@@ -1100,6 +1451,18 @@ function get_regolith() {
     make_vm_config "${ISO}"
 }
 
+function get_tails() {
+    validate_release "releases_tails"
+
+    RELEASE_JSON_URL="https://tails.boum.org/install/v2/Tails/amd64/${RELEASE}/latest.json"
+    RELEASE_JSON="$(wget -q -O- "$RELEASE_JSON_URL")"
+    URL=$(echo "$RELEASE_JSON" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
+    HASH=$(echo "$RELEASE_JSON" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
+    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
 
 function get_ubuntu() {
     local DEVEL="daily-live"
@@ -1149,6 +1512,7 @@ function get_ubuntu() {
         make_vm_config "${ISO}"
     fi
 }
+
 function get_garuda() {
     local HASH=""
     local ISO=""
@@ -1183,6 +1547,21 @@ function get_garuda() {
     #  check_hash "${ISO}" "${HASH}"
     #fi
     make_vm_config "${OS}-${RELEASE}.iso"
+}
+
+function get_haiku() {
+    local ISO=""
+    local URL=""
+    local HASH=""
+
+    validate_release "releases_haiku"
+
+    ISO="haiku-${RELEASE}-anyboot.iso"
+    URL="https://cdn.haiku-os.org/haiku-release/$(echo $RELEASE | awk -F '-' '{print $1}')/${ISO}"
+    HASH=$(wget -q -O- ${URL}.sha256 | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function unattended_windows() {
@@ -1480,7 +1859,6 @@ function unattended_windows() {
 EOF
 }
 
-
 function dbg_windows() {
   local DEBUG=0
   if [ ${DEBUG} -eq 1 ]; then
@@ -1623,10 +2001,16 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
         get_alma "${ISOTYPE}"
+    elif [ "${OS}" == "alpine" ]; then
+        get_alpine
     elif [ "${OS}" == "android" ]; then
         get_android
     elif [ "${OS}" == "archlinux" ]; then
         get_archlinux
+    elif [ "${OS}" == "arcolinux" ]; then
+        get_arcolinux
+    elif [ "${OS}" == "void" ]; then
+        get_void
     elif [ "${OS}" == "debian" ]; then
      if [ -n "${3}" ]; then
             FREEDOM="${3}"
@@ -1653,12 +2037,24 @@ if [ -n "${2}" ]; then
         get_fedora
     elif [ "${OS}" == "garuda" ]; then
         get_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        get_cachyos
+    elif [ "${OS}" == "gentoo" ]; then
+        get_gentoo
+    elif [ "${OS}" == "haiku" ]; then
+        get_haiku
     elif [ "${OS}" == "kali" ]; then
         get_kali
     elif [ "${OS}" == "kdeneon" ]; then
         get_kdeneon
+    elif [ "${OS}" == "kolibrios" ]; then
+        get_kolibrios
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
+    elif [[ "${OS}" == *"manjaro-"* ]]; then
+        get_manjaro
+    elif [[ "${OS}" == *"mxlinux-"* ]]; then
+        get_mxlinux
     elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
@@ -1667,7 +2063,7 @@ if [ -n "${2}" ]; then
         get_opensuse
     elif [ "${OS}" == "oraclelinux" ]; then
         get_oraclelinux
-  elif [ "${OS}" == "popos" ]; then
+    elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
             DRIVERS=(intel nvidia)
@@ -1703,6 +2099,8 @@ if [ -n "${2}" ]; then
         get_rocky "${ISOTYPE}"
     elif [ "${OS}" == "solus" ]; then
         get_solus
+    elif [[ "${OS}" == "tails"* ]]; then
+        get_tails
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -1730,10 +2128,14 @@ else
     echo -n "ERROR! You must specify a release: "
     if [ "${OS}" == "alma" ]; then
         releases_alma
+    elif [ "${OS}" == "alpine" ]; then
+        releases_alpine
     elif [ "${OS}" == "android" ]; then
         releases_android
     elif [ "${OS}" == "archlinux" ]; then
         releases_archlinux
+    elif [ "${OS}" == "arcolinux" ]; then
+        releases_arcolinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
     elif [ "${OS}" == "elementary" ]; then
@@ -1744,10 +2146,22 @@ else
         releases_fedora
     elif [ "${OS}" == "garuda" ]; then
         releases_garuda
+    elif [ "${OS}" == "cachyos" ]; then
+        releases_cachyos
+    elif [ "${OS}" == "gentoo" ]; then
+        releases_gentoo
+    elif [ "${OS}" == "haiku" ]; then
+        releases_haiku
     elif [ "${OS}" == "kali" ]; then
         releases_kali
+    elif [ "${OS}" == "kolibrios" ]; then
+        releases_kolibrios
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
+    elif [[ "${OS}" == *"manjaro-"* ]]; then
+        releases_manjaro
+    elif [[ "${OS}" == *"mxlinux-"* ]]; then
+        releases_mxlinux
     elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
@@ -1766,8 +2180,12 @@ else
         releases_rockylinux
     elif [ "${OS}" == "solus" ]; then
         releases_solus
+    elif [[ "${OS}" == "tails"* ]]; then
+        releases_tails
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
+    elif [ "${OS}" == "void" ]; then
+        releases_void
     elif [ "${OS}" == "windows" ]; then
         releases_windows
     elif [ "${OS}" == "zorin" ]; then
