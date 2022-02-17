@@ -610,107 +610,27 @@ function make_vm_config() {
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    if [ "${OS}" == "alma" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "alpine" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "android" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "archlinux" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "arcolinux" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "debian" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "cachyos" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "elementary" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "freebsd" ]; then
-        GUEST="freebsd"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "fedora" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "kali" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "garuda" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "gentoo" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "haiku" ]; then
-        GUEST="haiku"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "kdeneon" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "kolibrios" ]; then
-        GUEST="kolibrios"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"manjaro"* ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"mxlinux"* ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"nixos"* ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "openbsd" ]; then
-        GUEST="openbsd"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "opensuse" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "oraclelinux" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "popos" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "regolith" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "rockylinux" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "solus" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == "tails" ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "void" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "macos" ]; then
-        GUEST="macos"
-        IMAGE_TYPE="img"
-    elif [ "${OS}" == "windows" ]; then
-        GUEST="windows"
-        IMAGE_TYPE="iso"
-    elif [ "${OS}" == "zorin" ]; then
-        GUEST="linux"
-        IMAGE_TYPE="iso"
-    fi
-
+    case "${OS}" in
+        alma | android | archlinux | debian | elementary | fedora | kali | garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | popos | regolith | rockylinux | solus | *ubuntu* | zorin )
+            GUEST="linux"
+            IMAGE_TYPE="iso";;
+        freebsd )
+            GUEST="freebsd"
+            IMAGE_TYPE="iso";;
+        openbsd )
+            GUEST="openbsd"
+            IMAGE_TYPE="iso";;
+        macos )
+            GUEST="macos"
+            IMAGE_TYPE="img";;
+        windows )
+            GUEST="windows"
+            IMAGE_TYPE="iso";;
+        *)
+            echo "Undefined OS Defaulting to Guest=Linux and IMAGE_TYPE=iso"
+            GUEST="linux"
+            IMAGE_TYPE="iso";;
+    esac
 
     if [ -n "${ISOTYPE}" ]; then
         RELEASE=${RELEASE}-${ISOTYPE}
