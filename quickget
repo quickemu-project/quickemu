@@ -2133,70 +2133,8 @@ if [ -n "${2}" ]; then
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "alma" ]; then
-        releases_alma
-    elif [ "${OS}" == "alpine" ]; then
-        releases_alpine
-    elif [ "${OS}" == "android" ]; then
-        releases_android
-    elif [ "${OS}" == "archlinux" ]; then
-        releases_archlinux
-    elif [ "${OS}" == "arcolinux" ]; then
-        releases_arcolinux
-    elif [ "${OS}" == "debian" ]; then
-        releases_debian
-    elif [ "${OS}" == "elementary" ]; then
-        releases_elementary
-    elif [ "${OS}" == "freebsd" ]; then
-        releases_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        releases_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        releases_garuda
-    elif [ "${OS}" == "cachyos" ]; then
-        releases_cachyos
-    elif [ "${OS}" == "gentoo" ]; then
-        releases_gentoo
-    elif [ "${OS}" == "haiku" ]; then
-        releases_haiku
-    elif [ "${OS}" == "kali" ]; then
-        releases_kali
-    elif [ "${OS}" == "kolibrios" ]; then
-        releases_kolibrios
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
-        releases_linuxmint
-    elif [[ "${OS}" == *"manjaro-"* ]]; then
-        releases_manjaro
-    elif [[ "${OS}" == *"mxlinux-"* ]]; then
-        releases_mxlinux
-    elif [[ "${OS}" == *"nixos-"* ]]; then
-        releases_nixos
-    elif [ "${OS}" == "opensuse" ]; then
-        releases_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        releases_oraclelinux
-    elif [ "${OS}" == "openbsd" ]; then
-        releases_openbsd
-    elif [ "${OS}" == "macos" ]; then
-        releases_macos
-    elif [ "${OS}" == "popos" ]; then
-        releases_popos
-    elif [ "${OS}" == "regolith" ]; then
-        releases_regolith
-    elif [ "${OS}" == "rockylinux" ]; then
-        releases_rockylinux
-    elif [ "${OS}" == "solus" ]; then
-        releases_solus
-    elif [[ "${OS}" == "tails"* ]]; then
-        releases_tails
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        releases_ubuntu
-    elif [ "${OS}" == "void" ]; then
-        releases_void
-    elif [ "${OS}" == "windows" ]; then
-        releases_windows
-    elif [ "${OS}" == "zorin" ]; then
-        releases_zorin
+    if os_support | grep -q "${OS}" ; echo $? == 0 > /dev/null ; then
+        releases_"${OS}"
     else
         echo "${OS} is unknown"
         os_support
