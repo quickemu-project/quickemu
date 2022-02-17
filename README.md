@@ -370,6 +370,15 @@ tpm="on"
   * `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
   * `tpm="on"` instructs `quickemu` to create a software emulated TPM device using `swtpm`.
 
+## BSD Guests
+
+`quickemu` supports FreeBSD and OpenBSD.
+
+```bash
+quickget freebsd 13_0
+quickemu --vm freebsd-13_0.conf
+```
+
 ## Haiku Guests
 
 `quickemu` supports [Haiku](https://www.haiku-os.org/).
