@@ -665,7 +665,6 @@ function make_vm_config() {
             GUEST="windows"
             IMAGE_TYPE="iso";;
         *)
-            echo "Defaulting to Guest=Linux and IMAGE_TYPE=iso"
             GUEST="linux"
             IMAGE_TYPE="iso";;
     esac
