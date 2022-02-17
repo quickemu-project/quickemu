@@ -646,11 +646,6 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        alma | android | archlinux | debian | elementary | fedora | kali | \
-        garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | \
-        popos | regolith | rockylinux | solus | *ubuntu* | zorin )
-            GUEST="linux"
-            IMAGE_TYPE="iso";;
         freebsd )
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -670,7 +665,7 @@ function make_vm_config() {
             GUEST="windows"
             IMAGE_TYPE="iso";;
         *)
-            echo "Undefined OS Defaulting to Guest=Linux and IMAGE_TYPE=iso"
+            echo "Defaulting to Guest=Linux and IMAGE_TYPE=iso"
             GUEST="linux"
             IMAGE_TYPE="iso";;
     esac
