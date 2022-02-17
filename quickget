@@ -83,6 +83,15 @@ function pretty_name() {
   echo "${PRETTY_NAME}"
 }
 
+function use_fzf() {
+    OS=
+    RELEASE=
+    OS=$(os_support | tr ' ' '\n ' | sort -r | fzf)
+    FUZZY=$(echo $OS |cut -d'-' -f1)
+    RELEASE=$(releases_${FUZZY} | tr ' ' '\n ' | fzf)
+    "$progname" "$OS" "$RELEASE"
+}
+
 function validate_release() {
   local DISPLAY_NAME=""
   local RELEASE_GENERATOR="${1}"
@@ -1829,6 +1838,30 @@ function dbg_windows() {
   fi
 }
 
+function use_fzf2() {
+    OS=
+    RELEASE=
+    OS=$(cat newOSlist | cut -d';' -f1 | fzf)
+    FUZZY=${OS}
+    RELEASE=$(cat newOSlist | grep "$OS" |cut -d';' -f2 | sed 's/ /\n/g' | fzf)
+    get_magic
+}
+
+function use_fzf() {
+    OS=
+    RELEASE=
+    OS=$(os_support | tr ' ' '\n ' | sort -r | fzf)
+    if echo $OS | grep ubuntu ; then
+        FUZZY="ubuntu"
+    elif echo $OS | grep - ; then
+        FUZZY=$(echo $OS |cut -d'-' -f1)
+    else
+        FUZZY=${OS}
+    fi
+    RELEASE=$(releases_${FUZZY} | tr ' ' '\n ' | fzf)
+    get_"$FUZZY"
+}
+
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
     local ARCH="x64"
@@ -1981,10 +2014,15 @@ languages_windows
           *)
 
 if [ -n "${1}" ]; then
+    if [ "${1,,}" = fzf ]; then
+        use_fzf
+        exit 0
+    fi
     OS="${1,,}"
 else
     echo "ERROR! You must specify an operating system:"
     os_support
+    echo "Or try run: $progname fzf for fuzzy list available..."
     exit 1
 fi
 
@@ -2201,6 +2239,7 @@ else
         echo "${OS} is unknown"
         os_support
     fi
+    echo "Or try run: $progname fzf for fuzzy list available..."
     exit 1
 fi
 ;;
@@ -2209,5 +2248,6 @@ fi
     if [ $# == 0 ]; then
       echo "Error: You must supply an OS!"
       os_support
+      echo -n "Or try run: $progname fzf for fuzzy list available..."
       exit 1
 fi
