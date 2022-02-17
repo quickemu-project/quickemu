@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-
+progname=${0##*/}
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
