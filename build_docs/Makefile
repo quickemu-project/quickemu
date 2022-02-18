@@ -20,6 +20,7 @@ clean:
 	rm ./README.lst
 	rm ./quickemu.1-13-OtherGuests02-generated.md
 	rm ./quickemu.1-07-Ubuntus02-generated.md
+	rm ./quickemu.1-08-ZZBSDGuests-generated.md
 
 
 

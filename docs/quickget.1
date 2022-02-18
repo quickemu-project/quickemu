@@ -182,6 +182,7 @@ All the official Ubuntu flavours are supported, just replace
 \f[C]void\f[] (Void Linux)
 .IP \[bu] 2
 \f[C]zorin\f[] (Zorin OS)
+.SS BSD Guest Support
 .IP \[bu] 2
 \f[C]freebsd\f[] (FreeBSD)
 .IP \[bu] 2
@@ -432,6 +433,32 @@ quickemu\ \-\-vm\ freebsd\-13_0.conf
 .SS Other Guests
 .IP \[bu] 2
 \f[C]android\f[] (Android x86)
+.SS Haiku Guests
+.PP
+\f[C]quickemu\f[] supports Haiku (https://www.haiku-os.org/).
+.IP
+.nf
+\f[C]
+quickget\ quickget\ haiku\ r1beta3\-x86_64
+quickemu\ \-\-vm\ haiku\-r1beta3\-x86_64.conf
+\f[]
+.fi
+.PP
+At the moment the only way to share files between host and a Haiku guest
+is by using SSH (having a SSH server running on the host):
+.PP
+On guest:
+.IP
+.nf
+\f[C]
+scp\ example.txt\ user\@host\-local\-ip:/home/user\ #\ sending\ a\ file\ from\ guest\ to\ host
+scp\ user\@host\-local\-ip:/home/user/example.txt\ .\ #\ receiving\ a\ file\ from\ host\ to\ guest
+\f[]
+.fi
+.PP
+\f[C]quickget\f[] cannot automatically download and create virtual
+machines for Haiku nightly versions, but they work if the ISO and
+configuration are set up manually.
 .SH AUTHORS
 .PP
 Written by Martin Wimpress.
