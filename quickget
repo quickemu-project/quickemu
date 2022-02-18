@@ -539,17 +539,17 @@ function check_hash() {
 function copy_local(){
   if [ -n "${ISODIR}" ]; then
     # use supplied filename or default to original distro ISO name
-      if [ -z ${LOCALISO} ]; then
+      if [ -z "${LOCALISO}" ]; then
         LOCALISO=${FILE}
       fi
-      LOCALFILE=$(find ${ISODIR} -type f -name "${LOCALISO}" -print -quit )
+      LOCALFILE=$(find "${ISODIR}" -type f -name "${LOCALISO}" -print -quit )
       #echo got local file "${LOCALFILE}"
       if [ -f "${DIR}/${FILE}" ]; then
         echo "ERROR! File Exists - not copying over local file"
         echo "Move it out of the way to replace it with a local file"
         exit 1
       else
-        cp -pv "${LOCALFILE}" ${DIR}/${FILE}
+        cp -pv "${LOCALFILE}" "${DIR}"/"${FILE}"
       # if ! ; then echo ERROR! Failed to copy ${LOCALFILE}" to ${DIR}/${FILE}"
       fi
       #exit 0 # while testing
@@ -572,7 +572,19 @@ function web_get() {
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
     fi
+
+    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
     copy_local
+    # you only get one shot
+    LOCALISO=""
+    ISODIR=""
+    # echo "you are just testing
+    #          ISODIR:  ${ISODIR}
+    #          LOCALISO: ${LOCALISO}"
+    # echo stopped in web_get
+    # exit 0
+    fi
+
 
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
@@ -613,7 +625,18 @@ function zsync_get() {
         exit 1
       fi
 
+    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
     copy_local
+    # you only get one shot
+    LOCALISO=""
+    ISODIR=""
+    ##
+    # echo "you are just testing
+    #          ISODIR:  ${ISODIR}
+    #          LOCALISO: ${LOCALISO}"
+    # echo stopped in zsync_get
+    # exit 0
+    fi
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
           echo "ERROR! Failed to download ${URL}.zsync"
@@ -634,6 +657,7 @@ function start_vm_info() {
     echo "To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
+    exit 0
 }
 
 function make_vm_config() {
@@ -690,7 +714,7 @@ EOF
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
+        if [ "${OS}" == "alma"  ] && [ "${ISOTYPE}" == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -1947,10 +1971,10 @@ languages_windows
 # handle parameters
 
 # Take command line arguments
-#if [ $# -lt 1 ]; then
-#    usage
-#    exit 0
-#else
+if [ $# -lt 1 ]; then
+    usage
+    exit 0
+fi
     while [ $# -gt 0 ]; do
         case "${1}" in
           -isodir|--isodir)
@@ -1973,10 +1997,11 @@ languages_windows
               quickemu_version=$( "${whereIam}"/quickemu --version)
               echo "Quickemu Version: ${quickemu_version}"
               exit 0;;
-          test*)
+          -t|--t|-test|--test)
              echo "you are just testing
              ISODIR:  ${ISODIR}
              LOCALISO: ${LOCALISO}"
+             ls -lh "${ISODIR}/${LOCALISO}"
              exit 0;;
           *)
 
