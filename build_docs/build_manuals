@@ -9,7 +9,7 @@ echo quickemu.1-* > quickemu.lst
 echo quickget.1-00-header.md quickemu.1-0[7-9]* quickemu.1-1[0-3]* quickget.1-09-footer.md > quickget.lst
 # Readme header gets borked by pandoc
 echo quickemu.1-0[4-6]* README-06-Install.md quickemu.1-0[7-9]* \
-quickemu.1-1[0-3]* quickemu_conf.1-01-spiceheadless.md README-135-confoptions.md quickemu.1-1[4-9]* quickemu.1-2* > README.lst
+quickemu.1-1[0-3]* quickemu_conf.1-01-spiceheadless.md README-135-accessibility.md README-135-confoptions.md quickemu.1-1[4-9]* quickemu.1-2* > README.lst
 #
 echo quickemu_conf.1-00-hdr.md  README-135-confoptions.md quickemu_conf.1-05-footer.md > quickemu_conf.lst
 
