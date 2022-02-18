@@ -269,6 +269,9 @@ Other Linux Guests
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
 
+-   `freebsd` (FreeBSD)
+-   `openbsd` (OpenBSD)
+
 Or you can download a Linux image and manually create a VM
 configuration.
 

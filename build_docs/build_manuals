@@ -2,6 +2,7 @@
 ../quickemu  --help >quickemu.1-14-AllquickemuOptions-02generated.md
 ../quickget list_csv | awk -F"," '{print "* `" $2 "` ("$1")" }' |grep  -e buntu |sort -u  >quickemu.1-07-Ubuntus02-generated.md
 ../quickget list_csv | awk -F"," '{print "* `" $2 "` ("$1")" }' |grep -v -e 'Display Name' -e bsd -e windows -e  macos -e buntu -e android|sort -u >quickemu.1-08-OtherLinuxGuests02-generated.md
+../quickget list_csv | awk -F"," '{print "* `" $2 "` ("$1")" }' |grep -e bsd |sort -u >quickemu.1-08bsd-BSDGuests-generated.md
 ../quickget list_csv | awk -F"," '{print "* `" $2 "` ("$1")" }' |grep  android|sort -u  >quickemu.1-13-OtherGuests02-generated.md
 
 echo quickemu.1-* > quickemu.lst
