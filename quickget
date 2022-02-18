@@ -540,6 +540,14 @@ function copy_local(){
   case $OS in
     windows)
       echo "${OS} not (yet?)  supported for local isos" ;;
+    macos)
+      # echo "${OS} not (yet?)  supported for local isos" ;;
+      if [ -n "${ISODIR}" ]; then
+      for macfile in RecoveryImage.dmg RecoveryImage.chunklist
+      do
+        find "${ISODIR}" -type f -name "${macfile}" -exec cp -pv \{\} "$DIR"/ \;
+      done
+      fi;;
     *)
       if [ -n "${ISODIR}" ]; then
         # use supplied filename or default to original distro ISO name
