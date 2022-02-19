@@ -902,8 +902,6 @@ function vm_boot() {
          -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
          -device pci-ohci,id=smartpass
          -device usb-ccid
-         -chardev spicevmc,id=ccid,name=smartcard
-         -device ccid-card-passthru,chardev=ccid
          -monitor none
          -serial mon:stdio)
 
@@ -911,6 +909,12 @@ function vm_boot() {
     # shellcheck disable=SC2054
       args+=(-chardev braille,id=brltty
              -device usb-braille,id=usbbrl,chardev=brltty)
+  fi
+
+  if [[ "${smartcard}" == true ]]; then
+    # enable smartcard support
+    args+=(-chardev spicevmc,id=ccid,name=smartcard
+           -device ccid-card-passthru,chardev=ccid)
   fi
 
   if [ -n "${bridge}" ]; then
