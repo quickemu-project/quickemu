@@ -1595,6 +1595,7 @@ function unattended_windows() {
       xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <ComputerName>*</ComputerName>
+      <SkipAutoActivation>true</SkipAutoActivation>
       <OEMInformation>
         <Manufacturer>Quickemu Project</Manufacturer>
         <Model>Quickemu</Model>
