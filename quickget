@@ -543,23 +543,34 @@ function check_hash() {
 }
 
 function copy_local(){
-  if [ -n "${ISODIR}" ]; then
-    # use supplied filename or default to original distro ISO name
-      if [ -z ${LOCALISO} ]; then
-        LOCALISO=${FILE}
-      fi
-      LOCALFILE=$(find ${ISODIR} -type f -name "${LOCALISO}" -print -quit )
-      #echo got local file "${LOCALFILE}"
-      if [ -f "${DIR}/${FILE}" ]; then
-        echo "ERROR! File Exists - not copying over local file"
-        echo "Move it out of the way to replace it with a local file"
-        exit 1
-      else
-        cp -pv "${LOCALFILE}" ${DIR}/${FILE}
-      # if ! ; then echo ERROR! Failed to copy ${LOCALFILE}" to ${DIR}/${FILE}"
-      fi
-      #exit 0 # while testing
-    fi
+  case $OS in
+    windows)
+      echo "${OS} not (yet?)  supported for local isos" ;;
+    macos)
+      # echo "${OS} not (yet?)  supported for local isos" ;;
+      if [ -n "${ISODIR}" ]; then
+      for macfile in RecoveryImage.dmg RecoveryImage.chunklist
+      do
+        find "${ISODIR}" -type f -name "${macfile}" -exec cp -pv \{\} "$DIR"/ \;
+      done
+      fi;;
+    *)
+      if [ -n "${ISODIR}" ]; then
+        # use supplied filename or default to original distro ISO name
+          if [ -z "${LOCALISO}" ]; then
+            LOCALISO=${FILE}
+          fi
+          LOCALFILE=$(find "${ISODIR}" -type f -name "${LOCALISO}" -print -quit )
+          if [ -f "${DIR}/${FILE}" ]; then
+            echo "ERROR! File Exists - not copying over local file"
+            echo "Move it out of the way to replace it with a local file"
+            exit 1
+          else
+            cp -pv "${LOCALFILE}" "${DIR}"/"${FILE}"
+          # if ! ; then echo ERROR! Failed to copy ${LOCALFILE}" to ${DIR}/${FILE}"
+          fi
+        fi
+      esac
 }
 
 function web_get() {
@@ -578,7 +589,14 @@ function web_get() {
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
     fi
+
+    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
     copy_local
+    # you only get one shot
+    LOCALISO=""
+    ISODIR=""
+    fi
+
 
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
@@ -619,7 +637,12 @@ function zsync_get() {
         exit 1
       fi
 
+    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
     copy_local
+    # you only get one shot
+    LOCALISO=""
+    ISODIR=""
+    fi
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
           echo "ERROR! Failed to download ${URL}.zsync"
@@ -640,6 +663,7 @@ function start_vm_info() {
     echo "To start your ${OS} ${RELEASE} virtual machine run:"
     echo "    quickemu --vm ${OS}-${RELEASE}.conf"
     echo
+    exit 0
 }
 
 function make_vm_config() {
@@ -652,11 +676,6 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        alma | android | archlinux | debian | elementary | fedora | kali | \
-        garuda | kdeneon | linuxmint* | netboot | nixos* | opensuse | oraclelinux | \
-        popos | regolith | rockylinux | solus | *ubuntu* | zorin )
-            GUEST="linux"
-            IMAGE_TYPE="iso";;
         freebsd )
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -676,7 +695,6 @@ function make_vm_config() {
             GUEST="windows"
             IMAGE_TYPE="iso";;
         *)
-            echo "Undefined OS Defaulting to Guest=Linux and IMAGE_TYPE=iso"
             GUEST="linux"
             IMAGE_TYPE="iso";;
     esac
@@ -696,7 +714,7 @@ EOF
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "alma"  ] && [ ${ISOTYPE} == "dvd" ]; then
+        if [ "${OS}" == "alma"  ] && [ "${ISOTYPE}" == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -1170,8 +1188,8 @@ function get_void() {
     local HASH_URL=""
 
     validate_release "releases_void"
-    DATE=$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
-    URL="http://mirror.fit.cvut.cz/voidlinux/live/current"
+    DATE=$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
+    URL="https://alpha.de.repo.voidlinux.org/live/current"
     case ${RELEASE} in
       base)
         ISO="void-live-x86_64-${DATE}.iso";;
@@ -1184,13 +1202,13 @@ function get_void() {
     esac
     case ${RELEASE} in
       base)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
       musl)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
       xfce)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
       xfce-musl)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
     esac
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1962,10 +1980,10 @@ languages_windows
 # handle parameters
 
 # Take command line arguments
-#if [ $# -lt 1 ]; then
-#    usage
-#    exit 0
-#else
+if [ $# -lt 1 ]; then
+    usage
+    exit 0
+fi
     while [ $# -gt 0 ]; do
         case "${1}" in
           -isodir|--isodir)
@@ -1988,10 +2006,11 @@ languages_windows
               quickemu_version=$( "${whereIam}"/quickemu --version)
               echo "Quickemu Version: ${quickemu_version}"
               exit 0;;
-          test*)
+          -t|--t|-test|--test)
              echo "you are just testing
              ISODIR:  ${ISODIR}
              LOCALISO: ${LOCALISO}"
+             ls -lh "${ISODIR}/${LOCALISO}"
              exit 0;;
           *)
 
@@ -2128,7 +2147,7 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "windows" ]; then
         if [ -n "${3}" ]; then
             LANG_NAME="${3}"
-            if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
+            if [[ ! ${LANGS[*]} =~ "${LANG_NAME}" ]]; then
                 echo "ERROR! ${LANG_NAME} is not a supported language:"
                 for LANG in "${LANGS[@]}"; do
                   echo "${LANG}"
