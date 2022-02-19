@@ -1142,7 +1142,7 @@ function get_mxlinux() {
     make_vm_config "${ISO}"
 }
 
-function get_netboot.xyz() {
+function get_netboot() {
     ISO="netboot.xyz.iso"
     URL="https://boot.netboot.xyz/ipxe/netboot.xyz.iso"
     HASH=$(wget -q -O- "https://boot.netboot.xyz/ipxe/netboot.xyz-sha256-checksums.txt" | grep netboot.xyz.iso | cut -d' ' -f1)
