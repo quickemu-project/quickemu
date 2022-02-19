@@ -1173,8 +1173,8 @@ function get_void() {
     local HASH_URL=""
 
     validate_release "releases_void"
-    DATE=$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
-    URL="http://mirror.fit.cvut.cz/voidlinux/live/current"
+    DATE=$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
+    URL="https://alpha.de.repo.voidlinux.org/live/current"
     case ${RELEASE} in
       base)
         ISO="void-live-x86_64-${DATE}.iso";;
@@ -1187,13 +1187,13 @@ function get_void() {
     esac
     case ${RELEASE} in
       base)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
       musl)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
       xfce)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
       xfce-musl)
-        HASH="$(wget -q -O- "https://mirror.fit.cvut.cz/voidlinux/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
+        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
     esac
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
