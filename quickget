@@ -72,6 +72,7 @@ function pretty_name() {
     popos)              PRETTY_NAME="Pop!_OS";;
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    slackware)          PRETTY_NAME="Slackware Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -228,6 +229,7 @@ function os_support() {
     popos \
     regolith \
     rockylinux \
+    slackware \
     solus \
     tails \
     ubuntu \
@@ -423,6 +425,12 @@ function releases_rockylinux() {
     8.2 \
     8.1 \
     8.0
+}
+
+function releases_slackware() {
+    echo 14.2 \
+    15.0 \
+    current
 }
 
 function releases_solus() {
@@ -670,6 +678,11 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        alma | android | archlinux | debian | elementary | fedora | kali | \
+        garuda | kdeneon | linuxmint* | nixos* | opensuse | oraclelinux | \
+        popos | regolith | rockylinux | slackware | solus | *ubuntu* | zorin )
+            GUEST="linux"
+            IMAGE_TYPE="iso";;
         freebsd )
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -734,6 +747,11 @@ EOF
 
         if [ "${OS}" == "garuda"  ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+        fi
+
+	    if [ "${OS}" == "slackware" ]; then
+            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
+            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
         fi
 
         if [ "${OS}" == "haiku" ]; then
@@ -1229,6 +1247,28 @@ function get_rocky() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
+
+function get_slackware() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    local arch="64"
+    
+    if [[ "${RELEASE}" == "current" ]]; then
+	URL="https://slackware.nl/slackware/slackware${arch}-current-iso/slackware${arch}-current-install-dvd.iso"
+    else
+	URL="https://mirrors.slackware.com/slackware/slackware-iso/slackware${arch}-${RELEASE}-iso/slackware${arch}-${RELEASE}-install-dvd.iso"
+    fi
+
+    ISO="slackware${arch}-${RELEASE}-install-dvd.iso"
+    HASH=$(wget -q -O- "${URL}.md5")
+
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 
 function get_solus() {
     local RELNUM=""
@@ -2089,6 +2129,8 @@ if [ -n "${2}" ]; then
         get_opensuse
     elif [ "${OS}" == "oraclelinux" ]; then
         get_oraclelinux
+    elif [ "${OS}" == "slackware" ]; then
+        get_slackware
     elif [ "${OS}" == "popos" ]; then
         if [ -n "${3}" ]; then
             DRIVER="${3}"
@@ -2204,6 +2246,8 @@ else
         releases_regolith
     elif [ "${OS}" == "rockylinux" ]; then
         releases_rockylinux
+    elif [ "${OS}" == "slackware" ]; then
+        releases_slackware
     elif [ "${OS}" == "solus" ]; then
         releases_solus
     elif [[ "${OS}" == "tails"* ]]; then
