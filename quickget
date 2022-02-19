@@ -1965,7 +1965,7 @@ languages_windows
 # handle parameters
 
 # Take command line arguments
-if [ $# -lt 1 ]; then
+if [ $# -lt 0 ]; then
     usage
     exit 0
 fi
@@ -1995,7 +1995,6 @@ fi
              echo "you are just testing
              ISODIR:  ${ISODIR}
              LOCALISO: ${LOCALISO}"
-             ls -lh "${ISODIR}/${LOCALISO}"
              exit 0;;
           *)
 
