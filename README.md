@@ -484,6 +484,13 @@ configuration:
 
   * `floppy="/path/to/floppy.img"`
 
+## Smartcard support
+
+If you want to be able to pass an SDCard to your VM, add the following line to
+your VM configuration:
+
+  * `smartcard=true`
+
 # File Sharing
 
 All File Sharing options will only expose `~/Public` (or localised variations)
