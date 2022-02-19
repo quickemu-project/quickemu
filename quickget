@@ -2132,7 +2132,7 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "windows" ]; then
         if [ -n "${3}" ]; then
             LANG_NAME="${3}"
-            if [[ ! ${LANGS[*]} =~ ${LANG_NAME} ]]; then
+            if [[ ! ${LANGS[*]} =~ "${LANG_NAME}" ]]; then
                 echo "ERROR! ${LANG_NAME} is not a supported language:"
                 for LANG in "${LANGS[@]}"; do
                   echo "${LANG}"
