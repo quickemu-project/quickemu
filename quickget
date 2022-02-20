@@ -573,6 +573,11 @@ function web_get() {
     local LOCALFILE=""
     local URL="${1}"
 
+    if [ ${ONLY_PRINT_URL} ] ; then
+    echo "${URL}"
+    exit 0
+    fi
+
     if [ -n "${3}" ]; then
         FILE="${3}"
     else
@@ -1969,6 +1974,9 @@ if [ $# -lt 1 ]; then
 fi
     while [ $# -gt 0 ]; do
         case "${1}" in
+          -onlyprint|--onlyprint|-showurl|--showurl|-op|--op)
+            ONLY_PRINT_URL=true
+            shift;;
           -isodir|--isodir)
             ISODIR="${2}"
             shift
