@@ -1727,7 +1727,7 @@ function unattended_windows() {
       <UserData>
         <AcceptEula>true</AcceptEula>
         <ProductKey>
-          <key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</key>
+          <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
           <WillShowUI>Never</WillShowUI>
         </ProductKey>
       </UserData>
@@ -1738,12 +1738,10 @@ function unattended_windows() {
       language="neutral"
       versionScope="nonSxS"
       processorArchitecture="amd64">
-
       <!--
            This makes the VirtIO drivers available to Windows, assuming that
-           the VirtIO driver disk
-           (https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md)
-           is available as drive E:
+           the VirtIO driver disk is available as drive E:
+           https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
       -->
       <DriverPaths>
         <PathAndCredentials wcm:action="add" wcm:keyValue="1">
