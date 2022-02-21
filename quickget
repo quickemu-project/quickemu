@@ -49,14 +49,6 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
-    manjaro-xfce)       PRETTY_NAME="Manjaro XFCE";;
-    manjaro-kde)        PRETTY_NAME="Manjaro KDE";;
-    manjaro-gnome)      PRETTY_NAME="Manjaro Gnome";;
-    manjaro-budgie)     PRETTY_NAME="Manjaro Budgie";;
-    manjaro-cinnamon)   PRETTY_NAME="Manjaro Cinnamon";;
-    manjaro-deepin)     PRETTY_NAME="Manjaro Deepin";;
-    manjaro-i3)         PRETTY_NAME="Manjaro i3";;
-    manjaro-mate)       PRETTY_NAME="Manjaro MATE";;
     mxlinux-xfce)       PRETTY_NAME="MX Linux XFCE";;
     mxlinux-kde)        PRETTY_NAME="MX Linux KDE";;
     mxlinux-fluxbox)    PRETTY_NAME="MX Linux Fluxbox";;
@@ -202,14 +194,7 @@ function os_support() {
     linuxmint-cinnamon \
     linuxmint-mate \
     linuxmint-xfce \
-    manjaro-xfce \
-    manjaro-kde \
-    manjaro-gnome \
-    manjaro-budgie \
-    manjaro-cinnamon \
-    manjaro-deepin \
-    manjaro-i3 \
-    manjaro-mate \
+    manjaro \
     mxlinux-xfce \
     mxlinux-kde \
     mxlinux-fluxbox \
@@ -387,13 +372,14 @@ function releases_macos() {
 }
 
 function releases_manjaro() {
-    case ${OS} in
-    *xfce|*kde|*gnome) echo full \
-    minimal \
-    minimal-lts;;
-    *budgie|*cinnamon|*deepin|*i3|*mate) echo full \
-    minimal;;
-    esac
+    echo xfce \
+    gnome \
+    kde \
+    budgie \
+    cinnamon \
+    deepin \
+    i3 \
+    mate
 }
 
 function releases_popos() {
@@ -1001,37 +987,20 @@ function get_linuxmint() {
 }
 
 function get_manjaro() {
-    local FLAVOR=""
     local MANIFESTURL=""
     local HASH=""
     local ISO=""
-    local KEY_ISO=""
-    local KEY_HASH=""
+    local KEY_ISO="Download_x64 ="
+    local KEY_HASH="Download_x64_Checksum ="
     local URL=""
 
     validate_release "releases_manjaro"
-    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-    case ${FLAVOR} in
+    case ${RELEASE} in
       gnome|kde|xfce) BRANCH="official";;
       budgie|cinnamon|deepin|i3|mate) BRANCH="community";;
     esac
 
-    case ${RELEASE} in
-      full)
-        KEY_ISO="Download_x64 ="
-        KEY_HASH="Download_x64_Checksum ="
-        ;;
-      minimal)
-        KEY_ISO="Download_Minimal_x64 ="
-        KEY_HASH="Download_Minimal_x64_Checksum ="
-        ;;
-      minimal-lts)
-        KEY_ISO="Download_Minimal_lts ="
-        KEY_HASH="Download_Minimal_x64_Checksum_lts ="
-        ;;
-    esac
-
-    MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${FLAVOR}.md"
+    MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${RELEASE}.md"
     URL="$(wget -qO- "${MANIFESTURL}" | grep "${KEY_ISO}" | cut -d'"' -f2)"
     ISO="${URL##*/}"
     HASH=$(wget -qO- "${MANIFESTURL}" | grep "${KEY_HASH}" | cut -d'"' -f2)
@@ -1943,7 +1912,7 @@ if [ -n "${2}" ]; then
         get_kolibrios
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         get_linuxmint
-    elif [[ "${OS}" == *"manjaro-"* ]]; then
+    elif [ "${OS}" == "manjaro" ]; then
         get_manjaro
     elif [[ "${OS}" == *"mxlinux-"* ]]; then
         get_mxlinux
@@ -2040,7 +2009,7 @@ else
         releases_kolibrios
     elif [[ "${OS}" == *"linuxmint-"* ]]; then
         releases_linuxmint
-    elif [[ "${OS}" == *"manjaro-"* ]]; then
+    elif [ "${OS}" == "manjaro" ]; then
         releases_manjaro
     elif [[ "${OS}" == *"mxlinux-"* ]]; then
         releases_mxlinux
