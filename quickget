@@ -778,11 +778,11 @@ function get_alpine() {
     local BRANCH=""
 
     validate_release "releases_alpine"
-    if [[ "${RELEASE}" == "latest" ]]; then
-      BRANCH="latest-stable"
-    else
-      BRANCH="v${RELEASE}"
-    fi
+    case ${RELEASE} in
+      latest) BRANCH="latest-stable";;
+      *) BRANCH="v${RELEASE}";;
+    esac
+
     MANIFESTURL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/latest-releases.yaml"
     VERSION=$(wget -qO- "${MANIFESTURL}" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
