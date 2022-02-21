@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: 'January 7, 2022'
+date: 'February 20, 2022'
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -367,4 +367,4 @@ SEE ALSO
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu(1),quickemu\_conf(1) quickgui(1)
+quickemu(1), quickemu\_conf(1), quickgui(1)

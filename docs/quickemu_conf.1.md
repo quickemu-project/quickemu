@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: 'January 7, 2022'
+date: 'February 20, 2022'
 footer: 'quickemu\_conf'
 header: Quickemu Configuration Manual
 section: 1
@@ -259,4 +259,4 @@ SEE ALSO
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickget(1), quickemu(1), quickgui(1
+quickget(1), quickemu(1), quickgui(1)
