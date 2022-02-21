@@ -1984,7 +1984,7 @@ if [ -n "${2}" ]; then
         get_rocky
     elif [ "${OS}" == "solus" ]; then
         get_solus
-    elif [[ "${OS}" == "tails"* ]]; then
+    elif [ "${OS}" == "tails" ]; then
         get_tails
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         get_ubuntu
@@ -2069,7 +2069,7 @@ else
         releases_slackware
     elif [ "${OS}" == "solus" ]; then
         releases_solus
-    elif [[ "${OS}" == "tails"* ]]; then
+    elif [ "${OS}" == "tails" ]; then
         releases_tails
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         releases_ubuntu
