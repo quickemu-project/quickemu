@@ -89,6 +89,7 @@ function list_json() {
 
 function list_csv() {
   local DISPLAY_NAME
+  local DL=""
   local DOWNLOADER
   local FUNC
   local OPTION
@@ -96,16 +97,19 @@ function list_csv() {
   local PNG
   local RELEASE
   local SVG
-  local ZS=""
-  local DL=""
+  local HAS_ZSYNC=0
 
-# check if we have a zsync installed somewhere
-  ZS="$(which zsync)"
-  if [ -x "${ZS}" ]; then
-    DL="zsync"
-  else
+  # Check if zsync is available
+  if command -v zsync &>/dev/null; then
+    HAS_ZSYNC=1
+  fi
+
+  if command -v aria2c &>/dev/null; then
+    DL="aria2c"
+  elif command -v wget &>/dev/null; then
     DL="wget"
   fi
+
   echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
@@ -120,12 +124,12 @@ function list_csv() {
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
-        DOWNLOADER="${DL}"
-      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
-        DOWNLOADER="${DL}"
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+        DOWNLOADER="zsync"
+      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+        DOWNLOADER="zsync"
       else
-        DOWNLOADER="wget"
+        DOWNLOADER="${DL}"
       fi
 
       if [ "${OS}" == "windows" ]; then
@@ -518,7 +522,7 @@ function web_get() {
       exit 1
     fi
 
-    if command -v aria2c > /dev/null; then
+    if command -v aria2c &>/dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
@@ -538,12 +542,11 @@ function zsync_get() {
     local FILE=""
     local OUT=""
     local URL="${1}"
-    FILE="${URL##*/}"
     local ZS=""
 
-# check if we have a zsync installed somewhere
-  ZS="$(which zsync)"
-    if  [ -x "${ZS}" ]; then
+    FILE="${URL##*/}"
+
+    if command -v zsync &>/dev/null; then
       if [ -n "${3}" ]; then
           OUT="${3}"
       else
@@ -564,7 +567,7 @@ function zsync_get() {
           rm "${DIR}/${OUT}.zs-old"
       fi
     else
-      echo "INFO: zsync not found, falling back to wget"
+      echo "INFO: zsync not found, falling back to wget/aria2c"
       web_get "${ISO}" "${DIR}"
     fi
 }
