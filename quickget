@@ -50,9 +50,7 @@ function pretty_name() {
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
     mxlinux)            PRETTY_NAME="MX Linux";;
-    nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
-    nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
-    nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
+    nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
     opensuse)           PRETTY_NAME="openSUSE";;
@@ -118,8 +116,6 @@ function list_csv() {
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
       FUNC="linuxmint"
-    elif [[ "${OS}" == *"nixos"* ]]; then
-      FUNC="nixos"
     else
       FUNC="${OS}"
     fi
@@ -158,6 +154,10 @@ function list_csv() {
         for OPTION in xfce kde fluxbox; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
+      elif [ "${OS}" == "nixos" ]; then
+        for OPTION in gnome plasma5 minimal; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
       elif [ "${OS}" == "popos" ]; then
         for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
@@ -194,9 +194,7 @@ function os_support() {
     linuxmint-xfce \
     manjaro \
     mxlinux \
-    nixos-gnome \
-    nixos-plasma5 \
-    nixos-minimal \
+    nixos \
     lubuntu \
     macos \
     openbsd \
@@ -1037,15 +1035,19 @@ function get_mxlinux() {
 }
 
 function get_nixos() {
-    local FLAVOR=""
+    local DESKTOP="gnome"
     local HASH=""
     local ISO=""
     local URL=""
 
+    if [ -n "${1}" ]; then
+      DESKTOP="${1}"
+    fi
+
     validate_release "releases_nixos"
     URL="https://channels.nixos.org/nixos-${RELEASE}"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-    ISO="latest-nixos-${FLAVOR}-x86_64-linux.iso"
+    ISO="latest-nixos-${DESKTOP}-x86_64-linux.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1929,8 +1931,22 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
         get_mxlinux "${DESKTOP}"
-    elif [[ "${OS}" == *"nixos-"* ]]; then
-        get_nixos
+    elif [ "${OS}" == "nixos" ]; then
+        if [ -n "${3}" ]; then
+            DESKTOP="${3}"
+            DESKTOPS=(gnome plasma5 minimal)
+            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
+                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
+                for DESKTOP in "${DESKTOPS[@]}"; do
+                  echo "${DESKTOP}"
+                done
+                exit 1
+            fi
+        else
+            DESKTOP="gnome"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
+        get_nixos ${DESKTOP}
     elif [ "${OS}" == "openbsd" ]; then
         get_openbsd
     elif [ "${OS}" == "opensuse" ]; then
@@ -2026,7 +2042,7 @@ else
         releases_manjaro
     elif [ "${OS}" == "mxlinux" ]; then
         releases_mxlinux
-    elif [[ "${OS}" == *"nixos-"* ]]; then
+    elif [ "${OS}" == "nixos" ]; then
         releases_nixos
     elif [ "${OS}" == "opensuse" ]; then
         releases_opensuse
