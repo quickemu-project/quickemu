@@ -49,9 +49,7 @@ function pretty_name() {
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
     linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
     linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
-    mxlinux-xfce)       PRETTY_NAME="MX Linux XFCE";;
-    mxlinux-kde)        PRETTY_NAME="MX Linux KDE";;
-    mxlinux-fluxbox)    PRETTY_NAME="MX Linux Fluxbox";;
+    mxlinux)            PRETTY_NAME="MX Linux";;
     nixos-gnome)        PRETTY_NAME="NixOS Gnome";;
     nixos-plasma5)      PRETTY_NAME="NixOS KDE";;
     nixos-minimal)      PRETTY_NAME="NixOS Minimal";;
@@ -120,10 +118,6 @@ function list_csv() {
       FUNC="ubuntu"
     elif [[ "${OS}" == *"linuxmint"* ]]; then
       FUNC="linuxmint"
-    elif [[ "${OS}" == *"manjaro"* ]]; then
-      FUNC="manjaro"
-    elif [[ "${OS}" == *"mxlinux"* ]]; then
-      FUNC="mxlinux"
     elif [[ "${OS}" == *"nixos"* ]]; then
       FUNC="nixos"
     else
@@ -158,6 +152,10 @@ function list_csv() {
         done
       elif [ "${OS}" == "debian" ]; then
         for OPTION in cinnamon gnome kde lxde lxqt mate standard xfce; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [ "${OS}" == "mxlinux" ]; then
+        for OPTION in xfce kde fluxbox; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       elif [ "${OS}" == "popos" ]; then
@@ -195,9 +193,7 @@ function os_support() {
     linuxmint-mate \
     linuxmint-xfce \
     manjaro \
-    mxlinux-xfce \
-    mxlinux-kde \
-    mxlinux-fluxbox \
+    mxlinux \
     nixos-gnome \
     nixos-plasma5 \
     nixos-minimal \
@@ -1010,14 +1006,17 @@ function get_manjaro() {
 }
 
 function get_mxlinux() {
-    local FLAVOR=""
+    local DESKTOP="xfce"
     local HASH=""
     local ISO=""
     local URL=""
 
+    if [ -n "${1}" ]; then
+      DESKTOP="${1}"
+    fi
+
     validate_release "releases_mxlinux"
-    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-    case ${FLAVOR} in
+    case ${DESKTOP} in
       xfce)
         URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce"
         ISO="MX-${RELEASE}_x64.iso"
@@ -1914,8 +1913,22 @@ if [ -n "${2}" ]; then
         get_linuxmint
     elif [ "${OS}" == "manjaro" ]; then
         get_manjaro
-    elif [[ "${OS}" == *"mxlinux-"* ]]; then
-        get_mxlinux
+    elif [ "${OS}" == "mxlinux" ]; then
+        if [ -n "${3}" ]; then
+            DESKTOP="${3}"
+            DESKTOPS=(xfce kde fluxbox)
+            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
+                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
+                for DESKTOP in "${DESKTOPS[@]}"; do
+                  echo "${DESKTOP}"
+                done
+                exit 1
+            fi
+        else
+            DESKTOP="xfce"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
+        get_mxlinux "${DESKTOP}"
     elif [[ "${OS}" == *"nixos-"* ]]; then
         get_nixos
     elif [ "${OS}" == "openbsd" ]; then
@@ -2011,7 +2024,7 @@ else
         releases_linuxmint
     elif [ "${OS}" == "manjaro" ]; then
         releases_manjaro
-    elif [[ "${OS}" == *"mxlinux-"* ]]; then
+    elif [ "${OS}" == "mxlinux" ]; then
         releases_mxlinux
     elif [[ "${OS}" == *"nixos-"* ]]; then
         releases_nixos
