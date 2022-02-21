@@ -1115,8 +1115,8 @@ function get_zorin() {
 
     validate_release "releases_zorin"
     # their redirector returns an href so we need to get that and parse out the iso
-    URL=$(curl -s "https://zrn.co/${RELEASE}" |cut -d\" -f2)
-    ISO=$(echo "${URL}"| awk -F\/ ' {print $NF}')
+    URL=$(curl -s "https://zrn.co/${RELEASE}" | cut -d'"' -f2)
+    ISO=$(echo "${URL}" | awk -F\/ ' {print $NF}')
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
