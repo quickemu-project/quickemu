@@ -413,10 +413,14 @@ function editions_popos() {
 }
 
 function releases_regolith() {
-    echo 1.6.0_hirsute \
-    1.6.0_focal \
-    2.0.0_impish \
-    2.0.0_hirsute
+    echo focal \
+    hirsute \
+    impish
+}
+
+function editions_regolith() {
+    echo 1.6.0 \
+    2.0.0
 }
 
 function releases_rockylinux() {
@@ -1236,25 +1240,24 @@ function get_popos() {
 }
 
 function get_regolith() {
+    local EDITION=""
     local HASH=""
     local ISO=""
-    local URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download"
+    local SUBDIR=""
+    local URL=""
 
-    case ${RELEASE} in
-      1.6.0_focal)
-        URL="${URL}/release-release-focal-focal_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-        ;;
-      1.6.0_hirsute)
-        URL="${URL}/release-release-hirsute-hirsute_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-        ;;
-      2.0.0_impish)
-        URL="${URL}/regolith-linux-2.0-impish-latest";;
-      2.0.0_hirsute)
-        URL="${URL}/regolith-linux-2.0-hirsute-latest";;
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
+    case ${EDITION} in
+      1.6.0) SUBDIR="release-release-${RELEASE}-${RELEASE}_standard-${EDITION}";;
+      2.0.0) SUBDIR="regolith-linux-2.0-${RELEASE}-latest";;
     esac
-    ISO="Regolith_${RELEASE}.iso"
+
+    URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/${SUBDIR}"
+    ISO="Regolith_${EDITION}_${RELEASE}.iso"
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     if [ -n "${HASH}" ]; then
       check_hash "${ISO}" "${HASH}"
@@ -1861,6 +1864,20 @@ if [ -n "${2}" ]; then
                 exit 1
             fi
         fi
+
+        # Workaround for Regolith
+        if [ "${OS}" == "regolith" ]; then
+          if [ "${RELEASE}" == "focal" ] && [ "${EDITION}" == "2.0.0" ]; then
+            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
+            EDITION="1.6.0"
+            echo " - Setting edition to: ${EDITION}"
+          elif [ "${RELEASE}" == "impish" ] && [ "${EDITION}" == "1.6.0" ]; then
+            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
+            EDITION="2.0.0"
+            echo " - Setting edition to: ${EDITION}"
+          fi
+        fi
+
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release releases_"${OS}"
         get_"${OS}" "${EDITION}"
