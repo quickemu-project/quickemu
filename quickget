@@ -531,10 +531,14 @@ function languages_windows() {
 }
 
 function releases_zorin() {
-    echo 16core64 \
-    16lite64 \
-    16education64 \
-    16edulite64
+    echo 16
+}
+
+function editions_zorin() {
+    echo core64 \
+    lite64 \
+    education64 \
+    edulite64
 }
 
 function check_hash() {
@@ -1426,11 +1430,16 @@ function get_void() {
 }
 
 function get_zorin() {
+    local EDITION=""
     local ISO=""
     local URL=""
 
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
     # Parse out the iso URL from the redirector
-    URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}" 2>&1 | grep Location | cut -d' ' -f4)
+    URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}${EDITION}" 2>&1 | grep Location | cut -d' ' -f4)
     ISO="${URL##*/}"
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
