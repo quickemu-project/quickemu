@@ -995,34 +995,38 @@ function get_linuxmint() {
 function get_manjaro() {
     local FLAVOR=""
     local MANIFESTURL=""
-#    local ISOKEY=""
-    local HASHKEY=""
     local HASH=""
     local ISO=""
+    local KEY_ISO=""
+    local KEY_HASH=""
     local URL=""
 
     validate_release "releases_manjaro"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     case ${FLAVOR} in
-      xfce|kde|gnome) BRANCH="official";;
+      gnome|kde|xfce) BRANCH="official";;
       budgie|cinnamon|deepin|i3|mate) BRANCH="community";;
     esac
 
-    if [[ ${RELEASE} == "full" ]]; then
-      KEY="Download_x64 = "
-      HASHKEY="Download_x64_Checksum = "
-    elif [[ ${RELEASE} == "minimal" ]]; then
-      KEY="Download_Minimal_x64 = "
-      HASHKEY="Download_Minimal_x64_Checksum = "
-    elif [[ ${RELEASE} == "minimal" ]]; then
-      KEY="Download_Minimal_lts = "
-      HASHKEY="Download_Minimal_x64_Checksum_lts = "
-    fi
+    case ${RELEASE} in
+      full)
+        KEY_ISO="Download_x64 ="
+        KEY_HASH="Download_x64_Checksum ="
+        ;;
+      minimal)
+        KEY_ISO="Download_Minimal_x64 ="
+        KEY_HASH="Download_Minimal_x64_Checksum ="
+        ;;
+      minimal-lts)
+        KEY_ISO="Download_Minimal_lts ="
+        KEY_HASH="Download_Minimal_x64_Checksum_lts ="
+        ;;
+    esac
 
     MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${FLAVOR}.md"
-    URL="$(wget -qO- ${MANIFESTURL} | grep "${KEY}" | awk '{print $3}' | tr -d '"')"
-    ISO="$(echo $URL | awk -F "/" '{print $6}')"
-    HASH=$(wget -qO- ${MANIFESTURL} | grep "${HASHKEY}" | awk '{print $3}' | tr -d '"')
+    URL="$(wget -qO- "${MANIFESTURL}" | grep "${KEY_ISO}" | cut -d'"' -f2)"
+    ISO="${URL##*/}"
+    HASH=$(wget -qO- "${MANIFESTURL}" | grep "${KEY_HASH}" | cut -d'"' -f2)
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
