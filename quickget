@@ -239,7 +239,14 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    echo latest
+    echo v21.09.11 \
+    v21.11.05 \
+    v22.01.10
+}
+
+function editions_arcolinux() {
+    echo large \
+    small
 }
 
 function releases_cachyos() {
@@ -796,15 +803,18 @@ function get_archlinux() {
 }
 
 function get_arcolinux() {
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL=""
-    local VERSION=""
 
-    URL="https://ant.seedhost.eu/arcolinux/.quick/"
-    VERSION=$(wget -q -O- "${URL}/info" | cut -d' ' -f 2)
-    ISO="arcolinuxl-${VERSION}-x86_64.iso"
-    HASH=$(wget -q -O- "${URL}/arcolinuxl-${VERSION}-x86_64.iso.sha1" | cut -d' ' -f 1)
+    if [ -n "${1}" ]; then
+      EDITION="${1:0:1}"
+    fi
+
+    URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
+    ISO="arcolinux${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f 1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
