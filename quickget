@@ -640,15 +640,8 @@ function zsync_get() {
     fi
 }
 
-function start_vm_info() {
-    echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
-    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
-    echo
-    exit 0
-}
-
 function make_vm_config() {
+    local CONF_FILE=""
     local IMAGE_FILE=""
     local ISO_FILE=""
     local IMAGE_TYPE=""
@@ -678,40 +671,47 @@ function make_vm_config() {
             IMAGE_TYPE="iso";;
     esac
 
-    if [ -n "${ISOTYPE}" ]; then
-        RELEASE=${RELEASE}-${ISOTYPE}
+    if [ -n "${EDITION}" ]; then
+        CONF_FILE="${OS}-${RELEASE}-${EDITION}.conf"
+    else
+        CONF_FILE="${OS}-${RELEASE}.conf"
     fi
 
-    if [ ! -e "${OS}-${RELEASE}.conf" ]; then
-        echo "Making VM configuration for ${OS}-${RELEASE}..."
-        cat << EOF > "${OS}-${RELEASE}.conf"
+    if [ ! -e "${CONF_FILE}" ]; then
+        echo "Making ${CONF_FILE}"
+        cat << EOF > "${CONF_FILE}"
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
         if [ -n "${ISO_FILE}" ]; then
-            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
+            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
 
+        # OS specific tweaks
         case ${OS} in
-          alma|cachyos|garuda|oraclelinux|rockylinux|void|zorin) echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
-          haiku|kolibrios|openbsd|slackware|tails) echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf";;
-          macos) echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf";;
+          alma|cachyos|garuda|oraclelinux|rockylinux|void|zorin) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          haiku|kolibrios|openbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
         esac
 
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
-            echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            echo "tpm=\"on\"" >> "${CONF_FILE}"
             # Only force SecureBoot on for non-Debian/Ubuntu distros.
             if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
               SEC_BOOT="off"
             else
               SEC_BOOT="on"
             fi
-            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${CONF_FILE}"
         fi
     fi
-    start_vm_info
+    echo
+    echo "To start your $(pretty_name "${OS}") virtual machine run:"
+    echo "    quickemu --vm ${CONF_FILE}"
+    echo
+    exit 0
 }
 
 function get_android() {
