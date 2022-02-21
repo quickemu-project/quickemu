@@ -771,12 +771,11 @@ function get_alpine() {
       *) BRANCH="v${RELEASE}";;
     esac
 
-    MANIFESTURL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/latest-releases.yaml"
-    VERSION=$(wget -qO- "${MANIFESTURL}" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
+    URL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64"
+    VERSION=$(wget -qO- "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
-    URL="https://dl-cdn.alpinelinux.org/alpine/${BRANCH}/releases/x86_64/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
-    HASH=$(wget -qO- "${MANIFESTURL}" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    HASH=$(wget -qO- "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
