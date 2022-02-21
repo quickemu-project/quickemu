@@ -327,7 +327,7 @@ function releases_garuda() {
 
 function releases_haiku() {
     echo r1beta3-x86_64 \
-        r1beta3-x86_gcc2h
+         r1beta3-x86_gcc2h
 }
 
 function releases_kali() {
@@ -1343,7 +1343,6 @@ function get_popos() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_regolith() {
     local HASH=""
