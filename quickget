@@ -1897,7 +1897,7 @@ if [ -n "${2}" ]; then
         validate_release releases_"${OS}"
         get_"${OS}" "${EDITION}"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
-        validate_release releases_"${OS}"
+        validate_release releases_ubuntu
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
         LANG="English International"
@@ -1918,10 +1918,20 @@ if [ -n "${2}" ]; then
         get_"${OS}"
     fi
 else
-    echo -n "ERROR! You must specify a release: "
+    echo "ERROR! You must specify a release."
     case ${OS} in
-      *ubuntu*) releases_ubuntu;;
-      *) releases_"${OS}";;
+      *ubuntu*)
+        echo -n " - Releases: "
+        releases_ubuntu
+        ;;
+      *)
+        echo -n " - Releases: "
+        releases_"${OS}"
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+          echo -n " - Editions: "
+          editions_"${OS}"
+        fi
+        ;;
     esac
     exit 1
 fi
