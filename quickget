@@ -1082,10 +1082,10 @@ function get_openbsd() {
     local URL=""
 
     validate_release "releases_openbsd"
+    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64"
     ISO="install${RELEASE//\./}.iso"
-    URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/${ISO}"
-    HASH=$(wget -q -O- "https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64/SHA256" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- "${URL}/SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
