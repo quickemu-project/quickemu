@@ -250,7 +250,8 @@ function releases_cachyos() {
 }
 
 function releases_debian() {
-    echo 11.2.0
+    echo 10.11.0 \
+    11.2.0
 }
 
 function editions_debian() {
@@ -285,20 +286,25 @@ function releases_freebsd(){
 }
 
 function releases_garuda() {
-    echo bspwm \
-    dr460nized \
+    echo 220131 \
+    220220
+}
+
+function editions_garuda() {
+    echo dr460nized \
     dr460nized-blackarch \
     dr460nized-gaming \
+    bspwm \
+    cinnamon \
     gnome \
     i3 \
     kde-barebones \
     lxqt-kwin \
+    mate \
     qtile \
     sway \
     wayfire \
-    xfce \
-    mate \
-    cinnamon
+    xfce
 }
 
 function releases_gentoo(){
@@ -640,15 +646,8 @@ function zsync_get() {
     fi
 }
 
-function start_vm_info() {
-    echo
-    echo "To start your ${OS} ${RELEASE} virtual machine run:"
-    echo "    quickemu --vm ${OS}-${RELEASE}.conf"
-    echo
-    exit 0
-}
-
 function make_vm_config() {
+    local CONF_FILE=""
     local IMAGE_FILE=""
     local ISO_FILE=""
     local IMAGE_TYPE=""
@@ -678,21 +677,24 @@ function make_vm_config() {
             IMAGE_TYPE="iso";;
     esac
 
-    if [ -n "${ISOTYPE}" ]; then
-        RELEASE=${RELEASE}-${ISOTYPE}
+    if [ -n "${EDITION}" ]; then
+        CONF_FILE="${OS}-${RELEASE}-${EDITION}.conf"
+    else
+        CONF_FILE="${OS}-${RELEASE}.conf"
     fi
 
-    if [ ! -e "${OS}-${RELEASE}.conf" ]; then
-        echo "Making VM configuration for ${OS}-${RELEASE}..."
-        cat << EOF > "${OS}-${RELEASE}.conf"
+    if [ ! -e "${CONF_FILE}" ]; then
+        echo "Making ${CONF_FILE}"
+        cat << EOF > "${CONF_FILE}"
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
         if [ -n "${ISO_FILE}" ]; then
-            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
+            echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
 
+        # OS specific tweaks
         case ${OS} in
           alma|cachyos|garuda|oraclelinux|rockylinux|void|zorin) echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
           haiku|kolibrios|netbsd|openbsd|slackware|tails) echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf";;
@@ -701,17 +703,21 @@ EOF
 
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
-            echo "tpm=\"on\"" >> "${OS}-${RELEASE}.conf"
+            echo "tpm=\"on\"" >> "${CONF_FILE}"
             # Only force SecureBoot on for non-Debian/Ubuntu distros.
             if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
               SEC_BOOT="off"
             else
               SEC_BOOT="on"
             fi
-            echo "secureboot=\"${SEC_BOOT}\"" >> "${OS}-${RELEASE}.conf"
+            echo "secureboot=\"${SEC_BOOT}\"" >> "${CONF_FILE}"
         fi
     fi
-    start_vm_info
+    echo
+    echo "To start your $(pretty_name "${OS}") virtual machine run:"
+    echo "    quickemu --vm ${CONF_FILE}"
+    echo
+    exit 0
 }
 
 function get_android() {
@@ -825,11 +831,16 @@ function get_debian() {
     local EDITION=""
     local HASH=""
     local ISO=""
-    local URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid"
+    local URL=""
 
     if [ -n "${1}" ]; then
       EDITION="${1}"
     fi
+
+    case ${RELEASE} in
+      11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/"
+    esac
 
     ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
@@ -910,28 +921,24 @@ function get_freebsd() {
 }
 
 function get_garuda() {
-    local DATE=""
+    local BRANCH=""
+    local EDITION=""
     local HASH=""
     local ISO=""
-    local URL="http://mirrors.fossho.st/garuda/iso"
-    local REL_TYPE=""
-    local LATEST_URL=""
-    local HASH_URL=""
+    local URL=""
 
-    case ${RELEASE} in
-      mate|cinnamon)
-        REL_TYPE="community";;
-      *)
-        REL_TYPE="garuda";;
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
+    case ${EDITION} in
+      cinnamon|mate) BRANCH="community";;
+      *) BRANCH="garuda";;
     esac
 
-    # Follow daily releases and use SHA hash file to derive .iso and date
-    LATEST_URL="${URL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
-    HASH_URL="$(wget -q -O- "${LATEST_URL}")"
-    ISO="$(echo "${HASH_URL}" | awk '{print $NF}')"
-    HASH=$(echo "${HASH_URL}" | cut -d' ' -f1)
-    DATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' | cut -d'.' -f1)
-    URL="${URL}/${REL_TYPE}/${RELEASE}/${DATE}"
+    URL="http://mirrors.fossho.st/garuda/iso/${BRANCH}/${EDITION}/${RELEASE}"
+    ISO="${OS}-${EDITION}-linux-zen-${RELEASE}.iso"
+    HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${OS}-${RELEASE}.iso"
