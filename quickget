@@ -502,11 +502,9 @@ function releases_windows() {
 
 function releases_zorin() {
     echo 16core64 \
-    15lite64 \
-    15lite32 \
-    15education64 \
-    15edulite64 \
-    15edulite32
+    16lite64 \
+    16education64 \
+    16edulite64
 }
 
 function check_hash() {
