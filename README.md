@@ -228,6 +228,7 @@ Other Operating Systems
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
+-   `netbsd` (NetBSD)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
 -   `opensuse` (openSUSE)
