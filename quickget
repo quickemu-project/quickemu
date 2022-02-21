@@ -1093,32 +1093,17 @@ function get_openbsd() {
 function get_void() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local HASH_URL=""
+    local URL="https://alpha.de.repo.voidlinux.org/live/current"
 
     validate_release "releases_void"
-    DATE=$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | awk 'NR == 1' |cut -d'.' -f1| cut -d'-' -f4)
-    URL="https://alpha.de.repo.voidlinux.org/live/current"
+    DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${RELEASE} in
-      base)
-        ISO="void-live-x86_64-${DATE}.iso";;
-      musl)
-        ISO="void-live-x86_64-musl-${DATE}.iso";;
-      xfce)
-        ISO="void-live-x86_64-${DATE}-xfce.iso";;
-      xfce-musl)
-        ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+      base)      ISO="void-live-x86_64-${DATE}.iso";;
+      musl)      ISO="void-live-x86_64-musl-${DATE}.iso";;
+      xfce)      ISO="void-live-x86_64-${DATE}-xfce.iso";;
+      xfce-musl) ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
-    case ${RELEASE} in
-      base)
-        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}.iso" | cut -d' ' -f4)";;
-      musl)
-        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
-      xfce)
-        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-${DATE}-xfce.iso" | cut -d' ' -f4)";;
-      xfce-musl)
-        HASH="$(wget -q -O- "https://alpha.de.repo.voidlinux.org/live/current/sha256sum.txt" | grep "void-live-x86_64-musl-${DATE}.iso" | cut -d' ' -f4)";;
-    esac
+    HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
