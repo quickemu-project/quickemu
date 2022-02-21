@@ -968,18 +968,11 @@ function get_kdeneon() {
 
 function get_kolibrios() {
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="kolibri.iso"
+    local URL="https://builds.kolibrios.org/eng"
 
     validate_release "releases_kolibrios"
-    #URL="https://builds.kolibrios.org/eng/${RELEASE}.7z"
-    ISO="kolibri.iso"
-    URL="https://builds.kolibrios.org/eng/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
-    #7z e "${VM_PATH}/${RELEASE}.7z" "kolibri.iso"
-    #ISO="kolibrios-${RELEASE}.iso"
-    #mv "kolibri.iso" "${VM_PATH}/${ISO}"
-    #rm "${VM_PATH}/${RELEASE}.7z"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
 
