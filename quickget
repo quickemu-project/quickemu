@@ -194,6 +194,7 @@ function os_support() {
     arcolinux \
     cachyos \
     debian \
+    devaun \
     elementary \
     freebsd \
     fedora \
@@ -292,6 +293,11 @@ function releases_debian() {
 function releases_cachyos() {
     echo 2022.01.09 \
     2022.02.11
+}
+
+function releases_devuan() {
+    echo beowulf \
+    chimaera
 }
 
 function releases_elementary() {
@@ -870,6 +876,26 @@ function get_debian() {
     HASHLINE=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${RELEASE}.iso")
     ISO="$(echo "${HASHLINE}" | awk '{print $NF}')"
     HASH=$(echo "${HASHLINE}" | cut -d'\' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_devuan() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VERSION=""
+
+    validate_release "releases_devuan"
+    case ${RELEASE} in
+      beowulf) VERSION="3.1.1";;
+      chimaera) VERSION="4.0.0";;
+    esac
+
+    URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
+    ISO="devuan_${RELEASE}_${VERSION}_amd64_desktop-live.iso"
+    HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
@@ -1938,6 +1964,8 @@ if [ -n "${2}" ]; then
         fi
         VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
         get_debian  "${FREEDOM}"
+    elif [ "${OS}" == "devuan" ]; then
+        get_devuan
     elif [ "${OS}" == "elementary" ]; then
         get_elementary
     elif [ "${OS}" == "macos" ]; then
@@ -2051,6 +2079,8 @@ else
         releases_arcolinux
     elif [ "${OS}" == "debian" ]; then
         releases_debian
+    elif [ "${OS}" == "devuan" ]; then
+        releases_devuan
     elif [ "${OS}" == "elementary" ]; then
         releases_elementary
     elif [ "${OS}" == "freebsd" ]; then
