@@ -588,8 +588,8 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        freebsd )
-            GUEST="freebsd"
+        freebsd|openbsd)
+            GUEST="bsd"
             IMAGE_TYPE="iso";;
         haiku)
             GUEST="haiku"
@@ -597,13 +597,10 @@ function make_vm_config() {
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
-        openbsd )
-            GUEST="openbsd"
-            IMAGE_TYPE="iso";;
-        macos )
+        macos)
             GUEST="macos"
             IMAGE_TYPE="img";;
-        windows )
+        windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
         *)

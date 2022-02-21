@@ -464,14 +464,19 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    freebsd|linux|openbsd)
+    *bsd|haiku|linux)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
+
       if [ "${guest_os}" == "freebsd" ]; then
         MOUSE="usb-mouse"
+      elif [ "${guest_os}" == "haiku" ]; then
+        MACHINE_TYPE="pc"
+        NET_DEVICE="rtl8139"
       fi
+
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
@@ -483,20 +488,8 @@ function vm_boot() {
       fi
       MACHINE_TYPE="pc"
       NET_DEVICE="rtl8139"
-      GUEST_TWEAKS="-boot d"
       if [ -z "${disk_size}" ]; then
         disk_size="256M"
-      fi
-      ;;
-    haiku)
-      CPU="-cpu host,kvm=on"
-      MACHINE_TYPE="pc"
-      NET_DEVICE="rtl8139"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      if [ -z "${disk_size}" ]; then
-        disk_size="32G"
       fi
       ;;
     macos)
