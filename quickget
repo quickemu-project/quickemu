@@ -1307,23 +1307,22 @@ function get_popos() {
 function get_regolith() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local GHDL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/"
+    local URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download"
 
     validate_release "releases_regolith"
-
-    URL="${GHDL}"
     case ${RELEASE} in
       1.6.0_focal)
-        URL="${URL}release-release-focal-focal_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1);;
+        URL="${URL}/release-release-focal-focal_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+        ;;
       1.6.0_hirsute)
-        URL="${URL}release-release-hirsute-hirsute_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1);;
+        URL="${URL}/release-release-hirsute-hirsute_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+        ;;
       2.0.0_impish)
-        URL="${URL}regolith-linux-2.0-impish-latest";;
+        URL="${URL}/regolith-linux-2.0-impish-latest";;
       2.0.0_hirsute)
-        URL="${URL}regolith-linux-2.0-hirsute-latest";;
+        URL="${URL}/regolith-linux-2.0-hirsute-latest";;
     esac
     ISO="Regolith_${RELEASE}.iso"
     web_get "${URL}/${ISO}" "${VM_PATH}"
