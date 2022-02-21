@@ -932,7 +932,7 @@ function get_gentoo() {
     ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1)
     HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "$(basename ${ISO})" "${HASH}"
+    check_hash "$(basename "${ISO}")" "${HASH}"
     make_vm_config "${ISO}"
 }
 
@@ -956,8 +956,8 @@ function get_kali() {
 }
 
 function get_kdeneon() {
-    local ISO=""
     local HASH=""
+    local ISO=""
     local URL=""
 
     URL="https://files.kde.org/neon/images/${RELEASE}/current"
@@ -996,11 +996,12 @@ function get_linuxmint() {
 }
 
 function get_manjaro() {
-    local MANIFESTURL=""
+    local BRANCH=""
     local HASH=""
     local ISO=""
     local KEY_ISO="Download_x64 ="
     local KEY_HASH="Download_x64_Checksum ="
+    local MANIFESTURL=""
     local URL=""
 
     case ${RELEASE} in
@@ -1079,6 +1080,7 @@ function get_openbsd() {
 }
 
 function get_void() {
+    local DATE=""
     local HASH=""
     local ISO=""
     local URL="https://alpha.de.repo.voidlinux.org/live/current"
