@@ -463,7 +463,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    *bsd|haiku|linux)
+    *bsd|haiku|freedos|linux)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
@@ -471,7 +471,7 @@ function vm_boot() {
 
       if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
         MOUSE="usb-mouse"
-      elif [ "${guest_os}" == "haiku" ]; then
+      elif [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "freedos" ]; then
         MACHINE_TYPE="pc"
         NET_DEVICE="rtl8139"
       fi
