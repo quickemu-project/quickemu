@@ -841,27 +841,24 @@ function get_cachyos() {
 
 function get_debian() {
     local HASH=""
+    local HASHLINE=""
     local ISO=""
     local URL=""
-    local HASHLINE=""
-    local FREEDOM=""
-
 
     validate_release "releases_debian"
 
     if [ "${1}" == "nonfree" ]; then
       RELEASE="${RELEASE}+nonfree"
     fi
-    case $RELEASE in
-      *+nonfree)  URL="http://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/current-live/amd64/iso-hybrid" ;;
-      *)          URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid";;
+
+    case ${RELEASE} in
+      *+nonfree) URL="http://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/current-live/amd64/iso-hybrid";;
+      *)         URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid";;
     esac
 
-
-    HASHLINE=$(wget -q -O- ${URL}/SHA512SUMS |grep ${RELEASE}.iso)
-    ISO="$(echo ${HASHLINE} | awk '{print $NF}' )"
-    HASH=$(echo ${HASHLINE} | cut -d\  -f1)
-
+    HASHLINE=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${RELEASE}.iso")
+    ISO="$(echo "${HASHLINE}" | awk '{print $NF}')"
+    HASH=$(echo "${HASHLINE}" | cut -d'\' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
