@@ -172,10 +172,6 @@ function list_csv() {
         for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
-      elif [ "${OS}" == "alma" ]; then
-        for OPTION in minimal dvd; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
       else
         echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
       fi
@@ -764,14 +760,7 @@ function get_alma() {
     local URL=""
 
     validate_release "releases_alma"
-
-    if [ -n "${1}" ]; then
-      ISOTYPE="${1}"
-    fi
-
-    # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
-    # We'll just grab the first
-    URL=$(wget -qq -O- "https://mirrors.almalinux.org/isos/x86_64/${RELEASE}.html" | awk -F"<li>|</li>" '{for(i=2;i<=NF;i+=2) {print $i}}' RS="" | grep href | cut -d'"' -f2 | head -1)
+    URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
     ISO="AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \("${ISO}" | cut -d'\' -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
@@ -1904,21 +1893,7 @@ if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
     if [ "${OS}" == "alma" ]; then
-        if [ -n "${3}" ]; then
-            ISOTYPE="${3,,}"
-            ISOTYPES=(minimal dvd)
-            if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
-                echo "iso ${ISOTYPE} is not supported:"
-                for ISOTYPE in "${ISOTYPES[@]}"; do
-                  echo "${ISOTYPE}"
-                done
-                exit 1
-            fi
-        else
-            ISOTYPE="minimal"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
-        get_alma "${ISOTYPE}"
+        get_alma
     elif [ "${OS}" == "alpine" ]; then
         get_alpine
     elif [ "${OS}" == "android" ]; then
