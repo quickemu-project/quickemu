@@ -1037,26 +1037,25 @@ function get_mxlinux() {
     local HASH=""
     local ISO=""
     local URL=""
-    local BASE_URL=""
 
     validate_release "releases_mxlinux"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-
-    if [[ "$FLAVOR" == "xfce" ]]; then
+    case ${FLAVOR} in
+      xfce)
+        URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce"
         ISO="MX-${RELEASE}_x64.iso"
-        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce/"
-    elif [[ "$FLAVOR" == "kde" ]]; then
+        ;;
+      kde)
+        URL="https://sourceforge.net/projects/mx-linux/files/Final/KDE"
         ISO="MX-${RELEASE}_KDE_x64.iso"
-        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/KDE/"
-    elif [[ "$FLAVOR" == "fluxbox" ]]; then
+        ;;
+      fluxbox)
+        URL="https://sourceforge.net/projects/mx-linux/files/Final/Fluxbox"
         ISO="MX-${RELEASE}_fluxbox_x64.iso"
-        BASE_URL="https://sourceforge.net/projects/mx-linux/files/Final/Fluxbox/"
-    fi
-
-    URL="${BASE_URL}/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
-    web_get "${URL}.sha256" "${VM_PATH}"
-    HASH=$(cat "${VM_PATH}/${ISO}.sha256" | cut -d' ' -f1)
+        ;;
+    esac
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
