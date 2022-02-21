@@ -2,12 +2,12 @@
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
-#  1. Add the new OS, all lowercase, to os_support()
-#  2. Add a "pretty name" to pretty_name()
-#  3. Create a releases_newos() generator that outputs the currently supported release versions
-#  4. If the OS has "editions" (Linux Mint for example), create editions_newos() generator
-#  5. Add the new OS to make_vm_config(); (only if required)
-#  6. Create a get_newos() function that does something like this:
+#  1. Update os_support() - add new OS, all lowercase
+#  2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
+#  3. Create a releases_newos() generator (required) outputs the current supported release versions
+#  4. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
+#  5. Update make_vm_config() - add any *required* new OS tweaks
+#  6. Create a get_newos() function - that does something like this:
 #     function get_newos() {
 #         local EDITION=""
 #         local HASH=""
@@ -18,8 +18,8 @@
 #           EDITION="${1}"
 #         fi
 #
-#         ISO="newos-${RELEASE}-amd64.iso"
-#         URL="https://www.newos.org/download"
+#         URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
+#         ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
 #         web_get "${URL}/${ISO}" "${VM_PATH}"
 #         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
 #         HASH=$(cut -d' ' -f1 < "${VM_PATH}/SHA256SUMS")
