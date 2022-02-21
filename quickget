@@ -534,41 +534,9 @@ function check_hash() {
     fi
 }
 
-function copy_local(){
-  case $OS in
-    windows)
-      echo "${OS} not (yet?)  supported for local isos" ;;
-    macos)
-      # echo "${OS} not (yet?)  supported for local isos" ;;
-      if [ -n "${ISODIR}" ]; then
-      for macfile in RecoveryImage.dmg RecoveryImage.chunklist
-      do
-        find "${ISODIR}" -type f -name "${macfile}" -exec cp -pv \{\} "$DIR"/ \;
-      done
-      fi;;
-    *)
-      if [ -n "${ISODIR}" ]; then
-        # use supplied filename or default to original distro ISO name
-          if [ -z "${LOCALISO}" ]; then
-            LOCALISO=${FILE}
-          fi
-          LOCALFILE=$(find "${ISODIR}" -type f -name "${LOCALISO}" -print -quit )
-          if [ -f "${DIR}/${FILE}" ]; then
-            echo "ERROR! File Exists - not copying over local file"
-            echo "Move it out of the way to replace it with a local file"
-            exit 1
-          else
-            cp -pv "${LOCALFILE}" "${DIR}"/"${FILE}"
-          # if ! ; then echo ERROR! Failed to copy ${LOCALFILE}" to ${DIR}/${FILE}"
-          fi
-        fi
-      esac
-}
-
 function web_get() {
     local DIR="${2}"
     local FILE=""
-    local LOCALFILE=""
     local URL="${1}"
 
     if [ -n "${3}" ]; then
@@ -581,14 +549,6 @@ function web_get() {
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
     fi
-
-    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
-    copy_local
-    # you only get one shot
-    LOCALISO=""
-    ISODIR=""
-    fi
-
 
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
@@ -608,7 +568,6 @@ function web_get() {
 function zsync_get() {
     local DIR="${2}"
     local FILE=""
-    local LOCALFILE=""
     local OUT=""
     local URL="${1}"
     FILE="${URL##*/}"
@@ -627,13 +586,6 @@ function zsync_get() {
         echo "ERROR! Unable to create directory ${DIR}"
         exit 1
       fi
-
-    if [ -n "${LOCALISO}" ] || [ -n "${ISODIR}" ] ; then
-    copy_local
-    # you only get one shot
-    LOCALISO=""
-    ISODIR=""
-    fi
 
       if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
           echo "ERROR! Failed to download ${URL}.zsync"
@@ -1923,25 +1875,7 @@ function get_windows() {
     esac
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
 }
-function usage() {
-  echo
-  echo "Usage"
-  echo "  $0 [--isodir] [--localiso] [--list | --json] <OS> <Release> (<Option>)"
-  echo
-  echo If you omit parameters a list of supported OS options will be provided.
-  echo If you omit a Release a list of supported releases for the selected OS will be  given.
-  echo
-  echo "You can also pass optional parameters"
-  echo
-  echo "  --list                  : print a csv list of supported guest"
-  echo "  --json                  : print a json list of supported guest"
-  echo "  --isodir                : base path beneath which to find local ISO copy
-                                       if a matching file is found it will be copied to the VM directory"
-  echo "  --localiso              : local ISO filename - defaults to target filename"
-  echo "  --help                  : Print usage (this)"
-  echo "  --version               : Print version"
-  exit 1
-}
+
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
@@ -1953,45 +1887,17 @@ fi
 LANGS=()
 languages_windows
 
-# handle parameters
-
-# Take command line arguments
-if [ $# -lt 1 ]; then
-    usage
-    exit 0
-fi
-    while [ $# -gt 0 ]; do
-        case "${1}" in
-          -isodir|--isodir)
-            ISODIR="${2}"
-            shift
-            shift;;
-          -localiso|--localiso)
-            LOCALISO="${2}"
-            shift
-            shift;;
-         -h|--h|-help|--help)
-            usage
-            exit 0;;
-         -l|--l|-list|--list|list|list_csv)
-            list_csv;;
-          -j|--j|-json|--json|list_json)
-            list_json;;
-          -v|--v|-version|--version|version )
-             whereIam=$(dirname "${BASH_SOURCE[0]}")
-              quickemu_version=$( "${whereIam}"/quickemu --version)
-              echo "Quickemu Version: ${quickemu_version}"
-              exit 0;;
-          -t|--t|-test|--test)
-             echo "you are just testing
-             ISODIR:  ${ISODIR}
-             LOCALISO: ${LOCALISO}"
-             ls -lh "${ISODIR}/${LOCALISO}"
-             exit 0;;
-          *)
-
 if [ -n "${1}" ]; then
     OS="${1,,}"
+    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
+        list_csv
+    elif [ "${OS}" == "list_json" ]; then
+        list_json
+    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
+      WHERE=$(dirname "${BASH_SOURCE[0]}")
+      "${WHERE}/quickemu" --version
+      exit 0
+    fi
 else
     echo "ERROR! You must specify an operating system:"
     os_support
@@ -2211,12 +2117,4 @@ else
         os_support
     fi
     exit 1
-fi
-;;
-   esac
-    done
-    if [ $# == 0 ]; then
-      echo "Error: You must supply an OS!"
-      os_support
-      exit 1
 fi
