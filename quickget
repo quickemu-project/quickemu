@@ -288,7 +288,8 @@ function releases_debian() {
 }
 
 function releases_cachyos() {
-    echo 2022.01.09
+    echo 2022.01.09 \
+    2022.02.11
 }
 
 function releases_elementary() {
@@ -828,13 +829,10 @@ function get_arcolinux() {
 function get_cachyos() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local VERSION=""
+    local URL="https://mirror.cachyos.org/ISO"
 
     validate_release "releases_cachyos"
-    #ISO="cachyos-cli-${RELEASE}-x86_64.iso"
     ISO="cachyos-${RELEASE}-x86_64.iso"
-    URL="https://mirror.cachyos.org/ISO"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
