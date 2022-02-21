@@ -1835,7 +1835,8 @@ if [ -n "${1}" ]; then
       exit 0
     fi
 else
-    echo "ERROR! You must specify an operating system:"
+    echo "ERROR! You must specify an operating system."
+    echo -n " - Operating Systems: "
     os_support
     exit 1
 fi
