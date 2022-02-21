@@ -227,6 +227,7 @@ Other Operating Systems
 -   `linuxmint` (Linux Mint)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
+-   `netboot` (netboot.xyz)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
 -   `opensuse` (openSUSE)
