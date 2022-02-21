@@ -423,10 +423,14 @@ function releases_slackware() {
 }
 
 function releases_solus() {
-    echo 4.3-budgie \
-    4.3-gnome \
-    4.3-mate \
-    4.3-plasma
+    echo 4.3
+}
+
+function editions_solus() {
+    echo budgie \
+    gnome \
+    mate \
+    plasma
 }
 
 function releases_tails() {
@@ -1151,24 +1155,24 @@ function get_slackware() {
 }
 
 function get_solus() {
-    local RELNUM=""
-    local RELTYPE=""
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL=""
 
     validate_release "releases_solus"
-    RELNUM=$(echo "${RELEASE}" | cut -d'-' -f1)
-    RELTYPE=$(echo "${RELEASE}" | cut -d'-' -f2)
-    case ${RELTYPE} in
+      EDITION="${1}"
+    fi
+
+    case ${EDITION} in
       mate|gnome)
-        RELTYPE=${RELTYPE^^};;
+        EDITION=${EDITION^^};;
       *)
-        RELTYPE=${RELTYPE^};;
+        EDITION=${EDITION^};;
     esac
 
-    ISO="Solus-${RELNUM}-${RELTYPE}.iso"
-    URL="https://mirrors.rit.edu/solus/images/${RELNUM}"
+    URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
+    ISO="Solus-${RELEASE}-${EDITION}.iso"
     HASH=$(wget -q -O- "${URL}.sha256sum" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1882,7 +1886,7 @@ if [ -n "${2}" ]; then
 
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
-        EDITIONS=("$(editions_"${OS}")")
+        EDITIONS=($(editions_${OS}))
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
