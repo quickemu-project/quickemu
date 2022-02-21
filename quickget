@@ -1136,9 +1136,6 @@ function get_rocky() {
     local URL=""
 
     validate_release "releases_rockylinux"
-    if [ -n "${1}" ]; then
-      ISOTYPE="${1}"
-    fi
     URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64"
     ISO="Rocky-${RELEASE}-x86_64-${ISOTYPE}.iso"
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
@@ -1979,21 +1976,7 @@ if [ -n "${2}" ]; then
     elif  [ "${OS}" == "regolith" ]; then
         get_regolith
     elif [ "${OS}" == "rockylinux" ]; then
-        if [ -n "${3}" ]; then
-            ISOTYPE="${3}"
-            ISOTYPES=(minimal dvd1 boot)
-            if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
-                echo "iso ${ISOTYPE} is not supported:"
-                for ISOTYPE in "${ISOTYPES[@]}"; do
-                  echo "${ISOTYPE}"
-                done
-                exit 1
-            fi
-        else
-            ISOTYPE="dvd1"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${ISOTYPE}"
-        get_rocky "${ISOTYPE}"
+        get_rocky
     elif [ "${OS}" == "solus" ]; then
         get_solus
     elif [[ "${OS}" == "tails"* ]]; then
