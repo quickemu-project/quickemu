@@ -1155,23 +1155,22 @@ function get_slackware() {
     local ISO=""
     local URL=""
 
-    local arch="64"
-    
-    if [[ "${RELEASE}" == "current" ]]; then
-	URL="https://slackware.nl/slackware/slackware${arch}-current-iso/slackware${arch}-current-install-dvd.iso"
-    else
-	URL="https://mirrors.slackware.com/slackware/slackware-iso/slackware${arch}-${RELEASE}-iso/slackware${arch}-${RELEASE}-install-dvd.iso"
-    fi
+    case ${RELEASE} in
+        current)
+          URL="https://slackware.nl/slackware/slackware64-current-iso"
+          ISO="slackware64-current-install-dvd.iso"
+          ;;
+        *)
+          URL="https://mirrors.slackware.com/slackware/slackware-iso/slackware64-${RELEASE}-iso"
+          ISO="slackware64-${RELEASE}-install-dvd.iso"
+          ;;
+    esac
 
-    ISO="slackware${arch}-${RELEASE}-install-dvd.iso"
-    HASH=$(wget -q -O- "${URL}.md5" |  cut -d' ' -f1)
-
-
-    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_solus() {
     local RELNUM=""
