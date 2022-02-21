@@ -164,13 +164,13 @@ function list_csv() {
         for OPTION in "${LANGS[@]}"; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
+      elif [ "${OS}" == "debian" ]; then
+        for OPTION in cinnamon gnome kde lxde lxqt mate standard xfce; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
       elif [ "${OS}" == "popos" ]; then
         for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "debian" ]; then
-        for OPTION in standard nonfree; do
-         echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       elif [ "${OS}" == "alma" ]; then
         for OPTION in minimal dvd; do
@@ -275,17 +275,8 @@ function releases_arcolinux() {
     echo latest
 }
 
-# later refactor these DE variants like languages and avoid the arch ?
-# all these are available with a "nonfree" option too
 function releases_debian() {
-    echo cinnamon \
-    gnome \
-    kde \
-    lxde \
-    lxqt \
-    mate \
-    standard \
-    xfce
+    echo 11.2.0
 }
 
 function releases_cachyos() {
@@ -855,25 +846,18 @@ function get_cachyos() {
 }
 
 function get_debian() {
+    local DESKTOP="standard"
     local HASH=""
-    local HASHLINE=""
     local ISO=""
-    local URL=""
+    local URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid"
 
-    validate_release "releases_debian"
-
-    if [ "${1}" == "nonfree" ]; then
-      RELEASE="${RELEASE}+nonfree"
+    if [ -n "${1}" ]; then
+      DESKTOP="${1}"
     fi
 
-    case ${RELEASE} in
-      *+nonfree) URL="http://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/current-live/amd64/iso-hybrid";;
-      *)         URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid";;
-    esac
-
-    HASHLINE=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${RELEASE}.iso")
-    ISO="$(echo "${HASHLINE}" | awk '{print $NF}')"
-    HASH=$(echo "${HASHLINE}" | cut -d'\' -f1)
+    validate_release "releases_debian"
+    ISO="debian-live-${RELEASE}-amd64-${DESKTOP}.iso"
+    HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
@@ -1948,20 +1932,20 @@ if [ -n "${2}" ]; then
         get_void
     elif [ "${OS}" == "debian" ]; then
         if [ -n "${3}" ]; then
-            FREEDOM="${3}"
-            FREEDOMS=(standard nonfree)
-            if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
-                echo "ERROR! ${FREEDOM} is not a supported freedom:"
-                for DRIVER in "${FREEDOMS[@]}"; do
-                  echo "${FREEDOM}"
+            DESKTOP="${3}"
+            DESKTOPS=(cinnamon gnome kde lxde lxqt mate standard xfce)
+            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
+                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
+                for DESKTOP in "${DESKTOPS[@]}"; do
+                  echo "${DESKTOP}"
                 done
                 exit 1
             fi
         else
-            FREEDOM="standard"
+            DESKTOP="standard"
         fi
-        VM_PATH="${OS}-${RELEASE}-${FREEDOM}"
-        get_debian  "${FREEDOM}"
+        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
+        get_debian "${DESKTOP}"
     elif [ "${OS}" == "devuan" ]; then
         get_devuan
     elif [ "${OS}" == "elementary" ]; then
