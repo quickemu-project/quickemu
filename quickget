@@ -449,6 +449,12 @@ function releases_void() {
     xfce-musl
 }
 
+function releases_windows() {
+    echo 8 \
+    10 \
+    11
+}
+
 function languages_windows() {
     LANGS=(Arabic
     "Brazilian Portuguese"
@@ -488,13 +494,6 @@ function languages_windows() {
     Thai
     Turkish
     Ukrainian)
-}
-
-
-function releases_windows() {
-    echo 8 \
-    10 \
-    11
 }
 
 function releases_zorin() {
@@ -1884,7 +1883,7 @@ if [ -n "${2}" ]; then
 
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
-        EDITIONS=($(editions_${OS}))
+        EDITIONS=("$(editions_"${OS}")")
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
@@ -1897,24 +1896,24 @@ if [ -n "${2}" ]; then
             fi
         fi
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
-        get_${OS} "${EDITION}"
+        get_"${OS}" "${EDITION}"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
-      get_ubuntu
+        get_ubuntu
     elif [ "${OS}" == "windows" ]; then
-        LANG_NAME="English International"
+        LANG="English International"
         if [ -n "${3}" ]; then
-            LANG_NAME="${3}"
-            if [[ ! ${LANGS[*]} =~ "${LANG_NAME}" ]]; then
-                echo -e "ERROR! ${LANG_NAME} is not a supported Windows language:\n"
+            EDITION="${3}"
+            if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
+                echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
                 for LANG in "${LANGS[@]}"; do
                   echo -n "${LANG} "
                 done
                 exit 1
             fi
         fi
-        get_windows "${LANG_NAME}"
+        get_windows "${LANG}"
     else
-      get_"${OS}"
+        get_"${OS}"
     fi
 else
     echo -n "ERROR! You must specify a release: "
