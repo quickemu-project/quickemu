@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
 #  1. Add the new OS, all lowercase, to os_support()
 #  2. Add a "pretty name" display name to pretty_name()
 #  3. Create a releases_newos() generator that outputs the currently supported release versions
-#  4. Add the new OS to make_vm_config()
+#  4. Add the new OS to make_vm_config(); (only if required)
 #  5. Create a get_newos() function that does something like this:
 #     function get_newos() {
 #         local HASH=""
@@ -15,8 +14,8 @@
 #
 #         validate_release "releases_newos"
 #         ISO="newos-${RELEASE}-amd64.iso"
-#         URL="https://www.newos.org/download/${ISO}"
-#         web_get "${URL}" "${VM_PATH}"
+#         URL="https://www.newos.org/download"
+#         web_get "${URL}/${ISO}" "${VM_PATH}"
 #         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
 #         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
 #         check_hash "${ISO}" "${HASH}"
