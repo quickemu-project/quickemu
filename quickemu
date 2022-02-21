@@ -470,7 +470,7 @@ function vm_boot() {
         CPU="${CPU},topoext"
       fi
 
-      if [ "${guest_os}" == "freebsd" ]; then
+      if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
         MOUSE="usb-mouse"
       elif [ "${guest_os}" == "haiku" ]; then
         MACHINE_TYPE="pc"

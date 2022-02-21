@@ -47,6 +47,7 @@ function pretty_name() {
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
+    ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
@@ -173,6 +174,7 @@ function os_support() {
     freebsd \
     garuda \
     gentoo \
+    ghostbsd \
     haiku \
     kali \
     kdeneon \
@@ -328,6 +330,17 @@ function editions_garuda() {
 
 function releases_gentoo(){
     echo latest
+}
+
+function releases_ghostbsd(){
+    echo 21.10.16 \
+    21.11.24 \
+    22.01.12
+}
+
+function editions_ghostbsd(){
+    echo mate \
+    xfce
 }
 
 function releases_haiku() {
@@ -675,8 +688,8 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        freebsd|openbsd)
-            GUEST="bsd"
+        freebsd|ghostbsd)
+            GUEST="freebsd"
             IMAGE_TYPE="iso";;
         haiku)
             GUEST="haiku"
@@ -687,6 +700,9 @@ function make_vm_config() {
         macos)
             GUEST="macos"
             IMAGE_TYPE="img";;
+        openbsd)
+            GUEST="openbsd"
+            IMAGE_TYPE="iso";;
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
@@ -974,6 +990,28 @@ function get_gentoo() {
     HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "$(basename "${ISO}")" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_ghostbsd() {
+    local EDITION=""
+    local ISO=""
+    local URL=""
+    local HASH=""
+
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
+    case ${EDITION} in
+      mate) ISO="GhostBSD-${RELEASE}.iso";;
+      xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
+    esac
+
+    URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f3)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 

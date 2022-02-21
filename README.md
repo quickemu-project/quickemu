@@ -220,6 +220,7 @@ Other Operating Systems
 -   `freebsd` (FreeBSD)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
+-   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
