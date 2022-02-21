@@ -102,16 +102,20 @@ Features
 
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
+
 -   [Fedora](https://getfedora.org/) & openSUSE
     ([Leap](https://get.opensuse.org/leap/),
     [Tumbleweed](https://get.opensuse.org/tumbleweed/),
     [MicroOS](https://microos.opensuse.org/))
+
 -   [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE),
     [elementary OS](https://elementary.io/),
     [Pop!\_OS](https://pop.system76.com/)
+
 -   [Arch Linux](https://www.archlinux.org/),
     [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/),
     [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
+
 -   [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and
     latest 2.0.0 pre-release )
 
@@ -119,20 +123,32 @@ Features
     [OpenBSD](https://www.openbsd.org/)
 
 -   Full SPICE support including host/guest clipboard sharing
+
 -   VirtIO-webdavd file sharing for Linux and Windows guests
+
 -   VirtIO-9p file sharing for Linux and macOS guests
+
 -   [QEMU Guest Agent
     support](https://wiki.qemu.org/Features/GuestAgent); provides access
     to a system-level agent via standard QMP commands
+
 -   Samba file sharing for Linux, macOS and Windows guests (*if `smbd`
     is installed on the host*)
+
 -   VirGL acceleration
+
 -   USB device pass-through
+
 -   Smartcard pass-through
+
 -   Automatic SSH port forwarding to guests
+
 -   Network port forwarding
+
 -   Full duplex audio
+
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
+
 -   Graphical user interfaces available
 
 Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/)
@@ -310,19 +326,6 @@ guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 ```
-
-If you already have a collection of ISOs downloaded you can have
-`quickget` find and copy your existing file into the VM directory.
-
-``` {.text}
---isodir                : base path beneath which to find local ISO copy
-                                       if a matching file is found it will be copied to the VM directory
---localiso              : optional local ISO filename - defaults to target filename
-```
-
-`quickget` will then continue to `wget` or `zsync` using that file as a
-prior copy. If the target file exists in the VM directory `quickget`
-will raise an error if you run it with `--isodir`
 
 -   Use `quickemu` to start the virtual machine:
 
@@ -513,7 +516,6 @@ All the options
 Here are the usage instructions:
 
 ``` {.bash}
-
 
 Usage
   quickemu --vm ubuntu.conf

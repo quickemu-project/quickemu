@@ -155,19 +155,6 @@ disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 ```
 
-If you already have a collection of ISOs downloaded you can have
-`quickget` find and copy your existing file into the VM directory.
-
-``` {.text}
---isodir                : base path beneath which to find local ISO copy
-                                       if a matching file is found it will be copied to the VM directory
---localiso              : optional local ISO filename - defaults to target filename
-```
-
-`quickget` will then continue to `wget` or `zsync` using that file as a
-prior copy. If the target file exists in the VM directory `quickget`
-will raise an error if you run it with `--isodir`
-
 -   Use `quickemu` to start the virtual machine:
 
 ``` {.bash}
