@@ -657,7 +657,7 @@ function vm_boot() {
 
   # Setup the appropriate audio device based on the display output
   case ${OUTPUT} in
-    spice|spice-app|none) AUDIO_DEV="spice,id=audio0,out.mixing-engine=off";;
+    spice|spice-app|none) AUDIO_DEV="spice,id=audio0";;
     *) AUDIO_DEV="pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}";;
   esac
 
