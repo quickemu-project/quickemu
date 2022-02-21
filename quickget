@@ -1400,17 +1400,16 @@ function get_ubuntu() {
 }
 
 function get_garuda() {
+    local DATE=""
     local HASH=""
     local ISO=""
-    local URL=""
+    local URL="http://mirrors.fossho.st/garuda/iso"
     local REL_TYPE=""
     local LATEST_URL=""
     local HASH_URL=""
-    local GLDL="http://mirrors.fossho.st/garuda/iso"
 
     validate_release "releases_garuda"
 
-    # Part of the path is different for a couple of community releases vs the supported garuda ones
     case ${RELEASE} in
       mate|cinnamon)
         REL_TYPE="community";;
@@ -1418,20 +1417,15 @@ function get_garuda() {
         REL_TYPE="garuda";;
     esac
 
-    # need to follow daily releases and use contents of SHA sums file
-    # to derive the filename and date
-    LATEST_URL="${GLDL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
-    HASH_URL="$(wget -q -O- ${LATEST_URL})"
-    ISO="$(echo ${HASH_URL} | awk '{print $NF}' )"
-    HASH=$(echo "${HASH_URL}" | cut -d\  -f1)
-    LDATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' |cut -d'.' -f1) #
-    URL="${GLDL}/${REL_TYPE}/${RELEASE}/${LDATE}"
-
-    #web_get "${URL}/${ISO}" "${VM_PATH}"
-    zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
-    #if [ -n "${HASH}" ]; then
-    #  check_hash "${ISO}" "${HASH}"
-    #fi
+    # Follow daily releases and use SHA hash file to derive .iso and date
+    LATEST_URL="${URL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
+    HASH_URL="$(wget -q -O- "${LATEST_URL}")"
+    ISO="$(echo "${HASH_URL}" | awk '{print $NF}')"
+    HASH=$(echo "${HASH_URL}" | cut -d' ' -f1)
+    DATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' | cut -d'.' -f1)
+    URL="${URL}/${REL_TYPE}/${RELEASE}/${DATE}"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${OS}-${RELEASE}.iso"
 }
 
