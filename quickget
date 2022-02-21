@@ -168,8 +168,8 @@ function os_support() {
     debian \
     devuan \
     elementary \
-    freebsd \
     fedora \
+    freebsd \
     garuda \
     gentoo \
     haiku \
@@ -240,6 +240,11 @@ function releases_arcolinux() {
     echo latest
 }
 
+function releases_cachyos() {
+    echo 2022.01.09 \
+    2022.02.11
+}
+
 function releases_debian() {
     echo 11.2.0
 }
@@ -255,11 +260,6 @@ function editions_debian() {
   xfce
 }
 
-function releases_cachyos() {
-    echo 2022.01.09 \
-    2022.02.11
-}
-
 function releases_devuan() {
     echo beowulf \
     chimaera
@@ -269,19 +269,15 @@ function releases_elementary() {
     echo 6.1
 }
 
-function releases_freebsd(){
-    echo 12.2 \
-    13.0
-}
-
 function releases_fedora(){
     echo 33 \
     34 \
     35
 }
 
-function releases_gentoo(){
-    echo latest
+function releases_freebsd(){
+    echo 12.2 \
+    13.0
 }
 
 function releases_garuda() {
@@ -299,6 +295,10 @@ function releases_garuda() {
     xfce \
     mate \
     cinnamon
+}
+
+function releases_gentoo(){
+    echo latest
 }
 
 function releases_haiku() {
@@ -342,6 +342,25 @@ function editions_mxlinux(){
     fluxbox
 }
 
+function releases_macos() {
+    echo high-sierra \
+    mojave \
+    catalina \
+    big-sur \
+    monterey
+}
+
+function releases_manjaro() {
+    echo xfce \
+    gnome \
+    kde \
+    budgie \
+    cinnamon \
+    deepin \
+    i3 \
+    mate
+}
+
 function releases_nixos(){
     echo 21.05 \
     21.11
@@ -352,7 +371,6 @@ function editions_nixos(){
     plasma5 \
     minimal
 }
-
 
 function releases_openbsd(){
     echo 7.0
@@ -377,25 +395,6 @@ function releases_oraclelinux() {
     7.7
 }
 
-function releases_macos() {
-    echo high-sierra \
-    mojave \
-    catalina \
-    big-sur \
-    monterey
-}
-
-function releases_manjaro() {
-    echo xfce \
-    gnome \
-    kde \
-    budgie \
-    cinnamon \
-    deepin \
-    i3 \
-    mate
-}
-
 function releases_popos() {
     echo 20.04 \
     21.04 \
@@ -413,7 +412,6 @@ function releases_regolith() {
     2.0.0_impish \
     2.0.0_hirsute
 }
-
 
 function releases_rockylinux() {
     echo 8.5 \
@@ -848,19 +846,6 @@ function get_elementary() {
     make_vm_config "${ISO}"
 }
 
-function get_freebsd() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
-    HASH=$(wget -q -O- "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep '('"${ISO}"')' | cut -d' ' -f4)
-    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
 function get_fedora() {
     local FEDORA_RELEASE=""
     local FEDORA_VERSIONS=""
@@ -886,6 +871,47 @@ function get_fedora() {
     make_vm_config "${ISO}"
 }
 
+function get_freebsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    HASH=$(wget -q -O- "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep '('"${ISO}"')' | cut -d' ' -f4)
+    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}/${ISO}"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_garuda() {
+    local DATE=""
+    local HASH=""
+    local ISO=""
+    local URL="http://mirrors.fossho.st/garuda/iso"
+    local REL_TYPE=""
+    local LATEST_URL=""
+    local HASH_URL=""
+
+    case ${RELEASE} in
+      mate|cinnamon)
+        REL_TYPE="community";;
+      *)
+        REL_TYPE="garuda";;
+    esac
+
+    # Follow daily releases and use SHA hash file to derive .iso and date
+    LATEST_URL="${URL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
+    HASH_URL="$(wget -q -O- "${LATEST_URL}")"
+    ISO="$(echo "${HASH_URL}" | awk '{print $NF}')"
+    HASH=$(echo "${HASH_URL}" | cut -d' ' -f1)
+    DATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' | cut -d'.' -f1)
+    URL="${URL}/${REL_TYPE}/${RELEASE}/${DATE}"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${OS}-${RELEASE}.iso"
+}
+
 function get_gentoo() {
     local HASH=""
     local ISO=""
@@ -895,6 +921,21 @@ function get_gentoo() {
     HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "$(basename "${ISO}")" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_haiku() {
+    local BASE=""
+    local ISO=""
+    local URL=""
+    local HASH=""
+
+    BASE=$(echo "${RELEASE}" | cut -d'-' -f1)
+    URL="https://cdn.haiku-os.org/haiku-release/${BASE}"
+    ISO="haiku-${RELEASE}-anyboot.iso"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
@@ -955,6 +996,74 @@ function get_linuxmint() {
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
+}
+
+function get_macos() {
+    local BOARD_ID=""
+    local CWD=""
+    local MACRECOVERY=""
+    local MLB=""
+
+    case ${RELEASE} in
+        high-sierra)
+            BOARD_ID="Mac-7BA5B2D9E42DDD94"
+            MLB="00000000000J80300";;
+        mojave)
+            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
+            MLB="00000000000KXPG00";;
+        catalina)
+            BOARD_ID="Mac-CFF7D910A743CAAF"
+            MLB="00000000000PHCD00";;
+        big-sur)
+            BOARD_ID="Mac-35C1E88140C3E6CF"
+            MLB="00000000000000000";;
+        monterey)
+            BOARD_ID="Mac-06F11F11946D27C5"
+            MLB="00000000000000000";;
+        *) echo "ERROR! Unknown release: ${RELEASE}"
+           releases_macos
+           exit 1;;
+    esac
+
+    # Use a bundled macrecovery if possible
+    CWD="$(dirname "${0}")"
+    if [ -x "${CWD}/macrecovery" ]; then
+        MACRECOVERY="${CWD}/macrecovery"
+    elif [ -x /usr/bin/macrecovery ]; then
+        MACRECOVERY="/usr/bin/macrecovery"
+    else
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
+        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
+    fi
+
+    if [ -z "${MACRECOVERY}" ]; then
+        echo "ERROR! Can not find a usable macrecovery."
+        exit 1
+    fi
+
+    # Get firmware
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+    if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
+    fi
+
+    if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+        echo "Downloading ${RELEASE}..."
+        ${MACRECOVERY} \
+            --board-id "${BOARD_ID}" \
+            --mlb "${MLB}" \
+            --basename RecoveryImage \
+            --outdir "${VM_PATH}" \
+            download
+    fi
+
+    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+        echo "Converting RecoveryImage..."
+        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img"
+    fi
+
+    make_vm_config RecoveryImage.img
 }
 
 function get_manjaro() {
@@ -1041,37 +1150,98 @@ function get_openbsd() {
     make_vm_config "${ISO}"
 }
 
-function get_void() {
-    local DATE=""
-    local EDITION=""
+function get_opensuse() {
     local HASH=""
     local ISO=""
-    local URL="https://alpha.de.repo.voidlinux.org/live/current"
+    local URL=""
 
-    DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
-    if [ -n "${1}" ]; then
-      EDITION="${1}"
+    if [ "${RELEASE}" == "tumbleweed" ]; then
+        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    elif [ "${RELEASE}" == "microos" ]; then
+        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+    else
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
+        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
     fi
-    case ${EDITION} in
-      glibc)      ISO="void-live-x86_64-${DATE}.iso";;
-      musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
-      xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
-      xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
-    esac
-    HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_oraclelinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local VER_MAJ=""
+    local VER_MIN=""
+
+    VER_MAJ=${RELEASE::1}
+    VER_MIN=${RELEASE:2:1}
+    URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
+    if [ "${VER_MAJ}" == "8" ]; then
+        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso"
+    else
+        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso"
+    fi
+    HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
-function get_zorin() {
+function get_popos() {
+    local EDITION=""
+    local HASH=""
     local ISO=""
     local URL=""
 
-    # Parse out the iso URL from the redirector
-    URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}" 2>&1 | grep Location | cut -d' ' -f4)
-    ISO="${URL##*/}"
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
+    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq ".url")
+    URL="${URL//\"/}"
+    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq ".sha_sum")
+    HASH="${HASH//\"/}"
     web_get "${URL}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_regolith() {
+    local HASH=""
+    local ISO=""
+    local URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download"
+
+    case ${RELEASE} in
+      1.6.0_focal)
+        URL="${URL}/release-release-focal-focal_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+        ;;
+      1.6.0_hirsute)
+        URL="${URL}/release-release-hirsute-hirsute_standard-1.6.0"
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
+        ;;
+      2.0.0_impish)
+        URL="${URL}/regolith-linux-2.0-impish-latest";;
+      2.0.0_hirsute)
+        URL="${URL}/regolith-linux-2.0-hirsute-latest";;
+    esac
+    ISO="Regolith_${RELEASE}.iso"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    if [ -n "${HASH}" ]; then
+      check_hash "${ISO}" "${HASH}"
+    fi
     make_vm_config "${ISO}"
 }
 
@@ -1140,169 +1310,6 @@ function get_solus() {
     make_vm_config "${ISO}"
 }
 
-function get_opensuse() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    if [ "${RELEASE}" == "tumbleweed" ]; then
-        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    elif [ "${RELEASE}" == "microos" ]; then
-        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
-        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
-        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    else
-        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
-    fi
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_oraclelinux() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-    local VER_MAJ=""
-    local VER_MIN=""
-
-    VER_MAJ=${RELEASE::1}
-    VER_MIN=${RELEASE:2:1}
-    URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
-    if [ "${VER_MAJ}" == "8" ]; then
-        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso"
-    else
-        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso"
-    fi
-    HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_macos() {
-    local BOARD_ID=""
-    local CWD=""
-    local MACRECOVERY=""
-    local MLB=""
-
-    case ${RELEASE} in
-        high-sierra)
-            BOARD_ID="Mac-7BA5B2D9E42DDD94"
-            MLB="00000000000J80300";;
-        mojave)
-            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
-            MLB="00000000000KXPG00";;
-        catalina)
-            BOARD_ID="Mac-CFF7D910A743CAAF"
-            MLB="00000000000PHCD00";;
-        big-sur)
-            BOARD_ID="Mac-35C1E88140C3E6CF"
-            MLB="00000000000000000";;
-        monterey)
-            BOARD_ID="Mac-06F11F11946D27C5"
-            MLB="00000000000000000";;
-        *) echo "ERROR! Unknown release: ${RELEASE}"
-           releases_macos
-           exit 1;;
-    esac
-
-    # Use a bundled macrecovery if possible
-    CWD="$(dirname "${0}")"
-    if [ -x "${CWD}/macrecovery" ]; then
-        MACRECOVERY="${CWD}/macrecovery"
-    elif [ -x /usr/bin/macrecovery ]; then
-        MACRECOVERY="/usr/bin/macrecovery"
-    else
-        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
-        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
-    fi
-
-    if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery."
-        exit 1
-    fi
-
-    # Get firmware
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
-    if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
-    fi
-
-    if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-        echo "Downloading ${RELEASE}..."
-        ${MACRECOVERY} \
-            --board-id "${BOARD_ID}" \
-            --mlb "${MLB}" \
-            --basename RecoveryImage \
-            --outdir "${VM_PATH}" \
-            download
-    fi
-
-    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
-        echo "Converting RecoveryImage..."
-        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img"
-    fi
-
-    make_vm_config RecoveryImage.img
-}
-
-function get_popos() {
-    local EDITION=""
-    local HASH=""
-    local ISO=""
-    local URL=""
-
-    if [ -n "${1}" ]; then
-      EDITION="${1}"
-    fi
-
-    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq ".url")
-    URL="${URL//\"/}"
-    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
-    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq ".sha_sum")
-    HASH="${HASH//\"/}"
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
-}
-
-function get_regolith() {
-    local HASH=""
-    local ISO=""
-    local URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download"
-
-    case ${RELEASE} in
-      1.6.0_focal)
-        URL="${URL}/release-release-focal-focal_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-        ;;
-      1.6.0_hirsute)
-        URL="${URL}/release-release-hirsute-hirsute_standard-1.6.0"
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-        ;;
-      2.0.0_impish)
-        URL="${URL}/regolith-linux-2.0-impish-latest";;
-      2.0.0_hirsute)
-        URL="${URL}/regolith-linux-2.0-hirsute-latest";;
-    esac
-    ISO="Regolith_${RELEASE}.iso"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    if [ -n "${HASH}" ]; then
-      check_hash "${ISO}" "${HASH}"
-    fi
-    make_vm_config "${ISO}"
-}
-
 function get_tails() {
     local ISO=""
     local HASH=""
@@ -1367,46 +1374,37 @@ function get_ubuntu() {
     fi
 }
 
-function get_garuda() {
+function get_void() {
     local DATE=""
+    local EDITION=""
     local HASH=""
     local ISO=""
-    local URL="http://mirrors.fossho.st/garuda/iso"
-    local REL_TYPE=""
-    local LATEST_URL=""
-    local HASH_URL=""
+    local URL="https://alpha.de.repo.voidlinux.org/live/current"
 
-    case ${RELEASE} in
-      mate|cinnamon)
-        REL_TYPE="community";;
-      *)
-        REL_TYPE="garuda";;
+    DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+    case ${EDITION} in
+      glibc)      ISO="void-live-x86_64-${DATE}.iso";;
+      musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
+      xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
+      xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
-
-    # Follow daily releases and use SHA hash file to derive .iso and date
-    LATEST_URL="${URL}/latest/${REL_TYPE}/${RELEASE}/latest.iso.sha256"
-    HASH_URL="$(wget -q -O- "${LATEST_URL}")"
-    ISO="$(echo "${HASH_URL}" | awk '{print $NF}')"
-    HASH=$(echo "${HASH_URL}" | cut -d' ' -f1)
-    DATE=$(echo "${ISO}" | awk -F'-' '{print $NF}' | cut -d'.' -f1)
-    URL="${URL}/${REL_TYPE}/${RELEASE}/${DATE}"
+    HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
-    make_vm_config "${OS}-${RELEASE}.iso"
+    make_vm_config "${ISO}"
 }
 
-function get_haiku() {
-    local BASE=""
+function get_zorin() {
     local ISO=""
     local URL=""
-    local HASH=""
 
-    BASE=$(echo "${RELEASE}" | cut -d'-' -f1)
-    URL="https://cdn.haiku-os.org/haiku-release/${BASE}"
-    ISO="haiku-${RELEASE}-anyboot.iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
+    # Parse out the iso URL from the redirector
+    URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}" 2>&1 | grep Location | cut -d' ' -f4)
+    ISO="${URL##*/}"
+    web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
 
