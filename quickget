@@ -199,9 +199,13 @@ function os_support() {
 }
 
 function releases_alma() {
-    # consider flavours for boot and dvd as well as
     echo 8.4 \
     8.5
+}
+
+function editions_alma() {
+    echo minimal \
+    dvd
 }
 
 function releases_alpine() {
@@ -748,14 +752,17 @@ function get_android() {
 }
 
 function get_alma() {
+    local EDITION=""
     local HASH=""
     local ISO=""
-    local ISOTYPE="minimal"
     local URL=""
 
-    validate_release "releases_alma"
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
     URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
-    ISO="AlmaLinux-${RELEASE}-x86_64-${ISOTYPE}.iso"
+    ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \("${ISO}" | cut -d'\' -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
