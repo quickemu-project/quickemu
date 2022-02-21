@@ -304,9 +304,14 @@ function releases_gentoo(){
 }
 
 function releases_haiku() {
-    echo r1beta3-x86_64 \
-         r1beta3-x86_gcc2h
+    echo r1beta3
 }
+
+function editions_haiku() {
+    echo x86_64 \
+         x86_gcc2h
+}
+
 
 function releases_kali() {
     echo latest \
@@ -935,14 +940,17 @@ function get_gentoo() {
 }
 
 function get_haiku() {
-    local BASE=""
+    local EDITION=""
     local ISO=""
     local URL=""
     local HASH=""
 
-    BASE=$(echo "${RELEASE}" | cut -d'-' -f1)
-    URL="https://cdn.haiku-os.org/haiku-release/${BASE}"
-    ISO="haiku-${RELEASE}-anyboot.iso"
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
+    URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
+    ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
