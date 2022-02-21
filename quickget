@@ -939,17 +939,15 @@ function get_kali() {
     local SUBDIR=""
 
     validate_release "releases_kali"
+    case ${RELEASE} in
+      latest) SUBDIR="current";;
+      *) SUBDIR="kali-weekly";;
+    esac
 
-    if [[ "${RELEASE}" == "latest" ]]; then
-        SUBDIR="current"
-    else
-        SUBDIR="kali-weekly"
-    fi
-
-    ISO=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/?C=M;O=D" |grep -o ">kali-linux-.*-installer-amd64.iso"|head -n 1|cut -c 2-)
-    HASH=$(wget -q -O- "https://cdimage.kali.org/${SUBDIR}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
-    URL="https://cdimage.kali.org/${SUBDIR}/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
+    URL="https://cdimage.kali.org/${SUBDIR}"
+    ISO=$(wget -q -O- "${URL}/?C=M;O=D" | grep -o ">kali-linux-.*-installer-amd64.iso" | head -n 1 | cut -c 2-)
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
