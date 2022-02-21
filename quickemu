@@ -1172,7 +1172,7 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -acc|--acc|-accessible|--accessible|-accessibility|--accessibility)
+          -accessible|--accessible|-accessibility|--accessibility)
             ACCESSIBLE="${2}"
             accessible_param_check
             shift
