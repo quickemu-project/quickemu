@@ -43,9 +43,7 @@ function pretty_name() {
     cachyos)            PRETTY_NAME="CachyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
-    gentoo)             PRETTY_NAME="Gentoo";;
     garuda)             PRETTY_NAME="Garuda Linux";;
-    haiku)              PRETTY_NAME="Haiku";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
