@@ -688,7 +688,7 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
-  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )
+  --braille               : Enable braille support. Requires SDL.
   --delete-disk           : Delete the disk image and EFI variables
   --delete-vm             : Delete the entire VM and it's configuration
   --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'

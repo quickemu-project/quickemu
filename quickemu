@@ -897,8 +897,9 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  if [[ "${ACCESSIBLE}" == "braille" ]] || [[ "${ACCESSIBLE}" == "brl" ]]; then
-    # shellcheck disable=SC2054
+  # FIXME: Check for device availability. qemu will fail to start otherwise
+  if [ -n "${BRAILLE}" ]; then
+      # shellcheck disable=SC2054
       args+=(-chardev braille,id=brltty
              -device usb-braille,id=usbbrl,chardev=brltty)
   fi
@@ -1049,7 +1050,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )"
+  echo "  --braille               : Enable braille support. Requires SDL."
   echo "  --delete-disk           : Delete the disk image and EFI variables"
   echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
@@ -1066,14 +1067,6 @@ function usage() {
   exit 1
 }
 
-#
-function accessible_param_check() {
-  if [ "${ACCESSIBLE}" != "braille" ] && [ "${ACCESSIBLE}" != "brl" ] ; then
-    echo "ERROR! Requested accessiblility '${ACCESSIBLE}' is not recognised."
-    exit 1
-    # TODO can we check the device/API is available
-  fi
-}
 function display_param_check() {
   if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
@@ -1104,6 +1097,7 @@ tpm="off"
 usb_devices=()
 extra_args=""
 
+BRAILLE=""
 DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
@@ -1165,10 +1159,8 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -accessible|--accessible|-accessibility|--accessibility)
-            ACCESSIBLE="${2}"
-            accessible_param_check
-            shift
+          -braille|--braille)
+            BRAILLE="on"
             shift;;
           -delete|--delete|-delete-disk|--delete-disk)
             DELETE_DISK=1
@@ -1251,7 +1243,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   fi
 
   if [ -z "${OUTPUT}" ]; then
-    if [ -z "${display}" ]; then
+    # Braille support requires SDL. Override OUTPUT if braille was requested.
+    if [ -n "${BRAILLE}" ]; then
+      OUTPUT="sdl"
+    elif [ -z "${display}" ]; then
       OUTPUT="sdl"
     else
       OUTPUT="${display}"
