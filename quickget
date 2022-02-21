@@ -104,7 +104,7 @@ function list_csv() {
 
 # check if we have a zsync installed somewhere
   ZS="$(which zsync)"
-  if  [ -x "${ZS}" ]; then
+  if [ -x "${ZS}" ]; then
     DL="zsync"
   else
     DL="wget"
@@ -122,19 +122,12 @@ function list_csv() {
     PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
     SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
-
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
       elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ]; then
         DOWNLOADER="${DL}"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ]; then
-        DOWNLOADER="${DL}"
-      elif [ "${OS}" == "cachyos" ]; then
-        DOWNLOADER="${DL}"
-      elif [ "${OS}" == "garuda" ]; then
-        DOWNLOADER="${DL}"
-      elif [ "${OS}" == "gentoo" ]; then
         DOWNLOADER="${DL}"
       else
         DOWNLOADER="wget"
