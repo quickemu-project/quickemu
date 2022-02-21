@@ -1196,27 +1196,20 @@ function get_oraclelinux() {
     local HASH=""
     local ISO=""
     local URL=""
-
-    local arch="x86_64"
+    local VER_MAJ=""
+    local VER_MIN=""
 
     validate_release "releases_oraclelinux"
-
-    local majorver=${RELEASE::1}
-    local minorver=${RELEASE:2:1}
-
-    local baseurl="https://yum.oracle.com/ISOS/OracleLinux/OL${majorver}/u${minorver}/${arch}/"
-    local hashurl="https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${majorver}-U${minorver}-Server-x86_64.checksum"
-
-    if [ "${majorver}" == "8" ]; then
-        ISO="OracleLinux-R${majorver}-U${minorver}-${arch}-dvd.iso"
+    VER_MAJ=${RELEASE::1}
+    VER_MIN=${RELEASE:2:1}
+    URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
+    if [ "${VER_MAJ}" == "8" ]; then
+        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso"
     else
-        ISO="OracleLinux-R${majorver}-U${minorver}-Server-${arch}-dvd.iso"
+        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso"
     fi
-
-    URL="${baseurl}/${ISO}"
-    HASH=$(wget -q -O- "${hashurl}" | grep "${ISO}" | cut -d' ' -f1)
-
-    web_get "${URL}" "${VM_PATH}"
+    HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
