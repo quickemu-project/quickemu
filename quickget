@@ -816,10 +816,10 @@ function get_arcolinux() {
     local VERSION=""
 
     validate_release "releases_arcolinux"
-    VERSION=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/info' | cut -d " " -f 2)
     URL="https://ant.seedhost.eu/arcolinux/.quick/"
+    VERSION=$(wget -q -O- "${URL}/info" | cut -d' ' -f 2)
     ISO="arcolinuxl-${VERSION}-x86_64.iso"
-    HASH=$(wget -q -O- 'https://ant.seedhost.eu/arcolinux/.quick/arcolinuxl-'${VERSION}'-x86_64.iso.sha1' | cut -d " " -f 1)
+    HASH=$(wget -q -O- "${URL}/arcolinuxl-${VERSION}-x86_64.iso.sha1" | cut -d' ' -f 1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
