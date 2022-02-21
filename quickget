@@ -1333,11 +1333,17 @@ function get_regolith() {
 }
 
 function get_tails() {
+    local ISO=""
+    local HASH=""
+    local RELEASE_JSON_URL=""
+    local RELEASE_JSON=""
+    local URL=""
+
     validate_release "releases_tails"
     RELEASE_JSON_URL="https://tails.boum.org/install/v2/Tails/amd64/${RELEASE}/latest.json"
-    RELEASE_JSON="$(wget -q -O- "$RELEASE_JSON_URL")"
-    URL=$(echo "$RELEASE_JSON" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
-    HASH=$(echo "$RELEASE_JSON" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
+    RELEASE_JSON="$(wget -q -O- "${RELEASE_JSON_URL}")"
+    URL=$(echo "${RELEASE_JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
+    HASH=$(echo "${RELEASE_JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
