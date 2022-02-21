@@ -5,23 +5,28 @@
 #  1. Add the new OS, all lowercase, to os_support()
 #  2. Add a "pretty name" display name to pretty_name()
 #  3. Create a releases_newos() generator that outputs the currently supported release versions
-#  4. Add the new OS to make_vm_config(); (only if required)
-#  5. Create a get_newos() function that does something like this:
+#  4. If the OS has "editions" (Linux Mint for example), create editions_newos() generator
+#  5. Add the new OS to make_vm_config(); (only if required)
+#  6. Create a get_newos() function that does something like this:
 #     function get_newos() {
+#         local EDITION=""
 #         local HASH=""
 #         local ISO=""
 #         local URL=""
+#
+#         if [ -n "${1}" ]; then
+#           EDITION="${1}"
+#         fi
 #
 #         validate_release "releases_newos"
 #         ISO="newos-${RELEASE}-amd64.iso"
 #         URL="https://www.newos.org/download"
 #         web_get "${URL}/${ISO}" "${VM_PATH}"
 #         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-#         HASH=$(cat "${VM_PATH}/SHA256SUMS" | cut -d' ' -f1)
+#         HASH=$(cut -d' ' -f1 < "${VM_PATH}/SHA256SUMS")
 #         check_hash "${ISO}" "${HASH}"
 #         make_vm_config "${ISO}"
 #     }
-#  6. Add new OS to the argument parser at the bottom of the script
 
 function cleanup() {
   if [ -n "$(jobs -p)" ]; then
@@ -132,28 +137,13 @@ function list_csv() {
         DOWNLOADER="${DL}"
       fi
 
-      if [ "${OS}" == "windows" ]; then
+      # If the OS has an editions_() function, use it.
+      if [[ $(type -t "editions_${OS}") == function ]]; then
+        for OPTION in $(editions_"${OS}"); do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [ "${OS}" == "windows" ]; then
         for OPTION in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "debian" ]; then
-        for OPTION in cinnamon gnome kde lxde lxqt mate standard xfce; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "linuxmint" ]; then
-        for OPTION in cinnamon mate xfce; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "mxlinux" ]; then
-        for OPTION in xfce kde fluxbox; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "nixos" ]; then
-        for OPTION in gnome plasma5 minimal; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      elif [ "${OS}" == "popos" ]; then
-        for OPTION in intel nvidia; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       else
@@ -246,6 +236,17 @@ function releases_debian() {
     echo 11.2.0
 }
 
+function editions_debian() {
+  echo standard \
+  cinnamon \
+  gnome \
+  kde \
+  lxde \
+  lxqt \
+  mate \
+  xfce
+}
+
 function releases_cachyos() {
     echo 2022.01.09 \
     2022.02.11
@@ -317,14 +318,33 @@ function releases_linuxmint(){
     echo 20.2
 }
 
+function editions_linuxmint(){
+    echo cinnamon \
+    mate \
+    xfce
+}
+
 function releases_mxlinux(){
     echo 21
+}
+
+function editions_mxlinux(){
+    echo xfce \
+    kde \
+    fluxbox
 }
 
 function releases_nixos(){
     echo 21.05 \
     21.11
 }
+
+function editions_nixos(){
+    echo gnome \
+    plasma5 \
+    minimal
+}
+
 
 function releases_openbsd(){
     echo 7.0
@@ -372,6 +392,11 @@ function releases_popos() {
     echo 20.04 \
     21.04 \
     21.10
+}
+
+function editions_popos() {
+    echo intel \
+    nvidia
 }
 
 function releases_regolith() {
@@ -803,17 +828,17 @@ function get_cachyos() {
 }
 
 function get_debian() {
-    local DESKTOP="standard"
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid"
 
     if [ -n "${1}" ]; then
-      DESKTOP="${1}"
+      EDITION="${1}"
     fi
 
     validate_release "releases_debian"
-    ISO="debian-live-${RELEASE}-amd64-${DESKTOP}.iso"
+    ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -953,19 +978,18 @@ function get_kolibrios() {
 }
 
 function get_linuxmint() {
-    local DESKTOP="cinnamon"
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL=""
 
     if [ -n "${1}" ]; then
-      DESKTOP="${1}"
+      EDITION="${1}"
     fi
 
     validate_release "releases_linuxmint"
-    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
-    ISO="linuxmint-${RELEASE}-${DESKTOP}-64bit.iso"
+    ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     HASH=$(wget -q -O- "${URL}/${RELEASE}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -996,17 +1020,17 @@ function get_manjaro() {
 }
 
 function get_mxlinux() {
-    local DESKTOP="xfce"
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL=""
 
     if [ -n "${1}" ]; then
-      DESKTOP="${1}"
+      EDITION="${1}"
     fi
 
     validate_release "releases_mxlinux"
-    case ${DESKTOP} in
+    case ${EDITION} in
       xfce)
         URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce"
         ISO="MX-${RELEASE}_x64.iso"
@@ -1027,19 +1051,18 @@ function get_mxlinux() {
 }
 
 function get_nixos() {
-    local DESKTOP="gnome"
+    local EDITION=""
     local HASH=""
     local ISO=""
     local URL=""
 
     if [ -n "${1}" ]; then
-      DESKTOP="${1}"
+      EDITION="${1}"
     fi
 
     validate_release "releases_nixos"
     URL="https://channels.nixos.org/nixos-${RELEASE}"
-    FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
-    ISO="latest-nixos-${DESKTOP}-x86_64-linux.iso"
+    ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1848,239 +1871,55 @@ else
     exit 1
 fi
 
+if [[ ! $(os_support) =~ ${OS} ]]; then
+  echo -e "ERROR! ${OS} is not a supported OS.\n"
+  os_support
+  exit 1
+fi
+
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
-    if [ "${OS}" == "alma" ]; then
-        get_alma
-    elif [ "${OS}" == "alpine" ]; then
-        get_alpine
-    elif [ "${OS}" == "android" ]; then
-        get_android
-    elif [ "${OS}" == "archlinux" ]; then
-        get_archlinux
-    elif [ "${OS}" == "arcolinux" ]; then
-        get_arcolinux
-    elif [ "${OS}" == "void" ]; then
-        get_void
-    elif [ "${OS}" == "debian" ]; then
+
+    # If the OS has an editions_() function, use it.
+    if [[ $(type -t "editions_${OS}") == function ]]; then
+        EDITIONS=($(editions_${OS}))
+        EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
-            DESKTOP="${3}"
-            DESKTOPS=(cinnamon gnome kde lxde lxqt mate standard xfce)
-            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
-                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
-                for DESKTOP in "${DESKTOPS[@]}"; do
-                  echo "${DESKTOP}"
+            EDITION="${3}"
+            if [[ ! ${EDITIONS[*]} =~ ${EDITION} ]]; then
+                echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
+                for EDITION in "${EDITIONS[@]}"; do
+                  echo -n "${EDITION} "
                 done
                 exit 1
             fi
-        else
-            DESKTOP="standard"
         fi
-        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
-        get_debian "${DESKTOP}"
-    elif [ "${OS}" == "devuan" ]; then
-        get_devuan
-    elif [ "${OS}" == "elementary" ]; then
-        get_elementary
-    elif [ "${OS}" == "macos" ]; then
-        get_macos
-    elif [ "${OS}" == "freebsd" ]; then
-        get_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        get_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        get_garuda
-    elif [ "${OS}" == "cachyos" ]; then
-        get_cachyos
-    elif [ "${OS}" == "gentoo" ]; then
-        get_gentoo
-    elif [ "${OS}" == "haiku" ]; then
-        get_haiku
-    elif [ "${OS}" == "kali" ]; then
-        get_kali
-    elif [ "${OS}" == "kdeneon" ]; then
-        get_kdeneon
-    elif [ "${OS}" == "kolibrios" ]; then
-        get_kolibrios
-    elif [ "${OS}" == "linuxmint" ]; then
-        if [ -n "${3}" ]; then
-            DESKTOP="${3}"
-            DESKTOPS=(cinnamon mate xfce)
-            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
-                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
-                for DESKTOP in "${DESKTOPS[@]}"; do
-                  echo "${DESKTOP}"
-                done
-                exit 1
-            fi
-        else
-            DESKTOP="cinnamon"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
-        get_linuxmint ${DESKTOP}
-    elif [ "${OS}" == "manjaro" ]; then
-        get_manjaro
-    elif [ "${OS}" == "mxlinux" ]; then
-        if [ -n "${3}" ]; then
-            DESKTOP="${3}"
-            DESKTOPS=(xfce kde fluxbox)
-            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
-                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
-                for DESKTOP in "${DESKTOPS[@]}"; do
-                  echo "${DESKTOP}"
-                done
-                exit 1
-            fi
-        else
-            DESKTOP="xfce"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
-        get_mxlinux "${DESKTOP}"
-    elif [ "${OS}" == "nixos" ]; then
-        if [ -n "${3}" ]; then
-            DESKTOP="${3}"
-            DESKTOPS=(gnome plasma5 minimal)
-            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
-                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
-                for DESKTOP in "${DESKTOPS[@]}"; do
-                  echo "${DESKTOP}"
-                done
-                exit 1
-            fi
-        else
-            DESKTOP="gnome"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
-        get_nixos ${DESKTOP}
-    elif [ "${OS}" == "openbsd" ]; then
-        get_openbsd
-    elif [ "${OS}" == "opensuse" ]; then
-        get_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        get_oraclelinux
-    elif [ "${OS}" == "slackware" ]; then
-        get_slackware
-    elif [ "${OS}" == "popos" ]; then
-        if [ -n "${3}" ]; then
-            DRIVER="${3}"
-            DRIVERS=(intel nvidia)
-            if [[ ! ${DRIVERS[*]} =~ ${DRIVER} ]]; then
-                echo "ERROR! ${DRIVER} is not a supported driver:"
-                for DRIVER in "${DRIVERS[@]}"; do
-                  echo "${DRIVER}"
-                done
-                exit 1
-            fi
-        else
-            DRIVER="intel"
-        fi
-        VM_PATH="${OS}-${RELEASE}-${DRIVER}"
-        get_popos "${DRIVER}"
-    elif  [ "${OS}" == "regolith" ]; then
-        get_regolith
-    elif [ "${OS}" == "rockylinux" ]; then
-        get_rocky
-    elif [ "${OS}" == "solus" ]; then
-        get_solus
-    elif [ "${OS}" == "tails" ]; then
-        get_tails
+        VM_PATH="${OS}-${RELEASE}-${EDITION}"
+        get_${OS} "${EDITION}"
     elif [[ "${OS}" == *"ubuntu"* ]]; then
-        get_ubuntu
+      get_ubuntu
     elif [ "${OS}" == "windows" ]; then
+        LANG_NAME="English International"
         if [ -n "${3}" ]; then
             LANG_NAME="${3}"
             if [[ ! ${LANGS[*]} =~ "${LANG_NAME}" ]]; then
-                echo "ERROR! ${LANG_NAME} is not a supported language:"
+                echo -e "ERROR! ${LANG_NAME} is not a supported Windows language:\n"
                 for LANG in "${LANGS[@]}"; do
-                  echo "${LANG}"
+                  echo -n "${LANG} "
                 done
                 exit 1
             fi
-        else
-            LANG_NAME="English International"
         fi
         get_windows "${LANG_NAME}"
-    elif [ "${OS}" == "zorin" ]; then
-        get_zorin
     else
-        echo "ERROR! ${OS} is unknown:"
-        os_support
-        exit 1
+      get_"${OS}"
     fi
 else
     echo -n "ERROR! You must specify a release: "
-    if [ "${OS}" == "alma" ]; then
-        releases_alma
-    elif [ "${OS}" == "alpine" ]; then
-        releases_alpine
-    elif [ "${OS}" == "android" ]; then
-        releases_android
-    elif [ "${OS}" == "archlinux" ]; then
-        releases_archlinux
-    elif [ "${OS}" == "arcolinux" ]; then
-        releases_arcolinux
-    elif [ "${OS}" == "debian" ]; then
-        releases_debian
-    elif [ "${OS}" == "devuan" ]; then
-        releases_devuan
-    elif [ "${OS}" == "elementary" ]; then
-        releases_elementary
-    elif [ "${OS}" == "freebsd" ]; then
-        releases_freebsd
-    elif [ "${OS}" == "fedora" ]; then
-        releases_fedora
-    elif [ "${OS}" == "garuda" ]; then
-        releases_garuda
-    elif [ "${OS}" == "cachyos" ]; then
-        releases_cachyos
-    elif [ "${OS}" == "gentoo" ]; then
-        releases_gentoo
-    elif [ "${OS}" == "haiku" ]; then
-        releases_haiku
-    elif [ "${OS}" == "kali" ]; then
-        releases_kali
-    elif [ "${OS}" == "kolibrios" ]; then
-        releases_kolibrios
-    elif [ "${OS}" == "linuxmint" ]; then
-        releases_linuxmint
-    elif [ "${OS}" == "manjaro" ]; then
-        releases_manjaro
-    elif [ "${OS}" == "mxlinux" ]; then
-        releases_mxlinux
-    elif [ "${OS}" == "nixos" ]; then
-        releases_nixos
-    elif [ "${OS}" == "opensuse" ]; then
-        releases_opensuse
-    elif [ "${OS}" == "oraclelinux" ]; then
-        releases_oraclelinux
-    elif [ "${OS}" == "openbsd" ]; then
-        releases_openbsd
-    elif [ "${OS}" == "macos" ]; then
-        releases_macos
-    elif [ "${OS}" == "popos" ]; then
-        releases_popos
-    elif [ "${OS}" == "regolith" ]; then
-        releases_regolith
-    elif [ "${OS}" == "rockylinux" ]; then
-        releases_rockylinux
-    elif [ "${OS}" == "slackware" ]; then
-        releases_slackware
-    elif [ "${OS}" == "solus" ]; then
-        releases_solus
-    elif [ "${OS}" == "tails" ]; then
-        releases_tails
-    elif [[ "${OS}" == *"ubuntu"* ]]; then
-        releases_ubuntu
-    elif [ "${OS}" == "void" ]; then
-        releases_void
-    elif [ "${OS}" == "windows" ]; then
-        releases_windows
-    elif [ "${OS}" == "zorin" ]; then
-        releases_zorin
-    else
-        echo "${OS} is unknown"
-        os_support
-    fi
+    case ${OS} in
+      *ubuntu*) releases_ubuntu;;
+      *) releases_"${OS}";;
+    esac
     exit 1
 fi
