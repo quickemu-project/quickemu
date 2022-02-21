@@ -670,58 +670,11 @@ EOF
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "alma" ] && [ "${ISOTYPE}" == "dvd" ]; then
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "kolibrios" ]; then
-            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "openbsd" ]; then
-            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "tails" ]; then
-            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "macos" ]; then
-            echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "cachyos" ]; then
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "garuda" ]; then
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-	    if [ "${OS}" == "slackware" ]; then
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
-            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "haiku" ]; then
-            echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf"
-            echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "oraclelinux" ]; then
-            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "void" ]; then
-            echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
-        fi
-
-        if [ "${OS}" == "zorin"  ]; then
-            case  ${RELEASE} in
-              15education64|15edulite64|15edulite32)
-                echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
-            esac
-        fi
+        case ${OS} in
+          alma|cachyos|garuda|oraclelinux|rockylinux|void|zorin) echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf";;
+          haiku|kolibrios|openbsd|slackware|tails) echo "boot=\"legacy\"" >> "${OS}-${RELEASE}.conf";;
+          macos) echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf";;
+        esac
 
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
