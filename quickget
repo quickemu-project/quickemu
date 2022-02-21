@@ -419,6 +419,11 @@ function releases_rockylinux() {
     8.0
 }
 
+function editions_rockylinux() {
+    echo minimal \
+    dvd1
+}
+
 function releases_slackware() {
     echo 14.2 \
     15.0 \
@@ -1102,15 +1107,18 @@ function get_zorin() {
     make_vm_config "${ISO}"
 }
 
-function get_rocky() {
+function get_rockylinux() {
+    local EDITION=""
     local HASH=""
     local ISO=""
-    local ISOTYPE="minimal"
     local URL=""
 
-    validate_release "releases_rockylinux"
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
+    fi
+
     URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64"
-    ISO="Rocky-${RELEASE}-x86_64-${ISOTYPE}.iso"
+    ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
