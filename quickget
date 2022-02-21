@@ -279,14 +279,28 @@ function releases_elementary() {
     echo 6.1
 }
 
-function releases_fedora(){
+function releases_fedora() {
     echo 33 \
     34 \
     35
 }
 
+function editions_fedora() {
+  echo Workstation \
+  Cinnamon \
+  i3 \
+  KDE \
+  LXDE \
+  LXQt \
+  Mate \
+  Xfce \
+  Silverblue \
+  Server
+}
+
 function releases_freebsd(){
     echo 12.2 \
+    12.3 \
     13.0
 }
 
@@ -886,25 +900,26 @@ function get_elementary() {
 }
 
 function get_fedora() {
-    local FEDORA_RELEASE=""
-    local FEDORA_VERSIONS=""
+    local EDITION=""
     local HASH=""
     local ISO=""
+    local JSON=""
     local URL=""
-    local VERSION_NUM=""
+    local VARIANT=""
 
-    FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
-    if [[ "${RELEASE}" == *"beta"* ]]; then
-        VERSION_NUM=${RELEASE%"_beta"}
-        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq -c '. | select(.version | contains("Beta"))' | jq '. | select(.variant=="Workstation")')
-        ISO="Fedora-Workstation-Live-x86_64-${VERSION_NUM}_Beta-1.2.iso"
-    else
-        FEDORA_RELEASE=$(echo "${FEDORA_VERSIONS}" | jq '. | select(.variant=="Workstation" and .version=="'${RELEASE}'")')
-        ISO="Fedora-Workstation-Live-x86_64-${RELEASE}-1.2.iso"
+    if [ -n "${1}" ]; then
+      EDITION="${1}"
     fi
 
-    URL=$(echo "${FEDORA_RELEASE}" | jq -r '.link')
-    HASH=$(echo "${FEDORA_RELEASE}" | jq -r '.sha256')
+    case ${EDITION} in
+      Server|Silverblue|Workstation) VARIANT="${EDITION}";;
+      *) VARIANT="Spins";;
+    esac
+
+    JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+    URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
+    ISO="${URL##*/}"
+    HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
