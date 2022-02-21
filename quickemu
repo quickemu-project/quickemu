@@ -1007,7 +1007,7 @@ function vm_boot() {
   # scripts. The vendor name, Quickemu Project, contains a space. It needs to be
   # double-quoted.
   SHELL_ARGS="${args[*]}"
-  SHELL_ARGS="${SHELL_ARGS//(/\\(}"
+  SHELL_ARGS="${SHELL_ARGS//\(/\\(}"
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
