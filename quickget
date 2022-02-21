@@ -39,6 +39,7 @@ function pretty_name() {
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
@@ -166,6 +167,7 @@ function os_support() {
     elementary \
     fedora \
     freebsd \
+    freedos \
     garuda \
     gentoo \
     ghostbsd \
@@ -281,6 +283,10 @@ function releases_freebsd(){
 
 function editions_freebsd(){
     echo disc1 dvd1
+}
+
+function releases_freedos() {
+    echo 1.2
 }
 
 function releases_garuda() {
@@ -615,6 +621,9 @@ function make_vm_config() {
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;
+        freedos)
+            GUEST="freedos"
+            IMAGE_TYPE="iso";;
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
@@ -656,7 +665,7 @@ EOF
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-          kolibrios)
+          kolibrios|freedos)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
@@ -831,6 +840,20 @@ function get_freebsd() {
 
     HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_freedos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    ISO="FD12CD.iso"
+    HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1)
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_garuda() {
