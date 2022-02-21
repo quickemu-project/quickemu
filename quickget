@@ -256,14 +256,14 @@ function releases_alpine() {
 }
 
 function releases_android() {
-  echo 9.0 \
-  8.1 \
-  7.1 \
-  6.0 \
-  5.1 \
-  4.4 \
-  4.0 \
-  2.2
+    echo 9.0 \
+    8.1 \
+    7.1 \
+    6.0 \
+    5.1 \
+    4.4 \
+    4.0 \
+    2.2
 }
 
 function releases_archlinux() {
@@ -594,18 +594,17 @@ function web_get() {
 
     if command -v aria2c > /dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
-          echo #Necessary as aria2c in suppressed mode doesnot have new lines
+          echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
           exit 1
         fi
-        echo #Necessary as aria2c in suppressed mode doesnot have new lines
+        echo #Necessary as aria2c in suppressed mode does not have new lines
     else
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL}. Try running 'quickget' again."
           exit 1
         fi
     fi
-
 }
 
 function zsync_get() {
@@ -708,7 +707,7 @@ EOF
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "alma"  ] && [ "${ISOTYPE}" == "dvd" ]; then
+        if [ "${OS}" == "alma" ] && [ "${ISOTYPE}" == "dvd" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -728,11 +727,11 @@ EOF
             echo "macos_release=\"${RELEASE}\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "cachyos"  ]; then
+        if [ "${OS}" == "cachyos" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "garuda"  ]; then
+        if [ "${OS}" == "garuda" ]; then
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -741,11 +740,11 @@ EOF
             echo "disk_size=\"32G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "oraclelinux"  ]; then
+        if [ "${OS}" == "oraclelinux" ]; then
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
-        if [ "${OS}" == "void"  ]; then
+        if [ "${OS}" == "void" ]; then
             echo "disk_size=\"20G\"" >> "${OS}-${RELEASE}.conf"
         fi
 
@@ -812,7 +811,6 @@ function get_alma() {
     if [ -n "${1}" ]; then
       ISOTYPE="${1}"
     fi
-
 
     # The mirror url returns 10 or so local mirrors with some kind or RR rotation/load balancing
     # We'll just grab the first
@@ -881,7 +879,6 @@ function get_arcolinux() {
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
-
 
 function get_cachyos() {
     local HASH=""
@@ -963,7 +960,6 @@ function get_fedora() {
     local VERSION_NUM=""
 
     validate_release "releases_fedora"
-
     FEDORA_VERSIONS=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="Workstation" or .variant=="Spins") and .arch=="x86_64")')
     if [[ "${RELEASE}" == *"beta"* ]]; then
         VERSION_NUM=${RELEASE%"_beta"}
@@ -1007,6 +1003,7 @@ function get_kali() {
     local ISO=""
     local URL=""
     local SUBDIR=""
+
     validate_release "releases_kali"
 
     if [[ "${RELEASE}" == "latest" ]]; then
@@ -1150,8 +1147,8 @@ function get_nixos() {
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
-
 }
+
 function get_openbsd() {
     local HASH=""
     local ISO=""
@@ -1391,7 +1388,6 @@ function get_popos() {
     fi
 
     validate_release "releases_popos"
-
     URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${DRIVER}" | jq ".url")
     URL="${URL//\"/}"
     ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
@@ -1434,7 +1430,6 @@ function get_regolith() {
 
 function get_tails() {
     validate_release "releases_tails"
-
     RELEASE_JSON_URL="https://tails.boum.org/install/v2/Tails/amd64/${RELEASE}/latest.json"
     RELEASE_JSON="$(wget -q -O- "$RELEASE_JSON_URL")"
     URL=$(echo "$RELEASE_JSON" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
@@ -2008,9 +2003,8 @@ fi
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
     VM_PATH="${OS}-${RELEASE}"
-
     if [ "${OS}" == "alma" ]; then
-     if [ -n "${3}" ]; then
+        if [ -n "${3}" ]; then
             ISOTYPE="${3,,}"
             ISOTYPES=(minimal dvd ) # boot) # a step too far
             if [[ ! ${ISOTYPES[*]} =~ ${ISOTYPE} ]]; then
@@ -2036,7 +2030,7 @@ if [ -n "${2}" ]; then
     elif [ "${OS}" == "void" ]; then
         get_void
     elif [ "${OS}" == "debian" ]; then
-     if [ -n "${3}" ]; then
+        if [ -n "${3}" ]; then
             FREEDOM="${3}"
             FREEDOMS=(standard nonfree)
             if [[ ! ${FREEDOMS[*]} =~ ${FREEDOM} ]]; then
