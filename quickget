@@ -922,21 +922,13 @@ function get_fedora() {
 function get_gentoo() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local LOCAT=""
-    local INSTALLMIN=""
+    local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds/"
 
     validate_release "releases_gentoo"
-    eval $( wget  -O/tmp/gentoolatest https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/${RELEASE}-iso.txt 2>&1 |grep Location | awk '{print "LOCAT="$2}' )
-    LOCAT=$(dirname ${LOCAT})
-    eval $( awk '/admincd-amd64/ {print "ADMIN="$1}; /install-amd64-minimal/ {print "INSTALLMIN="$1}' /tmp/gentoolatest )
-    URL="${LOCAT}/${INSTALLMIN}"
-    ISO=$(basename "${INSTALLMIN}" )
-
-
-    web_get "${URL}" "${VM_PATH}"
-    HASH=$(wget -q -O- ${LOCAT}/${INSTALLMIN}.DIGESTS|grep -e iso|grep  -v -e CONT -e catalyst|cut -d\  -f1)
-    check_hash "${ISO}" "${HASH}"
+    ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1)
+    HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep iso | grep -v CONTENTS | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "$(basename ${ISO})" "${HASH}"
     make_vm_config "${ISO}"
 }
 
