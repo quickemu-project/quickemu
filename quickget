@@ -136,8 +136,6 @@ function list_csv() {
         DOWNLOADER="${DL}"
       elif [ "${OS}" == "gentoo" ]; then
         DOWNLOADER="${DL}"
-      elif [[ "${OS}" == *"kdeneon"* ]]; then
-        DOWNLOADER="${DL}"
       else
         DOWNLOADER="wget"
       fi
@@ -942,15 +940,15 @@ function get_kali() {
 
 function get_kdeneon() {
     local ISO=""
+    local HASH=""
     local URL=""
 
     validate_release "releases_kdeneon"
-    ISO="neon-${RELEASE}-current.iso"
-    # Get the URL of the mirror closest to the user's location
-    URL=$(wget -q -O- "https://files.kde.org/neon/images/${RELEASE}/current/neon-${RELEASE}-current.iso.zsync.mirrorlist" | \
-          grep "neon-${RELEASE}-current.iso.zsync" | grep '>1.<' | cut -d\" -f 6 | sed 's/https/http/g' | xargs dirname)
-    zsync_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "$(wget -q -O- "https://files.kde.org/neon/images/${RELEASE}/current/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)"
+    URL="https://files.kde.org/neon/images/${RELEASE}/current"
+    ISO=$(wget -q -O- "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    HASH=$(wget -q -O- "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
 
