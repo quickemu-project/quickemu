@@ -46,9 +46,7 @@ function pretty_name() {
     garuda)             PRETTY_NAME="Garuda Linux";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxmint-cinnamon) PRETTY_NAME="Linux Mint Cinnamon";;
-    linuxmint-mate)     PRETTY_NAME="Linux Mint MATE";;
-    linuxmint-xfce)     PRETTY_NAME="Linux Mint XFCE";;
+    linuxmint)          PRETTY_NAME="Linux Mint";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
@@ -114,8 +112,6 @@ function list_csv() {
     DISPLAY_NAME="$(pretty_name "${OS}")"
     if [[ "${OS}" == *"ubuntu"* ]]; then
       FUNC="ubuntu"
-    elif [[ "${OS}" == *"linuxmint"* ]]; then
-      FUNC="linuxmint"
     else
       FUNC="${OS}"
     fi
@@ -139,6 +135,10 @@ function list_csv() {
         done
       elif [ "${OS}" == "debian" ]; then
         for OPTION in cinnamon gnome kde lxde lxqt mate standard xfce; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [ "${OS}" == "linuxmint" ]; then
+        for OPTION in cinnamon mate xfce; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
       elif [ "${OS}" == "mxlinux" ]; then
@@ -180,9 +180,7 @@ function os_support() {
     kdeneon \
     kolibrios \
     kubuntu \
-    linuxmint-cinnamon \
-    linuxmint-mate \
-    linuxmint-xfce \
+    linuxmint \
     manjaro \
     mxlinux \
     nixos \
@@ -956,15 +954,19 @@ function get_kolibrios() {
 }
 
 function get_linuxmint() {
-    local FLAVOR=""
+    local DESKTOP="cinnamon"
     local HASH=""
     local ISO=""
     local URL=""
 
+    if [ -n "${1}" ]; then
+      DESKTOP="${1}"
+    fi
+
     validate_release "releases_linuxmint"
     FLAVOR=$(echo "${OS}" | cut -d'-' -f2)
     URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
-    ISO="linuxmint-${RELEASE}-${FLAVOR}-64bit.iso"
+    ISO="linuxmint-${RELEASE}-${DESKTOP}-64bit.iso"
     HASH=$(wget -q -O- "${URL}/${RELEASE}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
@@ -1902,8 +1904,22 @@ if [ -n "${2}" ]; then
         get_kdeneon
     elif [ "${OS}" == "kolibrios" ]; then
         get_kolibrios
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
-        get_linuxmint
+    elif [ "${OS}" == "linuxmint" ]; then
+        if [ -n "${3}" ]; then
+            DESKTOP="${3}"
+            DESKTOPS=(cinnamon mate xfce)
+            if [[ ! ${DESKTOPS[*]} =~ ${DESKTOP} ]]; then
+                echo "ERROR! ${DESKTOP} is not a supported Desktop Environment:"
+                for DESKTOP in "${DESKTOPS[@]}"; do
+                  echo "${DESKTOP}"
+                done
+                exit 1
+            fi
+        else
+            DESKTOP="cinnamon"
+        fi
+        VM_PATH="${OS}-${RELEASE}-${DESKTOP}"
+        get_linuxmint ${DESKTOP}
     elif [ "${OS}" == "manjaro" ]; then
         get_manjaro
     elif [ "${OS}" == "mxlinux" ]; then
@@ -2027,7 +2043,7 @@ else
         releases_kali
     elif [ "${OS}" == "kolibrios" ]; then
         releases_kolibrios
-    elif [[ "${OS}" == *"linuxmint-"* ]]; then
+    elif [ "${OS}" == "linuxmint" ]; then
         releases_linuxmint
     elif [ "${OS}" == "manjaro" ]; then
         releases_manjaro
