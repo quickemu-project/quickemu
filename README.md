@@ -33,13 +33,17 @@ Features
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
 -   **Windows** 8.1, 10 and 11 including TPM 2.0
--   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu flavours](https://ubuntu.com/download/flavours)**
+-   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
+    flavours](https://ubuntu.com/download/flavours)**
 -   **Over 360 operating system editions are supported!**
 -   Full SPICE support including host/guest clipboard sharing
 -   VirtIO-webdavd file sharing for Linux and Windows guests
 -   VirtIO-9p file sharing for Linux and macOS guests
--   [QEMU Guest Agent support](https://wiki.qemu.org/Features/GuestAgent); provides access to a system-level agent via standard QMP commands
--   Samba file sharing for Linux, macOS and Windows guests (*if `smbd` is installed on the host*)
+-   [QEMU Guest Agent
+    support](https://wiki.qemu.org/Features/GuestAgent); provides access
+    to a system-level agent via standard QMP commands
+-   Samba file sharing for Linux, macOS and Windows guests (*if `smbd`
+    is installed on the host*)
 -   VirGL acceleration
 -   USB device pass-through
 -   Smartcard pass-through
@@ -66,7 +70,8 @@ QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/wat
 Requirements
 ------------
 
--   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL, SPICE & VirtFS support**
+-   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL,
+    SPICE & VirtFS support**
 -   [bash](https://www.gnu.org/software/bash/) (*4.0 or newer*)
 -   [Coreutils](https://www.gnu.org/software/coreutils/)
 -   [EDK II](https://github.com/tianocore/edk2)
@@ -237,7 +242,7 @@ Other Operating Systems
 -   `popos` (Pop!\_OS)
 -   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
--   `slackware` (Slackware)
+-   `slackware` (Slackware Linux)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `void` (Void Linux)
@@ -612,7 +617,6 @@ All the options
 Here are the usage instructions:
 
 ``` {.bash}
-
 
 Usage
   quickemu --vm ubuntu.conf
