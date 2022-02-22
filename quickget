@@ -230,12 +230,12 @@ function releases_alpine() {
 function releases_android() {
     echo 9.0 \
     8.1 \
-    7.1 \
-    6.0 \
-    5.1 \
-    4.4 \
-    4.0 \
-    2.2
+    7.1
+}
+
+function editions_android() {
+    echo x86 \
+    x86_64
 }
 
 function releases_archlinux() {
@@ -769,33 +769,6 @@ EOF
     exit 0
 }
 
-function get_android() {
-  local HASH=""
-  local ISO=""
-  local URL=""
-
-  fosshubVersionInfo=$(wget -O - -q "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =")
-  version="android-x86-${RELEASE}"
-  releaseJson=$(echo "${fosshubVersionInfo:16}" | jq --arg ver "${version}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
-
-  HASH=$(echo "${releaseJson}" | jq -r .hash.sha256)
-  ISO=$(echo "${releaseJson}" | jq -r .n)
-
-  baseurl="https://mirrors.gigenet.com/OSDN/android-x86/"
-
-  releaseFolders=$(wget -q -O - ${baseurl} | grep -o -E '[0-9]{5}' | uniq)
-  for item in $releaseFolders; do
-    file=$(wget -O - -q "${baseurl}${item}" | grep "${ISO}")
-    if [[ $file != "" ]]; then
-      URL="${baseurl}${item}/${ISO}"
-      break
-    fi
-  done
-  web_get "${URL}" "${VM_PATH}"
-  check_hash "${ISO}" "${HASH}"
-  make_vm_config "${ISO}"
-}
-
 function get_alma() {
     local EDITION=""
     local HASH=""
@@ -831,6 +804,31 @@ function get_alpine() {
     ISO="alpine-virt-${VERSION}-x86_64.iso"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     HASH=$(wget -qO- "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_android() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local JSON_ALL=""
+    local JSON_REL=""
+    local URL="https://mirrors.gigenet.com/OSDN/android-x86"
+
+    JSON_ALL=$(wget -q -O- "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =" | cut -d'=' -f2-)
+    JSON_REL=$(echo "${JSON_ALL}" | jq --arg ver "${OS}-${EDITION}-${RELEASE}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+    ISO=$(echo "${JSON_REL}" | jq -r .n)
+    HASH=$(echo "${JSON_REL}" | jq -r .hash.sha256)
+
+    # Traverse the directories to find the .iso location
+    for DIR in $(wget -q -O- ${URL} | grep -o -E '[0-9]{5}' | sort -ur); do
+        if wget -q -O- "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
+            URL="${URL}/${DIR}"
+            break
+        fi
+    done
+    web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
 }
