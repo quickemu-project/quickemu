@@ -215,6 +215,7 @@ Other Operating Systems
 -   `cachyos` (CachyOS)
 -   `debian` (Debian)
 -   `devuan` (Devuan)
+    `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
