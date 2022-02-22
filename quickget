@@ -921,12 +921,9 @@ function get_elementary() {
     local ISO=""
     local ISOTAG="20211218-rc"
     local URL=""
-    local B66tim=""
 
-    B66tim=$(date +%s | base64)
     ISO="elementaryos-${RELEASE}-stable.${ISOTAG}.iso"
-    # TODO:  derive region from geoIP
-    URL="https://ams3.dl.elementary.io/download/${B66tim}=/${ISO}"
+    URL="https://ams3.dl.elementary.io/download/$(date +%s | base64)=/${ISO}"
     web_get "${URL}" "${VM_PATH}"
     make_vm_config "${ISO}"
 }
