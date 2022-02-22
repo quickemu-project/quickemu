@@ -427,9 +427,6 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-Other Guests
-------------
-
 All the options
 ===============
 
