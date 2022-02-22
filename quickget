@@ -1947,9 +1947,9 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "list_json" ]; then
         list_json
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-      WHERE=$(dirname "${BASH_SOURCE[0]}")
-      "${WHERE}/quickemu" --version
-      exit 0
+        WHERE=$(dirname "${BASH_SOURCE[0]}")
+        "${WHERE}/quickemu" --version
+        exit 0
     fi
 else
     echo "ERROR! You must specify an operating system."
@@ -1959,9 +1959,9 @@ else
 fi
 
 if [[ ! $(os_support) =~ ${OS} ]]; then
-  echo -e "ERROR! ${OS} is not a supported OS.\n"
-  os_support
-  exit 1
+    echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support
+    exit 1
 fi
 
 if [ -n "${2}" ]; then
