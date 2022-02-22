@@ -15,7 +15,7 @@ quickget - download and prepare materials for building a quickemu VM
 SYNOPSIS
 ========
 
-**quickget** \[*os*\] \[*release*\] \[*variant*\] \| \[*OPTION*\]\*
+**quickget** \[*os*\] \[*release*\] \[*edition*\] \| \[*OPTION*\]\*
 
 DESCRIPTION
 ===========
@@ -33,10 +33,10 @@ OPTIONS
 :   provide a csv list of all supported guest OSes, versions and
     variants.
 
-**\[OS\] \[Release\] \[Variant\]**
-:   specify the OS and release (and optional variant) if insufficient
+**\[OS\] \[Release\] \[Edition\]**
+:   specify the OS and release (and optional edition) if insufficient
     input is provided a list of missing options will be reported and the
-    script will exit. Variants may not apply and will be defaulted if
+    script will exit. Editions may not apply and will be defaulted if
     not provided.
 
 NOTES
