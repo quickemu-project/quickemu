@@ -90,58 +90,46 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Linux Guests
-------------------
+Other Operating Systems
+-----------------------
 
 `quickget` also supports:
 
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
+-   `android` (Android x86)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `cachyos` (CachyOS)
 -   `debian` (Debian)
+-   `devuan` (Devuan)
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
+-   `freebsd` (FreeBSD)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
+-   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
--   `linuxmint-cinnamon` (Linux Mint Cinnamon)
--   `linuxmint-mate` (Linux Mint MATE)
--   `linuxmint-xfce` (Linux Mint XFCE)
--   `manjaro-budgie` (Manjaro Budgie)
--   `manjaro-cinnamon` (Manjaro Cinnamon)
--   `manjaro-deepin` (Manjaro Deepin)
--   `manjaro-gnome` (Manjaro Gnome)
--   `manjaro-i3` (Manjaro i3)
--   `manjaro-kde` (Manjaro KDE)
--   `manjaro-mate` (Manjaro MATE)
--   `manjaro-xfce` (Manjaro XFCE)
--   `mxlinux-fluxbox` (MX Linux Fluxbox)
--   `mxlinux-kde` (MX Linux KDE)
--   `mxlinux-xfce` (MX Linux XFCE)
--   `nixos-gnome` (NixOS Gnome)
--   `nixos-minimal` (NixOS Minimal)
--   `nixos-plasma5` (NixOS KDE)
+-   `linuxmint` (Linux Mint)
+-   `manjaro` (Manjaro)
+-   `mxlinux` (MX Linux)
+-   `netboot` (netboot.xyz)
+-   `netbsd` (NetBSD)
+-   `nixos` (NixOS)
+-   `openbsd` (OpenBSD)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
+-   `slackware` (Slackware Linux)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
-
-### BSD Guest Support
-
-`quickget` also supports:
-
--   `freebsd` (FreeBSD)
--   `openbsd` (OpenBSD)
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -299,44 +287,8 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-BSD Guests
-----------
-
-`quickemu` supports FreeBSD and OpenBSD.
-
-``` {.bash}
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
-```
-
 Other Guests
 ------------
-
--   `android` (Android x86)
-
-Haiku Guests
-------------
-
-`quickemu` supports [Haiku](https://www.haiku-os.org/).
-
-``` {.bash}
-quickget quickget haiku r1beta3-x86_64
-quickemu --vm haiku-r1beta3-x86_64.conf
-```
-
-At the moment the only way to share files between host and a Haiku guest
-is by using SSH (having a SSH server running on the host):
-
-On guest:
-
-``` {.bash}
-scp example.txt user@host-local-ip:/home/user # sending a file from guest to host
-scp user@host-local-ip:/home/user/example.txt . # receiving a file from host to guest
-```
-
-`quickget` cannot automatically download and create virtual machines for
-Haiku nightly versions, but they work if the ISO and configuration are
-set up manually.
 
 AUTHORS
 =======

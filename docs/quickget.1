@@ -93,13 +93,15 @@ All the official Ubuntu flavours are supported, just replace
 \f[C]ubuntu\f[R] (Ubuntu)
 .IP \[bu] 2
 \f[C]xubuntu\f[R] (Xubuntu)
-.SS Other Linux Guests
+.SS Other Operating Systems
 .PP
 \f[C]quickget\f[R] also supports:
 .IP \[bu] 2
 \f[C]alma\f[R] (Alma Linux)
 .IP \[bu] 2
 \f[C]alpine\f[R] (Alpine Linux)
+.IP \[bu] 2
+\f[C]android\f[R] (Android x86)
 .IP \[bu] 2
 \f[C]archlinux\f[R] (Arch Linux)
 .IP \[bu] 2
@@ -109,13 +111,19 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[C]debian\f[R] (Debian)
 .IP \[bu] 2
+\f[C]devuan\f[R] (Devuan)
+.IP \[bu] 2
 \f[C]elementary\f[R] (elementary OS)
 .IP \[bu] 2
 \f[C]fedora\f[R] (Fedora)
 .IP \[bu] 2
+\f[C]freebsd\f[R] (FreeBSD)
+.IP \[bu] 2
 \f[C]garuda\f[R] (Garuda Linux)
 .IP \[bu] 2
 \f[C]gentoo\f[R] (Gentoo)
+.IP \[bu] 2
+\f[C]ghostbsd\f[R] (GhostBSD)
 .IP \[bu] 2
 \f[C]haiku\f[R] (Haiku)
 .IP \[bu] 2
@@ -125,39 +133,19 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[C]kolibrios\f[R] (KolibriOS)
 .IP \[bu] 2
-\f[C]linuxmint-cinnamon\f[R] (Linux Mint Cinnamon)
+\f[C]linuxmint\f[R] (Linux Mint)
 .IP \[bu] 2
-\f[C]linuxmint-mate\f[R] (Linux Mint MATE)
+\f[C]manjaro\f[R] (Manjaro)
 .IP \[bu] 2
-\f[C]linuxmint-xfce\f[R] (Linux Mint XFCE)
+\f[C]mxlinux\f[R] (MX Linux)
 .IP \[bu] 2
-\f[C]manjaro-budgie\f[R] (Manjaro Budgie)
+\f[C]netboot\f[R] (netboot.xyz)
 .IP \[bu] 2
-\f[C]manjaro-cinnamon\f[R] (Manjaro Cinnamon)
+\f[C]netbsd\f[R] (NetBSD)
 .IP \[bu] 2
-\f[C]manjaro-deepin\f[R] (Manjaro Deepin)
+\f[C]nixos\f[R] (NixOS)
 .IP \[bu] 2
-\f[C]manjaro-gnome\f[R] (Manjaro Gnome)
-.IP \[bu] 2
-\f[C]manjaro-i3\f[R] (Manjaro i3)
-.IP \[bu] 2
-\f[C]manjaro-kde\f[R] (Manjaro KDE)
-.IP \[bu] 2
-\f[C]manjaro-mate\f[R] (Manjaro MATE)
-.IP \[bu] 2
-\f[C]manjaro-xfce\f[R] (Manjaro XFCE)
-.IP \[bu] 2
-\f[C]mxlinux-fluxbox\f[R] (MX Linux Fluxbox)
-.IP \[bu] 2
-\f[C]mxlinux-kde\f[R] (MX Linux KDE)
-.IP \[bu] 2
-\f[C]mxlinux-xfce\f[R] (MX Linux XFCE)
-.IP \[bu] 2
-\f[C]nixos-gnome\f[R] (NixOS Gnome)
-.IP \[bu] 2
-\f[C]nixos-minimal\f[R] (NixOS Minimal)
-.IP \[bu] 2
-\f[C]nixos-plasma5\f[R] (NixOS KDE)
+\f[C]openbsd\f[R] (OpenBSD)
 .IP \[bu] 2
 \f[C]opensuse\f[R] (openSUSE)
 .IP \[bu] 2
@@ -169,6 +157,8 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[C]rockylinux\f[R] (Rocky Linux)
 .IP \[bu] 2
+\f[C]slackware\f[R] (Slackware Linux)
+.IP \[bu] 2
 \f[C]solus\f[R] (Solus)
 .IP \[bu] 2
 \f[C]tails\f[R] (Tails)
@@ -176,13 +166,6 @@ All the official Ubuntu flavours are supported, just replace
 \f[C]void\f[R] (Void Linux)
 .IP \[bu] 2
 \f[C]zorin\f[R] (Zorin OS)
-.SS BSD Guest Support
-.PP
-\f[C]quickget\f[R] also supports:
-.IP \[bu] 2
-\f[C]freebsd\f[R] (FreeBSD)
-.IP \[bu] 2
-\f[C]openbsd\f[R] (OpenBSD)
 .PP
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -417,45 +400,7 @@ drivers.
 .IP \[bu] 2
 \f[C]tpm=\[dq]on\[dq]\f[R] instructs \f[C]quickemu\f[R] to create a
 software emulated TPM device using \f[C]swtpm\f[R].
-.SS BSD Guests
-.PP
-\f[C]quickemu\f[R] supports FreeBSD and OpenBSD.
-.IP
-.nf
-\f[C]
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
-\f[R]
-.fi
 .SS Other Guests
-.IP \[bu] 2
-\f[C]android\f[R] (Android x86)
-.SS Haiku Guests
-.PP
-\f[C]quickemu\f[R] supports Haiku (https://www.haiku-os.org/).
-.IP
-.nf
-\f[C]
-quickget quickget haiku r1beta3-x86_64
-quickemu --vm haiku-r1beta3-x86_64.conf
-\f[R]
-.fi
-.PP
-At the moment the only way to share files between host and a Haiku guest
-is by using SSH (having a SSH server running on the host):
-.PP
-On guest:
-.IP
-.nf
-\f[C]
-scp example.txt user\[at]host-local-ip:/home/user # sending a file from guest to host
-scp user\[at]host-local-ip:/home/user/example.txt . # receiving a file from host to guest
-\f[R]
-.fi
-.PP
-\f[C]quickget\f[R] cannot automatically download and create virtual
-machines for Haiku nightly versions, but they work if the ISO and
-configuration are set up manually.
 .SH AUTHORS
 .PP
 Written by Martin Wimpress.

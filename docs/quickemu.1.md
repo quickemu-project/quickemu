@@ -97,58 +97,26 @@ Features
 --------
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
-
 -   **Windows** 8.1, 10 and 11 including TPM 2.0
-
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
-
--   [Fedora](https://getfedora.org/) & openSUSE
-    ([Leap](https://get.opensuse.org/leap/),
-    [Tumbleweed](https://get.opensuse.org/tumbleweed/),
-    [MicroOS](https://microos.opensuse.org/))
-
--   [Linux Mint](https://linuxmint.com/) (Cinnamon, MATE, and XFCE),
-    [elementary OS](https://elementary.io/),
-    [Pop!\_OS](https://pop.system76.com/)
-
--   [Arch Linux](https://www.archlinux.org/),
-    [Kali](https://www.kali.org/),[Garuda](https://garudalinux.org/),
-    [ZorinOS](https://zorin.com/os/) & [NixOS](https://nixos.org/)
-
--   [Regolith Linux](https://regolith-linux.org/) (Release 1.6 and
-    latest 2.0.0 pre-release )
-
--   [FreeBSD](https://www.freebsd.org/) &
-    [OpenBSD](https://www.openbsd.org/)
-
+-   **Over 360 operating system editions are supported!**
 -   Full SPICE support including host/guest clipboard sharing
-
 -   VirtIO-webdavd file sharing for Linux and Windows guests
-
 -   VirtIO-9p file sharing for Linux and macOS guests
-
 -   [QEMU Guest Agent
     support](https://wiki.qemu.org/Features/GuestAgent); provides access
     to a system-level agent via standard QMP commands
-
 -   Samba file sharing for Linux, macOS and Windows guests (*if `smbd`
     is installed on the host*)
-
 -   VirGL acceleration
-
 -   USB device pass-through
-
 -   Smartcard pass-through
-
 -   Automatic SSH port forwarding to guests
-
 -   Network port forwarding
-
 -   Full duplex audio
-
+-   Braille support
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
-
 -   Graphical user interfaces available
 
 Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/)
@@ -262,58 +230,46 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Linux Guests
-------------------
+Other Operating Systems
+-----------------------
 
 `quickget` also supports:
 
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
+-   `android` (Android x86)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `cachyos` (CachyOS)
 -   `debian` (Debian)
+-   `devuan` (Devuan)
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
+-   `freebsd` (FreeBSD)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
+-   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
--   `linuxmint-cinnamon` (Linux Mint Cinnamon)
--   `linuxmint-mate` (Linux Mint MATE)
--   `linuxmint-xfce` (Linux Mint XFCE)
--   `manjaro-budgie` (Manjaro Budgie)
--   `manjaro-cinnamon` (Manjaro Cinnamon)
--   `manjaro-deepin` (Manjaro Deepin)
--   `manjaro-gnome` (Manjaro Gnome)
--   `manjaro-i3` (Manjaro i3)
--   `manjaro-kde` (Manjaro KDE)
--   `manjaro-mate` (Manjaro MATE)
--   `manjaro-xfce` (Manjaro XFCE)
--   `mxlinux-fluxbox` (MX Linux Fluxbox)
--   `mxlinux-kde` (MX Linux KDE)
--   `mxlinux-xfce` (MX Linux XFCE)
--   `nixos-gnome` (NixOS Gnome)
--   `nixos-minimal` (NixOS Minimal)
--   `nixos-plasma5` (NixOS KDE)
+-   `linuxmint` (Linux Mint)
+-   `manjaro` (Manjaro)
+-   `mxlinux` (MX Linux)
+-   `netboot` (netboot.xyz)
+-   `netbsd` (NetBSD)
+-   `nixos` (NixOS)
+-   `openbsd` (OpenBSD)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
+-   `slackware` (Slackware Linux)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
-
-### BSD Guest Support
-
-`quickget` also supports:
-
--   `freebsd` (FreeBSD)
--   `openbsd` (OpenBSD)
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -471,44 +427,8 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-BSD Guests
-----------
-
-`quickemu` supports FreeBSD and OpenBSD.
-
-``` {.bash}
-quickget freebsd 13_0
-quickemu --vm freebsd-13_0.conf
-```
-
 Other Guests
 ------------
-
--   `android` (Android x86)
-
-Haiku Guests
-------------
-
-`quickemu` supports [Haiku](https://www.haiku-os.org/).
-
-``` {.bash}
-quickget quickget haiku r1beta3-x86_64
-quickemu --vm haiku-r1beta3-x86_64.conf
-```
-
-At the moment the only way to share files between host and a Haiku guest
-is by using SSH (having a SSH server running on the host):
-
-On guest:
-
-``` {.bash}
-scp example.txt user@host-local-ip:/home/user # sending a file from guest to host
-scp user@host-local-ip:/home/user/example.txt . # receiving a file from host to guest
-```
-
-`quickget` cannot automatically download and create virtual machines for
-Haiku nightly versions, but they work if the ISO and configuration are
-set up manually.
 
 All the options
 ===============
@@ -521,7 +441,7 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
-  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )
+  --braille               : Enable braille support. Requires SDL.
   --delete-disk           : Delete the disk image and EFI variables
   --delete-vm             : Delete the entire VM and it's configuration
   --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'
