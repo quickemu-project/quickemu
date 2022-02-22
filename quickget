@@ -1768,7 +1768,7 @@ function get_windows() {
     local ARCH="x64"
     local INDEX=0
     local LANG_CODE="en"
-    local LANG_EDITION=""
+    local LANG_EDITION="${1}"
     local LATEST_WINDOWS_VERSION=""
     local WINDOWS_NAME=""
     local VERSION_ID=""
@@ -1779,8 +1779,6 @@ function get_windows() {
     local DOWNLOAD_INFO=""
     local DOWNLOAD_ID=""
     local DOWNLOAD_URL=""
-
-    LANG_EDITION="${1}"
 
     # Ignore the most recent Windows 10 release for now.
     case ${RELEASE} in
