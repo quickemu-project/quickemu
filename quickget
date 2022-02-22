@@ -216,17 +216,17 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    echo latest \
-    3.12 \
+    echo 3.12 \
     3.13 \
     3.14 \
-    3.15
+    3.15 \
+    latest
 }
 
 function releases_android() {
-    echo 9.0 \
+    echo 7.1 \
     8.1 \
-    7.1
+    9.0
 }
 
 function editions_android() {
@@ -305,8 +305,7 @@ function releases_freebsd(){
 }
 
 function releases_garuda() {
-    echo 220131 \
-    220220
+    echo 220131
 }
 
 function editions_garuda() {
@@ -351,8 +350,8 @@ function editions_haiku() {
 }
 
 function releases_kali() {
-    echo latest \
-    weekly
+    echo current \
+    kali-weekly
 }
 
 function releases_kdeneon() {
@@ -410,9 +409,9 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-  echo 9.2 \
+  echo 9.0 \
   9.1 \
-  9.0
+  9.2
 }
 
 function releases_nixos(){
@@ -443,13 +442,13 @@ function releases_opensuse(){
 }
 
 function releases_oraclelinux() {
-    echo 8.5 \
-    8.4 \
-    8.3 \
-    8.2 \
-    7.9 \
+    echo 7.7 \
     7.8 \
-    7.7
+    7.9 \
+    8.2 \
+    8.3 \
+    8.4 \
+    8.5
 }
 
 function releases_popos() {
@@ -473,12 +472,9 @@ function editions_regolith() {
 }
 
 function releases_rockylinux() {
-    echo 8.5 \
+    echo 8.3 \
     8.4 \
-    8.3 \
-    8.2 \
-    8.1 \
-    8.0
+    8.5
 }
 
 function editions_rockylinux() {
@@ -488,8 +484,7 @@ function editions_rockylinux() {
 
 function releases_slackware() {
     echo 14.2 \
-    15.0 \
-    current
+    15.0
 }
 
 function releases_solus() {
