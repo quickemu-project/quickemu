@@ -514,10 +514,10 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo bionic \
-    focal \
-    hirsute \
-    impish \
+    echo 18.04 \
+    20.04 \
+    21.04 \
+    21.10 \
     devel \
     canary
 }
@@ -1453,7 +1453,7 @@ function get_tails() {
     RELEASE_JSON="$(wget -q -O- "${RELEASE_JSON_URL}")"
     URL=$(echo "${RELEASE_JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${RELEASE_JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
-    ISO=$(echo "${URL}" | sed -e "s/.*\/\([^\/]*\)$/\1/")
+    ISO="${URL##*/}"
     web_get "${URL}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
@@ -1947,9 +1947,9 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "list_json" ]; then
         list_json
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-      WHERE=$(dirname "${BASH_SOURCE[0]}")
-      "${WHERE}/quickemu" --version
-      exit 0
+        WHERE=$(dirname "${BASH_SOURCE[0]}")
+        "${WHERE}/quickemu" --version
+        exit 0
     fi
 else
     echo "ERROR! You must specify an operating system."
@@ -1959,9 +1959,9 @@ else
 fi
 
 if [[ ! $(os_support) =~ ${OS} ]]; then
-  echo -e "ERROR! ${OS} is not a supported OS.\n"
-  os_support
-  exit 1
+    echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support
+    exit 1
 fi
 
 if [ -n "${2}" ]; then
