@@ -454,7 +454,6 @@ function releases_oraclelinux() {
 
 function releases_popos() {
     echo 20.04 \
-    21.04 \
     21.10
 }
 
@@ -465,7 +464,6 @@ function editions_popos() {
 
 function releases_regolith() {
     echo focal \
-    hirsute \
     impish
 }
 
@@ -512,7 +510,6 @@ function releases_tails() {
 function releases_ubuntu() {
     echo 18.04 \
     20.04 \
-    21.04 \
     21.10 \
     devel \
     canary
