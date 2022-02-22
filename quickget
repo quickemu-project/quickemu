@@ -53,6 +53,7 @@ function pretty_name() {
     linuxmint)          PRETTY_NAME="Linux Mint";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
+    netbsd)             PRETTY_NAME="NetBSD";;
     nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
@@ -184,6 +185,7 @@ function os_support() {
     manjaro \
     mxlinux \
     netboot \
+    netbsd \
     nixos \
     lubuntu \
     macos \
@@ -352,7 +354,6 @@ function editions_haiku() {
          x86_gcc2h
 }
 
-
 function releases_kali() {
     echo latest \
     weekly
@@ -410,6 +411,12 @@ function releases_manjaro() {
 
 function releases_netboot() {
   echo latest
+}
+
+function releases_netbsd() {
+  echo 9.2 \
+  9.1 \
+  9.0
 }
 
 function releases_nixos(){
@@ -700,6 +707,9 @@ function make_vm_config() {
         macos)
             GUEST="macos"
             IMAGE_TYPE="img";;
+        netbsd)
+            GUEST="netbsd"
+            IMAGE_TYPE="iso";;
         openbsd)
             GUEST="openbsd"
             IMAGE_TYPE="iso";;
@@ -730,8 +740,13 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|cachyos|garuda|oraclelinux|rockylinux|void|zorin) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          haiku|kolibrios|openbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          kolibrios)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+            echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
           macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
         esac
 
@@ -978,7 +993,7 @@ function get_garuda() {
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
-    make_vm_config "${OS}-${RELEASE}.iso"
+    make_vm_config "${ISO}"
 }
 
 function get_gentoo() {
@@ -1219,6 +1234,19 @@ function get_netboot() {
     local URL="https://boot.netboot.xyz/ipxe"
 
     HASH=$(wget -q -O- "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_netbsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images/"
+    ISO="NetBSD-${RELEASE}-amd64.iso"
+    HASH=$(wget -q -O- "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
