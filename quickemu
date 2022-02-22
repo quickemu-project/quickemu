@@ -328,8 +328,8 @@ function vm_boot() {
   fi
   echo ", ${RAM_VM} RAM"
 
-  if [ "${RAM_VM//G/}" -lt 4 ]; then
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+  if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+    if [ "${RAM_VM//G/}" -lt 4 ]; then
         echo "ERROR! You have insufficient RAM to run ${guest_os} in a VM"
         exit 1
     fi
