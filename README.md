@@ -242,7 +242,7 @@ Other Operating Systems
 -   `popos` (Pop!\_OS)
 -   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
--   `slackware` (Slackware Linux)
+-   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `void` (Void Linux)
@@ -403,9 +403,6 @@ tpm="on"
 -   `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
-
-Other Guests
-------------
 
 SPICE
 =====
