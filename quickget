@@ -1931,7 +1931,12 @@ if [ -n "${2}" ]; then
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release releases_"${OS}"
         get_"${OS}" "${EDITION}"
+    elif [ "${OS}" == "macos" ]; then
+        # macOS doesn't use create_vm()
+        validate_release releases_macos
+        get_macos
     elif [[ "${OS}" == *"ubuntu"* ]]; then
+        # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
         get_ubuntu
     elif [ "${OS}" == "windows" ]; then
@@ -1946,6 +1951,7 @@ if [ -n "${2}" ]; then
                 exit 1
             fi
         fi
+        # Windows doesn't use create_vm()
         validate_release releases_windows
         get_windows "${LANG}"
     else
