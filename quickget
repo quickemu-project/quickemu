@@ -932,7 +932,7 @@ function get_freebsd() {
     local URL=""
 
     URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
-    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-disc1.iso"
     HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | cut -d' ' -f4)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
