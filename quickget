@@ -1845,6 +1845,22 @@ function get_windows() {
     make_vm_config "${FILE_NAME}" "virtio-win.iso"
 }
 
+create_vm() {
+    # shellcheck disable=SC2206
+    local URL_HASH=(${1// / })
+    local URL="${URL_HASH[0]}"
+    local HASH="${URL_HASH[1]}"
+    local ISO="${URL##*/}"
+    #echo "${URL}"
+    #echo "${ISO}"
+    #echo "${HASH}"
+    web_get "${URL}" "${VM_PATH}"
+    if [ -n "${HASH}" ]; then
+      check_hash "${ISO}" "${HASH}"
+    fi
+    make_vm_config "${ISO}"
+}
+
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4))
