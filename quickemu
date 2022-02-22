@@ -464,14 +464,19 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    freebsd|linux|openbsd)
+    *bsd|haiku|linux)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
-      if [ "${guest_os}" == "freebsd" ]; then
+
+      if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
         MOUSE="usb-mouse"
+      elif [ "${guest_os}" == "haiku" ]; then
+        MACHINE_TYPE="pc"
+        NET_DEVICE="rtl8139"
       fi
+
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
@@ -483,20 +488,8 @@ function vm_boot() {
       fi
       MACHINE_TYPE="pc"
       NET_DEVICE="rtl8139"
-      GUEST_TWEAKS="-boot d"
       if [ -z "${disk_size}" ]; then
         disk_size="256M"
-      fi
-      ;;
-    haiku)
-      CPU="-cpu host,kvm=on"
-      MACHINE_TYPE="pc"
-      NET_DEVICE="rtl8139"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      if [ -z "${disk_size}" ]; then
-        disk_size="32G"
       fi
       ;;
     macos)
@@ -657,7 +650,7 @@ function vm_boot() {
 
   # Setup the appropriate audio device based on the display output
   case ${OUTPUT} in
-    spice|spice-app|none) AUDIO_DEV="spice,id=audio0,out.mixing-engine=off";;
+    spice|spice-app|none) AUDIO_DEV="spice,id=audio0";;
     *) AUDIO_DEV="pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}";;
   esac
 
@@ -904,8 +897,9 @@ function vm_boot() {
          -monitor none
          -serial mon:stdio)
 
-  if [[ "${ACCESSIBLE}" == "braille" ]] || [[ "${ACCESSIBLE}" == "brl" ]]; then
-    # shellcheck disable=SC2054
+  # FIXME: Check for device availability. qemu will fail to start otherwise
+  if [ -n "${BRAILLE}" ]; then
+      # shellcheck disable=SC2054
       args+=(-chardev braille,id=brltty
              -device usb-braille,id=usbbrl,chardev=brltty)
   fi
@@ -1056,7 +1050,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --accessible            : Select accessible facilitation. 'braille' (default - currently requires --display sdl )"
+  echo "  --braille               : Enable braille support. Requires SDL."
   echo "  --delete-disk           : Delete the disk image and EFI variables"
   echo "  --delete-vm             : Delete the entire VM and it's configuration"
   echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
@@ -1073,14 +1067,6 @@ function usage() {
   exit 1
 }
 
-#
-function accessible_param_check() {
-  if [ "${ACCESSIBLE}" != "braille" ] && [ "${ACCESSIBLE}" != "brl" ] ; then
-    echo "ERROR! Requested accessiblility '${ACCESSIBLE}' is not recognised."
-    exit 1
-    # TODO can we check the device/API is available
-  fi
-}
 function display_param_check() {
   if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
@@ -1111,6 +1097,7 @@ tpm="off"
 usb_devices=()
 extra_args=""
 
+BRAILLE=""
 DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
@@ -1132,7 +1119,7 @@ VMPATH=""
 
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="3.11"
+readonly VERSION="3.12"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
@@ -1172,10 +1159,8 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-          -acc|--acc|-accessible|--accessible|-accessibility|--accessibility)
-            ACCESSIBLE="${2}"
-            accessible_param_check
-            shift
+          -braille|--braille)
+            BRAILLE="on"
             shift;;
           -delete|--delete|-delete-disk|--delete-disk)
             DELETE_DISK=1
@@ -1258,7 +1243,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   fi
 
   if [ -z "${OUTPUT}" ]; then
-    if [ -z "${display}" ]; then
+    # Braille support requires SDL. Override OUTPUT if braille was requested.
+    if [ -n "${BRAILLE}" ]; then
+      OUTPUT="sdl"
+    elif [ -z "${display}" ]; then
       OUTPUT="sdl"
     else
       OUTPUT="${display}"
