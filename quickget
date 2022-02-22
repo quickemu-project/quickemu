@@ -889,24 +889,18 @@ function get_debian() {
       EDITION="${1}"
     fi
 
+    case ${RELEASE} in
+      11.2.0)
+        URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      *)
+        URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid";;
+    esac
+
+    ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
+
     if [ "${EDITION}" == "netinst" ]; then
-      case ${RELEASE} in
-        11.2.0)
-          URL="https://cdimage.debian.org/debian-cd/${RELEASE}/amd64/iso-cd";;
-        *)
-          URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}/amd64/iso-cd";;
-      esac
-
-      ISO="debian-${RELEASE}-amd64-${EDITION}.iso"
-    else
-      case ${RELEASE} in
-        11.2.0)
-          URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-        *)
-          URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid";;
-      esac
-
-      ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
+        URL="$(echo ${URL} | sed 's/-live//' | sed 's/hybrid/cd/')"
+        ISO="$(echo ${ISO} | sed 's/-live//')"
     fi
 
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
