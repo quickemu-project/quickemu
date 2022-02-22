@@ -44,6 +44,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
+    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -170,6 +171,7 @@ function os_support() {
     cachyos \
     debian \
     devuan \
+    dragonflybsd \
     elementary \
     fedora \
     freebsd \
@@ -277,6 +279,10 @@ function editions_debian() {
 function releases_devuan() {
     echo beowulf \
     chimaera
+}
+
+function releases_dragonflybsd() {
+    echo 6.2.1
 }
 
 function releases_elementary() {
@@ -695,6 +701,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        dragonflybsd)
+            GUEST="dragonflybsd"
+            IMAGE_TYPE="iso";;
         freebsd|ghostbsd)
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -741,7 +750,7 @@ EOF
         # OS specific tweaks
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           kolibrios)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
@@ -914,6 +923,19 @@ function get_devuan() {
     URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
     ISO="devuan_${RELEASE}_${VERSION}_amd64_desktop-live.iso"
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
+function get_dragonflybsd() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    URL="http://mirror-master.dragonflybsd.org/iso-images"
+    ISO="dfly-x86_64-${RELEASE}_REL.iso"
+    HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
     make_vm_config "${ISO}"
