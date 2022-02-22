@@ -514,10 +514,10 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo bionic \
-    focal \
-    hirsute \
-    impish \
+    echo 18.04 \
+    20.04 \
+    21.04 \
+    21.10 \
     devel \
     canary
 }
