@@ -771,14 +771,10 @@ function get_devuan() {
 }
 
 function get_elementary() {
-    local ISO=""
-    local ISOTAG="20211218-rc"
-    local URL=""
-
-    ISO="elementaryos-${RELEASE}-stable.${ISOTAG}.iso"
-    URL="https://ams3.dl.elementary.io/download/$(date +%s | base64)=/${ISO}"
-    web_get "${URL}" "${VM_PATH}"
-    make_vm_config "${ISO}"
+    local HASH=""
+    local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
+    local URL="https://ams3.dl.elementary.io/download"
+    echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
 }
 
 function get_fedora() {
