@@ -12,16 +12,11 @@ export LC_ALL=C
 #     function get_newos() {
 #         local EDITION="${1:-}"
 #         local HASH=""
-#         local ISO=""
-#         local URL=""
+#         local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
+#         local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
 #
-#         URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
-#         ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
-#         web_get "${URL}/${ISO}" "${VM_PATH}"
-#         web_get "${URL}/SHA256SUMS" "${VM_PATH}"
-#         HASH=$(cut -d' ' -f1 < "${VM_PATH}/SHA256SUMS")
-#         check_hash "${ISO}" "${HASH}"
-#         make_vm_config "${ISO}"
+#         HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
+#         echo "${URL}/${ISO} ${HASH}"
 #     }
 
 function cleanup() {
@@ -1835,8 +1830,8 @@ if [ -n "${2}" ]; then
         fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
-        validate_release releases_"${OS}"
-        get_"${OS}" "${EDITION}"
+        validate_release "releases_${OS}"
+        create_vm "$("get_${OS}" "${EDITION}")"
     elif [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
@@ -1861,8 +1856,8 @@ if [ -n "${2}" ]; then
         validate_release releases_windows
         get_windows "${LANG}"
     else
-        validate_release releases_"${OS}"
-        get_"${OS}"
+        validate_release "releases_${OS}"
+        create_vm "$("get_${OS}")"
     fi
 else
     echo "ERROR! You must specify a release."
