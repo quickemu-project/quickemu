@@ -242,7 +242,7 @@ function releases_debian() {
 }
 
 function editions_debian() {
-    echo standard cinnamon gnome kde lxde lxqt mate xfce
+    echo standard cinnamon gnome kde lxde lxqt mate xfce netinst
 }
 
 function releases_devuan() {
@@ -757,6 +757,12 @@ function get_debian() {
       11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
+
+    if [ "${EDITION}" == "netinst" ]; then
+        URL="$(echo "${URL}" | sed 's/-live//' | sed 's/hybrid/cd/')"
+        ISO="$(echo "${ISO}" | sed 's/-live//')"
+    fi
+
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
