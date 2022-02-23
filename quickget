@@ -738,12 +738,9 @@ function get_arcolinux() {
 
 function get_cachyos() {
     local HASH=""
-    local ISO=""
+    local ISO="cachyos-${RELEASE}-x86_64.iso"
     local URL="https://mirror.cachyos.org/ISO"
-
-    ISO="cachyos-${RELEASE}-x86_64.iso"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_debian() {
