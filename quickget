@@ -1030,24 +1030,19 @@ function get_opensuse() {
 
     if [ "${RELEASE}" == "tumbleweed" ]; then
         ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+        URL="https://download.opensuse.org/tumbleweed/iso"
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/tumbleweed/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+        URL="https://download.opensuse.org/tumbleweed/iso"
     elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
-        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     else
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
-        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso/${ISO}"
-        HASH=$(wget -q -O- "${URL}.sha256" | cut -d' ' -f1)
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     fi
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_oraclelinux() {
