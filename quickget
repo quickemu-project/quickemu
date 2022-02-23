@@ -792,11 +792,8 @@ function get_fedora() {
 
     JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
-    ISO="${URL##*/}"
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL} ${HASH}"
 }
 
 function get_freebsd() {
