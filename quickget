@@ -674,15 +674,10 @@ EOF
 function get_alma() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local URL=""
-
-    URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
-    ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
-    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep \("${ISO}" | cut -d'\' -f4)"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
+    local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
+    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_alpine() {
