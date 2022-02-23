@@ -833,19 +833,15 @@ function get_gentoo() {
 function get_ghostbsd() {
     local EDITION="${1:-}"
     local ISO=""
-    local URL=""
+    local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
     local HASH=""
 
     case ${EDITION} in
       mate) ISO="GhostBSD-${RELEASE}.iso";;
       xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
     esac
-
-    URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f3)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_haiku() {
