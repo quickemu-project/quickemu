@@ -1065,13 +1065,9 @@ function get_popos() {
     local HASH=""
     local ISO=""
     local URL=""
-
     URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
-    ISO="${URL##*/}"
     HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL} ${HASH}"
 }
 
 function get_regolith() {
