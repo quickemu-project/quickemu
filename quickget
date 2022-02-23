@@ -1179,9 +1179,7 @@ function get_void() {
         xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_zorin() {
