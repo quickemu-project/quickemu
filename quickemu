@@ -1300,3 +1300,5 @@ if [ ${SHORTCUT} -eq 1 ]; then
 fi
 
 vm_boot
+
+# vim:tabstop=2:shiftwidth=2:expandtab
