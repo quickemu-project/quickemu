@@ -760,20 +760,14 @@ function get_debian() {
 function get_devuan() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local VERSION=""
+    local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
 
     case ${RELEASE} in
-      beowulf) VERSION="3.1.1";;
-      chimaera) VERSION="4.0.0";;
+      beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
+      chimaera) ISO="devuan_${RELEASE}_4.0.0_amd64_desktop-live.iso";;
     esac
-
-    URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
-    ISO="devuan_${RELEASE}_${VERSION}_amd64_desktop-live.iso"
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_elementary() {
