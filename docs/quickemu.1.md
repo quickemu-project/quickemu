@@ -31,6 +31,9 @@ OPTIONS
 
 You can also pass optional parameters
 
+**--braille**
+:   Enable braille support. Requires SDL.
+
 **--delete**
 :   Delete the disk image.
 
