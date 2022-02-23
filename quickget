@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
+    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -54,7 +55,6 @@ function pretty_name() {
     popos)              PRETTY_NAME="Pop!_OS";;
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slackware)          PRETTY_NAME="Slackware Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -162,6 +162,7 @@ function os_support() {
     cachyos \
     debian \
     devuan \
+    dragonflybsd \
     elementary \
     fedora \
     freebsd \
@@ -242,11 +243,15 @@ function releases_debian() {
 }
 
 function editions_debian() {
-    echo standard cinnamon gnome kde lxde lxqt mate xfce
+    echo standard cinnamon gnome kde lxde lxqt mate xfce netinst
 }
 
 function releases_devuan() {
     echo beowulf chimaera
+}
+
+function releases_dragonflybsd() {
+    echo 6.2.1
 }
 
 function releases_elementary() {
@@ -272,6 +277,10 @@ function editions_fedora() {
 
 function releases_freebsd(){
     echo 12.2 12.3 13.0
+}
+
+function editions_freebsd(){
+    echo disc1 dvd1
 }
 
 function releases_garuda() {
@@ -597,6 +606,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        dragonflybsd)
+            GUEST="dragonflybsd"
+            IMAGE_TYPE="iso";;
         freebsd|ghostbsd)
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -643,7 +655,7 @@ EOF
         # OS specific tweaks
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           kolibrios)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
@@ -753,6 +765,12 @@ function get_debian() {
       11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
+
+    if [ "${EDITION}" == "netinst" ]; then
+        URL="$(echo "${URL}" | sed 's/-live//' | sed 's/hybrid/cd/')"
+        ISO="$(echo "${ISO}" | sed 's/-live//')"
+    fi
+
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -767,6 +785,15 @@ function get_devuan() {
       chimaera) ISO="devuan_${RELEASE}_4.0.0_amd64_desktop-live.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_dragonflybsd() {
+    local HASH=""
+    local ISO="dfly-x86_64-${RELEASE}_REL.iso"
+    local URL="http://mirror-master.dragonflybsd.org/iso-images"
+
+    HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1704,3 +1731,5 @@ else
     esac
     exit 1
 fi
+
+# vim:tabstop=4:shiftwidth=4:expandtab
