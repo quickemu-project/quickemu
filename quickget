@@ -884,15 +884,11 @@ function get_kolibrios() {
 function get_linuxmint() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
+    local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
 
-    URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
-    ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
-    HASH=$(wget -q -O- "${URL}/${RELEASE}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_macos() {
