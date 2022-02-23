@@ -960,26 +960,19 @@ function get_macos() {
 }
 
 function get_manjaro() {
-    local BRANCH=""
     local HASH=""
     local ISO=""
-    local KEY_ISO="Download_x64 ="
-    local KEY_HASH="Download_x64_Checksum ="
     local MANIFESTURL=""
     local URL=""
 
     case ${RELEASE} in
-      gnome|kde|xfce) BRANCH="official";;
-      budgie|cinnamon|deepin|i3|mate) BRANCH="community";;
+      gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md";;
+      budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md";;
     esac
 
-    MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/${BRANCH}/${RELEASE}.md"
-    URL="$(wget -qO- "${MANIFESTURL}" | grep "${KEY_ISO}" | cut -d'"' -f2)"
-    ISO="${URL##*/}"
-    HASH=$(wget -qO- "${MANIFESTURL}" | grep "${KEY_HASH}" | cut -d'"' -f2)
-    web_get "${URL}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    URL="$(wget -qO- "${MANIFESTURL}" | grep "Download_x64 =" | cut -d'"' -f2)"
+    HASH=$(wget -qO- "${MANIFESTURL}" | grep "Download_x64_Checksum =" | cut -d'"' -f2)
+    echo "${URL} ${HASH}"
 }
 
 function get_mxlinux() {
