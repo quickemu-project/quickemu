@@ -1347,10 +1347,10 @@ function get_void() {
 
     DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
-      glibc)      ISO="void-live-x86_64-${DATE}.iso";;
-      musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
-      xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
-      xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+        glibc)      ISO="void-live-x86_64-${DATE}.iso";;
+        musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
+        xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     web_get "${URL}/${ISO}" "${VM_PATH}"
@@ -1698,7 +1698,6 @@ function get_windows() {
     dbg_windows "${WINDOWS_VERSIONS}"
     LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '"${RELEASE}"'")))['${INDEX}']')
     dbg_windows "${LATEST_WINDOWS_VERSION}"
-
     WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
     dbg_windows "${WINDOWS_NAME}"
     VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
