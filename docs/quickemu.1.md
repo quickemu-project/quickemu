@@ -227,9 +227,9 @@ with your preferred flavour.
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
--   `ubuntu-kylin` (Ubuntu Kylin)
+-   `ubuntukylin` (Ubuntukylin)
 -   `ubuntu-mate` (Ubuntu MATE)
--   `ubuntu-studio` (Ubuntu Studio)
+-   `ubuntustudio` (Ubuntustudio)
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
