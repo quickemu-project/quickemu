@@ -1009,15 +1009,10 @@ function get_netbsd() {
 function get_nixos() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local URL=""
-
-    URL="https://channels.nixos.org/nixos-${RELEASE}"
-    ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
+    local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
+    local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_openbsd() {
