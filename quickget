@@ -806,23 +806,18 @@ function get_freebsd() {
 }
 
 function get_garuda() {
-    local BRANCH=""
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
 
     case ${EDITION} in
-      cinnamon|mate) BRANCH="community";;
-      *) BRANCH="garuda";;
+      cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
+      *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
     esac
-
-    URL="http://mirrors.fossho.st/garuda/iso/${BRANCH}/${EDITION}/${RELEASE}"
-    ISO="${OS}-${EDITION}-linux-zen-${RELEASE}.iso"
+    ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso"
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_gentoo() {
