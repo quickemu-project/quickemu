@@ -274,6 +274,10 @@ function releases_freebsd(){
     echo 12.2 12.3 13.0
 }
 
+function editions_freebsd(){
+    echo disc1 dvd1
+}
+
 function releases_garuda() {
     echo 220131
 }
