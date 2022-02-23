@@ -206,32 +206,23 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.4 \
-    8.5
+    echo 8.4 8.5
 }
 
 function editions_alma() {
-    echo minimal \
-    dvd
+    echo minimal dvd
 }
 
 function releases_alpine() {
-    echo 3.12 \
-    3.13 \
-    3.14 \
-    3.15 \
-    latest
+    echo 3.12 3.13 3.14 3.15 latest
 }
 
 function releases_android() {
-    echo 7.1 \
-    8.1 \
-    9.0
+    echo 7.1 8.1 9.0
 }
 
 function editions_android() {
-    echo x86 \
-    x86_64
+    echo x86 x86_64
 }
 
 function releases_archlinux() {
@@ -239,40 +230,27 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    echo v21.09.11 \
-    v21.11.05 \
-    v22.01.10
+    echo v21.09.11 v21.11.05 v22.01.10
 }
 
 function editions_arcolinux() {
-    echo large \
-    small
+    echo large small
 }
 
 function releases_cachyos() {
-    echo 2022.01.09 \
-    2022.02.11
+    echo 2022.01.09 2022.02.11
 }
 
 function releases_debian() {
-    echo 10.11.0 \
-    11.2.0
+    echo 10.11.0 11.2.0
 }
 
 function editions_debian() {
-  echo standard \
-  cinnamon \
-  gnome \
-  kde \
-  lxde \
-  lxqt \
-  mate \
-  xfce
+    echo standard cinnamon gnome kde lxde lxqt mate xfce
 }
 
 function releases_devuan() {
-    echo beowulf \
-    chimaera
+    echo beowulf chimaera
 }
 
 function releases_elementary() {
@@ -280,9 +258,7 @@ function releases_elementary() {
 }
 
 function releases_fedora() {
-    echo 33 \
-    34 \
-    35
+    echo 33 34 35
 }
 
 function editions_fedora() {
@@ -299,9 +275,7 @@ function editions_fedora() {
 }
 
 function releases_freebsd(){
-    echo 12.2 \
-    12.3 \
-    13.0
+    echo 12.2 12.3 13.0
 }
 
 function releases_garuda() {
@@ -325,19 +299,16 @@ function editions_garuda() {
     xfce
 }
 
-function releases_gentoo(){
+function releases_gentoo() {
     echo latest
 }
 
-function releases_ghostbsd(){
-    echo 21.10.16 \
-    21.11.24 \
-    22.01.12
+function releases_ghostbsd() {
+    echo 21.10.16 21.11.24 22.01.12
 }
 
-function editions_ghostbsd(){
-    echo mate \
-    xfce
+function editions_ghostbsd() {
+    echo mate xfce
 }
 
 function releases_haiku() {
@@ -345,20 +316,15 @@ function releases_haiku() {
 }
 
 function editions_haiku() {
-    echo x86_64 \
-         x86_gcc2h
+    echo x86_64 x86_gcc2h
 }
 
 function releases_kali() {
-    echo current \
-    kali-weekly
+    echo current kali-weekly
 }
 
 function releases_kdeneon() {
-    echo user \
-    testing \
-    unstable \
-    developer
+    echo user testing unstable developer
 }
 
 function releases_kolibrios() {
@@ -370,9 +336,7 @@ function releases_linuxmint(){
 }
 
 function editions_linuxmint(){
-    echo cinnamon \
-    mate \
-    xfce
+    echo cinnamon mate xfce
 }
 
 function releases_mxlinux(){
@@ -380,17 +344,11 @@ function releases_mxlinux(){
 }
 
 function editions_mxlinux(){
-    echo xfce \
-    kde \
-    fluxbox
+    echo Xfce KDE Fluxbox
 }
 
 function releases_macos() {
-    echo high-sierra \
-    mojave \
-    catalina \
-    big-sur \
-    monterey
+    echo high-sierra mojave catalina big-sur monterey
 }
 
 function releases_manjaro() {
@@ -409,72 +367,47 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-  echo 9.0 \
-  9.1 \
-  9.2
+    echo 9.0 9.1 9.2
 }
 
 function releases_nixos(){
-    echo 21.05 \
-    21.11
+    echo 21.05 21.11
 }
 
 function editions_nixos(){
-    echo gnome \
-    plasma5 \
-    minimal
+    echo gnome plasma5 minimal
 }
 
 function releases_openbsd(){
-    echo 6.7 \
-    6.8 \
-    6.9 \
-    7.0
+    echo 6.7 6.8 6.9 7.0
 }
 
 function releases_opensuse(){
-    echo 15.0 \
-    15.1 \
-    15.2 \
-    15.3 \
-    microos \
-    tumbleweed
+    echo 15.0 15.1 15.2 15.3 microos tumbleweed
 }
 
 function releases_oraclelinux() {
-    echo 7.7 \
-    7.8 \
-    7.9 \
-    8.2 \
-    8.3 \
-    8.4 \
-    8.5
+    echo 7.7 7.8 7.9 8.2 8.3 8.4 8.5
 }
 
 function releases_popos() {
-    echo 20.04 \
-    21.10
+    echo 20.04 21.10
 }
 
 function editions_popos() {
-    echo intel \
-    nvidia
+    echo intel nvidia
 }
 
 function releases_regolith() {
-    echo focal \
-    impish
+    echo focal impish
 }
 
 function editions_regolith() {
-    echo 1.6.0 \
-    2.0.0
+    echo 1.6.0 2.0.0
 }
 
 function releases_rockylinux() {
-    echo 8.3 \
-    8.4 \
-    8.5
+    echo 8.3 8.4 8.5
 }
 
 function editions_rockylinux() {
@@ -483,8 +416,7 @@ function editions_rockylinux() {
 }
 
 function releases_slackware() {
-    echo 14.2 \
-    15.0
+    echo 14.2 15.0
 }
 
 function releases_solus() {
@@ -492,10 +424,7 @@ function releases_solus() {
 }
 
 function editions_solus() {
-    echo budgie \
-    gnome \
-    mate \
-    plasma
+    echo Budgie GNOME MATE Plasma
 }
 
 function releases_tails() {
@@ -511,16 +440,11 @@ function releases_void() {
 }
 
 function editions_void() {
-    echo glibc \
-    musl \
-    xfce-glibc \
-    xfce-musl
+    echo glibc musl xfce-glibc xfce-musl
 }
 
 function releases_windows() {
-    echo 8 \
-    10 \
-    11
+    echo 8 10 11
 }
 
 function languages_windows() {
@@ -569,10 +493,7 @@ function releases_zorin() {
 }
 
 function editions_zorin() {
-    echo core64 \
-    lite64 \
-    education64 \
-    edulite64
+    echo core64 lite64 education64 edulite64
 }
 
 function check_hash() {
