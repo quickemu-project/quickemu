@@ -1048,22 +1048,16 @@ function get_opensuse() {
 function get_oraclelinux() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local VER_MAJ=""
-    local VER_MIN=""
+    local VER_MAJ=${RELEASE::1}
+    local VER_MIN=${RELEASE:2:1}
+    local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
 
-    VER_MAJ=${RELEASE::1}
-    VER_MIN=${RELEASE:2:1}
-    URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
-    if [ "${VER_MAJ}" == "8" ]; then
-        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso"
-    else
-        ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso"
-    fi
+    case ${VER_MAJ} in
+      8) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
+      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+    esac
     HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_popos() {
