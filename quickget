@@ -1087,15 +1087,15 @@ function get_regolith() {
 function get_rockylinux() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
+    local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
 
-    URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64"
-    ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
+    case ${RELEASE} in
+      8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
+      *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
+    esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_slackware() {
