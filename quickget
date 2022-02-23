@@ -639,36 +639,37 @@ function web_get() {
 
 function zsync_get() {
     local DIR="${2}"
-    local FILE=""
+    local FILE="${1##*/}"
     local OUT=""
     local URL="${1}"
-    local ZS=""
-
-    FILE="${URL##*/}"
 
     if command -v zsync &>/dev/null; then
-      if [ -n "${3}" ]; then
-          OUT="${3}"
-      else
-          OUT="${FILE}"
-      fi
+        if [ -n "${3}" ]; then
+            OUT="${3}"
+        else
+            OUT="${FILE}"
+        fi
 
-      if ! mkdir -p "${DIR}" 2>/dev/null; then
-        echo "ERROR! Unable to create directory ${DIR}"
-        exit 1
-      fi
-
-      if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-          echo "ERROR! Failed to download ${URL}.zsync"
+        if ! mkdir -p "${DIR}" 2>/dev/null; then
+          echo "ERROR! Unable to create directory ${DIR}"
           exit 1
-      fi
+        fi
 
-      if [ -e "${DIR}/${OUT}.zs-old" ]; then
-          rm "${DIR}/${OUT}.zs-old"
-      fi
+        if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+            echo "ERROR! Failed to download ${URL}.zsync"
+            exit 1
+        fi
+
+        if [ -e "${DIR}/${OUT}.zs-old" ]; then
+            rm "${DIR}/${OUT}.zs-old"
+        fi
     else
-      echo "INFO: zsync not found, falling back to wget/aria2c"
-      web_get "${ISO}" "${DIR}"
+        echo "INFO: zsync not found, falling back to wget/aria2c"
+        if [ -n "${3}" ]; then
+            web_get "${1}" "${2}" "${3}"
+        else
+            web_get "${1}" "${2}"
+        fi
     fi
 }
 
