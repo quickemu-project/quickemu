@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
-if ((BASH_VERSINFO[0] < 4))
-then
+if ((BASH_VERSINFO[0] < 4)); then
   echo "Sorry, you need bash 4.0 or newer to run this script."
   exit 1
 fi
@@ -992,8 +991,8 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
-  if [ -n "$extra_args" ]; then
-      args+=($extra_args)
+  if [ -n "${extra_args}" ]; then
+      args+=("${extra_args}")
   fi
 
   # The OSK parameter contains parenthesis, they need to be escaped in the shell
@@ -1023,8 +1022,8 @@ function shortcut_create {
   local dirname="${HOME}/.local/share/applications"
   local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
 
-  if [ ! -d ${dirname} ]; then
-    mkdir -p ${dirname}
+  if [ ! -d "${dirname}" ]; then
+    mkdir -p "${dirname}"
   fi
   cat << EOF > "${filename}"
 [Desktop Entry]
@@ -1078,6 +1077,7 @@ bridge=""
 cpu_cores=""
 disk_img=""
 disk_size=""
+extra_args=""
 fixed_iso=""
 floppy=""
 guest_os="linux"
@@ -1090,7 +1090,6 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
-extra_args=""
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1112,9 +1111,10 @@ VMDIR=""
 VMNAME=""
 VMPATH=""
 
+# shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="3.12"
+readonly VERSION="3.13"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
