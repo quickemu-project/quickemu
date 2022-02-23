@@ -730,15 +730,10 @@ function get_archlinux() {
 function get_arcolinux() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local URL=""
-
-    URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
-    ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f 1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
+    local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_cachyos() {
