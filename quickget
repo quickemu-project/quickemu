@@ -746,19 +746,15 @@ function get_cachyos() {
 function get_debian() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
+    local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
 
     case ${RELEASE} in
       11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-      *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/"
+      *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
-
-    ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_devuan() {
