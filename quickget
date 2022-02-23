@@ -790,15 +790,11 @@ function get_devuan() {
 
 function get_dragonflybsd() {
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="dfly-x86_64-${RELEASE}_REL.iso"
+    local URL="http://mirror-master.dragonflybsd.org/iso-images"
 
-    URL="http://mirror-master.dragonflybsd.org/iso-images"
-    ISO="dfly-x86_64-${RELEASE}_REL.iso"
     HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_elementary() {
