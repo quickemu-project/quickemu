@@ -708,17 +708,14 @@ function get_android() {
     JSON_REL=$(echo "${JSON_ALL}" | jq --arg ver "${OS}-${EDITION}-${RELEASE}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
     ISO=$(echo "${JSON_REL}" | jq -r .n)
     HASH=$(echo "${JSON_REL}" | jq -r .hash.sha256)
-
     # Traverse the directories to find the .iso location
-    for DIR in $(wget -q -O- ${URL} | grep -o -E '[0-9]{5}' | sort -ur); do
+    for DIR in $(wget -q -O- "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
         if wget -q -O- "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
             URL="${URL}/${DIR}"
             break
         fi
     done
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_archlinux() {
