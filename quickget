@@ -979,26 +979,15 @@ function get_mxlinux() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local URL=""
+    local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
 
     case ${EDITION} in
-      xfce)
-        URL="https://sourceforge.net/projects/mx-linux/files/Final/Xfce"
-        ISO="MX-${RELEASE}_x64.iso"
-        ;;
-      kde)
-        URL="https://sourceforge.net/projects/mx-linux/files/Final/KDE"
-        ISO="MX-${RELEASE}_KDE_x64.iso"
-        ;;
-      fluxbox)
-        URL="https://sourceforge.net/projects/mx-linux/files/Final/Fluxbox"
-        ISO="MX-${RELEASE}_fluxbox_x64.iso"
-        ;;
+      Xfce) ISO="MX-${RELEASE}_x64.iso";;
+      KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
+      Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_netboot() {
