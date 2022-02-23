@@ -1100,24 +1100,10 @@ function get_rockylinux() {
 
 function get_slackware() {
     local HASH=""
-    local ISO=""
-    local URL=""
-
-    case ${RELEASE} in
-        current)
-          URL="https://slackware.nl/slackware/slackware64-current-iso"
-          ISO="slackware64-current-install-dvd.iso"
-          ;;
-        *)
-          URL="https://mirrors.slackware.com/slackware/slackware-iso/slackware64-${RELEASE}-iso"
-          ISO="slackware64-${RELEASE}-install-dvd.iso"
-          ;;
-    esac
-
+    local ISO="slackware64-${RELEASE}-install-dvd.iso"
+    local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_solus() {
