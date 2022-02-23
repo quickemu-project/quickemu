@@ -767,8 +767,9 @@ function get_debian() {
     esac
 
     if [ "${EDITION}" == "netinst" ]; then
-        URL="$(echo "${URL}" | sed 's/-live//' | sed 's/hybrid/cd/')"
-        ISO="$(echo "${ISO}" | sed 's/-live//')"
+        URL="${URL/-live/}"
+        URL="${URL/hybrid/cd}"
+        ISO="${ISO/-live/}"
     fi
 
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
