@@ -846,16 +846,12 @@ function get_ghostbsd() {
 
 function get_haiku() {
     local EDITION="${1:-}"
-    local ISO=""
-    local URL=""
+    local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
+    local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
     local HASH=""
 
-    URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
-    ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_kali() {
