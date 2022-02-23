@@ -798,15 +798,11 @@ function get_fedora() {
 
 function get_freebsd() {
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
 
-    URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
-    ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
-    HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA512-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | cut -d' ' -f4)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_garuda() {
