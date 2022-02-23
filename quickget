@@ -1109,22 +1109,11 @@ function get_slackware() {
 function get_solus() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="Solus-${RELEASE}-${EDITION}.iso"
+    local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
 
-    case ${EDITION} in
-      mate|gnome)
-        EDITION=${EDITION^^};;
-      *)
-        EDITION=${EDITION^};;
-    esac
-
-    URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
-    ISO="Solus-${RELEASE}-${EDITION}.iso"
-    HASH=$(wget -q -O- "${URL}.sha256sum" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_tails() {
