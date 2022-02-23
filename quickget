@@ -721,16 +721,10 @@ function get_android() {
 function get_archlinux() {
     local HASH=""
     local ISO=""
-    local URL=""
-    local VERSION=""
-
-    VERSION=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.latest_version' | cut -d "\"" -f 2)
-    URL="https://mirror.rackspace.com/archlinux/iso/${VERSION}"
-    ISO="archlinux-${VERSION}-x86_64.iso"
-    HASH=$(wget -q -O- 'https://archlinux.org/releng/releases/json/' | jq '.releases[0].sha1_sum' | cut -d "\"" -f 2)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    local URL="https://mirror.rackspace.com/archlinux"
+    ISO=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
+    HASH=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha1_sum')
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_arcolinux() {
