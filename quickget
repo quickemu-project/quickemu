@@ -878,9 +878,7 @@ function get_kolibrios() {
     local HASH=""
     local ISO="kolibri.iso"
     local URL="https://builds.kolibrios.org/eng"
-
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_linuxmint() {
