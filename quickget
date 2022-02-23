@@ -196,9 +196,9 @@ function os_support() {
     tails \
     ubuntu \
     ubuntu-budgie \
-    ubuntu-kylin \
+    ubuntukylin \
     ubuntu-mate \
-    ubuntu-studio \
+    ubuntustudio \
     void \
     windows \
     xubuntu \
@@ -503,11 +503,7 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo 18.04 \
-    20.04 \
-    21.10 \
-    devel \
-    canary
+    echo 18.04 20.04 21.10 daily-live daily-canary
 }
 
 function releases_void() {
@@ -1386,45 +1382,34 @@ function get_tails() {
 }
 
 function get_ubuntu() {
-    local DEVEL="daily-live"
     local ISO=""
     local HASH=""
-    local PROJECT=""
     local URL=""
 
-    case ${OS} in
-      kubuntu|lubuntu|ubuntu|ubuntu-budgie|ubuntu-mate|xubuntu)
-        PROJECT="${OS}";;
-      ubuntu-kylin)
-        PROJECT="ubuntukylin";;
-      ubuntu-studio)
-        PROJECT="ubuntustudio"
-        DEVEL="dvd";;
-      *) echo "ERROR! ${OS} is not a recognised Ubuntu flavour."
-         exit 1;;
-    esac
-
-    if [ "${RELEASE}" == "canary" ] && [ "${OS}" != "ubuntu" ]; then
-      echo "ERROR! Canary is currently only available for Ubuntu."
-      exit 1
+    if [[ "${RELEASE}" == *"daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
+        # Ubuntu Studio daily-live images are in the dvd directory
+        RELEASE="dvd"
+    elif [ "${RELEASE}" == "daily-canary" ] && [ "${OS}" != "ubuntu" ]; then
+        # daily-canary is only available for Ubuntu, switch flavours to daily-live
+        RELEASE="daily-live"
     fi
 
-    if [ "${RELEASE}" == "canary" ]; then
-        DEVEL="daily-canary"
-        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
-    elif [ "${RELEASE}" == "devel" ]; then
-        URL="http://cdimage.ubuntu.com/${PROJECT}/${DEVEL}/current"
-    elif [ "${PROJECT}" == "ubuntu" ]; then
+    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        URL="http://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+        VM_PATH="${OS}-devel"
+    elif [ "${OS}" == "ubuntu" ]; then
         URL="http://releases.ubuntu.com/${RELEASE}"
     else
-        URL="http://cdimage.ubuntu.com/${PROJECT}/releases/${RELEASE}/release"
+        URL="http://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
 
-    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f2 | sed 's|*||g')
-    if [ "${RELEASE}" == "canary" ] || [ "${RELEASE}" == "devel" ]; then
-        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-${RELEASE}.iso"
-        make_vm_config "${OS}-${RELEASE}.iso"
+    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d'*' -f2)
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f1)
+    #echo "${URL}/${ISO} ${HASH}"
+
+    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
         check_hash "${ISO}" "${HASH}"
