@@ -1073,23 +1073,15 @@ function get_popos() {
 function get_regolith() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
-    local SUBDIR=""
+    local ISO="Regolith_${EDITION}_${RELEASE}.iso"
     local URL=""
 
     case ${EDITION} in
-      1.6.0) SUBDIR="release-release-${RELEASE}-${RELEASE}_standard-${EDITION}";;
-      2.0.0) SUBDIR="regolith-linux-2.0-${RELEASE}-latest";;
+      1.6.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/release-release-${RELEASE}-${RELEASE}_standard-${EDITION}";;
+      2.0.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/regolith-linux-2.0-${RELEASE}-latest";;
     esac
-
-    URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/${SUBDIR}"
-    ISO="Regolith_${EDITION}_${RELEASE}.iso"
     HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    if [ -n "${HASH}" ]; then
-      check_hash "${ISO}" "${HASH}"
-    fi
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_rockylinux() {
