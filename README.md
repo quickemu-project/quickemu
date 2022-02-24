@@ -17,8 +17,8 @@ operating system you want to run and Quickemu will figure out the best
 way to do it for you. For example:
 
 ``` {.bash}
-quickget ubuntu-mate impish
-quickemu --vm ubuntu-mate-impish.conf
+quickget ubuntu-mate 21.10
+quickemu --vm ubuntu-mate-21.10-.conf
 ```
 
 The original objective of the project was to enable quick testing of
@@ -166,8 +166,8 @@ Ubuntu Guest
 virtual machine configuration.
 
 ``` {.bash}
-quickget ubuntu focal
-quickemu --vm ubuntu-focal.conf
+quickget ubuntu 20.04
+quickemu --vm ubuntu-20.04.conf
 ```
 
 -   Complete the installation as normal.
@@ -419,7 +419,7 @@ requires that the `spicy` client is installed, available from the
 `spice-client-gtk` package in Debian/Ubuntu.
 
 ``` {.bash}
-quickemu --vm ubuntu-focal.conf --display spice
+quickemu --vm ubuntu-20.04.conf --display spice
 ```
 
 Headless
@@ -431,14 +431,14 @@ available from the `spice-client-gtk` package in Debian/Ubuntu to
 connect to the running VM
 
 ``` {.bash}
-quickemu --vm ubuntu-focal.conf --display none
+quickemu --vm ubuntu-20.04.conf --display none
 ```
 
 You can also use the `.ports` file in the VM directory to lookup what
 SSH and SPICE ports the VM is connected to.
 
 ``` {.bash}
-cat ubuntu-focal/ubuntu-focal.ports
+cat ubuntu-20.04/ubuntu-20.04.ports
 ```
 
 Accessibility
@@ -448,7 +448,7 @@ Qemu provides support for using BrlAPI to display braille output on a
 real or fake device.
 
 ``` {.bash}
-quickemu --vm ubuntu-impish.conf --braille --display sdl
+quickemu --vm ubuntu-21.10.conf --braille --display sdl
 ```
 
 BIOS and EFI
@@ -642,7 +642,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in
 shortcut.
 
 ``` {.bash}
-quickemu --vm ubuntu-focal-desktop.conf --shortcut
+quickemu --vm ubuntu-20.04-desktop.conf --shortcut
 ```
 
 Screen and window size (Linux guests only)
