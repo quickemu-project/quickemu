@@ -933,7 +933,11 @@ function vm_boot() {
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
-  if [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
+  if [ -n "{iso}" ] && [ "${guest_os}" == "freedos" ]; then
+    # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
+    # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
+    args+=(-boot order=dc)
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
     # Since there is bug (probably) in KolibriOS: cdrom indexes 0 or 1 make system show an extra unexisting iso, so we use index=2
     # shellcheck disable=SC2054
     args+=(-drive media=cdrom,index=2,file="${iso}")
