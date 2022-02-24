@@ -86,6 +86,7 @@ Requirements
 -   [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 -   [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
 -   [zsync](http://zsync.moria.org.uk/)
+-   [unzip](http://www.info-zip.org/UnZip.html)
 
 Usage
 =====
