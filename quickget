@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 export LC_ALL=C
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
@@ -20,186 +21,186 @@ export LC_ALL=C
 #     }
 
 function cleanup() {
-  if [ -n "$(jobs -p)" ]; then
-    kill "$(jobs -p)"
-  fi
+    if [ -n "$(jobs -p)" ]; then
+        kill "$(jobs -p)"
+    fi
 }
 
 function pretty_name() {
-  local SIMPLE_NAME=""
-  local PRETTY_NAME=""
-  SIMPLE_NAME="${1}"
-  case ${SIMPLE_NAME} in
-    alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linux";;
-    android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
-    cachyos)            PRETTY_NAME="CachyOS";;
-    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
-    elementary)         PRETTY_NAME="elementary OS";;
-    freebsd)            PRETTY_NAME="FreeBSD";;
-    garuda)             PRETTY_NAME="Garuda Linux";;
-    ghostbsd)           PRETTY_NAME="GhostBSD";;
-    kdeneon)            PRETTY_NAME="KDE Neon";;
-    kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
-    netboot)            PRETTY_NAME="netboot.xyz";;
-    netbsd)             PRETTY_NAME="NetBSD";;
-    nixos)              PRETTY_NAME="NixOS";;
-    macos)              PRETTY_NAME="macOS";;
-    openbsd)            PRETTY_NAME="OpenBSD";;
-    opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
-    popos)              PRETTY_NAME="Pop!_OS";;
-    regolith)           PRETTY_NAME="Regolith Linux";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
-    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
-    void)               PRETTY_NAME="Void Linux";;
-    zorin)              PRETTY_NAME="Zorin OS";;
-    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
-  esac
-  echo "${PRETTY_NAME}"
+    local SIMPLE_NAME=""
+    local PRETTY_NAME=""
+    SIMPLE_NAME="${1}"
+    case ${SIMPLE_NAME} in
+        alma)               PRETTY_NAME="Alma Linux" ;;
+        alpine)             PRETTY_NAME="Alpine Linux" ;;
+        android)            PRETTY_NAME="Android x86" ;;
+        archlinux)          PRETTY_NAME="Arch Linux" ;;
+        arcolinux)          PRETTY_NAME="Arco Linux" ;;
+        cachyos)            PRETTY_NAME="CachyOS" ;;
+        dragonflybsd)       PRETTY_NAME="DragonFlyBSD" ;;
+        elementary)         PRETTY_NAME="elementary OS" ;;
+        freebsd)            PRETTY_NAME="FreeBSD" ;;
+        garuda)             PRETTY_NAME="Garuda Linux" ;;
+        ghostbsd)           PRETTY_NAME="GhostBSD" ;;
+        kdeneon)            PRETTY_NAME="KDE Neon" ;;
+        kolibrios)          PRETTY_NAME="KolibriOS" ;;
+        linuxmint)          PRETTY_NAME="Linux Mint" ;;
+        mxlinux)            PRETTY_NAME="MX Linux" ;;
+        netboot)            PRETTY_NAME="netboot.xyz" ;;
+        netbsd)             PRETTY_NAME="NetBSD" ;;
+        nixos)              PRETTY_NAME="NixOS" ;;
+        macos)              PRETTY_NAME="macOS" ;;
+        openbsd)            PRETTY_NAME="OpenBSD" ;;
+        opensuse)           PRETTY_NAME="openSUSE" ;;
+        oraclelinux)        PRETTY_NAME="Oracle Linux" ;;
+        popos)              PRETTY_NAME="Pop!_OS" ;;
+        regolith)           PRETTY_NAME="Regolith Linux" ;;
+        rockylinux)         PRETTY_NAME="Rocky Linux" ;;
+        ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie" ;;
+        ubuntukylin)        PRETTY_NAME="Ubuntu Kylin" ;;
+        ubuntu-mate)        PRETTY_NAME="Ubuntu MATE" ;;
+        ubuntustudio)       PRETTY_NAME="Ubuntu Studio" ;;
+        void)               PRETTY_NAME="Void Linux" ;;
+        zorin)              PRETTY_NAME="Zorin OS" ;;
+        *)                  PRETTY_NAME="${SIMPLE_NAME^}" ;;
+    esac
+    echo "${PRETTY_NAME}"
 }
 
 function validate_release() {
-  local DISPLAY_NAME=""
-  local RELEASE_GENERATOR=""
-  local RELEASES=""
+    local DISPLAY_NAME=""
+    local RELEASE_GENERATOR=""
+    local RELEASES=""
 
-  DISPLAY_NAME="$(pretty_name "${OS}")"
-  case ${OS} in
-    *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
-    *) RELEASE_GENERATOR="${1}";;
-  esac
+    DISPLAY_NAME="$(pretty_name "${OS}")"
+    case ${OS} in
+        *ubuntu*) RELEASE_GENERATOR="releases_ubuntu" ;;
+        *) RELEASE_GENERATOR="${1}" ;;
+    esac
 
-  RELEASES=$(${RELEASE_GENERATOR})
-  if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
-      echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
-      echo -n "${RELEASES}"
-      exit 1
-  fi
+    RELEASES=$(${RELEASE_GENERATOR})
+    if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
+        echo -n "${RELEASES}"
+        exit 1
+    fi
 }
 
 function list_json() {
-  # Reference: https://stackoverflow.com/a/67359273
-  list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
-  exit 0
+    # Reference: https://stackoverflow.com/a/67359273
+    list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+    exit 0
 }
 
 function list_csv() {
-  local DISPLAY_NAME
-  local DL=""
-  local DOWNLOADER
-  local FUNC
-  local OPTION
-  local OS
-  local PNG
-  local RELEASE
-  local SVG
-  local HAS_ZSYNC=0
+    local DISPLAY_NAME
+    local DL=""
+    local DOWNLOADER
+    local FUNC
+    local OPTION
+    local OS
+    local PNG
+    local RELEASE
+    local SVG
+    local HAS_ZSYNC=0
 
-  # Check if zsync is available
-  if command -v zsync &>/dev/null; then
-    HAS_ZSYNC=1
-  fi
-
-  if command -v aria2c &>/dev/null; then
-    DL="aria2c"
-  elif command -v wget &>/dev/null; then
-    DL="wget"
-  fi
-
-  echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
-  for OS in $(os_support); do
-    DISPLAY_NAME="$(pretty_name "${OS}")"
-    if [[ "${OS}" == *"ubuntu"* ]]; then
-      FUNC="ubuntu"
-    else
-      FUNC="${OS}"
+    # Check if zsync is available
+    if command -v zsync &>/dev/null; then
+        HAS_ZSYNC=1
     fi
-    PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
-    SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
-    for RELEASE in $("releases_${FUNC}"); do
-      if [ "${OS}" == "macos" ]; then
-        DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
-      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
-      else
-        DOWNLOADER="${DL}"
-      fi
+    if command -v aria2c &>/dev/null; then
+        DL="aria2c"
+    elif command -v wget &>/dev/null; then
+        DL="wget"
+    fi
 
-      # If the OS has an editions_() function, use it.
-      if [[ $(type -t "editions_${OS}") == function ]]; then
-        for OPTION in $(editions_"${OS}"); do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+    echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
+    for OS in $(os_support); do
+        DISPLAY_NAME="$(pretty_name "${OS}")"
+        if [[ "${OS}" == *"ubuntu"* ]]; then
+            FUNC="ubuntu"
+        else
+            FUNC="${OS}"
+        fi
+        PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
+        SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+
+        for RELEASE in $("releases_${FUNC}"); do
+            if [ "${OS}" == "macos" ]; then
+                DOWNLOADER="macrecovery"
+            elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+                DOWNLOADER="zsync"
+            elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+                DOWNLOADER="zsync"
+            else
+                DOWNLOADER="${DL}"
+            fi
+
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+                done
+            elif [ "${OS}" == "windows" ]; then
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+                done
+            else
+                echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
+            fi
         done
-      elif [ "${OS}" == "windows" ]; then
-        for OPTION in "${LANGS[@]}"; do
-          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
-        done
-      else
-        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
-      fi
     done
-  done
-  exit 0
+    exit 0
 }
 
 function os_support() {
     echo alma \
-    alpine \
-    android \
-    archlinux \
-    arcolinux \
-    cachyos \
-    debian \
-    devuan \
-    dragonflybsd \
-    elementary \
-    fedora \
-    freebsd \
-    garuda \
-    gentoo \
-    ghostbsd \
-    haiku \
-    kali \
-    kdeneon \
-    kolibrios \
-    kubuntu \
-    linuxmint \
-    manjaro \
-    mxlinux \
-    netboot \
-    netbsd \
-    nixos \
-    lubuntu \
-    macos \
-    openbsd \
-    opensuse \
-    oraclelinux \
-    popos \
-    regolith \
-    rockylinux \
-    slackware \
-    solus \
-    tails \
-    ubuntu \
-    ubuntu-budgie \
-    ubuntukylin \
-    ubuntu-mate \
-    ubuntustudio \
-    void \
-    windows \
-    xubuntu \
-    zorin
+        alpine \
+        android \
+        archlinux \
+        arcolinux \
+        cachyos \
+        debian \
+        devuan \
+        dragonflybsd \
+        elementary \
+        fedora \
+        freebsd \
+        garuda \
+        gentoo \
+        ghostbsd \
+        haiku \
+        kali \
+        kdeneon \
+        kolibrios \
+        kubuntu \
+        linuxmint \
+        manjaro \
+        mxlinux \
+        netboot \
+        netbsd \
+        nixos \
+        lubuntu \
+        macos \
+        openbsd \
+        opensuse \
+        oraclelinux \
+        popos \
+        regolith \
+        rockylinux \
+        slackware \
+        solus \
+        tails \
+        ubuntu \
+        ubuntu-budgie \
+        ubuntukylin \
+        ubuntu-mate \
+        ubuntustudio \
+        void \
+        windows \
+        xubuntu \
+        zorin
 }
 
 function releases_alma() {
@@ -263,16 +264,16 @@ function releases_fedora() {
 }
 
 function editions_fedora() {
-  echo Workstation \
-  Cinnamon \
-  i3 \
-  KDE \
-  LXDE \
-  LXQt \
-  Mate \
-  Xfce \
-  Silverblue \
-  Server
+    echo Workstation \
+        Cinnamon \
+        i3 \
+        KDE \
+        LXDE \
+        LXQt \
+        Mate \
+        Xfce \
+        Silverblue \
+        Server
 }
 
 function releases_freebsd(){
@@ -289,19 +290,19 @@ function releases_garuda() {
 
 function editions_garuda() {
     echo dr460nized \
-    dr460nized-blackarch \
-    dr460nized-gaming \
-    bspwm \
-    cinnamon \
-    gnome \
-    i3 \
-    kde-barebones \
-    lxqt-kwin \
-    mate \
-    qtile \
-    sway \
-    wayfire \
-    xfce
+        dr460nized-blackarch \
+        dr460nized-gaming \
+        bspwm \
+        cinnamon \
+        gnome \
+        i3 \
+        kde-barebones \
+        lxqt-kwin \
+        mate \
+        qtile \
+        sway \
+        wayfire \
+        xfce
 }
 
 function releases_gentoo() {
@@ -358,17 +359,17 @@ function releases_macos() {
 
 function releases_manjaro() {
     echo xfce \
-    gnome \
-    kde \
-    budgie \
-    cinnamon \
-    deepin \
-    i3 \
-    mate
+        gnome \
+        kde \
+        budgie \
+        cinnamon \
+        deepin \
+        i3 \
+        mate
 }
 
 function releases_netboot() {
-  echo latest
+    echo latest
 }
 
 function releases_netbsd() {
@@ -416,8 +417,7 @@ function releases_rockylinux() {
 }
 
 function editions_rockylinux() {
-    echo minimal \
-    dvd1
+    echo minimal dvd1
 }
 
 function releases_slackware() {
@@ -453,44 +453,46 @@ function releases_windows() {
 }
 
 function languages_windows() {
-    LANGS=(Arabic
-    "Brazilian Portuguese"
-    Bulgarian
-    "Chinese (Simplified)"
-    "Chinese (Traditional)"
-    Croatian
-    Czech
-    Danish
-    Dutch
-    English
-    "English International"
-    Estonian
-    Finnish
-    French
-    "French Canadian"
-    German
-    Greek
-    Hebrew
-    Hungarian
-    Italian
-    Japanese
-    Korean
-    Latvian
-    Lithuanian
-    Norwegian
-    Polish
-    Portuguese
-    Romanian
-    Russian
-    "Serbian Latin"
-    Slovak
-    Slovenian
-    Spanish
-    "Spanish (Mexico)"
-    Swedish
-    Thai
-    Turkish
-    Ukrainian)
+    LANGS=(
+        Arabic
+        "Brazilian Portuguese"
+        Bulgarian
+        "Chinese (Simplified)"
+        "Chinese (Traditional)"
+        Croatian
+        Czech
+        Danish
+        Dutch
+        English
+        "English International"
+        Estonian
+        Finnish
+        French
+        "French Canadian"
+        German
+        Greek
+        Hebrew
+        Hungarian
+        Italian
+        Japanese
+        Korean
+        Latvian
+        Lithuanian
+        Norwegian
+        Polish
+        Portuguese
+        Romanian
+        Russian
+        "Serbian Latin"
+        Slovak
+        Slovenian
+        Spanish
+        "Spanish (Mexico)"
+        Swedish
+        Thai
+        Turkish
+        Ukrainian
+    )
 }
 
 function releases_zorin() {
@@ -510,12 +512,12 @@ function check_hash() {
 
     # Guess the hash algorithm by the hash length
     case ${#hash} in
-      32) hash_algo=md5sum;;
-      40) hash_algo=sha1sum;;
-      64) hash_algo=sha256sum;;
-      128) hash_algo=sha512sum;;
-       *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
-          return;;
+        32) hash_algo=md5sum ;;
+        40) hash_algo=sha1sum ;;
+        64) hash_algo=sha256sum ;;
+        128) hash_algo=sha512sum ;;
+        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+            return ;;
     esac
 
     echo -n "Checking ${iso} with ${hash_algo}... "
@@ -540,21 +542,21 @@ function web_get() {
     fi
 
     if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
-      exit 1
+        echo "ERROR! Unable to create directory ${DIR}"
+        exit 1
     fi
 
     if command -v aria2c &>/dev/null; then
         if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
-          echo #Necessary as aria2c in suppressed mode does not have new lines
-          echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
-          exit 1
+            echo #Necessary as aria2c in suppressed mode does not have new lines
+            echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
+            exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
     else
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-          echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
-          exit 1
+            echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+            exit 1
         fi
     fi
 }
@@ -573,8 +575,8 @@ function zsync_get() {
         fi
 
         if ! mkdir -p "${DIR}" 2>/dev/null; then
-          echo "ERROR! Unable to create directory ${DIR}"
-          exit 1
+            echo "ERROR! Unable to create directory ${DIR}"
+            exit 1
         fi
 
         if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
@@ -608,31 +610,31 @@ function make_vm_config() {
     case "${OS}" in
         dragonflybsd)
             GUEST="dragonflybsd"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         freebsd|ghostbsd)
             GUEST="freebsd"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         haiku)
             GUEST="haiku"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         kolibrios)
             GUEST="kolibrios"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         macos)
             GUEST="macos"
-            IMAGE_TYPE="img";;
+            IMAGE_TYPE="img" ;;
         netbsd)
             GUEST="netbsd"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         openbsd)
             GUEST="openbsd"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         windows)
             GUEST="windows"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
         *)
             GUEST="linux"
-            IMAGE_TYPE="iso";;
+            IMAGE_TYPE="iso" ;;
     esac
 
     if [ -n "${EDITION}" ]; then
@@ -654,14 +656,14 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-          kolibrios)
-            echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "disk_size=\"2G\"" >> "${CONF_FILE}"
-            echo "ram=\"128M\"" >> "${CONF_FILE}"
-            ;;
-          macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
+            alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}" ;;
+            dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}" ;;
+            kolibrios)
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+                echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+                echo "ram=\"128M\"" >> "${CONF_FILE}"
+                ;;
+            macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}" ;;
         esac
 
         # Enable TPM for Windows 11
@@ -669,9 +671,9 @@ EOF
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             # Only force SecureBoot on for non-Debian/Ubuntu distros.
             if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
-              SEC_BOOT="off"
+                SEC_BOOT="off"
             else
-              SEC_BOOT="on"
+                SEC_BOOT="on"
             fi
             echo "secureboot=\"${SEC_BOOT}\"" >> "${CONF_FILE}"
         fi
@@ -688,7 +690,7 @@ function get_alma() {
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
     local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
-    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
+    HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -699,8 +701,8 @@ function get_alpine() {
     local VERSION=""
 
     case ${RELEASE} in
-      latest) URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64";;
-      *) URL="https://dl-cdn.alpinelinux.org/alpine/v${RELEASE}/releases/x86_64";;
+        latest) URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64" ;;
+        *) URL="https://dl-cdn.alpinelinux.org/alpine/v${RELEASE}/releases/x86_64" ;;
     esac
     VERSION=$(wget -qO- "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
@@ -762,8 +764,8 @@ function get_debian() {
     local URL=""
 
     case ${RELEASE} in
-      11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-      *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
+        11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid" ;;
+        *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/" ;;
     esac
 
     if [ "${EDITION}" == "netinst" ]; then
@@ -782,8 +784,8 @@ function get_devuan() {
     local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
 
     case ${RELEASE} in
-      beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
-      chimaera) ISO="devuan_${RELEASE}_4.0.0_amd64_desktop-live.iso";;
+        beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso" ;;
+        chimaera) ISO="devuan_${RELEASE}_4.0.0_amd64_desktop-live.iso" ;;
     esac
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -814,8 +816,8 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Silverblue|Workstation) VARIANT="${EDITION}";;
-      *) VARIANT="Spins";;
+        Server|Silverblue|Workstation) VARIANT="${EDITION}" ;;
+        *) VARIANT="Spins" ;;
     esac
 
     JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
@@ -840,8 +842,8 @@ function get_garuda() {
     local URL=""
 
     case ${EDITION} in
-      cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
-      *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
+        cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}" ;;
+        *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}" ;;
     esac
     ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso"
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
@@ -865,8 +867,8 @@ function get_ghostbsd() {
     local HASH=""
 
     case ${EDITION} in
-      mate) ISO="GhostBSD-${RELEASE}.iso";;
-      xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
+        mate) ISO="GhostBSD-${RELEASE}.iso" ;;
+        xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso" ;;
     esac
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
@@ -928,22 +930,22 @@ function get_macos() {
     case ${RELEASE} in
         high-sierra)
             BOARD_ID="Mac-7BA5B2D9E42DDD94"
-            MLB="00000000000J80300";;
+            MLB="00000000000J80300" ;;
         mojave)
             BOARD_ID="Mac-7BA5B2DFE22DDD8C"
-            MLB="00000000000KXPG00";;
+            MLB="00000000000KXPG00" ;;
         catalina)
             BOARD_ID="Mac-CFF7D910A743CAAF"
-            MLB="00000000000PHCD00";;
+            MLB="00000000000PHCD00" ;;
         big-sur)
             BOARD_ID="Mac-35C1E88140C3E6CF"
-            MLB="00000000000000000";;
+            MLB="00000000000000000" ;;
         monterey)
             BOARD_ID="Mac-06F11F11946D27C5"
-            MLB="00000000000000000";;
+            MLB="00000000000000000" ;;
         *) echo "ERROR! Unknown release: ${RELEASE}"
-           releases_macos
-           exit 1;;
+            releases_macos
+            exit 1 ;;
     esac
 
     # Use a bundled macrecovery if possible
@@ -994,8 +996,8 @@ function get_manjaro() {
     local URL=""
 
     case ${RELEASE} in
-      gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md";;
-      budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md";;
+        gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md" ;;
+        budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md" ;;
     esac
 
     URL="$(wget -qO- "${MANIFESTURL}" | grep "Download_x64 =" | cut -d'"' -f2)"
@@ -1010,9 +1012,9 @@ function get_mxlinux() {
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
 
     case ${EDITION} in
-      Xfce) ISO="MX-${RELEASE}_x64.iso";;
-      KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
-      Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
+        Xfce) ISO="MX-${RELEASE}_x64.iso" ;;
+        KDE) ISO="MX-${RELEASE}_KDE_x64.iso" ;;
+        Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso" ;;
     esac
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1081,8 +1083,8 @@ function get_oraclelinux() {
     local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
 
     case ${VER_MAJ} in
-      8) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
-      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+        8) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso" ;;
+        *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso" ;;
     esac
     HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1105,8 +1107,8 @@ function get_regolith() {
     local URL=""
 
     case ${EDITION} in
-      1.6.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/release-release-${RELEASE}-${RELEASE}_standard-${EDITION}";;
-      2.0.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/regolith-linux-2.0-${RELEASE}-latest";;
+        1.6.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/release-release-${RELEASE}-${RELEASE}_standard-${EDITION}" ;;
+        2.0.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/regolith-linux-2.0-${RELEASE}-latest" ;;
     esac
     HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1119,8 +1121,8 @@ function get_rockylinux() {
     local URL=""
 
     case ${RELEASE} in
-      8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
-      *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
+        8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64" ;;
+        *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/" ;;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
@@ -1201,10 +1203,10 @@ function get_void() {
 
     DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
-        glibc)      ISO="void-live-x86_64-${DATE}.iso";;
-        musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
-        xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
-        xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+        glibc)      ISO="void-live-x86_64-${DATE}.iso" ;;
+        musl)       ISO="void-live-x86_64-musl-${DATE}.iso" ;;
+        xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso" ;;
+        xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso" ;;
     esac
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
@@ -1225,300 +1227,300 @@ function unattended_windows() {
     cat << 'EOF' > "${1}"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend"
-  xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <!--
-       For documentation on components:
-       https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/
-  -->
-  <settings pass="offlineServicing">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <ComputerName>*</ComputerName>
-    </component>
-  </settings>
+    xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!--
+        For documentation on components:
+        https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/
+    -->
+    <settings pass="offlineServicing">
+        <component name="Microsoft-Windows-Shell-Setup"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ComputerName>*</ComputerName>
+        </component>
+    </settings>
 
-  <settings pass="generalize">
-    <component name="Microsoft-Windows-PnPSysprep"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS">
-      <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
-    </component>
-  </settings>
+    <settings pass="generalize">
+        <component name="Microsoft-Windows-PnPSysprep"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS">
+            <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+        </component>
+    </settings>
 
-  <settings pass="specialize">
-    <component name="Microsoft-Windows-Security-SPP-UX"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <SkipAutoActivation>true</SkipAutoActivation>
-    </component>
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <ComputerName>*</ComputerName>
-      <OEMInformation>
-        <Manufacturer>Quickemu Project</Manufacturer>
-        <Model>Quickemu</Model>
-        <SupportHours>24/7</SupportHours>
-        <SupportPhone></SupportPhone>
-        <SupportProvider>Quickemu Project</SupportProvider>
-        <SupportURL>https://github.com/quickemu-project/quickemu/issues</SupportURL>
-      </OEMInformation>
-      <OEMName>Quickemu Project</OEMName>
-    </component>
-    <component name="Microsoft-Windows-SQMApi"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <CEIPEnabled>0</CEIPEnabled>
-    </component>
-  </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Security-SPP-UX"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <SkipAutoActivation>true</SkipAutoActivation>
+        </component>
+        <component name="Microsoft-Windows-Shell-Setup"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ComputerName>*</ComputerName>
+            <OEMInformation>
+                <Manufacturer>Quickemu Project</Manufacturer>
+                <Model>Quickemu</Model>
+                <SupportHours>24/7</SupportHours>
+                <SupportPhone></SupportPhone>
+                <SupportProvider>Quickemu Project</SupportProvider>
+                <SupportURL>https://github.com/quickemu-project/quickemu/issues</SupportURL>
+            </OEMInformation>
+            <OEMName>Quickemu Project</OEMName>
+        </component>
+        <component name="Microsoft-Windows-SQMApi"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <CEIPEnabled>0</CEIPEnabled>
+        </component>
+    </settings>
 
-  <settings pass="windowsPE">
-    <component name="Microsoft-Windows-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <Diagnostics>
-        <OptIn>false</OptIn>
-      </Diagnostics>
-      <DiskConfiguration>
-        <Disk wcm:action="add">
-          <DiskID>0</DiskID>
-          <WillWipeDisk>true</WillWipeDisk>
-          <CreatePartitions>
-            <!-- Windows RE Tools partition -->
-            <CreatePartition wcm:action="add">
-              <Order>1</Order>
-              <Type>Primary</Type>
-              <Size>256</Size>
-            </CreatePartition>
-            <!-- System partition (ESP) -->
-            <CreatePartition wcm:action="add">
-              <Order>2</Order>
-              <Type>EFI</Type>
-              <Size>128</Size>
-            </CreatePartition>
-            <!-- Microsoft reserved partition (MSR) -->
-            <CreatePartition wcm:action="add">
-              <Order>3</Order>
-              <Type>MSR</Type>
-              <Size>128</Size>
-            </CreatePartition>
-            <!-- Windows partition -->
-            <CreatePartition wcm:action="add">
-              <Order>4</Order>
-              <Type>Primary</Type>
-              <Extend>true</Extend>
-            </CreatePartition>
-          </CreatePartitions>
-          <ModifyPartitions>
-            <!-- Windows RE Tools partition -->
-            <ModifyPartition wcm:action="add">
-              <Order>1</Order>
-              <PartitionID>1</PartitionID>
-              <Label>WINRE</Label>
-              <Format>NTFS</Format>
-              <TypeID>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</TypeID>
-            </ModifyPartition>
-            <!-- System partition (ESP) -->
-            <ModifyPartition wcm:action="add">
-              <Order>2</Order>
-              <PartitionID>2</PartitionID>
-              <Label>System</Label>
-              <Format>FAT32</Format>
-            </ModifyPartition>
-            <!-- MSR partition does not need to be modified -->
-            <ModifyPartition wcm:action="add">
-              <Order>3</Order>
-              <PartitionID>3</PartitionID>
-            </ModifyPartition>
-            <!-- Windows partition -->
-              <ModifyPartition wcm:action="add">
-              <Order>4</Order>
-              <PartitionID>4</PartitionID>
-              <Label>Windows</Label>
-              <Letter>C</Letter>
-              <Format>NTFS</Format>
-            </ModifyPartition>
-          </ModifyPartitions>
-        </Disk>
-      </DiskConfiguration>
-      <DynamicUpdate>
-        <Enable>true</Enable>
-        <WillShowUI>Never</WillShowUI>
-      </DynamicUpdate>
-      <ImageInstall>
-        <OSImage>
-          <InstallTo>
-            <DiskID>0</DiskID>
-            <PartitionID>4</PartitionID>
-          </InstallTo>
-          <InstallToAvailablePartition>false</InstallToAvailablePartition>
-        </OSImage>
-      </ImageInstall>
-      <RunSynchronous>
-        <RunSynchronousCommand wcm:action="add">
-          <Order>1</Order>
-          <Path>reg add HKLM\System\Setup\LabConfig /v BypassCPUCheck /t REG_DWORD /d 0x00000001 /f</Path>
-        </RunSynchronousCommand>
-        <RunSynchronousCommand wcm:action="add">
-          <Order>2</Order>
-          <Path>reg add HKLM\System\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 0x00000001 /f</Path>
-        </RunSynchronousCommand>
-        <RunSynchronousCommand wcm:action="add">
-          <Order>3</Order>
-          <Path>reg add HKLM\System\Setup\LabConfig /v BypassSecureBootCheck /t REG_DWORD /d 0x00000001 /f</Path>
-        </RunSynchronousCommand>
-        <RunSynchronousCommand wcm:action="add">
-          <Order>4</Order>
-          <Path>reg add HKLM\System\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 0x00000001 /f</Path>
-        </RunSynchronousCommand>
-      </RunSynchronous>
-      <UpgradeData>
-        <Upgrade>false</Upgrade>
-        <WillShowUI>Never</WillShowUI>
-      </UpgradeData>
-      <UserData>
-        <AcceptEula>true</AcceptEula>
-        <ProductKey>
-          <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
-          <WillShowUI>Never</WillShowUI>
-        </ProductKey>
-      </UserData>
-    </component>
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-Setup"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <Diagnostics>
+                <OptIn>false</OptIn>
+            </Diagnostics>
+            <DiskConfiguration>
+                <Disk wcm:action="add">
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                    <CreatePartitions>
+                        <!-- Windows RE Tools partition -->
+                        <CreatePartition wcm:action="add">
+                            <Order>1</Order>
+                            <Type>Primary</Type>
+                            <Size>256</Size>
+                        </CreatePartition>
+                        <!-- System partition (ESP) -->
+                        <CreatePartition wcm:action="add">
+                            <Order>2</Order>
+                            <Type>EFI</Type>
+                            <Size>128</Size>
+                        </CreatePartition>
+                        <!-- Microsoft reserved partition (MSR) -->
+                        <CreatePartition wcm:action="add">
+                            <Order>3</Order>
+                            <Type>MSR</Type>
+                            <Size>128</Size>
+                        </CreatePartition>
+                        <!-- Windows partition -->
+                        <CreatePartition wcm:action="add">
+                            <Order>4</Order>
+                            <Type>Primary</Type>
+                            <Extend>true</Extend>
+                        </CreatePartition>
+                    </CreatePartitions>
+                    <ModifyPartitions>
+                        <!-- Windows RE Tools partition -->
+                        <ModifyPartition wcm:action="add">
+                            <Order>1</Order>
+                            <PartitionID>1</PartitionID>
+                            <Label>WINRE</Label>
+                            <Format>NTFS</Format>
+                            <TypeID>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</TypeID>
+                        </ModifyPartition>
+                        <!-- System partition (ESP) -->
+                        <ModifyPartition wcm:action="add">
+                            <Order>2</Order>
+                            <PartitionID>2</PartitionID>
+                            <Label>System</Label>
+                            <Format>FAT32</Format>
+                        </ModifyPartition>
+                        <!-- MSR partition does not need to be modified -->
+                        <ModifyPartition wcm:action="add">
+                            <Order>3</Order>
+                            <PartitionID>3</PartitionID>
+                        </ModifyPartition>
+                        <!-- Windows partition -->
+                            <ModifyPartition wcm:action="add">
+                            <Order>4</Order>
+                            <PartitionID>4</PartitionID>
+                            <Label>Windows</Label>
+                            <Letter>C</Letter>
+                            <Format>NTFS</Format>
+                        </ModifyPartition>
+                    </ModifyPartitions>
+                </Disk>
+            </DiskConfiguration>
+            <DynamicUpdate>
+                <Enable>true</Enable>
+                <WillShowUI>Never</WillShowUI>
+            </DynamicUpdate>
+            <ImageInstall>
+                <OSImage>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>4</PartitionID>
+                    </InstallTo>
+                    <InstallToAvailablePartition>false</InstallToAvailablePartition>
+                </OSImage>
+            </ImageInstall>
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Path>reg add HKLM\System\Setup\LabConfig /v BypassCPUCheck /t REG_DWORD /d 0x00000001 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <Path>reg add HKLM\System\Setup\LabConfig /v BypassRAMCheck /t REG_DWORD /d 0x00000001 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Path>reg add HKLM\System\Setup\LabConfig /v BypassSecureBootCheck /t REG_DWORD /d 0x00000001 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <Path>reg add HKLM\System\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 0x00000001 /f</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+            <UpgradeData>
+                <Upgrade>false</Upgrade>
+                <WillShowUI>Never</WillShowUI>
+            </UpgradeData>
+            <UserData>
+                <AcceptEula>true</AcceptEula>
+                <ProductKey>
+                    <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+                    <WillShowUI>Never</WillShowUI>
+                </ProductKey>
+            </UserData>
+        </component>
 
-    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      processorArchitecture="amd64">
-      <!--
-           This makes the VirtIO drivers available to Windows, assuming that
-           the VirtIO driver disk is available as drive E:
-           https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
-      -->
-      <DriverPaths>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="1">
-          <Path>E:\qemufwcfg\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="2">
-          <Path>E:\vioinput\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="3">
-          <Path>E:\vioscsi\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="4">
-          <Path>E:\viostor\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
-          <Path>E:\vioserial\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
-          <Path>E:\qxldod\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
-          <Path>E:\amd64\w10</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
-          <Path>E:\viogpudo\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
-          <Path>E:\viorng\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
-          <Path>E:\NetKVM\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
-          <Path>E:\viofs\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="12">
-          <Path>E:\Balloon\w10\amd64</Path>
-        </PathAndCredentials>
-      </DriverPaths>
-    </component>
-  </settings>
+        <component name="Microsoft-Windows-PnpCustomizationsWinPE"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            processorArchitecture="amd64">
+            <!--
+                This makes the VirtIO drivers available to Windows, assuming that
+                the VirtIO driver disk is available as drive E:
+                https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
+            -->
+            <DriverPaths>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+                    <Path>E:\qemufwcfg\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="2">
+                    <Path>E:\vioinput\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="3">
+                    <Path>E:\vioscsi\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="4">
+                    <Path>E:\viostor\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="5">
+                    <Path>E:\vioserial\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="6">
+                    <Path>E:\qxldod\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="7">
+                    <Path>E:\amd64\w10</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="8">
+                    <Path>E:\viogpudo\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+                    <Path>E:\viorng\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="10">
+                    <Path>E:\NetKVM\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="11">
+                    <Path>E:\viofs\w10\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="12">
+                    <Path>E:\Balloon\w10\amd64</Path>
+                </PathAndCredentials>
+            </DriverPaths>
+        </component>
+    </settings>
 
-  <settings pass="oobeSystem">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <OOBE>
-        <HideEULAPage>true</HideEULAPage>
-        <HideLocalAccountScreen>false</HideLocalAccountScreen>
-        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
-        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-        <ProtectYourPC>3</ProtectYourPC>
-        <SkipUserOOBE>false</SkipUserOOBE>
-        <SkipMachineOOBE>false</SkipMachineOOBE>
-        <VMModeOptimizations>
-          <SkipWinREInitialization>true</SkipWinREInitialization>
-        </VMModeOptimizations>
-      </OOBE>
-      <FirstLogonCommands>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install Virtio Guest Agent</Description>
-          <Order>1</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
-          <Description>Install spice-webdavd file sharing agent</Description>
-          <Order>2</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install usbdk USB sharing agent</Description>
-          <Order>3</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
-          <Description>Install spice-vdagent SPICE agent</Description>
-          <Order>4</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
-          <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
-          <Description>Disable Hibernation</Description>
-          <Order>5</Order>
-        </SynchronousCommand>
-      </FirstLogonCommands>
-    </component>
-  </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup"
+            processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35"
+            language="neutral"
+            versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideLocalAccountScreen>false</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <ProtectYourPC>3</ProtectYourPC>
+                <SkipUserOOBE>false</SkipUserOOBE>
+                <SkipMachineOOBE>false</SkipMachineOOBE>
+                <VMModeOptimizations>
+                    <SkipWinREInitialization>true</SkipWinREInitialization>
+                </VMModeOptimizations>
+            </OOBE>
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
+                    <Description>Install Virtio Guest Agent</Description>
+                    <Order>1</Order>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>msiexec /i F:\spice-webdavd-x64-latest.msi /quiet /passive /qn</CommandLine>
+                    <Description>Install spice-webdavd file sharing agent</Description>
+                    <Order>2</Order>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
+                    <Description>Install usbdk USB sharing agent</Description>
+                    <Order>3</Order>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
+                    <Description>Install spice-vdagent SPICE agent</Description>
+                    <Order>4</Order>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
+                    <Description>Disable Hibernation</Description>
+                    <Order>5</Order>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+        </component>
+    </settings>
 </unattend>
 EOF
 }
 
 function dbg_windows() {
-  local DEBUG=0
-  if [ ${DEBUG} -eq 1 ]; then
-    echo "${1}"
-  fi
+    local DEBUG=0
+    if [ ${DEBUG} -eq 1 ]; then
+        echo "${1}"
+    fi
 }
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
@@ -1540,8 +1542,8 @@ function get_windows() {
 
     # Ignore the most recent Windows 10 release for now.
     case ${RELEASE} in
-      10) INDEX=0;;
-      11) INDEX=0;;
+        10) INDEX=0 ;;
+        11) INDEX=0 ;;
     esac
 
     echo "Getting Windows ${RELEASE} URL..."
@@ -1555,8 +1557,8 @@ function get_windows() {
     dbg_windows "${VERSION_ID}"
 
     case ${RELEASE} in
-        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
-        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '"${RELEASE}"'").edition_id');;
+        8) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id') ;;
+        10|11) EDITION_ID=$(wget -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '"${RELEASE}"'").edition_id') ;;
     esac
     dbg_windows "${EDITION_ID}"
 
@@ -1582,7 +1584,7 @@ function get_windows() {
 
     # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
     if [ -n "${DOWNLOAD_SHA1}" ]; then
-      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+        check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
     fi
 
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
@@ -1613,7 +1615,7 @@ create_vm() {
     #echo "${HASH}"
     web_get "${URL}" "${VM_PATH}"
     if [ -n "${HASH}" ]; then
-      check_hash "${ISO}" "${HASH}"
+        check_hash "${ISO}" "${HASH}"
     fi
     make_vm_config "${ISO}"
 }
@@ -1665,7 +1667,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${EDITIONS[*]} =~ ${EDITION} ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
                 for EDITION in "${EDITIONS[@]}"; do
-                  echo -n "${EDITION} "
+                    echo -n "${EDITION} "
                 done
                 exit 1
             fi
@@ -1673,15 +1675,15 @@ if [ -n "${2}" ]; then
 
         # Workaround for Regolith
         if [ "${OS}" == "regolith" ]; then
-          if [ "${RELEASE}" == "focal" ] && [ "${EDITION}" == "2.0.0" ]; then
-            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
-            EDITION="1.6.0"
-            echo " - Setting edition to: ${EDITION}"
-          elif [ "${RELEASE}" == "impish" ] && [ "${EDITION}" == "1.6.0" ]; then
-            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
-            EDITION="2.0.0"
-            echo " - Setting edition to: ${EDITION}"
-          fi
+            if [ "${RELEASE}" == "focal" ] && [ "${EDITION}" == "2.0.0" ]; then
+                echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
+                EDITION="1.6.0"
+                echo " - Setting edition to: ${EDITION}"
+            elif [ "${RELEASE}" == "impish" ] && [ "${EDITION}" == "1.6.0" ]; then
+                echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
+                EDITION="2.0.0"
+                echo " - Setting edition to: ${EDITION}"
+            fi
         fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
@@ -1702,7 +1704,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
                 echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
                 for LANG in "${LANGS[@]}"; do
-                  echo -n "${LANG} "
+                    echo -n "${LANG} "
                 done
                 exit 1
             fi
@@ -1717,18 +1719,18 @@ if [ -n "${2}" ]; then
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
-      *ubuntu*)
-        echo -n " - Releases: "
-        releases_ubuntu
-        ;;
-      *)
-        echo -n " - Releases: "
-        releases_"${OS}"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-          echo -n " - Editions: "
-          editions_"${OS}"
-        fi
-        ;;
+        *ubuntu*)
+            echo -n " - Releases: "
+            releases_ubuntu
+            ;;
+        *)
+            echo -n " - Releases: "
+            releases_"${OS}"
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                echo -n " - Editions: "
+                editions_"${OS}"
+            fi
+            ;;
     esac
     exit 1
 fi
