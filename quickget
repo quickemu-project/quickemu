@@ -867,15 +867,7 @@ function get_freedos() {
           ;;
     esac
 
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-
-    if [[ $ISO =~ ".zip" ]]; then
-      unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-      ISO=$(ls ${VM_PATH} | grep -i '.iso')
-    fi
-
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_garuda() {
@@ -1653,13 +1645,21 @@ create_vm() {
     local URL="${URL_HASH[0]}"
     local HASH="${URL_HASH[1]}"
     local ISO="${URL##*/}"
+
     #echo "${URL}"
     #echo "${ISO}"
     #echo "${HASH}"
     web_get "${URL}" "${VM_PATH}"
+
     if [ -n "${HASH}" ]; then
       check_hash "${ISO}" "${HASH}"
     fi
+
+    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+
     make_vm_config "${ISO}"
 }
 
