@@ -73,8 +73,8 @@ You can also pass optional parameters
 EXAMPLES
 ========
 
-**quickemu --vm ubuntu-mate-impish.conf**
-:   Launches the VM specified in the file *ubuntu-mate-impish.conf*
+**quickemu --vm ubuntu-mate-21.10-.conf**
+:   Launches the VM specified in the file *ubuntu-mate-21.10-.conf*
 
 Introduction
 ------------
@@ -85,8 +85,8 @@ operating system you want to run and Quickemu will figure out the best
 way to do it for you. For example:
 
 ``` {.bash}
-quickget ubuntu-mate impish
-quickemu --vm ubuntu-mate-impish.conf
+quickget ubuntu-mate 21.10
+quickemu --vm ubuntu-mate-21.10-.conf
 ```
 
 The original objective of the project was to enable quick testing of
@@ -192,8 +192,8 @@ Ubuntu Guest
 virtual machine configuration.
 
 ``` {.bash}
-quickget ubuntu focal
-quickemu --vm ubuntu-focal.conf
+quickget ubuntu 20.04
+quickemu --vm ubuntu-20.04.conf
 ```
 
 -   Complete the installation as normal.
@@ -467,7 +467,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in
 shortcut.
 
 ``` {.bash}
-quickemu --vm ubuntu-focal-desktop.conf --shortcut
+quickemu --vm ubuntu-20.04-desktop.conf --shortcut
 ```
 
 Screen and window size (Linux guests only)

@@ -61,8 +61,8 @@ Do not commit any changes to disk/snapshot.
 Print version
 .SH EXAMPLES
 .TP
-\f[B]quickemu \[en]vm ubuntu-mate-impish.conf\f[R]
-Launches the VM specified in the file \f[I]ubuntu-mate-impish.conf\f[R]
+\f[B]quickemu \[en]vm ubuntu-mate-21.10-.conf\f[R]
+Launches the VM specified in the file \f[I]ubuntu-mate-21.10-.conf\f[R]
 .SS Introduction
 .PP
 Quickly create and run highly optimised desktop virtual machines for
@@ -73,8 +73,8 @@ For example:
 .IP
 .nf
 \f[C]
-quickget ubuntu-mate impish
-quickemu --vm ubuntu-mate-impish.conf
+quickget ubuntu-mate 21.10
+quickemu --vm ubuntu-mate-21.10-.conf
 \f[R]
 .fi
 .PP
@@ -209,8 +209,8 @@ create the virtual machine configuration.
 .IP
 .nf
 \f[C]
-quickget ubuntu focal
-quickemu --vm ubuntu-focal.conf
+quickget ubuntu 20.04
+quickemu --vm ubuntu-20.04.conf
 \f[R]
 .fi
 .IP \[bu] 2
@@ -613,7 +613,7 @@ Here is an example of how to create a shortcut.
 .IP
 .nf
 \f[C]
-quickemu --vm ubuntu-focal-desktop.conf --shortcut
+quickemu --vm ubuntu-20.04-desktop.conf --shortcut
 \f[R]
 .fi
 .SS Screen and window size (Linux guests only)

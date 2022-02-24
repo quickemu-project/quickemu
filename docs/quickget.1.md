@@ -49,8 +49,8 @@ Ubuntu Guest
 virtual machine configuration.
 
 ``` {.bash}
-quickget ubuntu focal
-quickemu --vm ubuntu-focal.conf
+quickget ubuntu 20.04
+quickemu --vm ubuntu-20.04.conf
 ```
 
 -   Complete the installation as normal.
