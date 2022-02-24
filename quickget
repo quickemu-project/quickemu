@@ -56,9 +56,9 @@ function pretty_name() {
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntu-kylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-studio)      PRETTY_NAME="Ubuntu Studio";;
+    ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
@@ -767,8 +767,9 @@ function get_debian() {
     esac
 
     if [ "${EDITION}" == "netinst" ]; then
-        URL="$(echo "${URL}" | sed 's/-live//' | sed 's/hybrid/cd/')"
-        ISO="$(echo "${ISO}" | sed 's/-live//')"
+        URL="${URL/-live/}"
+        URL="${URL/hybrid/cd}"
+        ISO="${ISO/-live/}"
     fi
 
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
