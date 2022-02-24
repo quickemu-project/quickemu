@@ -286,8 +286,7 @@ function editions_freebsd(){
 }
 
 function releases_freedos() {
-    echo 1.2 \
-         1.3
+    echo 1.2 1.3
 }
 
 function releases_garuda() {
@@ -893,19 +892,16 @@ function get_freebsd() {
 function get_freedos() {
     local HASH=""
     local ISO=""
-    local URL=""
+    local URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
 
-    URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
-
-    case $RELEASE in
+    case ${RELEASE} in
         1.2)
           ISO="FD12CD.iso"
           HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1)
           ;;
         1.3)
           ISO="FD13-LiveCD.zip"
-          HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | \
-            grep "${ISO}" | cut -d' ' -f1)
+          HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1)
           ;;
     esac
 
