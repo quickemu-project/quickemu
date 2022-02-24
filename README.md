@@ -220,7 +220,11 @@ Other Operating Systems
 -   `cachyos` (CachyOS)
 -   `debian` (Debian)
 -   `devuan` (Devuan)
+<<<<<<< HEAD
 -   `dragonflybsd` (DragonFlyBSD)
+=======
+    `dragonflybsd` (DragonFlyBSD)
+>>>>>>> 22e95b4e74efdf48f3413b6f6a58232bd9fdaf3d
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
