@@ -39,6 +39,7 @@ function pretty_name() {
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
@@ -166,6 +167,7 @@ function os_support() {
     elementary \
     fedora \
     freebsd \
+    freedos \
     garuda \
     gentoo \
     ghostbsd \
@@ -281,6 +283,11 @@ function releases_freebsd(){
 
 function editions_freebsd(){
     echo disc1 dvd1
+}
+
+function releases_freedos() {
+    echo 1.2 \
+         1.3
 }
 
 function releases_garuda() {
@@ -657,6 +664,9 @@ function make_vm_config() {
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;
+        freedos)
+            GUEST="freedos"
+            IMAGE_TYPE="iso";;
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
@@ -698,6 +708,11 @@ EOF
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          freedos)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+            echo "ram=\"256M\"" >> "${CONF_FILE}"
+            ;;
           kolibrios)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
@@ -872,6 +887,28 @@ function get_freebsd() {
     local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_freedos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+
+    case $RELEASE in
+        1.2)
+          ISO="FD12CD.iso"
+          HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1)
+          ;;
+        1.3)
+          ISO="FD13-LiveCD.zip"
+          HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | \
+            grep "${ISO}" | cut -d' ' -f1)
+          ;;
+    esac
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1657,13 +1694,21 @@ create_vm() {
     local URL="${URL_HASH[0]}"
     local HASH="${URL_HASH[1]}"
     local ISO="${URL##*/}"
+
     #echo "${URL}"
     #echo "${ISO}"
     #echo "${HASH}"
     web_get "${URL}" "${VM_PATH}"
+
     if [ -n "${HASH}" ]; then
       check_hash "${ISO}" "${HASH}"
     fi
+
+    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+
     make_vm_config "${ISO}"
 }
 
