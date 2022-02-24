@@ -666,7 +666,12 @@ EOF
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-          kolibrios|freedos)
+          freedos)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+            echo "ram=\"256M\"" >> "${CONF_FILE}"
+            ;;
+          kolibrios)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
