@@ -86,6 +86,7 @@ Requirements
 -   [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 -   [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
 -   [zsync](http://zsync.moria.org.uk/)
+-   [unzip](http://www.info-zip.org/UnZip.html)
 
 Usage
 =====
@@ -215,10 +216,11 @@ Other Operating Systems
 -   `cachyos` (CachyOS)
 -   `debian` (Debian)
 -   `devuan` (Devuan)
-    `dragonflybsd` (DragonFlyBSD)
+-    `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
+-    `freedos` (FreeDOS)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
