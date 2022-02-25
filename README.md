@@ -443,6 +443,14 @@ SSH and SPICE ports the VM is connected to.
 cat ubuntu-20.04/ubuntu-20.04.ports
 ```
 
+If, for example, the SSH port is set to 22220, and assuming your VM has
+a started SSH service (details vary by OS), you can typically SSH into
+it from the host as follows:
+
+``` {.bash}
+ssh -p 22220 your_vm_user@localhost
+```
+
 Accessibility
 =============
 
