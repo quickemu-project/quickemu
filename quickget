@@ -625,8 +625,9 @@ function zsync_get() {
           exit 1
         fi
 
-        if ! zsync "${URL}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-            echo "ERROR! Failed to download ${URL}.zsync"
+        # Only force http for zsync - not earlier because we might fall through here
+        if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+            echo "ERROR! Failed to download ${URL/https/http}.zsync"
             exit 1
         fi
 
