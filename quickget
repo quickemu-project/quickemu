@@ -39,6 +39,7 @@ function pretty_name() {
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
+    freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
@@ -166,6 +167,7 @@ function os_support() {
     elementary \
     fedora \
     freebsd \
+    freedos \
     garuda \
     gentoo \
     ghostbsd \
@@ -281,6 +283,10 @@ function releases_freebsd(){
 
 function editions_freebsd(){
     echo disc1 dvd1
+}
+
+function releases_freedos() {
+    echo 1.2 1.3
 }
 
 function releases_garuda() {
@@ -437,7 +443,49 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo 18.04 20.04 21.10 daily-live daily-canary
+    echo 14.04 \
+        16.04 \
+        18.04 \
+        20.04 \
+        21.10 \
+        daily-live \
+        daily-canary \
+        eol-4.10 \
+        eol-5.04 \
+        eol-5.10 \
+        eol-6.06.0 eol-6.06.1 eol-6.06.2 \
+        eol-6.10 \
+        eol-7.04 \
+        eol-7.10 \
+        eol-8.04.0 eol-8.04.1 eol-8.04.2 eol-8.04.3 eol-8.04.4 \
+        eol-8.10 \
+        eol-9.04 \
+        eol-9.10 \
+        eol-10.04.0 eol-10.04.1 eol-10.04.2 eol-10.04.3 eol-10.04.4 \
+        eol-10.10 \
+        eol-11.04 \
+        eol-11.10 \
+        eol-12.04 eol-12.04.0 eol-12.04.1 eol-12.04.2 eol-12.04.3 eol-12.04.4 eol-12.04.5 \
+        eol-12.10 \
+        eol-13.04 \
+        eol-13.10 \
+        eol-14.04.0 eol-14.04.1 eol-14.04.2 eol-14.04.3 eol-14.04.4 eol-14.04.5 \
+        eol-14.10 \
+        eol-15.04 \
+        eol-15.10 \
+        eol-16.04.0 eol-16.04.1 eol-16.04.2 eol-16.04.3 eol-16.04.4 eol-16.04.5 eol-16.04.6 \
+        eol-16.10 \
+        eol-17.04 \
+        eol-17.10 \
+        eol-18.04 eol-18.04.0 eol-18.04.1 eol-18.04.2 eol-18.04.3 eol-18.04.4 eol-18.04.5 \
+        eol-18.10 \
+        eol-19.04 \
+        eol-19.10 \
+        eol-20.04 eol-20.04.0 eol-20.04.1 eol-20.04.2 \
+        eol-20.10 \
+        eol-21.04 \
+        eol-21.10 \
+        ;
 }
 
 function releases_void() {
@@ -545,7 +593,7 @@ function web_get() {
     fi
 
     if command -v aria2c &>/dev/null; then
-        if ! aria2c -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
+        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" -o "${DIR}/${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
           exit 1
@@ -615,6 +663,9 @@ function make_vm_config() {
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;
+        freedos)
+            GUEST="freedos"
+            IMAGE_TYPE="iso";;
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
@@ -656,6 +707,11 @@ EOF
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          freedos)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+            echo "ram=\"256M\"" >> "${CONF_FILE}"
+            ;;
           kolibrios)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
@@ -830,6 +886,25 @@ function get_freebsd() {
     local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_freedos() {
+    local HASH=""
+    local ISO=""
+    local URL="http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+
+    case ${RELEASE} in
+        1.2)
+          ISO="FD12CD.iso"
+          HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1)
+          ;;
+        1.3)
+          ISO="FD13-LiveCD.zip"
+          HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1)
+          ;;
+    esac
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1169,17 +1244,24 @@ function get_ubuntu() {
         RELEASE="daily-live"
     fi
 
-    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
-        URL="http://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    if [[ "${RELEASE}" == "eol-"* ]]; then
+        URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
+    elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-devel"
     elif [ "${OS}" == "ubuntu" ]; then
-        URL="http://releases.ubuntu.com/${RELEASE}"
+        URL="https://releases.ubuntu.com/${RELEASE}"
     else
-        URL="http://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
+        URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
 
-    ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d'*' -f2)
-    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd' | grep amd64 | cut -d' ' -f1)
+    if wget -q --spider "${URL}/SHA256SUMS"; then
+        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d'*' -f2)
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+    else
+        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f3)
+        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+    fi
     #echo "${URL}/${ISO} ${HASH}"
 
     if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -1608,13 +1690,21 @@ create_vm() {
     local URL="${URL_HASH[0]}"
     local HASH="${URL_HASH[1]}"
     local ISO="${URL##*/}"
+
     #echo "${URL}"
     #echo "${ISO}"
     #echo "${HASH}"
     web_get "${URL}" "${VM_PATH}"
+
     if [ -n "${HASH}" ]; then
       check_hash "${ISO}" "${HASH}"
     fi
+
+    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+
     make_vm_config "${ISO}"
 }
 
@@ -1719,7 +1809,7 @@ else
     case ${OS} in
       *ubuntu*)
         echo -n " - Releases: "
-        releases_ubuntu
+        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
       *)
         echo -n " - Releases: "
