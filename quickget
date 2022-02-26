@@ -166,12 +166,12 @@ function check_links() {
       if [[ $(type -t "editions_${FUNC}") == function ]]; then
         for EDITY in $("editions_${FUNC}"); do
           URL=$(get_"${FUNC}" | cut -d " " -f1)
-          CHECK=$(curl -o /dev/null --silent --head --write-out '%{http_code}\t%{content_type}' "${URL}")
+          CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
           echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
         done
       else
         URL=$(get_"${FUNC}" | cut -d " " -f1)
-        CHECK=$(curl -o /dev/null --silent --head --write-out '%{http_code}\t%{content_type}' "${URL}")
+        CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
         echo "$FUNC $RELEASE ${CHECK} $URL"
       fi
     done
