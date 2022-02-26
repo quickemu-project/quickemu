@@ -623,7 +623,6 @@ Here are the usage instructions:
 
 ``` {.bash}
 
-
 Usage
   quickemu --vm ubuntu.conf
 
