@@ -159,6 +159,7 @@ Requirements
 -   [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 -   [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
 -   [zsync](http://zsync.moria.org.uk/)
+-   [unzip](http://www.info-zip.org/UnZip.html)
 
 Usage
 =====
@@ -233,11 +234,6 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Operating Systems
------------------------
-
-`quickget` also supports:
-
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
@@ -250,6 +246,7 @@ Other Operating Systems
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
+-   `freedos` (FreeDOS)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
@@ -437,6 +434,7 @@ All the options
 Here are the usage instructions:
 
 ``` {.bash}
+
 
 Usage
   quickemu --vm ubuntu.conf
