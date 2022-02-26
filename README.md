@@ -208,6 +208,11 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
+Other Operating Systems
+-----------------------
+
+`quickget` also supports:
+
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
