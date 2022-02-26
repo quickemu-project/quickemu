@@ -1,12 +1,80 @@
-<h1 align="center">
-  <img src=".github/logo.png" alt="Quickemu" width="256" />
-  <br />
-  Quickemu
-</h1>
+---
+author: Martin Wimpress
+date: 'February 20, 2022'
+footer: quickemu
+header: Quickemu User Manual
+section: 1
+title: QUICKEMU
+---
 
-<p align="center"><b>Quickly create and run optimised Windows, macOS and Linux desktop virtual machines.</b></p>
-<div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
-<p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
+NAME
+====
+
+quickemu - A quick VM builder and manager
+
+SYNOPSIS
+========
+
+**quickemu** \[*OPTION*\]...
+
+DESCRIPTION
+===========
+
+**quickemu** will create and run highly optimised desktop virtual
+machines for Linux, macOS and Windows
+
+OPTIONS
+=======
+
+**--vm**
+:   vm configuration file
+
+You can also pass optional parameters
+
+**--braille**
+:   Enable braille support. Requires SDL.
+
+**--delete**
+:   Delete the disk image.
+
+**--display**
+:   Select display backend. 'sdl' (default), 'gtk', 'none' or 'spice'
+
+**--fullscreen**
+:   Starts VM in full screen mode (Ctl+Alt+f to exit)
+
+**--ignore-msrs-always**
+:   Configure KVM to always ignore unhandled machine-specific registers
+
+**--screen \<screen\>**
+:   Use specified screen to determine the window size.
+
+**--shortcut**
+:   Create a desktop shortcut
+
+**--snapshot apply \<tag\>**
+:   Apply/restore a snapshot.
+
+**--snapshot create \<tag\>**
+:   Create a snapshot.
+
+**--snapshot delete \<tag\>**
+:   Delete a snapshot.
+
+**--snapshot info**
+:   Show disk/snapshot info.
+
+**--status-quo**
+:   Do not commit any changes to disk/snapshot.
+
+**--version**
+:   Print version
+
+EXAMPLES
+========
+
+**quickemu --vm ubuntu-mate-21.10-.conf**
+:   Launches the VM specified in the file *ubuntu-mate-21.10-.conf*
 
 Introduction
 ------------
@@ -91,7 +159,6 @@ Requirements
 -   [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 -   [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
 -   [zsync](http://zsync.moria.org.uk/)
--   [unzip](http://www.info-zip.org/UnZip.html)
 
 Usage
 =====
@@ -117,48 +184,6 @@ sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
 ```
-
-Install Quickemu
-================
-
-Ubuntu
-------
-
-Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
-includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04
-(Hirsute). To install Quickemu and all the dependencies run the
-following in a terminal:
-
-``` {.bash}
-sudo apt-add-repository ppa:flexiondotorg/quickemu
-sudo apt update
-sudo apt install quickemu
-```
-
-Other Linux
------------
-
-``` {.bash}
-git clone --depth=1 https://github.com/wimpysworld/quickemu
-cd quickemu
-```
-
-Now install all the **Requirements** documented above.
-
-### Other sources
-
-[Repology.org](https://repology.org/) found the following releases have
-been packaged.
-
-#### Quickemu
-
-[![Packaging
-status](https://repology.org/badge/vertical-allrepos/quickemu.svg)](https://repology.org/project/quickemu/versions)
-
-#### Quickgui
-
-[![Packaging
-status](https://repology.org/badge/vertical-allrepos/quickgui.svg)](https://repology.org/project/quickgui/versions)
 
 Ubuntu Guest
 ------------
@@ -225,7 +250,6 @@ Other Operating Systems
 -   `elementary` (elementary OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
--   `freedos` (FreeDOS)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
@@ -407,215 +431,6 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-SPICE
-=====
-
-The following features are available while using the SPICE protocol:
-
--   Copy/paste between the guest and host
--   Host file sharing to the guest
--   USB device redirection
-
-To use SPICE add `--display spice` to the Quickemu invocation, this
-requires that the `spicy` client is installed, available from the
-`spice-client-gtk` package in Debian/Ubuntu.
-
-``` {.bash}
-quickemu --vm ubuntu-20.04.conf --display spice
-```
-
-Headless
---------
-
-To start a VM with SPICE enabled, but no display attached use
-`--display none`. This requires that the `spicy` client is installed,
-available from the `spice-client-gtk` package in Debian/Ubuntu to
-connect to the running VM
-
-``` {.bash}
-quickemu --vm ubuntu-20.04.conf --display none
-```
-
-You can also use the `.ports` file in the VM directory to lookup what
-SSH and SPICE ports the VM is connected to.
-
-``` {.bash}
-cat ubuntu-20.04/ubuntu-20.04.ports
-```
-
-If, for example, the SSH port is set to 22220, and assuming your VM has
-a started SSH service (details vary by OS), you can typically SSH into
-it from the host as follows:
-
-``` {.bash}
-ssh -p 22220 your_vm_user@localhost
-```
-
-Accessibility
-=============
-
-Qemu provides support for using BrlAPI to display braille output on a
-real or fake device.
-
-``` {.bash}
-quickemu --vm ubuntu-21.10.conf --braille --display sdl
-```
-
-BIOS and EFI
-============
-
-Since Quickemu 2.1.0 `efi` is the default boot option. If you want to
-override this behaviour then add the following line to you VM
-configuration to enable legacy BIOS.
-
--   `boot="legacy"` - Enable Legacy BIOS boot
-
-Tuning CPU cores, RAM & disks
-=============================
-
-By default, Quickemu will calculate the number of CPUs cores and RAM to
-allocate to a VM based on the specifications of your host computer. You
-can override this default behaviour and tune the VM configuration to
-your liking.
-
-Add additional lines to your virtual machine configuration:
-
--   `cpu_cores="4"` - Specify the number of CPU cores allocated to the
-    VM
--   `ram="4G"` - Specify the amount of RAM to allocate to the VM
--   `disk_size="16G"` - Specify the size of the virtual disk allocated
-    to the VM
-
-Disk preallocation
-------------------
-
-Preallocation mode (allowed values: `off` (default), `metadata`,
-`falloc`, `full`). An image with preallocated metadata is initially
-larger but can improve performance when the image needs to grow.
-
-Specify what disk preallocation should be used, if any, when creating
-the system disk image by adding a line like this to your VM
-configuration.
-
--   `preallocation="metadata"`
-
-CD-ROM disks
-------------
-
-If you want to expose an ISO image from the host to guest add the
-following line to the VM configuration:
-
--   `fixed_iso="/path/to/image.iso"`
-
-Floppy disks
-------------
-
-If you're like [Alan Pope](https://popey.com) you'll probably want to
-mount a floppy disk image in the guest. To do so add the following line
-to the VM configuration:
-
--   `floppy="/path/to/floppy.img"`
-
-File Sharing
-============
-
-All File Sharing options will only expose `~/Public` (or localised
-variations) for the current user to the guest VMs.
-
-Samba 🐧 🍏 🪟
------------
-
-If `smbd` is available on the host, Quickemu will automatically enable
-the built-in QEMU support for exposing a Samba share from the host to
-the guest.
-
-You can install the minimal Samba components on Ubuntu using:
-
-``` {.bash}
-sudo apt install --no-install-recommends samba
-```
-
-SPICE WebDAV 🐧 🪟
-----------------
-
--   TBD
-
-VirtIO-9P 🐧 🍏
--------------
-
--   TBD
-
-Network port forwarding
-=======================
-
-Add an additional line to your virtual machine configuration. For
-example:
-
--   `port_forwards=("8123:8123" "8888:80")`
-
-In the example above:
-
--   Port 8123 on the host is forwarded to port 8123 on the guest.
--   Port 8888 on the host is forwarded to port 80 on the guest.
-
-Bridged networking
-==================
-
-Connect your virtual machine to a preconfigured network bridge. Add an
-additional line to your virtual machine configuration
-
--   `bridge="br0"`
-
-USB redirection
-===============
-
-Quickemu supports USB redirection via SPICE pass-through and host
-pass-through.
-
-SPICE redirection (recommended)
--------------------------------
-
-Using SPICE for USB pass-through is easiest as it doesn't require any
-elevated permission, start Quickemu with `--display spice` and then
-select `Input` -\> `Select USB Device for redirection` from the menu to
-choose which device(s) you want to attach to the guest.
-
-Host redirection **NOT Recommended**
-------------------------------------
-
-**USB host redirection is not recommended**, it is provided purely for
-backwards compatibility to older versions of Quickemu. Using SPICE is
-preferred, see above.
-
-Add an additional line to your virtual machine configuration. For
-example:
-
--   `usb_devices=("046d:082d" "046d:085e")`
-
-In the example above:
-
--   The USB device with vendor\_id 046d and product\_id 082d will be
-    exposed to the guest.
--   The USB device with vendor\_id 046d and product\_id 085e will be
-    exposed to the guest.
-
-If the USB devices are not writable, `quickemu` will display the
-appropriate commands to modify the USB device(s) access permissions,
-like this:
-
-     - USB:      Host pass-through requested:
-                  - Sennheiser Communications EPOS GTW 270 on bus 001 device 005 needs permission changes:
-                    sudo chown -v root:user /dev/bus/usb/001/005
-                    ERROR! USB permission changes are required 👆
-
-TPM
-===
-
-Since Quickemu 2.2.0 a software emulated TPM device can be added to
-guest virtual machines. Just add `tpm="on"` to your VM configuration.
-`quickget` will automatically add this line to Windows 11 virtual
-machines.
-
 All the options
 ===============
 
@@ -738,3 +553,21 @@ Useful reference that assisted the development of Quickemu.
     -   <https://www.kraxel.org/blog/2019/06/macos-qemu-guest/>
     -   <https://superuser.com/questions/628169/how-to-share-a-directory-with-the-host-without-networking-in-qemu>
     -   <https://virtio-fs.gitlab.io/>
+
+AUTHORS
+=======
+
+Written by Martin Wimpress.
+
+BUGS
+====
+
+Submit bug reports online at:
+<https://github.com/quickemu-project/quickemu/issues>
+
+SEE ALSO
+========
+
+Full sources at: <https://github.com/quickemu-project/quickemu>
+
+quickemu\_conf(1), quickget(1), quickgui(1)
