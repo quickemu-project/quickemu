@@ -176,6 +176,7 @@ function check_links() {
       fi
     done
   done
+  exit 0
 }
 
 
