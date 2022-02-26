@@ -10,7 +10,7 @@ export LC_ALL=C
 #  5. Update make_vm_config() - add any *required* new OS tweaks
 #  6. Create a get_newos() function - that does something like this:
 #     function get_newos() {
-#         local EDITION="${1:-}"
+#         local EDITION=$EDITY
 #         local HASH=""
 #         local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
 #         local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
@@ -24,6 +24,8 @@ function cleanup() {
     kill "$(jobs -p)"
   fi
 }
+
+EDITY="${1:-}"
 
 function pretty_name() {
   local SIMPLE_NAME=""
@@ -153,6 +155,29 @@ function list_csv() {
   done
   exit 0
 }
+function check_links() {
+  for OS in $(os_support); do
+    if [[ "${OS}" == *"ubuntu"* ]] || [[ "${OS}" == *"windows"* ]] || [[ "${OS}" == *"macos"* ]]; then
+      continue
+    else
+      FUNC="${OS}"
+    fi
+    for RELEASE in $("releases_${FUNC}"); do
+      if [[ $(type -t "editions_${FUNC}") == function ]]; then
+        for EDITY in $("editions_${FUNC}"); do
+          URL=$(get_"${FUNC}" | cut -d " " -f1)
+          CHECK=$(curl -o /dev/null --silent --head --write-out '%{http_code}\t%{content_type}' "${URL}")
+          echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
+        done
+      else
+        URL=$(get_"${FUNC}" | cut -d " " -f1)
+        CHECK=$(curl -o /dev/null --silent --head --write-out '%{http_code}\t%{content_type}' "${URL}")
+        echo "$FUNC $RELEASE ${CHECK} $URL"
+      fi
+    done
+  done
+}
+
 
 function os_support() {
     echo alma \
@@ -741,7 +766,7 @@ EOF
 }
 
 function get_alma() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
     local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
@@ -766,7 +791,7 @@ function get_alpine() {
 }
 
 function get_android() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local JSON_ALL=""
@@ -797,7 +822,7 @@ function get_archlinux() {
 }
 
 function get_arcolinux() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
@@ -813,7 +838,7 @@ function get_cachyos() {
 }
 
 function get_debian() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
@@ -863,7 +888,7 @@ function get_elementary() {
 }
 
 function get_fedora() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local JSON=""
@@ -910,7 +935,7 @@ function get_freedos() {
 }
 
 function get_garuda() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local URL=""
@@ -935,7 +960,7 @@ function get_gentoo() {
 }
 
 function get_ghostbsd() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local ISO=""
     local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
     local HASH=""
@@ -949,7 +974,7 @@ function get_ghostbsd() {
 }
 
 function get_haiku() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
     local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
     local HASH=""
@@ -986,7 +1011,7 @@ function get_kolibrios() {
 }
 
 function get_linuxmint() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
@@ -1080,7 +1105,7 @@ function get_manjaro() {
 }
 
 function get_mxlinux() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
@@ -1111,7 +1136,7 @@ function get_netbsd() {
 }
 
 function get_nixos() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
@@ -1165,7 +1190,7 @@ function get_oraclelinux() {
 }
 
 function get_popos() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local URL=""
@@ -1175,7 +1200,7 @@ function get_popos() {
 }
 
 function get_regolith() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="Regolith_${EDITION}_${RELEASE}.iso"
     local URL=""
@@ -1189,7 +1214,7 @@ function get_regolith() {
 }
 
 function get_rockylinux() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
@@ -1211,7 +1236,7 @@ function get_slackware() {
 }
 
 function get_solus() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
@@ -1277,7 +1302,7 @@ function get_ubuntu() {
 
 function get_void() {
     local DATE=""
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local URL="https://alpha.de.repo.voidlinux.org/live/current"
@@ -1294,7 +1319,7 @@ function get_void() {
 }
 
 function get_zorin() {
-    local EDITION="${1:-}"
+    local EDITION=$EDITY
     local HASH=""
     local ISO=""
     local URL=""
@@ -1725,6 +1750,8 @@ if [ -n "${1}" ]; then
         list_csv
     elif [ "${OS}" == "list_json" ]; then
         list_json
+    elif [ "${OS}" == "check_links" ]; then
+        check_links
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
         WHERE=$(dirname "${BASH_SOURCE[0]}")
         "${WHERE}/quickemu" --version
