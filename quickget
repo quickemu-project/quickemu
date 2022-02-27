@@ -482,10 +482,19 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo 14.04 \
-        16.04 \
-        18.04 \
-        20.04 \
+    local LTS_SUPPORT="14.04 16.04 18.04 20.04"
+    case "${OS}" in
+        kubuntu|lubuntu|ubuntukylin|\
+        ubuntu-mate|ubuntustudio|xubuntu)
+        ## after 14.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        ;;
+        ubuntu-budgie)
+        #after 16.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        ;;
+    esac
+    echo ${LTS_SUPPORT} \
         21.10 \
         daily-live \
         daily-canary \
