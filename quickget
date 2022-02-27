@@ -156,23 +156,46 @@ function list_csv() {
   exit 0
 }
 function check_links() {
+    local OSORUBUNTU
+    local CHECK_LINKS=true
   for OS in $(os_support); do
-    if [[ "${OS}" == *"ubuntu"* ]] || [[ "${OS}" == *"windows"* ]] || [[ "${OS}" == *"macos"* ]]; then
+    if \
+      [[ "${OS}" == *"windows"* ]] || \
+      [[ "${OS}" == *"macos"* ]]   || \
+      [[ ! "${OS}" == *"${1:${OS}}"*  ]]; then
       continue
     else
       FUNC="${OS}"
+        if [[ "${OS}" == *"ubuntu"* ]]; then
+        OSORUBUNTU="ubuntu"
+        else
+        OSORUBUNTU="${OS}"
+        fi
     fi
-    for RELEASE in $("releases_${FUNC}"); do
-      if [[ $(type -t "editions_${FUNC}") == function ]]; then
-        for EDITY in $("editions_${FUNC}"); do
-          URL=$(get_"${FUNC}" | cut -d " " -f1)
-          CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
-          echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
-        done
+    for RELEASE in $("releases_${OSORUBUNTU}"); do
+      if [[ ${RELEASE} == "eol-"* ]]; then
+        continue
       else
-        URL=$(get_"${FUNC}" | cut -d " " -f1)
-        CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
-        echo "$FUNC $RELEASE ${CHECK} $URL"
+        if [[ $(type -t "editions_${FUNC}") == function ]]; then
+            for EDITY in $("editions_${FUNC}"); do
+            URL=$(get_"${FUNC}" | cut -d " " -f1)
+            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            if [[ -n "${ZCHECK}" ]] ; then
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
+                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+            fi
+            echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
+
+            done
+        else
+            URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
+            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            if [[ -n "${ZCHECK}" ]] ; then
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
+                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+            fi
+            echo "$FUNC $RELEASE ${CHECK} $URL"
+        fi
       fi
     done
   done
@@ -332,7 +355,6 @@ function editions_garuda() {
     mate \
     qtile \
     sway \
-    wayfire \
     xfce
 }
 
@@ -469,10 +491,19 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo 14.04 \
-        16.04 \
-        18.04 \
-        20.04 \
+    local LTS_SUPPORT="14.04 16.04 18.04 20.04"
+    case "${OS}" in
+        kubuntu|lubuntu|ubuntukylin|\
+        ubuntu-mate|ubuntustudio|xubuntu)
+        ## after 14.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        ;;
+        ubuntu-budgie)
+        #after 16.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        ;;
+    esac
+    echo ${LTS_SUPPORT} \
         21.10 \
         daily-live \
         daily-canary \
@@ -594,7 +625,7 @@ function check_hash() {
 
     echo -n "Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
-        echo "ERROR!"
+        echo "ERROR! Checking ISO"
         echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
         exit 1
     else
@@ -945,7 +976,11 @@ function get_garuda() {
       cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
       *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
     esac
-    ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso"
+    case ${EDITION} in
+        xfce|kde-barebones)  ISO="garuda-${EDITION}-linux-lts-${RELEASE}.iso";;
+        *) ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso";;
+    esac
+
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1289,15 +1324,19 @@ function get_ubuntu() {
         ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f3)
         HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
     fi
-    #echo "${URL}/${ISO} ${HASH}"
 
-    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
-        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
-        make_vm_config "${OS}-devel.iso"
+    if [[ -n "${CHECK_LINKS}" ]] ; then
+        echo "${URL}/${ISO} ${HASH}"
     else
-        web_get "${URL}/${ISO}" "${VM_PATH}"
-        check_hash "${ISO}" "${HASH}"
-        make_vm_config "${ISO}"
+
+        if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+            zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+            make_vm_config "${OS}-devel.iso"
+        else
+            web_get "${URL}/${ISO}" "${VM_PATH}"
+            check_hash "${ISO}" "${HASH}"
+            make_vm_config "${ISO}"
+        fi
     fi
 }
 
@@ -1752,7 +1791,7 @@ if [ -n "${1}" ]; then
     elif [ "${OS}" == "list_json" ]; then
         list_json
     elif [ "${OS}" == "check_links" ]; then
-        check_links
+        check_links "${2:-}"
     elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
         WHERE=$(dirname "${BASH_SOURCE[0]}")
         "${WHERE}/quickemu" --version
