@@ -180,11 +180,20 @@ function check_links() {
             for EDITY in $("editions_${FUNC}"); do
             URL=$(get_"${FUNC}" | cut -d " " -f1)
             CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            if [[ -n "${ZCHECK}" ]] ; then
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
+                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+            fi
             echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
+
             done
         else
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
             CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            if [[ -n "${ZCHECK}" ]] ; then
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
+                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+            fi
             echo "$FUNC $RELEASE ${CHECK} $URL"
         fi
       fi
