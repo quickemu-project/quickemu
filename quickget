@@ -1726,9 +1726,7 @@ create_vm() {
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
     fi
-    # FIXME same as batocera - make common code
-    # maybe with a single type test
-    if [[ ${OS} == "ludos" ]] && [[ ${ISO} =~ ".gz" ]]; then
+    if [ ${IMAGE_TYPE} == "img" ] && [[ ${ISO} =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
     fi
