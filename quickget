@@ -158,10 +158,7 @@ function list_csv() {
 function check_links() {
     local OSORUBUNTU
     local CHECK_LINKS=true
-    local RED='\033[0;31m'
-    local GREEN='\033[0;32m'
-    local YELLOW='\033[1;33m'
-    local NC='\033[0m'
+    local JSON=[]
 
   for OS in $(os_support); do
     if \
@@ -180,57 +177,35 @@ function check_links() {
     for RELEASE in $("releases_${OSORUBUNTU}"); do
       if [[ ${RELEASE} == "eol-"* ]]; then
         continue
+        echo "eol"
       else
         if [[ $(type -t "editions_${FUNC}") == function ]]; then
             for EDITY in $("editions_${FUNC}"); do
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}")
             if [[ -n "${ZCHECK}" ]] ; then
-                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
-                if [[ "${ZCHECK}" == *"200"* ]] && [[ "${ZCHECK}" == *"application/octet-stream"* ]] || [[ "${ZCHECK}" == *"application/x-iso9660-image"* ]]; then
-                  COLOUR="${GREEN}"
-                elif [[ "${ZCHECK}" == *"000"* ]] || [[ "${ZCHECK}" == *"404"* ]]; then
-                  COLOUR="${RED}"
-                else
-                  COLOUR="${YELLOW}"
-                fi
-                echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}.zsync")
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$ZCHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+                #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ "${CHECK}" == *"200"* ]] && [[ "${CHECK}" == *"application/octet-stream"* ]] || [[ "${CHECK}" == *"application/x-iso9660-image"* ]]; then
-              COLOUR="${GREEN}"
-            elif [[ "${CHECK}" == *"000"* ]] || [[ "${CHECK}" == *"404"* ]]; then
-              COLOUR="${RED}"
-            else
-              COLOUR="${YELLOW}"
-            fi
-            echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+            #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
             done
         else
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
+            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}")
             if [[ -n "${ZCHECK}" ]] ; then
-                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
-                if [[ "${ZCHECK}" == *"200"* ]] && [[ "${ZCHECK}" == *"application/octet-stream"* ]] || [[ "${ZCHECK}" == *"application/x-iso9660-image"* ]]; then
-                  COLOUR="${GREEN}"
-                elif [[ "${ZCHECK}" == *"000"* ]] || [[ "${ZCHECK}" == *"404"* ]]; then
-                  COLOUR="${RED}"
-                else
-                  COLOUR="${YELLOW}"
-                fi
-                echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
+                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} {content_type}' "${URL}.zsync")
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$ZCHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+                #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ "${CHECK}" == *"200"* ]] && [[ "${CHECK}" == *"application/octet-stream"* ]] || [[ "${CHECK}" == *"application/x-iso9660-image"* ]]; then
-              COLOUR="${GREEN}"
-            elif [[ "${CHECK}" == *"000"* ]] || [[ "${CHECK}" == *"404"* ]]; then
-              COLOUR="${RED}"
-            else
-              COLOUR="${YELLOW}"
-            fi
-            echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+            #echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
         fi
       fi
     done
   done
+  echo $JSON|jq '.[]|select(.CHECK | startswith("000") or startswith("404") or startswith("3"))'
   exit 0
 }
 
