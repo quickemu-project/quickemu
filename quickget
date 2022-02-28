@@ -1722,11 +1722,11 @@ create_vm() {
       check_hash "${ISO}" "${HASH}"
     fi
 
-    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
-        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    if [ "${OS}" == "freedos" ] && [[ "${ISO}" =~ ".zip" ]]; then
+        unzip "${VM_PATH}"/"${ISO}" -d "${VM_PATH}"
+        ISO=$(ls "${VM_PATH}" | grep -i '.iso')
     fi
-    if [ ${IMAGE_TYPE} == "img" ] && [[ ${ISO} =~ ".gz" ]]; then
+    if [ "${IMAGE_TYPE}" == "img" ] && [[ "${ISO}" =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
     fi
@@ -1774,7 +1774,7 @@ if [ -n "${2}" ]; then
 
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
-        EDITIONS=($(editions_${OS}))
+        EDITIONS=($("editions_${OS}"))
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
