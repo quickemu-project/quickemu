@@ -158,6 +158,11 @@ function list_csv() {
 function check_links() {
     local OSORUBUNTU
     local CHECK_LINKS=true
+    local RED='\033[0;31m'
+    local GREEN='\033[0;32m'
+    local YELLOW='\033[1;33m'
+    local NC='\033[0m'
+
   for OS in $(os_support); do
     if \
       [[ "${OS}" == *"windows"* ]] || \
@@ -182,18 +187,46 @@ function check_links() {
             CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
-                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+                if [[ "${ZCHECK}" == *"200"* ]] && [[ "${ZCHECK}" == *"application/octet-stream"* ]] || [[ "${ZCHECK}" == *"application/x-iso9660-image"* ]]; then
+                  COLOUR="${GREEN}"
+                elif [[ "${ZCHECK}" == *"000"* ]] || [[ "${ZCHECK}" == *"404"* ]]; then
+                  COLOUR="${RED}"
+                else
+                  COLOUR="${YELLOW}"
+                fi
+                echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            echo "$FUNC $RELEASE $EDITY ${CHECK} $URL"
+            if [[ "${CHECK}" == *"200"* ]] && [[ "${CHECK}" == *"application/octet-stream"* ]] || [[ "${CHECK}" == *"application/x-iso9660-image"* ]]; then
+              COLOUR="${GREEN}"
+            elif [[ "${CHECK}" == *"000"* ]] || [[ "${CHECK}" == *"404"* ]]; then
+              COLOUR="${RED}"
+            else
+              COLOUR="${YELLOW}"
+            fi
+            echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
             done
         else
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
             CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}")
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code}\t%{content_type}' "${URL}.zsync")
-                echo "$FUNC $RELEASE $EDITY ${ZCHECK} ${URL}.zsync"
+                if [[ "${ZCHECK}" == *"200"* ]] && [[ "${ZCHECK}" == *"application/octet-stream"* ]] || [[ "${ZCHECK}" == *"application/x-iso9660-image"* ]]; then
+                  COLOUR="${GREEN}"
+                elif [[ "${ZCHECK}" == *"000"* ]] || [[ "${ZCHECK}" == *"404"* ]]; then
+                  COLOUR="${RED}"
+                else
+                  COLOUR="${YELLOW}"
+                fi
+                echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            echo "$FUNC $RELEASE ${CHECK} $URL"
+            if [[ "${CHECK}" == *"200"* ]] && [[ "${CHECK}" == *"application/octet-stream"* ]] || [[ "${CHECK}" == *"application/x-iso9660-image"* ]]; then
+              COLOUR="${GREEN}"
+            elif [[ "${CHECK}" == *"000"* ]] || [[ "${CHECK}" == *"404"* ]]; then
+              COLOUR="${RED}"
+            else
+              COLOUR="${YELLOW}"
+            fi
+            echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
         fi
       fi
     done
@@ -1205,7 +1238,7 @@ function get_opensuse() {
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     fi
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256"|awk '{if(NR==4) print $0}'|cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1258,7 +1291,7 @@ function get_rockylinux() {
       8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
-    HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
