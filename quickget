@@ -58,9 +58,9 @@ function pretty_name() {
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
+    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
