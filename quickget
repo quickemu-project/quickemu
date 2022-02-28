@@ -205,7 +205,8 @@ function check_links() {
       fi
     done
   done
-  echo $JSON|jq '.[]|select(.CHECK | startswith("000") or startswith("404") or startswith("3"))'
+  echo $JSON
+  #echo $JSON|jq '.[]|select(.CHECK | startswith("000") or startswith("404") or startswith("3"))'
   exit 0
 }
 
