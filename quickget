@@ -493,7 +493,6 @@ function releases_manjaro() {
     kde \
     budgie \
     cinnamon \
-    deepin \
     i3 \
     mate
 }
@@ -1283,7 +1282,8 @@ function get_opensuse() {
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     fi
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256"|awk '{if(NR==4) print $0}'|cut -d' ' -f1)
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |awk '{if(NR==4) print $0}'|cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
