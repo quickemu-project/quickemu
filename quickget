@@ -367,7 +367,6 @@ function releases_manjaro() {
     kde \
     budgie \
     cinnamon \
-    deepin \
     i3 \
     mate
 }
