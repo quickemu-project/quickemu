@@ -182,24 +182,69 @@ function check_links() {
         if [[ $(type -t "editions_${FUNC}") == function ]]; then
             for EDITY in $("editions_${FUNC}"); do
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}")
+            CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
+            CODE=$("${CHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
+            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
+            SIZE=$("${CHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
+            SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+            echo $STATUS $MIMETYPE $SIZE $SIZER
             if [[ -n "${ZCHECK}" ]] ; then
-                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}.zsync")
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$ZCHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+                ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
+                CODE=$("${ZCHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
+                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
+                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
+                SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
+                if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                    STATUS="GOOD"
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                    STATUS="WARNING"
+                elif [[ $CODE != *"200"* ]];then
+                    STATUS="ERROR" 
+                fi
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+            if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                STATUS="GOOD"
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                STATUS="WARNING"
+            elif [[ $CODE != *"200"* ]];then
+                STATUS="ERROR" 
+            fi
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
             #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
             done
         else
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} %{content_type}' "${URL}")
+            CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
+            CODE=$("${CHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
+            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
+            SIZE=$("${CHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
+            SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
             if [[ -n "${ZCHECK}" ]] ; then
-                ZCHECK=$(curl -o /dev/null --silent --head -L --write-out '%{http_code} {content_type}' "${URL}.zsync")
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$ZCHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+                ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
+                CODE=$("${ZCHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
+                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
+                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
+                SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
+                if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                    STATUS="GOOD"
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                    STATUS="WARNING"
+                elif [[ $CODE != *"200"* ]];then
+                    STATUS="ERROR" 
+                fi
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CHECK" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "CHECK" : $c, "URL" : $u}]')
+            if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                STATUS="GOOD"
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                STATUS="WARNING"
+            elif [[ $CODE != *"200"* ]];then
+                STATUS="ERROR" 
+            fi
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
             #echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
         fi
       fi
