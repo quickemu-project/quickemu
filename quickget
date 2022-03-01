@@ -306,7 +306,6 @@ function editions_garuda() {
     mate \
     qtile \
     sway \
-    wayfire \
     xfce
 }
 
@@ -919,7 +918,11 @@ function get_garuda() {
       cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
       *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
     esac
-    ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso"
+    case ${EDITION} in
+        xfce|kde-barebones)  ISO="garuda-${EDITION}-linux-lts-${RELEASE}.iso";;
+        *) ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso";;
+    esac
+
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
