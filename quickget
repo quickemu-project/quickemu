@@ -183,68 +183,83 @@ function check_links() {
             for EDITY in $("editions_${FUNC}"); do
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
             CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
-            CODE=$("${CHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
-            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
-            SIZE=$("${CHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
-            SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
-            echo $STATUS $MIMETYPE $SIZE $SIZER
+            CODE=$("${CHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
+            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
+            SIZE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
+            if [[ SIZE -gt 0 ]];then
+              SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+            else
+              SIZER=0
+            fi
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
-                CODE=$("${ZCHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
-                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
-                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
-                SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
-                if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                CODE=$("${ZCHECK}" 2>&1 |ggrep -m1 "HTTP/"|cut -d' ' -f 2)
+                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
+                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
+                if [[ SIZE -gt 0 ]];then
+                   SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+                else
+                  SIZER=0
+                fi
+                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
                     STATUS="WARNING"
-                elif [[ $CODE != *"200"* ]];then
+                else
                     STATUS="ERROR" 
                 fi
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
                 STATUS="WARNING"
-            elif [[ $CODE != *"200"* ]];then
+            else
                 STATUS="ERROR" 
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
             #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
             done
         else
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
             CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
-            CODE=$("${CHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
-            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
-            SIZE=$("${CHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
-            SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
+            CODE=$("${CHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
+            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
+            SIZE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
+            if [[ SIZE -gt 0 ]];then
+              SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+            else
+              SIZER=0
+            fi
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
-                CODE=$("${ZCHECK}" 2>&1 |grep -m1 HTTP|cut -d' ' -f 2)
-                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Type|cut -d' ' -f 2)
-                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 Content-Length|tr -d "\r" |cut -d' ' -f2)
-                SIZER=$(echo "${SIZE}" 2>&1 |numfmt --to=iec-i --suffix=B --format="%.2f")
-                if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+                CODE=$("${ZCHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
+                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
+                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
+                if [[ SIZE -gt 0 ]];then
+                  SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+                else
+                  SIZER=0
+                fi
+                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
                     STATUS="WARNING"
-                elif [[ $CODE != *"200"* ]];then
+                else
                     STATUS="ERROR" 
                 fi
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
+                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ "$MIMETYPE" == @(*"octet-stream"* | *"x-iso9660-image"* | *"zip"*) ]]  && [[ $SIZE -ge 5242880 ]]; then
+            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]] && [[ $SIZE -ge 5242880 ]]; then
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
                 STATUS="WARNING"
-            elif [[ $CODE != *"200"* ]];then
+            else
                 STATUS="ERROR" 
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg r "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u "SIZE" : $r, "CODE" : $c, "MIMETYPE" : $m }]')
+            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
             #echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
         fi
       fi
@@ -1184,7 +1199,7 @@ function get_manjaro() {
     local URL=""
 
     case ${RELEASE} in
-      gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md";;
+      gnome|kde|xfce) MANIFESTURL=" ";;
       budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md";;
     esac
 
