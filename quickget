@@ -201,9 +201,9 @@ function check_links() {
                 else
                   SIZER=0
                 fi
-                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
+                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
                     STATUS="WARNING"
                 else
                     STATUS="ERROR" 
@@ -211,9 +211,9 @@ function check_links() {
                 JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
+            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
                 STATUS="WARNING"
             else
                 STATUS="ERROR" 
@@ -242,9 +242,9 @@ function check_links() {
                 else
                   SIZER=0
                 fi
-                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
+                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
+                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
                     STATUS="WARNING"
                 else
                     STATUS="ERROR" 
@@ -252,9 +252,9 @@ function check_links() {
                 JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
                 #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* ]]; then
+            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* ]]; then
+            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
                 STATUS="WARNING"
             else
                 STATUS="ERROR" 
@@ -265,9 +265,18 @@ function check_links() {
       fi
     done
   done
-  echo $JSON
+  WAR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("WAR"))')
+  ERR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("ERR"))')
+  if [[ ERR != "" ]];then
+      echo $WAR $ERR
+      exit 1
+  else
+      echo $WAR
+      exit 0
+  fi
+  #echo $JSON
   #echo $JSON|jq '.[]|select(.CHECK | startswith("000") or startswith("404") or startswith("3"))'
-  exit 0
+  #exit 0
 }
 
 
@@ -1199,7 +1208,7 @@ function get_manjaro() {
     local URL=""
 
     case ${RELEASE} in
-      gnome|kde|xfce) MANIFESTURL=" ";;
+      gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md";;
       budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md";;
     esac
 
