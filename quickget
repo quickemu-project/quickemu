@@ -10,7 +10,7 @@ export LC_ALL=C
 #  5. Update make_vm_config() - add any *required* new OS tweaks
 #  6. Create a get_newos() function - that does something like this:
 #     function get_newos() {
-#         local EDITION=$EDITY
+#         local EDITION="${1:-}"
 #         local HASH=""
 #         local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
 #         local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
@@ -24,8 +24,6 @@ function cleanup() {
     kill "$(jobs -p)"
   fi
 }
-
-EDITY="${1:-}"
 
 function pretty_name() {
   local SIMPLE_NAME=""
@@ -158,6 +156,7 @@ function list_csv() {
 function check_links() {
     local OSORUBUNTU
     local CHECK_LINKS=true
+    local EDITION
     local JSON=[]
 
   for OS in $(os_support); do
@@ -180,103 +179,105 @@ function check_links() {
         echo "eol"
       else
         if [[ $(type -t "editions_${FUNC}") == function ]]; then
-            for EDITY in $("editions_${FUNC}"); do
-            URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
-            CODE=$("${CHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
-            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
-            SIZE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
-            if [[ SIZE -gt 0 ]];then
-              SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+            for EDITION in $("editions_${FUNC}"); do
+            URL=$(get_"${OSORUBUNTU}" "${EDITION}" | cut -d " " -f1)
+            CHECK=$(curl --silent --head -L "${URL}" | tr -d "\r" | tac)
+            CODE=$(echo "${CHECK}"  | grep -m1 'HTTP/' | cut -d' ' -f 2)
+            MIMETYPE=$(echo "${CHECK}" | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
+            SIZE=$(echo "${CHECK}"  | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
+            if [[ ${SIZE} -gt 0 ]]; then
+              SIZER=$(echo "${SIZE}" | numfmt --to=iec-i --suffix=B --format="%.2f")
             else
               SIZER=0
             fi
             if [[ -n "${ZCHECK}" ]] ; then
-                ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
-                CODE=$("${ZCHECK}" 2>&1 |ggrep -m1 "HTTP/"|cut -d' ' -f 2)
-                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
-                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
-                if [[ SIZE -gt 0 ]];then
-                   SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+                ZCHECK=$(curl --silent --head -L "${URL}.zsync" | tr -d "\r" | tac)
+                CODE=$(echo "${ZCHECK}" | grep -m1 'HTTP/' | cut -d' ' -f 2)
+                MIMETYPE=$(echo "${ZCHECK}" | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
+                SIZE=$(echo "${ZCHECK}" | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
+                if [[ ${SIZE} -gt 0 ]]; then
+                   SIZER=$(echo "${SIZE}" | numfmt --to=iec-i --suffix=B --format="%.2f")
                 else
                   SIZER=0
                 fi
-                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
+                if [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  == *"octet-stream"* || ${MIMETYPE}  == *"x-iso9660-image"* || ${MIMETYPE}  == *"zip"* || ${MIMETYPE}  == *"nosniff"* ]] && [[ ${SIZE} -gt 10240 ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
+                elif [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  != *"octet-stream"* || ${MIMETYPE}  != *"x-iso9660-image"* || ${MIMETYPE}  != *"zip"* || ${MIMETYPE}  != *"nosniff"* ]]; then
                     STATUS="WARNING"
                 else
-                    STATUS="ERROR" 
+                    STATUS="ERROR"
                 fi
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
-                #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
+                JSON=$(jq --null-input --arg f "${FUNC}" --arg r "${RELEASE}" --arg e "${EDITION}" --arg c "${CODE}" --arg m "${MIMETYPE}" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
+                #echo -e "${FUNC}  ${RELEASE}  ${EDITION}  $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
+            if [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  == *"octet-stream"* || ${MIMETYPE}  == *"x-iso9660-image"* || ${MIMETYPE}  == *"zip"* || ${MIMETYPE}  == *"nosniff"* ]] && [[ ${SIZE} -gt 10240 ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
+            elif [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  != *"octet-stream"* || ${MIMETYPE}  != *"x-iso9660-image"* || ${MIMETYPE}  != *"zip"* || ${MIMETYPE}  != *"nosniff"* ]]; then
                 STATUS="WARNING"
             else
-                STATUS="ERROR" 
+                STATUS="ERROR"
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
-            #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${CHECK} $URL $NC"
+            JSON=$(jq --null-input --arg f "${FUNC}" --arg r "${RELEASE}" --arg e "${EDITION}" --arg c "${CODE}  " --arg m "${MIMETYPE}" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
+            #echo -e "${FUNC}  ${RELEASE}  ${EDITION}  $COLOUR ${CHECK} $URL $NC"
             done
         else
+            EDITION=""
             URL=$(get_"${OSORUBUNTU}" | cut -d " " -f1)
-            CHECK=$(curl --silent --head -L "${URL}"|tr -d "\r"|tac)
-            CODE=$("${CHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
-            MIMETYPE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
-            SIZE=$("${CHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
-            if [[ SIZE -gt 0 ]];then
-              SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
+            CHECK=$(curl --silent --head -L "${URL}" | tr -d "\r" | tac)
+            CODE=$(echo "${CHECK}"  | grep -m1 "HTTP/" | cut -d' ' -f 2)
+            MIMETYPE=$(echo "${CHECK}"  | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
+            SIZE=$(echo "${CHECK}" | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
+            if [[ ${SIZE} -gt 0 ]]; then
+              SIZER=$(echo "${SIZE}" | numfmt --to=iec-i --suffix=B --format="%.2f")
             else
               SIZER=0
             fi
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
-                CODE=$("${ZCHECK}" 2>&1 |grep -m1 "HTTP/"|cut -d' ' -f 2)
-                MIMETYPE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[tT]ype|cut -d' ' -f 2)
-                SIZE=$("${ZCHECK}" 2>&1 |grep -m1 [cC]ontent-[lL]ength|tr -d "\r" |cut -d' ' -f2)
-                if [[ SIZE -gt 0 ]];then
+                CODE=$(echo "${ZCHECK}"  | grep -m1 'HTTP/' | cut -d' ' -f 2)
+                MIMETYPE=$(echo "${ZCHECK}"  | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
+                SIZE=$(echo "${ZCHECK}" | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
+                if [[ ${SIZE} -gt 0 ]]; then
                   SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
                 else
                   SIZER=0
                 fi
-                if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
+                if [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  == *"octet-stream"* || ${MIMETYPE}  == *"x-iso9660-image"* || ${MIMETYPE}  == *"zip"* || ${MIMETYPE}  == *"nosniff"* ]] && [[ ${SIZE} -gt 10240 ]]; then
                     STATUS="GOOD"
-                elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
+                elif [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  != *"octet-stream"* || ${MIMETYPE}  != *"x-iso9660-image"* || ${MIMETYPE}  != *"zip"* || ${MIMETYPE}  != *"nosniff"* ]]; then
                     STATUS="WARNING"
                 else
-                    STATUS="ERROR" 
+                    STATUS="ERROR"
                 fi
-                JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
-                #echo -e "$FUNC $RELEASE $EDITY $COLOUR ${ZCHECK} ${URL}.zsync $NC"
+                JSON=$(jq --null-input --arg f "${FUNC}" --arg r "${RELEASE}" --arg e "${EDITION}" --arg c "${CODE}  " --arg m "${MIMETYPE}" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
+                #echo -e "${FUNC}  ${RELEASE}  ${EDITION}  $COLOUR ${ZCHECK} ${URL}.zsync $NC"
             fi
-            if [[ $CODE == *"200"* ]] && [[ $MIMETYPE == *"octet-stream"* || $MIMETYPE == *"x-iso9660-image"* || $MIMETYPE == *"zip"* || $MIMETYPE == *"nosniff"* ]] && [[ SIZE -gt 10240 ]]; then
+            if [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  == *"octet-stream"* || ${MIMETYPE}  == *"x-iso9660-image"* || ${MIMETYPE}  == *"zip"* || ${MIMETYPE}  == *"nosniff"* ]] && [[ ${SIZE} -gt 10240 ]]; then
                 STATUS="GOOD"
-            elif [[ $CODE == *"200"* ]] && [[ $MIMETYPE != *"octet-stream"* || $MIMETYPE != *"x-iso9660-image"* || $MIMETYPE != *"zip"* || $MIMETYPE != *"nosniff"* ]]; then
+            elif [[ ${CODE} == *"200"* ]] && [[ ${MIMETYPE}  != *"octet-stream"* || ${MIMETYPE}  != *"x-iso9660-image"* || ${MIMETYPE}  != *"zip"* || ${MIMETYPE}  != *"nosniff"* ]]; then
                 STATUS="WARNING"
             else
-                STATUS="ERROR" 
+                STATUS="ERROR"
             fi
-            JSON=$(jq --null-input --arg f "$FUNC" --arg r "$RELEASE" --arg e "$EDITY" --arg c "$CODE" --arg m "$MIMETYPE" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
-            #echo -e "$FUNC $RELEASE $COLOUR ${CHECK} $URL $NC"
+            JSON=$(jq --null-input --arg f "${FUNC}" --arg r "${RELEASE}" --arg e "${EDITION}" --arg c "${CODE}  " --arg m "${MIMETYPE}" --arg q "$SIZER" --arg s "$STATUS" --arg u "$URL" --argjson  a "$JSON" '$a + [{"OS" : $f, "Release" : $r, "Edition" : $e, "STATUS" : $s, "URL" : $u, "SIZE" : $q, "CODE" : $c, "MIMETYPE" : $m }]')
+            #echo -e "${FUNC}  ${RELEASE}  $COLOUR ${CHECK} $URL $NC"
         fi
       fi
     done
   done
-  WAR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("WAR"))')
-  ERR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("ERR"))')
-  if [[ ERR != "" ]];then
-      echo $WAR $ERR
-      exit 1
-  else
-      echo $WAR
-      exit 0
-  fi
-  #echo $JSON
+#   WAR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("WAR"))')
+#   ERR=$(echo "${JSON}" | jq '.[]|select(.STATUS | startswith("ERR"))')
+#   if [[ "${ERR}" != "" ]]; then
+#       echo "$WAR" "$ERR"
+#       exit 1
+#   else
+#       echo "$WAR"
+#       exit 0
+#   fi
+  #
+  echo "${JSON}"
   #echo $JSON|jq '.[]|select(.CHECK | startswith("000") or startswith("404") or startswith("3"))'
-  #exit 0
+  exit 0
 }
 
 
@@ -874,7 +875,7 @@ EOF
 }
 
 function get_alma() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
     local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
@@ -899,7 +900,7 @@ function get_alpine() {
 }
 
 function get_android() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local JSON_ALL=""
@@ -930,7 +931,7 @@ function get_archlinux() {
 }
 
 function get_arcolinux() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
@@ -946,7 +947,7 @@ function get_cachyos() {
 }
 
 function get_debian() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
@@ -996,7 +997,7 @@ function get_elementary() {
 }
 
 function get_fedora() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local JSON=""
@@ -1043,7 +1044,7 @@ function get_freedos() {
 }
 
 function get_garuda() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -1072,7 +1073,7 @@ function get_gentoo() {
 }
 
 function get_ghostbsd() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local ISO=""
     local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
     local HASH=""
@@ -1086,7 +1087,7 @@ function get_ghostbsd() {
 }
 
 function get_haiku() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
     local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
     local HASH=""
@@ -1123,7 +1124,7 @@ function get_kolibrios() {
 }
 
 function get_linuxmint() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
@@ -1217,7 +1218,7 @@ function get_manjaro() {
 }
 
 function get_mxlinux() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
@@ -1248,7 +1249,7 @@ function get_netbsd() {
 }
 
 function get_nixos() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
@@ -1275,7 +1276,7 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
-    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
+    elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     else
@@ -1303,7 +1304,7 @@ function get_oraclelinux() {
 }
 
 function get_popos() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -1313,7 +1314,7 @@ function get_popos() {
 }
 
 function get_regolith() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="Regolith_${EDITION}_${RELEASE}.iso"
     local URL=""
@@ -1327,7 +1328,7 @@ function get_regolith() {
 }
 
 function get_rockylinux() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
@@ -1349,7 +1350,7 @@ function get_slackware() {
 }
 
 function get_solus() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
@@ -1419,7 +1420,7 @@ function get_ubuntu() {
 
 function get_void() {
     local DATE=""
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://alpha.de.repo.voidlinux.org/live/current"
@@ -1436,7 +1437,7 @@ function get_void() {
 }
 
 function get_zorin() {
-    local EDITION=$EDITY
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -1900,7 +1901,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${EDITIONS[*]} =~ ${EDITION} ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
                 for EDITION in "${EDITIONS[@]}"; do
-                  echo -n "${EDITION} "
+                  echo -n "${EDITION}"
                 done
                 exit 1
             fi
@@ -1937,7 +1938,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
                 echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
                 for LANG in "${LANGS[@]}"; do
-                  echo -n "${LANG} "
+                  echo -n "${LANG}"
                 done
                 exit 1
             fi
