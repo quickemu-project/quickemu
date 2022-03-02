@@ -235,9 +235,9 @@ function check_links() {
             fi
             if [[ -n "${ZCHECK}" ]] ; then
                 ZCHECK=$(curl --silent --head -L "${URL}.zsync"|tr -d "\r"|tac)
-                CODE=$(echo "${CHECK}"  | grep -m1 'HTTP/' | cut -d' ' -f 2)
-                MIMETYPE=$(echo "${CHECK}"  | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
-                SIZE=$(echo "${CHECK}" | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
+                CODE=$(echo "${ZCHECK}"  | grep -m1 'HTTP/' | cut -d' ' -f 2)
+                MIMETYPE=$(echo "${ZCHECK}"  | grep -m1 '[cC]ontent-[tT]ype' | cut -d' ' -f 2)
+                SIZE=$(echo "${ZCHECK}" | grep -m1 '[cC]ontent-[lL]ength' | tr -d "\r" | cut -d' ' -f2)
                 if [[ ${SIZE} -gt 0 ]]; then
                   SIZER=$(echo "${SIZE}"|numfmt --to=iec-i --suffix=B --format="%.2f")
                 else
