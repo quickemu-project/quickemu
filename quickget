@@ -1901,7 +1901,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${EDITIONS[*]} =~ ${EDITION} ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
                 for EDITION in "${EDITIONS[@]}"; do
-                  echo -n "${EDITION}"
+                  echo -n "${EDITION} "
                 done
                 exit 1
             fi
@@ -1938,7 +1938,7 @@ if [ -n "${2}" ]; then
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
                 echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
                 for LANG in "${LANGS[@]}"; do
-                  echo -n "${LANG}"
+                  echo -n "${LANG} "
                 done
                 exit 1
             fi
