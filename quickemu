@@ -761,9 +761,11 @@ function vm_boot() {
 
   echo -n "" > "${VMDIR}/${VMNAME}.ports"
 
-  # Find a free port to expose ssh to the guest
-  local SSH_PORT=""
-  SSH_PORT=$(get_port 22220 9)
+  if [ -z "$SSH_PORT" ]; then
+    # Find a free port to expose ssh to the guest
+    SSH_PORT=$(get_port 22220 9)
+  fi
+
   if [ -n "${SSH_PORT}" ]; then
     echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
@@ -783,10 +785,12 @@ function vm_boot() {
     done
   fi
 
-  # Find a free port for spice
   local SPICE="disable-ticketing=on"
-  local SPICE_PORT=""
-  SPICE_PORT=$(get_port 5930 9)
+  if [ -z "${SPICE_PORT}" ]; then
+    # Find a free port for spice
+    SPICE_PORT=$(get_port 5930 9)
+  fi
+
   if [ -z "${SPICE_PORT}" ]; then
     echo " - SPICE:    All SPICE ports have been exhausted."
     if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
@@ -1013,19 +1017,53 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
-  echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
-  ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
+  if [ ${VM_UP} -eq 0 ]; then
+    echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
+    ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
+    sleep 0.25
+  fi
 
-  # If output is 'none' then SPICE was requested.
-  if [ "${OUTPUT}" == "spice" ]; then
-    if [ -n "${PUBLIC}" ]; then
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
-    else
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
+}
+
+function start_viewer {
+  errno=0
+  if [ "${VIEWER}" != "none" ]; then
+    echo "---"
+
+    # If output is 'none' then SPICE was requested.
+    if [ "${OUTPUT}" == "spice" ]; then
+      if [ "${VIEWER}" == "remote-viewer" ]; then
+        # show via viewer: remote-viewer
+
+        if [ -n "${PUBLIC}" ]; then
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+          errno=$?
+        else
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+          errno=$?
+        fi
+
+      elif [ "${VIEWER}" == "spicy" ]; then
+        # show via viewer: spicy
+
+        if [ -n "${PUBLIC}" ]; then
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
+          errno=$?
+        else
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+          errno=$?
+        fi
+      fi
+      if [ $errno -ne 0 ]; then
+        echo "WARNING! Could not start viewer(${VIEWER}) Err: $errno"
+      fi
     fi
   fi
-  sleep 0.25
-  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
 }
 
 function shortcut_create {
@@ -1067,6 +1105,9 @@ function usage() {
   echo "  --snapshot delete <tag> : Delete a snapshot."
   echo "  --snapshot info         : Show disk/snapshot info."
   echo "  --status-quo            : Do not commit any changes to disk/snapshot."
+  echo "  --viewer                : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+  echo "  --ssh-port              : Set ssh-port manually"
+  echo "  --spice-port            : Set spice-port manually"
   echo "  --version               : Print version"
   exit 1
 }
@@ -1080,6 +1121,42 @@ function display_param_check() {
     exit 1
   fi
 }
+
+function viewer_param_check() {
+  if [ "${VIEWER}" != "none" ] && [ "${VIEWER}" != "spicy" ] && [ "${VIEWER}" != "remote-viewer" ]; then
+    echo "ERROR! Requested viewer '${VIEWER}' is not recognised."
+    exit 1
+  fi  
+  if [ "${VIEWER}" == "spicy" ] && ! command -v spicy &>/dev/null; then
+    echo "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
+    exit 1
+  elif [ "${VIEWER}" == "remote-viewer" ] && ! command -v remote-viewer &>/dev/null; then
+    echo "ERROR! Requested 'remote-viewer' as viewer, but 'remote-viewer' is not installed."
+    exit 1
+  fi
+}
+
+function parse_ports_from_file {
+    local FILE="${VMDIR}/${VMNAME}.ports"
+
+    # parse ports
+    port_name=( $(cat "$FILE" | cut -d, -f1) )
+    port_number=( $(cat "$FILE" | cut -d, -f2) )
+    for ((i=0; i<${#port_name[@]}; i++)); do
+      if [ ${port_name[$i]} == 'ssh' ]; then
+        SSH_PORT=${port_number[$i]}
+      fi
+      if [ ${port_name[$i]} == 'spice' ]; then
+        SPICE_PORT=${port_number[$i]}
+      fi
+    done
+}
+
+function is_numeric {
+    [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+### MAIN
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
@@ -1100,6 +1177,9 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
+viewer="spicy"
+ssh_port=""
+spice_port=""
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1120,6 +1200,9 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
+VIEWER=""
+SSH_PORT=""
+SPICE_PORT=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1213,6 +1296,18 @@ else
             VM="${2}"
             shift
             shift;;
+          -viewer|--viewer)
+            VIEWER="${2}"
+            shift
+            shift;;
+          -ssh-port|--ssh-port)
+            SSH_PORT="${2}"
+            shift;
+            shift;;
+          -spice-port|--spice-port)
+            SPICE_PORT="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1256,6 +1351,39 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     else
       OUTPUT="${display}"
       display_param_check
+    fi
+  fi
+
+  if [ -z "${VIEWER}" ]; then
+    VIEWER="${viewer}"
+  fi
+  viewer_param_check
+
+  if [ -z "${SSH_PORT}" ]; then
+    SSH_PORT=${ssh_port}
+  fi
+  if [ -n "${SSH_PORT}" ] &&  ! is_numeric "${SSH_PORT}"; then
+    echo "ERROR: ssh-port must be a number!"
+    exit 1
+  fi
+
+  if [ -z "${SPICE_PORT}" ]; then
+    SPICE_PORT=${spice_port}
+  fi
+  if [ -n "${SPICE_PORT}" ] && ! is_numeric "${SPICE_PORT}"; then
+    echo "ERROR: spice-port must be a number!"
+    exit 1
+  fi
+
+  # Check if vm is already run
+  VM_PID=0
+  VM_UP=0
+  if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+    VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
+    kill -0 ${VM_PID} 2>&1 >/dev/null
+    if [ $? -eq 0 ]; then
+        echo "VM already started!"
+        VM_UP=1
     fi
   fi
 
@@ -1309,6 +1437,12 @@ if [ ${SHORTCUT} -eq 1 ]; then
   exit
 fi
 
-vm_boot
+if [ $VM_UP -eq 0 ]; then
+    vm_boot
+    start_viewer
+else
+    parse_ports_from_file
+    start_viewer
+fi
 
 # vim:tabstop=2:shiftwidth=2:expandtab
