@@ -900,8 +900,8 @@ function vm_boot() {
          -device usb-ccid
          -chardev spicevmc,id=ccid,name=smartcard
          -device ccid-card-passthru,chardev=ccid
-         -monitor none
-         -serial mon:stdio)
+         )
+#         -serial mon:stdio)
 
   # FIXME: Check for device availability. qemu will fail to start otherwise
   if [ -n "${BRAILLE}" ]; then
@@ -1005,8 +1005,37 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
+  if [ -z "${monitor}" ]; then
+    monitor="${monitor}"
+  fi
+
+  if [ -z "${MONITOR_TELNET_HOST}" ]; then
+    MONITOR_TELNET_HOST="${monitor_telnet_host:-localhost}"
+  fi
+  if [ -z "${MONITOR_TELNET_PORT}" ]; then
+    MONITOR_TELNET_PORT="${monitor_telnet_port}"
+  fi
+  if [ -n "${MONITOR_TELNET_PORT}" ] &&  ! is_numeric "${MONITOR_TELNET_PORT}"; then
+    echo "ERROR: telnet-port must be a number!"
+    exit 1
+  fi
+
+  if [ "${MONITOR}" == "none" ]; then
+    args+=(-monitor none)
+    echo " - Monitor:  (off)"
+  elif [ "${MONITOR}" == "telnet" ]; then
+    args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
+    echo " - Monitor:  On host: telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
+    echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+  elif [ "${MONITOR}" == "socket" ]; then
+    args+=(-monitor unix:${VMDIR}/${VMNAME}-monitor.socket,server,nowait)
+    echo " - Monitor:  On host: nc -U \"${VMDIR}/${VMNAME}-monitor.socket\""
+  else
+    ::
+  fi
+
   if [ -n "${extra_args}" ]; then
-      args+=("${extra_args}")
+      args+=(${extra_args})
   fi
 
   # The OSK parameter contains parenthesis, they need to be escaped in the shell
@@ -1092,23 +1121,27 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --braille               : Enable braille support. Requires SDL."
-  echo "  --delete-disk           : Delete the disk image and EFI variables"
-  echo "  --delete-vm             : Delete the entire VM and it's configuration"
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
-  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
-  echo "  --screen <screen>       : Use specified screen to determine the window size."
-  echo "  --shortcut              : Create a desktop shortcut"
-  echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
-  echo "  --snapshot create <tag> : Create a snapshot."
-  echo "  --snapshot delete <tag> : Delete a snapshot."
-  echo "  --snapshot info         : Show disk/snapshot info."
-  echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --viewer                : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
-  echo "  --ssh-port              : Set ssh-port manually"
-  echo "  --spice-port            : Set spice-port manually"
-  echo "  --version               : Print version"
+  echo "  --braille                         : Enable braille support. Requires SDL."
+  echo "  --delete-disk                     : Delete the disk image and EFI variables"
+  echo "  --delete-vm                       : Delete the entire VM and it's configuration"
+  echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
+  echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
+  echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
+  echo "  --screen <screen>                 : Use specified screen to determine the window size."
+  echo "  --shortcut                        : Create a desktop shortcut"
+  echo "  --snapshot apply <tag>            : Apply/restore a snapshot."
+  echo "  --snapshot create <tag>           : Create a snapshot."
+  echo "  --snapshot delete <tag>           : Delete a snapshot."
+  echo "  --snapshot info                   : Show disk/snapshot info."
+  echo "  --status-quo                      : Do not commit any changes to disk/snapshot."
+  echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+  echo "  --ssh-port <port>                 : Set ssh-port manually"
+  echo "  --spice-port <port>               : Set spice-port manually"
+  echo "  --public-dir <path>               : expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
+  echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
+  echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
+  echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4444')"
+  echo "  --version                         : Print version"
   exit 1
 }
 
@@ -1180,6 +1213,10 @@ usb_devices=()
 viewer="spicy"
 ssh_port=""
 spice_port=""
+public_dir=""
+monitor="socket"
+monitor_telnet_port="4444"
+monitor_telnet_host="localhost"
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1203,27 +1240,12 @@ VMPATH=""
 VIEWER=""
 SSH_PORT=""
 SPICE_PORT=""
+MONITOR=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="3.15"
-
-# PUBLICSHARE is the only directory exposed to guest VMs for file
-# sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-if command -v xdg-user-dir &>/dev/null; then
-  PUBLIC=$(xdg-user-dir PUBLICSHARE)
-  if [ "${PUBLIC%/}" != "${HOME}" ]; then
-    if [ ! -d "${PUBLIC}" ]; then
-      mkdir -p "${PUBLIC}"
-    fi
-    PUBLIC_TAG="Public-${USER,,}"
-    # shellcheck disable=SC2012
-    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-  else
-    PUBLIC=""
-  fi
-fi
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
@@ -1308,6 +1330,22 @@ else
             SPICE_PORT="${2}"
             shift;
             shift;;
+          -public-dir|--public-dir)
+            PUBLIC="${2}"
+            shift;
+            shift;;
+          -monitor|--monitor)
+            MONITOR="${2}"
+            shift;
+            shift;;
+          -monitor-telnet-host|--monitor-telnet-host)
+            MONITOR_TELNET_HOST="${2}"
+            shift;
+            shift;;
+          -monitor-telnet-port|--monitor-telnet-port)
+            MONITOR_TELNET_PORT="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1358,6 +1396,31 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VIEWER="${viewer}"
   fi
   viewer_param_check
+
+  if [ -z "${PUBLIC}" ]; then
+    PUBLIC="${public_dir}"
+  fi
+
+  if [ "${PUBLIC}" == "none" ]; then
+    PUBLIC=""
+  else
+    # PUBLICSHARE is the only directory exposed to guest VMs for file
+    # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
+    if [ -z "${PUBLIC}" ]; then
+      if command -v xdg-user-dir &>/dev/null; then
+	PUBLIC=$(xdg-user-dir PUBLICSHARE)
+      fi
+    fi
+
+    if [ ! -d "${PUBLIC}" ]; then
+      echo "ERROR! Public directory: '${PUBLIC}' doesn't exist!"
+      exit 1
+    fi
+
+    PUBLIC_TAG="Public-${USER,,}"
+    # shellcheck disable=SC2012
+    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+  fi
 
   if [ -z "${SSH_PORT}" ]; then
     SSH_PORT=${ssh_port}
