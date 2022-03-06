@@ -1028,7 +1028,7 @@ function vm_boot() {
     echo " - Monitor:  On host: telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
     echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
   elif [ "${MONITOR}" == "socket" ]; then
-    args+=(-monitor unix:${VMDIR}/${VMNAME}-monitor.socket,server,nowait)
+    args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
     echo " - Monitor:  On host: nc -U \"${VMDIR}/${VMNAME}-monitor.socket\""
   else
     ::
@@ -1141,6 +1141,7 @@ function usage() {
   echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
   echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
   echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4444')"
+  echo "  --monitor-cmd <CMD>               : Send command to monitor if available. (Example: system_powerdown)"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1173,20 +1174,65 @@ function parse_ports_from_file {
     local FILE="${VMDIR}/${VMNAME}.ports"
 
     # parse ports
-    port_name=( $(cat "$FILE" | cut -d, -f1) )
-    port_number=( $(cat "$FILE" | cut -d, -f2) )
+    local port_name=( $(cat "$FILE" | cut -d, -f1) )
+    local port_number=( $(cat "$FILE" | cut -d, -f2) )
+    local host_name=( $(cat "$FILE" | gawk 'FS="," {print $3,"."}') )
+
     for ((i=0; i<${#port_name[@]}; i++)); do
-      if [ ${port_name[$i]} == 'ssh' ]; then
-        SSH_PORT=${port_number[$i]}
+      if [ "${port_name[$i]}" == "ssh" ]; then
+        SSH_PORT="${port_number[$i]}"
       fi
-      if [ ${port_name[$i]} == 'spice' ]; then
-        SPICE_PORT=${port_number[$i]}
+      if [ "${port_name[$i]}" == "spice" ]; then
+        SPICE_PORT="${port_number[$i]}"
+      fi
+      if [ "${port_name[$i]}" == "monitor-telnet" ]; then
+        MONITOR_TELNET_PORT="${port_number[$i]}"
+        MONITOR_TELNET_HOST="${host_name[$i]}"
       fi
     done
 }
 
 function is_numeric {
     [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+function monitor_send_cmd {
+    local MSG="${1}"
+
+    if [ -z "${MSG}" ]; then
+        echo "WARNING! Send to QEMU-Monitor: Message empty!"
+        return 1
+    fi
+
+    # Determine monitor channel
+    local monitor_channel=""
+
+    if [ -S "${VMDIR}/${VMNAME}-monitor.socket" ]; then
+        monitor_channel="socket"
+    elif [ -n "${MONITOR_TELNET_PORT}" ] && [ -n "${MONITOR_TELNET_HOST}" ]; then
+        monitor_channel="telnet"
+    else
+        echo "WARNING! No qemu-monitor channel available - Couldn't send message to monitor!"
+        return
+    fi
+
+
+    case "${monitor_channel}" in
+        socket)
+            echo -e " - MON-SEND: ${MSG}"
+            echo -e "${MSG}" | nc -N -U "${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null
+            ;;
+        telnet)
+            echo -e " - MON-SEND: ${MSG}"
+            echo -e "${MSG}" | nc -N "${MONITOR_TELNET_HOST}" "${MONITOR_TELNET_PORT}" 2>&1 > /dev/null
+            ;;
+        *)
+            echo "ERROR! This should never happen!"
+            exit 1
+            ;;
+    esac
+
+    return 0
 }
 
 ### MAIN
@@ -1217,6 +1263,7 @@ public_dir=""
 monitor="socket"
 monitor_telnet_port="4444"
 monitor_telnet_host="localhost"
+monitor_cmd=""
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1241,6 +1288,8 @@ VIEWER=""
 SSH_PORT=""
 SPICE_PORT=""
 MONITOR=""
+MONITOR_CMD=""
+VM_MONITOR_SOCKETPATH=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1338,6 +1387,10 @@ else
             MONITOR="${2}"
             shift;
             shift;;
+          -monitor-cmd|--monitor-cmd)
+            MONITOR_CMD="${2}"
+            shift;
+            shift;;
           -monitor-telnet-host|--monitor-telnet-host)
             MONITOR_TELNET_HOST="${2}"
             shift;
@@ -1369,6 +1422,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   VMDIR=$(dirname "${disk_img}")
   VMNAME=$(basename "${VM}" .conf)
   VMPATH=$(realpath "$(dirname "${VM}")")
+  VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
@@ -1503,9 +1557,11 @@ fi
 if [ $VM_UP -eq 0 ]; then
     vm_boot
     start_viewer
+    monitor_send_cmd "${MONITOR_CMD}"
 else
     parse_ports_from_file
     start_viewer
+    monitor_send_cmd "${MONITOR_CMD}"
 fi
 
 # vim:tabstop=2:shiftwidth=2:expandtab
