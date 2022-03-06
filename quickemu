@@ -1005,8 +1005,8 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
-  if [ -z "${monitor}" ]; then
-    monitor="${monitor}"
+  if [ -z "${MONITOR}" ]; then
+    MONITOR="${monitor:-none}"
   fi
 
   if [ -z "${MONITOR_TELNET_HOST}" ]; then
@@ -1024,14 +1024,60 @@ function vm_boot() {
     args+=(-monitor none)
     echo " - Monitor:  (off)"
   elif [ "${MONITOR}" == "telnet" ]; then
-    args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
-    echo " - Monitor:  On host: telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
-    echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+    # Find a free port to expose monitor-telnet to the guest
+    local temp_port="$(get_port ${MONITOR_TELNET_PORT} 9)"
+    if [ -z "${temp_port}" ]; then
+      echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
+    else
+      MONITOR_TELNET_PORT="${temp_port}"
+      args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
+      echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
+      echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+    fi
   elif [ "${MONITOR}" == "socket" ]; then
     args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
-    echo " - Monitor:  On host: nc -U \"${VMDIR}/${VMNAME}-monitor.socket\""
+    echo " - Monitor:  On host:  nc -U \"${VM_MONITOR_SOCKETPATH}\""
+    echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_MONITOR_SOCKETPATH}"
   else
-    ::
+    echo "ERROR! \"${MONITOR}\" is an unknown monitor option."
+    exit 1
+  fi
+
+  if [ -z "${SERIAL}" ]; then
+    SERIAL="${serial:-none}"
+  fi
+
+  if [ -z "${SERIAL_TELNET_HOST}" ]; then
+    SERIAL_TELNET_HOST="${serial_telnet_host:-localhost}"
+  fi
+  if [ -z "${SERIAL_TELNET_PORT}" ]; then
+    SERIAL_TELNET_PORT="${serial_telnet_port}"
+  fi
+  if [ -n "${SERIAL_TELNET_PORT}" ] &&  ! is_numeric "${SERIAL_TELNET_PORT}"; then
+    echo "ERROR: serial-port must be a number!"
+    exit 1
+  fi
+
+  if [ "${SERIAL}" == "none" ]; then
+    args+=(-serial none)
+  elif [ "${SERIAL}" == "telnet" ]; then
+    # Find a free port to expose serial-telnet to the guest
+    local temp_port="$(get_port ${SERIAL_TELNET_PORT} 9)"
+    if [ -z "${temp_port}" ]; then
+      echo " - Serial:   All Serial-Telnet ports have been exhausted."
+    else
+      SERIAL_TELNET_PORT="${temp_port}"
+      args+=(-serial telnet:${SERIAL_TELNET_HOST}:${SERIAL_TELNET_PORT},server,nowait)
+      echo " - Serial:   On host:  telnet ${SERIAL_TELNET_HOST} ${SERIAL_TELNET_PORT}"
+      echo "serial-telnet,${SERIAL_TELNET_PORT},${SERIAL_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+    fi
+  elif [ "${SERIAL}" == "socket" ]; then
+    args+=(-serial unix:${VM_SERIAL_SOCKETPATH},server,nowait)
+    echo " - Serial:   On host:  nc -U \"${VM_SERIAL_SOCKETPATH}\""
+    echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_SERIAL_SOCKETPATH}"
+  else
+    echo "ERROR! \"${SERIAL}\" is an unknown serial option."
+    exit 1
   fi
 
   if [ -n "${extra_args}" ]; then
@@ -1140,18 +1186,19 @@ function usage() {
   echo "  --public-dir <path>               : expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
   echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
   echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
-  echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4444')"
+  echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')"
   echo "  --monitor-cmd <CMD>               : Send command to monitor if available. (Example: system_powerdown)"
+  echo "  --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'"
+  echo "  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')"
+  echo "  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')"
   echo "  --version                         : Print version"
   exit 1
 }
 
 function display_param_check() {
+  # @ASK: accept "spice-app" as output ?
   if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
-    exit 1
-  elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
-    echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
     exit 1
   fi
 }
@@ -1181,13 +1228,14 @@ function parse_ports_from_file {
     for ((i=0; i<${#port_name[@]}; i++)); do
       if [ "${port_name[$i]}" == "ssh" ]; then
         SSH_PORT="${port_number[$i]}"
-      fi
-      if [ "${port_name[$i]}" == "spice" ]; then
+      elif [ "${port_name[$i]}" == "spice" ]; then
         SPICE_PORT="${port_number[$i]}"
-      fi
-      if [ "${port_name[$i]}" == "monitor-telnet" ]; then
+      elif [ "${port_name[$i]}" == "monitor-telnet" ]; then
         MONITOR_TELNET_PORT="${port_number[$i]}"
         MONITOR_TELNET_HOST="${host_name[$i]}"
+      elif [ "${port_name[$i]}" == "serial-telnet" ]; then
+        SERIAL_TELNET_PORT="${port_number[$i]}"
+        SERIAL_TELNET_HOST="${host_name[$i]}"
       fi
     done
 }
@@ -1220,11 +1268,11 @@ function monitor_send_cmd {
     case "${monitor_channel}" in
         socket)
             echo -e " - MON-SEND: ${MSG}"
-            echo -e "${MSG}" | nc -N -U "${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null
+            echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null
             ;;
         telnet)
             echo -e " - MON-SEND: ${MSG}"
-            echo -e "${MSG}" | nc -N "${MONITOR_TELNET_HOST}" "${MONITOR_TELNET_PORT}" 2>&1 > /dev/null
+            echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" 2>&1 > /dev/null
             ;;
         *)
             echo "ERROR! This should never happen!"
@@ -1261,9 +1309,12 @@ ssh_port=""
 spice_port=""
 public_dir=""
 monitor="socket"
-monitor_telnet_port="4444"
+monitor_telnet_port="4440"
 monitor_telnet_host="localhost"
 monitor_cmd=""
+serial="socket"
+serial_telnet_port="6660"
+serial_telnet_host="localhost"
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1290,6 +1341,8 @@ SPICE_PORT=""
 MONITOR=""
 MONITOR_CMD=""
 VM_MONITOR_SOCKETPATH=""
+VM_SERIAL_SOCKETPATH=""
+SERIAL=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1399,6 +1452,18 @@ else
             MONITOR_TELNET_PORT="${2}"
             shift;
             shift;;
+          -serial|--serial)
+            SERIAL="${2}"
+            shift;
+            shift;;
+          -serial-telnet-host|--serial-telnet-host)
+            SERIAL_TELNET_HOST="${2}"
+            shift;
+            shift;;
+          -serial-telnet-port|--serial-telnet-port)
+            SERIAL_TELNET_PORT="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1423,6 +1488,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   VMNAME=$(basename "${VM}" .conf)
   VMPATH=$(realpath "$(dirname "${VM}")")
   VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
+  VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
@@ -1557,11 +1623,11 @@ fi
 if [ $VM_UP -eq 0 ]; then
     vm_boot
     start_viewer
-    monitor_send_cmd "${MONITOR_CMD}"
+    [ -n "${MONITOR_CMD}" ] && monitor_send_cmd "${MONITOR_CMD}"
 else
     parse_ports_from_file
     start_viewer
-    monitor_send_cmd "${MONITOR_CMD}"
+    [ -n "${MONITOR_CMD}" ] &&monitor_send_cmd "${MONITOR_CMD}"
 fi
 
 # vim:tabstop=2:shiftwidth=2:expandtab
