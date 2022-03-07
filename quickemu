@@ -476,6 +476,12 @@ function vm_boot() {
         NET_DEVICE="rtl8139"
       fi
 
+      if [ "${guest_os}" == "freedos" ] ; then
+        # fix for #382
+        SMM="on"
+      fi
+
+
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
