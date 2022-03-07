@@ -933,7 +933,7 @@ function vm_boot() {
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
-  if [ -n "{iso}" ] && [ "${guest_os}" == "freedos" ]; then
+  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
     # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
     # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
     args+=(-boot order=dc)
