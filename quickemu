@@ -477,7 +477,11 @@ function vm_boot() {
       fi
 
       if [ "${guest_os}" == "freedos" ] ; then
+<<<<<<< HEAD
         # fix for #382
+=======
+        # fix for booting issue discussed in #382
+>>>>>>> eb67e14 (freedos fix - boot problems needed smm on)
         SMM="on"
       fi
 
