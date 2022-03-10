@@ -401,6 +401,11 @@ function vm_boot() {
         elif [ -e "/usr/share/qemu/edk2-x86_64-secure-code.fd" ]; then
           EFI_CODE="/usr/share/qemu/edk2-x86_64-secure-code.fd"
           efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
+        #                                       ^^^^ -really ?  Suspect a typo here!
+        # Solus new place to hide
+        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd"
+          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
           echo "       Please install OVMF firmware."
@@ -429,6 +434,11 @@ function vm_boot() {
         elif [ -e "/usr/share/qemu/edk2-x86_64-code.fd" ]; then
           EFI_CODE="/usr/share/qemu/edk2-x86_64-code.fd"
           efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
+        #                                       ^^^^ -really ?
+        # Solus
+        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.fd"
+          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! EFI boot requested but no EFI firmware found."
           echo "       Please install OVMF firmware."
