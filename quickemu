@@ -968,16 +968,16 @@ function vm_boot() {
 
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+           -drive id=SystemDisk,if=none,format=qcow2,detect-zeroes=on,file="${disk_img}" ${STATUS_QUO})
   elif [ "${guest_os}" == "kolibrios" ]; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+           -drive id=SystemDisk,if=none,format=qcow2,detect-zeroes=on,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+           -drive id=SystemDisk,if=none,format=qcow2,detect-zeroes=on,file="${disk_img}" ${STATUS_QUO})
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
