@@ -1261,7 +1261,7 @@ function get_ubuntu() {
         URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
     elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-        VM_PATH="${OS}-devel"
+        VM_PATH="${OS}-daily-live"
     elif [ "${OS}" == "ubuntu" ]; then
         URL="https://releases.ubuntu.com/${RELEASE}"
     else
