@@ -45,6 +45,7 @@ function pretty_name() {
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
+    ludos)              PRETTY_NAME="LudOS";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
@@ -177,6 +178,7 @@ function os_support() {
     kolibrios \
     kubuntu \
     linuxmint \
+    ludos \
     manjaro \
     mxlinux \
     netboot \
@@ -347,6 +349,10 @@ function releases_linuxmint(){
 
 function editions_linuxmint(){
     echo cinnamon mate xfce
+}
+
+function releases_ludos(){
+    echo 1.0-beta{1,2,3,4,5}
 }
 
 function releases_mxlinux(){
@@ -677,6 +683,9 @@ function make_vm_config() {
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
+        ludos)
+            GUEST="ludos"
+            IMAGE_TYPE="img";;
         macos)
             GUEST="macos"
             IMAGE_TYPE="img";;
@@ -1004,6 +1013,18 @@ function get_linuxmint() {
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_ludos() {
+    # not considering betas as editions at this point
+    #local EDITION="${1:-}"
+    local HASH=""
+    #https://github.com/libretro/LudOS/releases/download/v1.0-beta5/LudOS-Generic.x86_64-1.0-beta5.img.gz
+    local ISO="LudOS-Generic.x86_64-${RELEASE}.img.gz"
+    local URL="https://github.com/libretro/LudOS/releases/download/v${RELEASE}"
+
+    #HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1716,6 +1737,10 @@ create_vm() {
     if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+    if [[ ${OS} == "ludos" ]] && [[ ${ISO} =~ ".gz" ]] ; then
+        gzip -d "${VM_PATH}/${ISO}"
+        ISO="${ISO/.gz/}"
     fi
 
     make_vm_config "${ISO}"
