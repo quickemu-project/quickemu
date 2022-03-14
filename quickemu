@@ -231,7 +231,6 @@ function vm_boot() {
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
-  local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
   local SMM="off"
@@ -470,7 +469,7 @@ function vm_boot() {
       fi
 
       if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
-        MOUSE="usb-mouse"
+        MOUSE="usb"
       elif [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "freedos" ]; then
         MACHINE_TYPE="pc"
         NET_DEVICE="rtl8139"
@@ -873,9 +872,6 @@ function vm_boot() {
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
          ${VIDEO} -display ${DISPLAY_RENDER}
-         -device usb-ehci,id=input
-         -device usb-kbd,bus=input.0
-         -device ${MOUSE},bus=input.0
          -audiodev ${AUDIO_DEV}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
@@ -901,13 +897,63 @@ function vm_boot() {
          -chardev spicevmc,id=ccid,name=smartcard
          -device ccid-card-passthru,chardev=ccid
          )
-#         -serial mon:stdio)
+
+
+  # setup usb-controller
+  [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
+  if [ "${USB_CONTROLLER}" == "ehci" ]; then
+    args+=(-device usb-ehci,id=input)
+  elif [ "${USB_CONTROLLER}" == "xhci" ]; then
+    args+=(-device qemu-xhci,id=input)
+  elif [ -z "${USB_CONTROLLER}" ] || [ "${USB_CONTROLLER}" == "none" ]; then
+    # add nothing
+    :
+  else
+    echo "WARNING! Unknown usb-controller value: '${USB_CONTROLLER}'"
+  fi
+
+  # setup keyboard
+  # @INFO: must be set after usb-controller
+  [ -z "${KEYBOARD}" ] && KEYBOARD="$keyboard"
+  if [ "${KEYBOARD}" == "usb" ]; then
+    args+=(-device usb-kbd,bus=input.0)
+  elif [ "${KEYBOARD}" == "virtio" ]; then
+    args+=(-device virtio-keyboard)
+  elif [ "${KEYBOARD}" == "ps2" ] || [ -z "${KEYBOARD}" ]; then
+    # add nothing, default is ps/2 keyboard
+    :
+  else
+    echo "WARNING! Unknown keyboard value: '${KEYBOARD}'; Fallback to ps2"
+  fi
+
+  # setup keyboard_layout
+  # @INFO: When using the VNC display, you must use the -k parameter to set the keyboard layout if you are not using en-us.
+  [ -z "${KEYBOARD_LAYOUT}" ] && KEYBOARD_LAYOUT="$keyboard_layout"
+  if [ -n "${KEYBOARD_LAYOUT}" ]; then
+    args+=(-k ${KEYBOARD_LAYOUT})
+  fi
 
   # FIXME: Check for device availability. qemu will fail to start otherwise
   if [ -n "${BRAILLE}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-chardev braille,id=brltty
-             -device usb-braille,id=usbbrl,chardev=brltty)
+    # shellcheck disable=SC2054
+    args+=(-chardev braille,id=brltty
+           -device usb-braille,id=usbbrl,chardev=brltty)
+  fi
+
+  # setup mouse
+  # @INFO: must be set after usb-controller
+  [ -z "${MOUSE}" ] && MOUSE="$mouse"
+  if [ "${MOUSE}" == "usb" ]; then
+    args+=(-device usb-mouse,bus=input.0)
+  elif [ "${MOUSE}" == "tablet" ]; then
+    args+=(-device usb-tablet,bus=input.0)
+  elif [ "${MOUSE}" == "virtio" ]; then
+    args+=(-device virtio-mouse)
+  elif [ "${MOUSE}" == "ps2" ] || [ -z "${MOUSE}" ]; then
+    # add nothing, default is ps/2 mouse
+    :
+  else
+    echo "WARNING! Unknown mouse value: '${MOUSE}; Fallback to ps2'"
   fi
 
   if [ -n "${bridge}" ]; then
@@ -1187,10 +1233,14 @@ function usage() {
   echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
   echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
   echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')"
-  echo "  --monitor-cmd <CMD>               : Send command to monitor if available. (Example: system_powerdown)"
+  echo "  --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)"
   echo "  --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'"
   echo "  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')"
   echo "  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')"
+  echo "  --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'"
+  echo "  --keyboard_layout <layout>        : Set keyboard layout."
+  echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
+  echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1315,6 +1365,15 @@ monitor_cmd=""
 serial="socket"
 serial_telnet_port="6660"
 serial_telnet_host="localhost"
+# options: ehci(USB2.0), xhci(USB3.0)
+usb_controller="ehci"
+# options: ps2, usb, virtio
+keyboard="usb"
+keyboard_layout="en-us"
+# options: ps2, usb, tablet, virtio
+mouse="tablet"
+# options: ehci, xhci
+usb_controller="ehci"
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1339,10 +1398,18 @@ VIEWER=""
 SSH_PORT=""
 SPICE_PORT=""
 MONITOR=""
+MONITOR_TELNET_PORT=""
+MONITOR_TELNET_HOST=""
 MONITOR_CMD=""
 VM_MONITOR_SOCKETPATH=""
 VM_SERIAL_SOCKETPATH=""
 SERIAL=""
+SERIAL_TELNET_PORT=""
+SERIAL_TELNET_HOST=""
+KEYBOARD=""
+KEYBOARD_LAYOUT=""
+MOUSE=""
+USB_CONTROLLER=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1464,6 +1531,18 @@ else
             SERIAL_TELNET_PORT="${2}"
             shift;
             shift;;
+          -keyboard|--keyboard)
+            KEYBOARD="${2}"
+            shift;
+            shift;;
+          -mouse|--mouse)
+            MOUSE="${2}"
+            shift;
+            shift;;
+          -usb-controller|--usb-controller)
+            USB_CONTROLLER="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1528,7 +1607,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
     if [ -z "${PUBLIC}" ]; then
       if command -v xdg-user-dir &>/dev/null; then
-	PUBLIC=$(xdg-user-dir PUBLICSHARE)
+        PUBLIC=$(xdg-user-dir PUBLICSHARE)
       fi
     fi
 
