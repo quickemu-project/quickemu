@@ -1702,11 +1702,11 @@ fi
 if [ $VM_UP -eq 0 ]; then
     vm_boot
     start_viewer
-    [ -n "${MONITOR_CMD}" ] && monitor_send_cmd "${MONITOR_CMD}"
 else
     parse_ports_from_file
     start_viewer
-    [ -n "${MONITOR_CMD}" ] &&monitor_send_cmd "${MONITOR_CMD}"
 fi
+
+[ -n "${MONITOR_CMD}" ] && monitor_send_cmd "${MONITOR_CMD}"
 
 # vim:tabstop=2:shiftwidth=2:expandtab
