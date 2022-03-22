@@ -463,7 +463,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    *bsd|haiku|freedos|linux)
+    *bsd|haiku|freedos|linux|*solaris)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
@@ -481,6 +481,9 @@ function vm_boot() {
         SMM="on"
       fi
 
+      if [[ "${guest_os}" == *"solaris" ]]; then
+        USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
+      fi
 
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
