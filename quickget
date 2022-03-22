@@ -711,10 +711,13 @@ function make_vm_config() {
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
         cat << EOF > "${CONF_FILE}"
+#!$(which quickemu) --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
+        echo "Giving user execute permissions on ${CONF_FILE},"
+        chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
