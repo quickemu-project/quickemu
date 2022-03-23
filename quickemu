@@ -482,6 +482,7 @@ function vm_boot() {
       fi
 
       if [[ "${guest_os}" == *"solaris" ]]; then
+        MACHINE_TYPE="pc"
         USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
       fi
 
