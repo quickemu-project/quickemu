@@ -424,6 +424,8 @@ requires that the `spicy` client is installed, available from the
 quickemu --vm ubuntu-20.04.conf --display spice
 ```
 
+To enable copy/paste with a Windows guest, install [SPICE Windows guest tools](https://www.spice-space.org/download.html) in the guest VM.
+
 Headless
 --------
 
