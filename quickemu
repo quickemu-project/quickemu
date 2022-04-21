@@ -1126,8 +1126,12 @@ function vm_boot() {
     exit 1
   fi
 
-  if [ -n "${extra_args}" ]; then
-      args+=(${extra_args})
+  
+  if [ -z "${EXTRA_ARGS}" ]; then
+    EXTRA_ARGS="${extra_args}"
+  fi
+  if [ -n "${EXTRA_ARGS}" ]; then
+      args+=(${EXTRA_ARGS})
   fi
 
   # The OSK parameter contains parenthesis, they need to be escaped in the shell
@@ -1241,6 +1245,7 @@ function usage() {
   echo "  --keyboard_layout <layout>        : Set keyboard layout."
   echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
   echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
+  echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1410,6 +1415,7 @@ KEYBOARD=""
 KEYBOARD_LAYOUT=""
 MOUSE=""
 USB_CONTROLLER=""
+EXTRA_ARGS=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1541,6 +1547,10 @@ else
             shift;;
           -usb-controller|--usb-controller)
             USB_CONTROLLER="${2}"
+            shift;
+            shift;;
+          -extra_args|--extra_args)
+            EXTRA_ARGS="${2}"
             shift;
             shift;;
           -version|--version)
