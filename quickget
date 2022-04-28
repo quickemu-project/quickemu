@@ -38,6 +38,7 @@ function pretty_name() {
     cachyos)            PRETTY_NAME="CachyOS";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
+    endeavouros)        PRETTY_NAME="EndeavourOS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -165,6 +166,7 @@ function os_support() {
     devuan \
     dragonflybsd \
     elementary \
+    endeavouros \
     fedora \
     freebsd \
     freedos \
@@ -258,6 +260,12 @@ function releases_dragonflybsd() {
 
 function releases_elementary() {
     echo 6.1
+}
+
+function releases_endeavouros() {
+    echo apollo_22_1 \
+    atlantis-21_4 \
+    atlantis_neo-21_5
 }
 
 function releases_fedora() {
@@ -867,6 +875,16 @@ function get_elementary() {
     local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
+}
+
+function get_endeavouros() {
+    local HASH=""
+    # Endeavour release names are Capitalized and our $RELEASE is forced to lowercase so we have to revert it
+    local ISO="EndeavourOS_${RELEASE@u}.iso"
+    local URL="https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive"
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_fedora() {
