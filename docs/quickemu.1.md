@@ -1,30 +1,26 @@
 ---
 author: Martin Wimpress
-date: 'February 20, 2022'
+date: February 20, 2022
 footer: quickemu
 header: Quickemu User Manual
 section: 1
 title: QUICKEMU
 ---
 
-NAME
-====
+# NAME
 
 quickemu - A quick VM builder and manager
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 **quickemu** \[*OPTION*\]...
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 **quickemu** will create and run highly optimised desktop virtual
 machines for Linux, macOS and Windows
 
-OPTIONS
-=======
+# OPTIONS
 
 **--vm**
 :   vm configuration file
@@ -70,23 +66,21 @@ You can also pass optional parameters
 **--version**
 :   Print version
 
-EXAMPLES
-========
+# EXAMPLES
 
-**quickemu --vm ubuntu-mate-21.10-.conf**
-:   Launches the VM specified in the file *ubuntu-mate-21.10-.conf*
+**quickemu --vm ubuntu-mate-22.04-.conf**
+:   Launches the VM specified in the file *ubuntu-mate-22.04-.conf*
 
-Introduction
-------------
+## Introduction
 
 Quickly create and run highly optimised desktop virtual machines for
 Linux, macOS and Windows; with just two commands. You decide what
 operating system you want to run and Quickemu will figure out the best
 way to do it for you. For example:
 
-``` {.bash}
-quickget ubuntu-mate 21.10
-quickemu --vm ubuntu-mate-21.10-.conf
+``` bash
+quickget ubuntu-mate 22.04
+quickemu --vm ubuntu-mate-22.04-.conf
 ```
 
 The original objective of the project was to enable quick testing of
@@ -96,8 +90,7 @@ and no elevated permissions are required to run the virtual machines.
 **Quickemu now also includes comprehensive support for macOS and
 Windows**.
 
-Features
---------
+## Features
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
 -   **Windows** 8.1, 10 and 11 including TPM 2.0
@@ -135,8 +128,7 @@ Quickemu.
 [![Replace VirtualBox with Bash &
 QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
-Requirements
-------------
+## Requirements
 
 -   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL,
     SPICE & VirtFS support**
@@ -161,11 +153,9 @@ Requirements
 -   [zsync](http://zsync.moria.org.uk/)
 -   [unzip](http://www.info-zip.org/UnZip.html)
 
-Usage
-=====
+# Usage
 
-Graphical User Interfaces
--------------------------
+## Graphical User Interfaces
 
 While `quickemu` and `quickget` are designed for the terminal, a
 graphical user interface is also available:
@@ -180,21 +170,20 @@ Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 
 ### Quickgui for Ubuntu
 
-``` {.bash}
+``` bash
 sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
 ```
 
-Ubuntu Guest
-------------
+## Ubuntu Guest
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` {.bash}
-quickget ubuntu 20.04
-quickemu --vm ubuntu-20.04.conf
+``` bash
+quickget ubuntu 22.04
+quickemu --vm ubuntu-22.04.conf
 ```
 
 -   Complete the installation as normal.
@@ -211,7 +200,7 @@ quickemu --vm ubuntu-20.04.conf
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
 
-``` {.bash}
+``` bash
 quickget ubuntu devel
 quickemu --vm ubuntu-devel.conf
 ```
@@ -234,8 +223,11 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Operating Systems
------------------------
+## Other Operating Systems
+
+`quickget` also supports:
+
+## Other Operating Systems
 
 `quickget` also supports:
 
@@ -283,7 +275,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` {.bash}
+``` bash
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -291,7 +283,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` {.bash}
+``` bash
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -302,13 +294,12 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
         sharing.
 
-macOS Guest
------------
+## macOS Guest
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -338,7 +329,7 @@ supported.
 
 The default macOS configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -389,8 +380,7 @@ There are some considerations when running macOS via Quickemu.
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-Windows 8.1, 10 & 11 Guests
----------------------------
+## Windows 8.1, 10 & 11 Guests
 
 `quickget` can automatically download Windows 8.1, [Windows
 10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
@@ -400,7 +390,7 @@ with the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -414,13 +404,13 @@ By default `quickget` will download the *"English International"*
 release, but you can optionally specify one of the supported languages:
 For example:
 
-``` {.bash}
+``` bash
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/Win11_EnglishInternational_x64.iso"
@@ -433,12 +423,12 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-All the options
-===============
+# All the options
 
 Here are the usage instructions:
 
-``` {.bash}
+``` bash
+
 
 Usage
   quickemu --vm ubuntu.conf
@@ -461,19 +451,17 @@ You can also pass optional parameters
 
 ```
 
-Desktop shortcuts
------------------
+## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
 `~/.local/share/applications`. Here is an example of how to create a
 shortcut.
 
-``` {.bash}
-quickemu --vm ubuntu-20.04-desktop.conf --shortcut
+``` bash
+quickemu --vm ubuntu-22.04-desktop.conf --shortcut
 ```
 
-Screen and window size (Linux guests only)
-------------------------------------------
+## Screen and window size (Linux guests only)
 
 `qemu` will always default to the primary monitor to display the VM's
 window.
@@ -494,13 +482,13 @@ must match the resolution of the screen.
 
 To know which screen to use, type:
 
-``` {.bash}
+``` bash
 xrandr --listmonitors | grep -v Monitors
 ```
 
 The command will output something like this:
 
-``` {.bash}
+``` bash
  0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
  1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
 ```
@@ -509,7 +497,7 @@ The first number is what needs to be passed to the `--screen` option.
 
 For example:
 
-``` {.bash}
+``` bash
 quickemu --vm vm.conf --screen 0
 ```
 
@@ -518,8 +506,7 @@ which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
 
-References
-==========
+# References
 
 Useful reference that assisted the development of Quickemu.
 
@@ -556,20 +543,17 @@ Useful reference that assisted the development of Quickemu.
     -   <https://superuser.com/questions/628169/how-to-share-a-directory-with-the-host-without-networking-in-qemu>
     -   <https://virtio-fs.gitlab.io/>
 
-AUTHORS
-=======
+# AUTHORS
 
 Written by Martin Wimpress.
 
-BUGS
-====
+# BUGS
 
 Submit bug reports online at:
 <https://github.com/quickemu-project/quickemu/issues>
 
-SEE ALSO
-========
+# SEE ALSO
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu\_conf(1), quickget(1), quickgui(1)
+quickemu_conf(1), quickget(1), quickgui(1)
