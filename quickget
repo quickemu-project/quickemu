@@ -1669,8 +1669,16 @@ function get_windows() {
     dbg_windows "${DOWNLOAD_SHA1}"
     DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
     dbg_windows "${DOWNLOAD_ID}"
-    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    REDIRECT_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    dbg_windows "${REDIRECT_URL}"
+    DOWNLOAD_URL=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "${REDIRECT_URL}")
     dbg_windows "${DOWNLOAD_URL}"
+
+    MS_BASE_URL="https://software.download.prss.microsoft.com/"
+    if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
+        echo "Download URL not leading to Microsoft CDN"
+        exit 1
+    fi
 
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
