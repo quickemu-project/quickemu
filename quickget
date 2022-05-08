@@ -237,7 +237,11 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 2022.01.09 2022.02.11
+    echo 220330
+}
+
+function editions_cachyos(){
+        echo kde cli xfce
 }
 
 function releases_debian() {
@@ -814,8 +818,19 @@ function get_arcolinux() {
 
 function get_cachyos() {
     local HASH=""
-    local ISO="cachyos-${RELEASE}-x86_64.iso"
-    local URL="https://mirror.cachyos.org/ISO"
+    #https://mirror.cachyos.org/ISO/kde/220330/cachyos-kde-linux-cachyos-220330.iso
+    #https://mirror.cachyos.org/ISO/cli/220330/cachyos-cli-linux-220330.iso
+    #https://mirror.cachyos.org/ISO/xfce/220330/cachyos-xfce-linux-cachyos-220330.iso
+    #
+    #https://mirror.cachyos.org/ISO/kde/cachyos-2022.05.08-x86_64-4.iso
+    #
+    local CACHY=""
+    if [[ ! $EDITION == "cli" ]] ; then
+        CACHY="-cachyos"
+    fi
+    local ISO="cachyos-${EDITION}-linux${CACHY}-${RELEASE}.iso"
+    local URL="https://mirror.cachyos.org/ISO/${EDITION}/${RELEASE}"
+    ASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
