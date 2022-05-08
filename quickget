@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
+    centos)             PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
@@ -161,6 +162,7 @@ function os_support() {
     archlinux \
     arcolinux \
     cachyos \
+    centos \
     debian \
     devuan \
     dragonflybsd \
@@ -238,6 +240,14 @@ function editions_arcolinux() {
 
 function releases_cachyos() {
     echo 2022.01.09 2022.02.11
+}
+
+function releases_centos() {
+    echo 8 9
+}
+
+function editions_centos() {
+    echo dvd1 boot
 }
 
 function releases_debian() {
@@ -713,7 +723,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          alma|centos|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           freedos)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -816,6 +826,25 @@ function get_cachyos() {
     local HASH=""
     local ISO="cachyos-${RELEASE}-x86_64.iso"
     local URL="https://mirror.cachyos.org/ISO"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_centos() {
+    local HASH=""
+    local ISO=""
+    case ${RELEASE} in
+      8)
+        ISO="CentOS-Stream-${RELEASE}-x86_64-latest-${EDITION}.iso"
+        URL="https://mirrors.ocf.berkeley.edu/centos/8-stream/isos/x86_64"
+        HASH=$(wget -q -O- ${URL}/CHECKSUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        ;;
+      9)
+        ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
+        URL="https://mirrors.ocf.berkeley.edu/centos-stream/9-stream/BaseOS/x86_64/iso"
+        HASH=$(wget -q -O- ${URL}/${ISO}.SHA256SUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        ;;
+    esac
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
