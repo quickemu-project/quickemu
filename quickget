@@ -36,7 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
-    centos)             PRETTY_NAME="CentOS Stream";;
+    centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
@@ -162,7 +162,7 @@ function os_support() {
     archlinux \
     arcolinux \
     cachyos \
-    centos \
+    centos-stream \
     debian \
     devuan \
     dragonflybsd \
@@ -242,11 +242,11 @@ function releases_cachyos() {
     echo 2022.01.09 2022.02.11
 }
 
-function releases_centos() {
+function releases_centos-stream() {
     echo 8 9
 }
 
-function editions_centos() {
+function editions_centos-stream() {
     echo dvd1 boot
 }
 
@@ -723,7 +723,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          alma|centos-stream|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           freedos)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -829,7 +829,7 @@ function get_cachyos() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_centos() {
+function get_centos-stream() {
     local HASH=""
     local ISO=""
     case ${RELEASE} in
