@@ -753,6 +753,11 @@ function vm_boot() {
     ati-vga|cirrus-vga|VGA) VIDEO="${VIDEO},vgamem_mb=64";;
   esac
 
+  # Configure multiscreen if max_outputs was provided in the .conf file
+  if [ -v max_outputs ]; then
+    VIDEO="${VIDEO},max_outputs=${max_outputs}"
+  fi
+
   # Add fullscreen options
   VIDEO="${VIDEO} ${FULLSCREEN}"
 
