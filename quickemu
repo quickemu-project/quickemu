@@ -1057,7 +1057,7 @@ function usage() {
   echo "  --braille               : Enable braille support. Requires SDL."
   echo "  --delete-disk           : Delete the disk image and EFI variables"
   echo "  --delete-vm             : Delete the entire VM and it's configuration"
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
+  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
   echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>       : Use specified screen to determine the window size."
@@ -1072,7 +1072,7 @@ function usage() {
 }
 
 function display_param_check() {
-  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ] && [ "${OUTPUT}" != "spice-app" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
     exit 1
   elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
