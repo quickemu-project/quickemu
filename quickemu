@@ -1611,16 +1611,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     disk_size="${disk}"
   fi
 
+  # Set the default OUTPUT if not provided by user
   if [ -z "${OUTPUT}" ]; then
-    # Braille support requires SDL. Override OUTPUT if braille was requested.
-    if [ -n "${BRAILLE}" ]; then
-      OUTPUT="sdl"
-    elif [ -z "${display}" ]; then
-      OUTPUT="sdl"
-    else
-      OUTPUT="${display}"
-      display_param_check
-    fi
+    OUTPUT="sdl"
+  fi
+
+  # Braille support requires SDL. Override OUTPUT if braille was requested.
+  if [ -n "${BRAILLE}" ]; then
+    OUTPUT="sdl"
   fi
 
   if [ -z "${VIEWER}" ]; then
