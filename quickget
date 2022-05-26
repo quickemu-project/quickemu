@@ -162,6 +162,7 @@ function os_support() {
     arcolinux \
     cachyos \
     debian \
+    deepin \
     devuan \
     dragonflybsd \
     elementary \
@@ -246,6 +247,10 @@ function releases_debian() {
 
 function editions_debian() {
     echo standard cinnamon gnome kde lxde lxqt mate xfce netinst
+}
+
+function releases_deepin() {
+    echo 20 20.1 20.2 20.2.1 20.2.2 20.2.3 20.2.4 20.3 20.4 20.5
 }
 
 function releases_devuan() {
@@ -715,6 +720,10 @@ EOF
         case ${OS} in
           alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          deepin)
+            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+            echo "ram=\"4G\"" >> "${CONF_FILE}"
+            ;;
           freedos)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"4G\"" >> "${CONF_FILE}"
@@ -838,6 +847,30 @@ function get_debian() {
 
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_deepin() {
+    local HASH=""
+    local EDITION=""
+    local ISO="deepin-desktop-community-${RELEASE}-amd64.iso"
+    # deepin-desktop-community-20.3-amd64.iso
+    local URL="https://cdimage.deepin.com/releases/"${RELEASE}
+
+    # fix iso name
+    if [[ "${RELEASE}" == *"20" ]] ; then
+      EDITION="1003"
+      ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+    elif [[ "${RELEASE}" == *"20.1" ]]; then
+      EDITION="1010"
+      ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+    fi
+
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+
+    #echo "${URL}/${ISO} ${HASH}"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_devuan() {
@@ -1798,6 +1831,10 @@ if [ -n "${2}" ]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
         get_ubuntu
+    elif [[ "${OS}" == *"deepin"* ]]; then
+        # deepin doesn't use create_vm()
+        validate_release releases_deepin
+        get_deepin
     elif [ "${OS}" == "windows" ]; then
         LANG="English International"
         if [ -n "${3}" ]; then
