@@ -396,7 +396,7 @@ function releases_opensuse(){
 }
 
 function releases_oraclelinux() {
-    echo 7.7 7.8 7.9 8.2 8.3 8.4 8.5
+    echo 7.7 7.8 7.9 8.2 8.3 8.4 8.5 8.6
 }
 
 function releases_popos() {
