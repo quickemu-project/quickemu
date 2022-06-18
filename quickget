@@ -1786,6 +1786,14 @@ if [ -n "${2}" ]; then
             echo " - Setting edition to: ${EDITION}"
           fi
         fi
+        # Handle odd missing fedora cominations
+        if [[ $OS == fedora ]] ; then
+            if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
+                echo "ERROR! Unsupported combination"
+                echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                exit 1;
+            fi
+        fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
