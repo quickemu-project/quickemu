@@ -350,7 +350,7 @@ function editions_linuxmint(){
 }
 
 function releases_mxlinux(){
-    echo 21
+    echo 21.1
 }
 
 function editions_mxlinux(){
