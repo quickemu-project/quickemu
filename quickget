@@ -241,7 +241,7 @@ function releases_cachyos() {
 }
 
 function releases_debian() {
-    echo 10.11.0 11.2.0
+    echo 10.11.0 11.2.0 11.3.0
 }
 
 function editions_debian() {
@@ -441,7 +441,7 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    local LTS_SUPPORT="14.04 16.04 18.04 20.04"
+    local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
     case "${OS}" in
         kubuntu|lubuntu|ubuntukylin|\
         ubuntu-mate|ubuntustudio|xubuntu)
@@ -826,7 +826,7 @@ function get_debian() {
     local URL=""
 
     case ${RELEASE} in
-      11.2.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      11.3.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
 
