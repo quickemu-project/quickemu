@@ -261,7 +261,7 @@ function releases_elementary() {
 }
 
 function releases_fedora() {
-    echo 33 34 35
+    echo 33 34 35 36
 }
 
 function editions_fedora() {
