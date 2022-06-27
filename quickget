@@ -389,7 +389,7 @@ function releases_oraclelinux() {
 }
 
 function releases_popos() {
-    echo 20.04 21.10
+    echo 20.04 21.10 22.04
 }
 
 function editions_popos() {
