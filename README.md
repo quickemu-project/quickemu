@@ -400,6 +400,7 @@ disk_img="windows-11/disk.qcow2"
 iso="windows-11/Win11_EnglishInternational_x64.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
+secureboot="on"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
