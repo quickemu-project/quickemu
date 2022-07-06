@@ -8,17 +8,16 @@
 <div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
 <p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
 
-Introduction
-------------
+## Introduction
 
 Quickly create and run highly optimised desktop virtual machines for
 Linux, macOS and Windows; with just two commands. You decide what
 operating system you want to run and Quickemu will figure out the best
 way to do it for you. For example:
 
-``` {.bash}
-quickget ubuntu-mate 21.10
-quickemu --vm ubuntu-mate-21.10-.conf
+``` bash
+quickget ubuntu-mate 22.04
+quickemu --vm ubuntu-mate-22.04-.conf
 ```
 
 The original objective of the project was to enable quick testing of
@@ -28,8 +27,7 @@ and no elevated permissions are required to run the virtual machines.
 **Quickemu now also includes comprehensive support for macOS and
 Windows**.
 
-Features
---------
+## Features
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
 -   **Windows** 8.1, 10 and 11 including TPM 2.0
@@ -67,8 +65,7 @@ Quickemu.
 [![Replace VirtualBox with Bash &
 QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
-Requirements
-------------
+## Requirements
 
 -   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL,
     SPICE & VirtFS support**
@@ -93,11 +90,37 @@ Requirements
 -   [zsync](http://zsync.moria.org.uk/)
 -   [unzip](http://www.info-zip.org/UnZip.html)
 
-Usage
-=====
+### Installing Requirements
 
-Graphical User Interfaces
--------------------------
+For Ubuntu, Arch and nixos systems the
+[ppa](https://launchpad.net/~flexiondotorg/+archive/ubuntu/quickemu),
+[AUR](https://aur.archlinux.org/packages/quickemu) or
+[nix](https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/quickemu)
+packaging will take care of the dependencies. For other host
+distributions or operating systems it will be necessary to install the
+above requirements or their equivalents.
+
+These examples may save a little typing
+
+Debian:
+
+    sudo apt install qemu bash coreutils ovmf grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-client-gtk swtpm wget xdg-user-dirs zsync unzip
+
+Fedora:
+
+    sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+
+MacOS:
+
+This is a work in progress (see [issue
+248](https://github.com/quickemu-project/quickemu/issues/248) for other
+steps and changes that may enable running on MacOS)
+
+    brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
+
+# Usage
+
+## Graphical User Interfaces
 
 While `quickemu` and `quickget` are designed for the terminal, a
 graphical user interface is also available:
@@ -112,33 +135,30 @@ Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 
 ### Quickgui for Ubuntu
 
-``` {.bash}
+``` bash
 sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
 ```
 
-Install Quickemu
-================
+# Install Quickemu
 
-Ubuntu
-------
+## Ubuntu
 
 Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
 includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04
 (Hirsute). To install Quickemu and all the dependencies run the
 following in a terminal:
 
-``` {.bash}
+``` bash
 sudo apt-add-repository ppa:flexiondotorg/quickemu
 sudo apt update
 sudo apt install quickemu
 ```
 
-Other Linux
------------
+## Other Linux
 
-``` {.bash}
+``` bash
 git clone --depth=1 https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
@@ -160,15 +180,14 @@ status](https://repology.org/badge/vertical-allrepos/quickemu.svg)](https://repo
 [![Packaging
 status](https://repology.org/badge/vertical-allrepos/quickgui.svg)](https://repology.org/project/quickgui/versions)
 
-Ubuntu Guest
-------------
+## Ubuntu Guest
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` {.bash}
-quickget ubuntu 20.04
-quickemu --vm ubuntu-20.04.conf
+``` bash
+quickget ubuntu 22.04
+quickemu --vm ubuntu-22.04.conf
 ```
 
 -   Complete the installation as normal.
@@ -185,7 +204,7 @@ quickemu --vm ubuntu-20.04.conf
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
 
-``` {.bash}
+``` bash
 quickget ubuntu devel
 quickemu --vm ubuntu-devel.conf
 ```
@@ -208,8 +227,7 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Operating Systems
------------------------
+## Other Operating Systems
 
 `quickget` also supports:
 
@@ -257,7 +275,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` {.bash}
+``` bash
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -265,7 +283,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` {.bash}
+``` bash
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -276,13 +294,12 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
         sharing.
 
-macOS Guest
------------
+## macOS Guest
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -312,7 +329,7 @@ supported.
 
 The default macOS configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -363,8 +380,7 @@ There are some considerations when running macOS via Quickemu.
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-Windows 8.1, 10 & 11 Guests
----------------------------
+## Windows 8.1, 10 & 11 Guests
 
 `quickget` can automatically download Windows 8.1, [Windows
 10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
@@ -374,7 +390,7 @@ with the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -388,13 +404,13 @@ By default `quickget` will download the *"English International"*
 release, but you can optionally specify one of the supported languages:
 For example:
 
-``` {.bash}
+``` bash
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/Win11_EnglishInternational_x64.iso"
@@ -408,8 +424,7 @@ secureboot="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-SPICE
-=====
+# SPICE
 
 The following features are available while using the SPICE protocol:
 
@@ -421,51 +436,46 @@ To use SPICE add `--display spice` to the Quickemu invocation, this
 requires that the `spicy` client is installed, available from the
 `spice-client-gtk` package in Debian/Ubuntu.
 
-``` {.bash}
-quickemu --vm ubuntu-20.04.conf --display spice
+``` bash
+quickemu --vm ubuntu-22.04.conf --display spice
 ```
 
-To enable copy/paste with a Windows guest, install [SPICE Windows guest tools](https://www.spice-space.org/download.html) in the guest VM.
-
-Headless
---------
+## Headless
 
 To start a VM with SPICE enabled, but no display attached use
 `--display none`. This requires that the `spicy` client is installed,
 available from the `spice-client-gtk` package in Debian/Ubuntu to
 connect to the running VM
 
-``` {.bash}
-quickemu --vm ubuntu-20.04.conf --display none
+``` bash
+quickemu --vm ubuntu-22.04.conf --display none
 ```
 
 You can also use the `.ports` file in the VM directory to lookup what
 SSH and SPICE ports the VM is connected to.
 
-``` {.bash}
-cat ubuntu-20.04/ubuntu-20.04.ports
+``` bash
+cat ubuntu-22.04/ubuntu-22.04.ports
 ```
 
 If, for example, the SSH port is set to 22220, and assuming your VM has
 a started SSH service (details vary by OS), you can typically SSH into
 it from the host as follows:
 
-``` {.bash}
+``` bash
 ssh -p 22220 your_vm_user@localhost
 ```
 
-Accessibility
-=============
+# Accessibility
 
 Qemu provides support for using BrlAPI to display braille output on a
 real or fake device.
 
-``` {.bash}
-quickemu --vm ubuntu-21.10.conf --braille --display sdl
+``` bash
+quickemu --vm ubuntu-22.04.conf --braille --display sdl
 ```
 
-BIOS and EFI
-============
+# BIOS and EFI
 
 Since Quickemu 2.1.0 `efi` is the default boot option. If you want to
 override this behaviour then add the following line to you VM
@@ -473,8 +483,7 @@ configuration to enable legacy BIOS.
 
 -   `boot="legacy"` - Enable Legacy BIOS boot
 
-Tuning CPU cores, RAM & disks
-=============================
+# Tuning CPU cores, RAM & disks
 
 By default, Quickemu will calculate the number of CPUs cores and RAM to
 allocate to a VM based on the specifications of your host computer. You
@@ -489,8 +498,7 @@ Add additional lines to your virtual machine configuration:
 -   `disk_size="16G"` - Specify the size of the virtual disk allocated
     to the VM
 
-Disk preallocation
-------------------
+## Disk preallocation
 
 Preallocation mode (allowed values: `off` (default), `metadata`,
 `falloc`, `full`). An image with preallocated metadata is initially
@@ -502,16 +510,14 @@ configuration.
 
 -   `preallocation="metadata"`
 
-CD-ROM disks
-------------
+## CD-ROM disks
 
 If you want to expose an ISO image from the host to guest add the
 following line to the VM configuration:
 
 -   `fixed_iso="/path/to/image.iso"`
 
-Floppy disks
-------------
+## Floppy disks
 
 If you're like [Alan Pope](https://popey.com) you'll probably want to
 mount a floppy disk image in the guest. To do so add the following line
@@ -519,14 +525,12 @@ to the VM configuration:
 
 -   `floppy="/path/to/floppy.img"`
 
-File Sharing
-============
+# File Sharing
 
 All File Sharing options will only expose `~/Public` (or localised
 variations) for the current user to the guest VMs.
 
-Samba 🐧 🍏 🪟
------------
+## Samba 🐧 🍏 🪟
 
 If `smbd` is available on the host, Quickemu will automatically enable
 the built-in QEMU support for exposing a Samba share from the host to
@@ -534,22 +538,19 @@ the guest.
 
 You can install the minimal Samba components on Ubuntu using:
 
-``` {.bash}
+``` bash
 sudo apt install --no-install-recommends samba
 ```
 
-SPICE WebDAV 🐧 🪟
-----------------
+## SPICE WebDAV 🐧 🪟
 
 -   TBD
 
-VirtIO-9P 🐧 🍏
--------------
+## VirtIO-9P 🐧 🍏
 
 -   TBD
 
-Network port forwarding
-=======================
+# Network port forwarding
 
 Add an additional line to your virtual machine configuration. For
 example:
@@ -561,30 +562,26 @@ In the example above:
 -   Port 8123 on the host is forwarded to port 8123 on the guest.
 -   Port 8888 on the host is forwarded to port 80 on the guest.
 
-Bridged networking
-==================
+# Bridged networking
 
 Connect your virtual machine to a preconfigured network bridge. Add an
 additional line to your virtual machine configuration
 
 -   `bridge="br0"`
 
-USB redirection
-===============
+# USB redirection
 
 Quickemu supports USB redirection via SPICE pass-through and host
 pass-through.
 
-SPICE redirection (recommended)
--------------------------------
+## SPICE redirection (recommended)
 
 Using SPICE for USB pass-through is easiest as it doesn't require any
 elevated permission, start Quickemu with `--display spice` and then
 select `Input` -\> `Select USB Device for redirection` from the menu to
 choose which device(s) you want to attach to the guest.
 
-Host redirection **NOT Recommended**
-------------------------------------
+## Host redirection **NOT Recommended**
 
 **USB host redirection is not recommended**, it is provided purely for
 backwards compatibility to older versions of Quickemu. Using SPICE is
@@ -597,9 +594,9 @@ example:
 
 In the example above:
 
--   The USB device with vendor\_id 046d and product\_id 082d will be
+-   The USB device with vendor_id 046d and product_id 082d will be
     exposed to the guest.
--   The USB device with vendor\_id 046d and product\_id 085e will be
+-   The USB device with vendor_id 046d and product_id 085e will be
     exposed to the guest.
 
 If the USB devices are not writable, `quickemu` will display the
@@ -611,20 +608,19 @@ like this:
                     sudo chown -v root:user /dev/bus/usb/001/005
                     ERROR! USB permission changes are required 👆
 
-TPM
-===
+# TPM
 
 Since Quickemu 2.2.0 a software emulated TPM device can be added to
 guest virtual machines. Just add `tpm="on"` to your VM configuration.
 `quickget` will automatically add this line to Windows 11 virtual
 machines.
 
-All the options
-===============
+# All the options
 
 Here are the usage instructions:
 
-``` {.bash}
+``` bash
+
 
 Usage
   quickemu --vm ubuntu.conf
@@ -647,19 +643,17 @@ You can also pass optional parameters
 
 ```
 
-Desktop shortcuts
------------------
+## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
 `~/.local/share/applications`. Here is an example of how to create a
 shortcut.
 
-``` {.bash}
-quickemu --vm ubuntu-20.04-desktop.conf --shortcut
+``` bash
+quickemu --vm ubuntu-22.04-desktop.conf --shortcut
 ```
 
-Screen and window size (Linux guests only)
-------------------------------------------
+## Screen and window size (Linux guests only)
 
 `qemu` will always default to the primary monitor to display the VM's
 window.
@@ -680,13 +674,13 @@ must match the resolution of the screen.
 
 To know which screen to use, type:
 
-``` {.bash}
+``` bash
 xrandr --listmonitors | grep -v Monitors
 ```
 
 The command will output something like this:
 
-``` {.bash}
+``` bash
  0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
  1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
 ```
@@ -695,7 +689,7 @@ The first number is what needs to be passed to the `--screen` option.
 
 For example:
 
-``` {.bash}
+``` bash
 quickemu --vm vm.conf --screen 0
 ```
 
@@ -704,8 +698,7 @@ which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
 
-References
-==========
+# References
 
 Useful reference that assisted the development of Quickemu.
 
