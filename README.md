@@ -231,6 +231,10 @@ with your preferred flavour.
 
 `quickget` also supports:
 
+## Other Operating Systems
+
+`quickget` also supports:
+
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
@@ -439,6 +443,9 @@ requires that the `spicy` client is installed, available from the
 ``` bash
 quickemu --vm ubuntu-22.04.conf --display spice
 ```
+
+To enable copy/paste with a Windows guest, install [SPICE Windows guest
+tools](https://www.spice-space.org/download.html) in the guest VM.
 
 ## Headless
 
