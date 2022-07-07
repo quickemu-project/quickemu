@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 6, 2022
+date: July 7, 2022
 footer: quickemu_conf
 header: Quickemu Configuration Manual
 section: 1
@@ -150,6 +150,15 @@ You can install the minimal Samba components on Ubuntu using:
 ``` bash
 sudo apt install --no-install-recommends samba
 ```
+
+If everything is set up correctly, the `smbd` address will be printed
+when the virtual machine is started. For example:
+
+     - smbd:     On guest: smb://10.0.2.4/qemu
+
+If using a Windows guest, right-click on "This PC", click "Add a network
+location", and paste this address, removing `smb:` and replacing forward
+slashes with backslashes (in this example `\\10.0.2.4\qemu`).
 
 ## SPICE WebDAV 🐧 🪟
 
