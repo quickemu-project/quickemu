@@ -255,7 +255,7 @@ function releases_devuan() {
 function releases_dragonflybsd() {
     echo 6.2.1
 }
-s
+
 function releases_elementary() {
     echo 6.1
 }
@@ -826,7 +826,7 @@ function get_debian() {
     local URL=""
 
     case ${RELEASE} in
-      11.3.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      11.4.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
 
