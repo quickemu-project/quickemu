@@ -241,7 +241,7 @@ function releases_cachyos() {
 }
 
 function releases_debian() {
-    echo 10.11.0 11.2.0 11.3.0
+    echo 10.11.0 11.2.0 11.3.0 11.4.0
 }
 
 function editions_debian() {
@@ -255,7 +255,7 @@ function releases_devuan() {
 function releases_dragonflybsd() {
     echo 6.2.1
 }
-
+s
 function releases_elementary() {
     echo 6.1
 }
