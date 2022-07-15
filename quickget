@@ -416,12 +416,13 @@ function editions_regolith() {
 }
 
 function releases_rockylinux() {
-    echo 8.3 8.4 8.5
+    echo 8.3 8.4 8.5 9.0
 }
 
+# Rocky have renamed dvd1 -> dvd at 9.0
 function editions_rockylinux() {
     echo minimal \
-    dvd1
+    "dvd (dvd1 prior to 9.0)"
 }
 
 function releases_slackware() {
@@ -1207,7 +1208,7 @@ function get_rockylinux() {
     local URL=""
 
     case ${RELEASE} in
-      8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
+      9.0) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
