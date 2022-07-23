@@ -160,6 +160,7 @@ function os_support() {
     android \
     archlinux \
     arcolinux \
+    batocera \
     cachyos \
     debian \
     devuan \
@@ -262,6 +263,10 @@ function releases_elementary() {
 
 function releases_fedora() {
     echo 33 34 35
+}
+
+function releases_batocera() {
+  echo 33
 }
 
 function editions_fedora() {
@@ -662,6 +667,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        batocera)
+            GUEST="batocera"
+            IMAGE_TYPE="img";;
         dragonflybsd)
             GUEST="dragonflybsd"
             IMAGE_TYPE="iso";;
@@ -809,6 +817,13 @@ function get_arcolinux() {
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_batocera() {
+    local HASH=""
+    local ISO="batocera-x86_64-${RELEASE}-20220203.img.gz"
+    local URL="https://updates.batocera.org/x86_64/stable/last"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1716,6 +1731,10 @@ create_vm() {
     if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+    if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
+        gzip -d "${VM_PATH}/${ISO}"
+        ISO="${ISO/.gz/}"
     fi
 
     make_vm_config "${ISO}"

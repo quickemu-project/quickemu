@@ -485,6 +485,15 @@ function vm_boot() {
         disk_size="16G"
       fi
       ;;
+    batocera)
+      CPU="-cpu host,kvm=on"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      MACHINE_TYPE="pc"
+      NET_DEVICE="rtl8139"
+      disk_size="8G"
+    ;;
     kolibrios)
       CPU="-cpu qemu32,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
@@ -1023,6 +1032,12 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  elif [ "${guest_os}" == "batocera" ] ; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device virtio-blk-pci,drive=BootDisk
+           -drive id=BootDisk,if=none,format=raw,file="${img}"
+           -device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
