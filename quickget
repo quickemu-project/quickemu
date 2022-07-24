@@ -1284,11 +1284,11 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d'*' -f2)
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso |cut -d' ' -f1)
     else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f3)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
+        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
     fi
     #echo "${URL}/${ISO} ${HASH}"
 
