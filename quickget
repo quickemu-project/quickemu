@@ -303,23 +303,12 @@ function releases_freedos() {
 }
 
 function releases_garuda() {
-    echo 220131
+  echo latest
 }
 
 function editions_garuda() {
-    echo dr460nized \
-    dr460nized-blackarch \
-    dr460nized-gaming \
-    bspwm \
-    cinnamon \
-    gnome \
-    i3 \
-    kde-barebones \
-    lxqt-kwin \
-    mate \
-    qtile \
-    sway \
-    xfce
+  URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
+  echo $(wget -q -O - ${URL} | grep '^<a href' | sed -e 's/^.*="//' -e 's/\/.*//')
 }
 
 function releases_gentoo() {
@@ -954,22 +943,15 @@ function get_freedos() {
 }
 
 function get_garuda() {
-    local EDITION="${1:-}"
-    local HASH=""
-    local ISO=""
-    local URL=""
+  local EDITION="${1:-}"
+  local HASH=""
+  local ISO=""
+  local URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
 
-    case ${EDITION} in
-      cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
-      *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
-    esac
-    case ${EDITION} in
-        xfce|kde-barebones)  ISO="garuda-${EDITION}-linux-lts-${RELEASE}.iso";;
-        *) ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso";;
-    esac
+  ISO=${EDITION}/latest.iso
 
-    HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
-    echo "${URL}/${ISO} ${HASH}"
+  HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+  echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_gentoo() {
