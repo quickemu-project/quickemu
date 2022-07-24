@@ -88,16 +88,24 @@ with your preferred flavour.
 
 `quickget` also supports:
 
+## Other Operating Systems
+
+`quickget` also supports:
+
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
+-   `batocera` (Batocera)
 -   `cachyos` (CachyOS)
+-   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
+-   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
+-   `endeavouros` (EndeavourOS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
@@ -109,6 +117,7 @@ with your preferred flavour.
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
+-   `lmde` (Linux Mint Debian Edition)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)

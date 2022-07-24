@@ -326,6 +326,9 @@ All the official Ubuntu flavours are supported, just replace
 .SS Other Operating Systems
 .PP
 \f[V]quickget\f[R] also supports:
+.SS Other Operating Systems
+.PP
+\f[V]quickget\f[R] also supports:
 .IP \[bu] 2
 \f[V]alma\f[R] (Alma Linux)
 .IP \[bu] 2
@@ -337,15 +340,23 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[V]arcolinux\f[R] (Arco Linux)
 .IP \[bu] 2
+\f[V]batocera\f[R] (Batocera)
+.IP \[bu] 2
 \f[V]cachyos\f[R] (CachyOS)
 .IP \[bu] 2
+\f[V]centos-stream\f[R] (CentOS Stream)
+.IP \[bu] 2
 \f[V]debian\f[R] (Debian)
+.IP \[bu] 2
+\f[V]deepin\f[R] (Deepin)
 .IP \[bu] 2
 \f[V]devuan\f[R] (Devuan)
 .IP \[bu] 2
 \f[V]dragonflybsd\f[R] (DragonFlyBSD)
 .IP \[bu] 2
 \f[V]elementary\f[R] (elementary OS)
+.IP \[bu] 2
+\f[V]endeavouros\f[R] (EndeavourOS)
 .IP \[bu] 2
 \f[V]fedora\f[R] (Fedora)
 .IP \[bu] 2
@@ -368,6 +379,8 @@ All the official Ubuntu flavours are supported, just replace
 \f[V]kolibrios\f[R] (KolibriOS)
 .IP \[bu] 2
 \f[V]linuxmint\f[R] (Linux Mint)
+.IP \[bu] 2
+\f[V]lmde\f[R] (Linux Mint Debian Edition)
 .IP \[bu] 2
 \f[V]manjaro\f[R] (Manjaro)
 .IP \[bu] 2
@@ -647,20 +660,36 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
-  --braille               : Enable braille support. Requires SDL.
-  --delete-disk           : Delete the disk image and EFI variables
-  --delete-vm             : Delete the entire VM and it\[aq]s configuration
-  --display               : Select display backend. \[aq]sdl\[aq] (default), \[aq]gtk\[aq], \[aq]none\[aq], or \[aq]spice\[aq]
-  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)
-  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers
-  --screen <screen>       : Use specified screen to determine the window size.
-  --shortcut              : Create a desktop shortcut
-  --snapshot apply <tag>  : Apply/restore a snapshot.
-  --snapshot create <tag> : Create a snapshot.
-  --snapshot delete <tag> : Delete a snapshot.
-  --snapshot info         : Show disk/snapshot info.
-  --status-quo            : Do not commit any changes to disk/snapshot.
-  --version               : Print version
+  --braille                         : Enable braille support. Requires SDL.
+  --delete-disk                     : Delete the disk image and EFI variables
+  --delete-vm                       : Delete the entire VM and it\[aq]s configuration
+  --display                         : Select display backend. \[aq]sdl\[aq] (default), \[aq]gtk\[aq], \[aq]none\[aq], or \[aq]spice\[aq]
+  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
+  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
+  --screen <screen>                 : Use specified screen to determine the window size.
+  --shortcut                        : Create a desktop shortcut
+  --snapshot apply <tag>            : Apply/restore a snapshot.
+  --snapshot create <tag>           : Create a snapshot.
+  --snapshot delete <tag>           : Delete a snapshot.
+  --snapshot info                   : Show disk/snapshot info.
+  --status-quo                      : Do not commit any changes to disk/snapshot.
+  --viewer <viewer>                 : Choose an alternative viewer. \[at]Options: \[aq]spicy\[aq] (default), \[aq]remote-viewer\[aq], \[aq]none\[aq]
+  --ssh-port <port>                 : Set ssh-port manually
+  --spice-port <port>               : Set spice-port manually
+  --public-dir <path>               : expose share directory. \[at]Options: \[aq]\[aq] (default: xdg-user-dir PUBLICSHARE), \[aq]<directory>\[aq], \[aq]none\[aq]
+  --monitor <type>                  : Set monitor connection type. \[at]Options: \[aq]socket\[aq] (default), \[aq]telnet\[aq], \[aq]none\[aq]
+  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: \[aq]localhost\[aq])
+  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: \[aq]4440\[aq])
+  --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)
+  --serial <type>                   : Set serial connection type. \[at]Options: \[aq]socket\[aq] (default), \[aq]telnet\[aq], \[aq]none\[aq]
+  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: \[aq]localhost\[aq])
+  --serial-telnet-port <port>       : Set telnet port for serial. (default: \[aq]6660\[aq])
+  --keyboard <type>                 : Set keyboard. \[at]Options: \[aq]usb\[aq] (default), \[aq]ps2\[aq], \[aq]virtio\[aq]
+  --keyboard_layout <layout>        : Set keyboard layout.
+  --mouse <type>                    : Set mouse. \[at]Options: \[aq]tablet\[aq] (default), \[aq]ps2\[aq], \[aq]usb\[aq], \[aq]virtio\[aq]
+  --usb-controller <type>           : Set usb-controller. \[at]Options: \[aq]ehci\[aq] (default), \[aq]xhci\[aq], \[aq]none\[aq]
+  --extra_args <arguments>          : Pass additional arguments to qemu
+  --version                         : Print version
 
 \f[R]
 .fi
