@@ -645,7 +645,7 @@ function vm_boot() {
   fi
 
   if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
-    # Display MSRs alert if the guest is macOS
+    # Display MSRs alert if the guest is macOS or windows
     ignore_msrs_alert
   fi
 
