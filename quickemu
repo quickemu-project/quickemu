@@ -1149,7 +1149,6 @@ function vm_boot() {
     exit 1
   fi
 
-
   if [ -z "${EXTRA_ARGS}" ]; then
     EXTRA_ARGS="${extra_args}"
   fi
