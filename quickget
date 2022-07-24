@@ -208,7 +208,7 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.4 8.5
+    echo 8.5 8.6 9.0
 }
 
 function editions_alma() {
@@ -759,7 +759,7 @@ function get_alma() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
-    local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
+    local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE/beta-1/beta}/isos/x86_64/"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
