@@ -257,7 +257,7 @@ function editions_centos-stream() {
 }
 
 function releases_debian() {
-    echo 10.11.0 11.2.0 11.3.0
+    echo 10.11.0 11.2.0 11.3.0 11.4.0
 }
 
 function editions_debian() {
@@ -887,7 +887,7 @@ function get_debian() {
     local URL=""
 
     case ${RELEASE} in
-      11.3.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      11.4.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
 
