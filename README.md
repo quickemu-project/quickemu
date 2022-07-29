@@ -231,10 +231,6 @@ with your preferred flavour.
 
 `quickget` also supports:
 
-## Other Operating Systems
-
-`quickget` also supports:
-
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
