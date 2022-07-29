@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 25, 2022
+date: July 30, 2022
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -250,10 +250,6 @@ with your preferred flavour.
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
-
-## Other Operating Systems
-
-`quickget` also supports:
 
 ## Other Operating Systems
 
