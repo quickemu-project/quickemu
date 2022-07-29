@@ -1149,7 +1149,7 @@ function vm_boot() {
     exit 1
   fi
 
-  
+
   if [ -z "${EXTRA_ARGS}" ]; then
     EXTRA_ARGS="${extra_args}"
   fi
@@ -1285,7 +1285,7 @@ function viewer_param_check() {
   if [ "${VIEWER}" != "none" ] && [ "${VIEWER}" != "spicy" ] && [ "${VIEWER}" != "remote-viewer" ]; then
     echo "ERROR! Requested viewer '${VIEWER}' is not recognised."
     exit 1
-  fi  
+  fi
   if [ "${VIEWER}" == "spicy" ] && ! command -v spicy &>/dev/null; then
     echo "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
     exit 1
