@@ -1,35 +1,31 @@
 ---
 author: Martin Wimpress
-date: 'February 20, 2022'
+date: July 30, 2022
 footer: quickget
 header: Quickget User Manual
 section: 1
 title: QUICKGET
 ---
 
-NAME
-====
+# NAME
 
 quickget - download and prepare materials for building a quickemu VM
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 **quickget** \[*os*\] \[*release*\] \[*edition*\] \| \[*OPTION*\]\*
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 **quickget** will download the requisite materials and prepare a
 configuration for `quickemu` to use to build and run
 
-OPTIONS
-=======
+# OPTIONS
 
 **version \| -version \| --version**
 :   show version (from Quickemu)
 
-**list \| list\_csv \| list\_json**
+**list \| list_csv \| list_json**
 :   provide a csv list of all supported guest OSes, versions and
     variants.
 
@@ -39,18 +35,16 @@ OPTIONS
     script will exit. Editions may not apply and will be defaulted if
     not provided.
 
-NOTES
-=====
+# NOTES
 
-Ubuntu Guest
-------------
+## Ubuntu Guest
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` {.bash}
-quickget ubuntu 20.04
-quickemu --vm ubuntu-20.04.conf
+``` bash
+quickget ubuntu 22.04
+quickemu --vm ubuntu-22.04.conf
 ```
 
 -   Complete the installation as normal.
@@ -67,7 +61,7 @@ quickemu --vm ubuntu-20.04.conf
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
 
-``` {.bash}
+``` bash
 quickget ubuntu devel
 quickemu --vm ubuntu-devel.conf
 ```
@@ -90,8 +84,7 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
-Other Operating Systems
------------------------
+## Other Operating Systems
 
 `quickget` also supports:
 
@@ -100,11 +93,15 @@ Other Operating Systems
 -   `android` (Android x86)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
+-   `batocera` (Batocera)
 -   `cachyos` (CachyOS)
+-   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
+-   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
+-   `endeavouros` (EndeavourOS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
@@ -116,6 +113,7 @@ Other Operating Systems
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
+-   `lmde` (Linux Mint Debian Edition)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
@@ -139,7 +137,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` {.bash}
+``` bash
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -147,7 +145,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` {.bash}
+``` bash
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -158,13 +156,12 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
         sharing.
 
-macOS Guest
------------
+## macOS Guest
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -194,7 +191,7 @@ supported.
 
 The default macOS configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -245,8 +242,7 @@ There are some considerations when running macOS via Quickemu.
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-Windows 8.1, 10 & 11 Guests
----------------------------
+## Windows 8.1, 10 & 11 Guests
 
 `quickget` can automatically download Windows 8.1, [Windows
 10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
@@ -256,7 +252,7 @@ with the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
 and creates a virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -270,18 +266,19 @@ By default `quickget` will download the *"English International"*
 release, but you can optionally specify one of the supported languages:
 For example:
 
-``` {.bash}
+``` bash
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/Win11_EnglishInternational_x64.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
+secureboot="on"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
@@ -289,20 +286,17 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-AUTHORS
-=======
+# AUTHORS
 
 Written by Martin Wimpress.
 
-BUGS
-====
+# BUGS
 
 Submit bug reports online at:
 <https://github.com/quickemu-project/quickemu/issues>
 
-SEE ALSO
-========
+# SEE ALSO
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu(1), quickemu\_conf(1), quickgui(1)
+quickemu(1), quickemu_conf(1), quickgui(1)
