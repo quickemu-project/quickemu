@@ -422,7 +422,7 @@ function releases_opensuse(){
 }
 
 function releases_oraclelinux() {
-    echo 7.7 7.8 7.9 8.2 8.3 8.4 8.5
+    echo 7.7 7.8 7.9 8.4 8.5 8.6 9.0
 }
 
 function releases_popos() {
@@ -1270,8 +1270,8 @@ function get_oraclelinux() {
     local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
 
     case ${VER_MAJ} in
-      8) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
-      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+      7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
     esac
     HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
