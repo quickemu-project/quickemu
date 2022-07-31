@@ -291,7 +291,7 @@ function releases_fedora() {
 }
 
 function releases_batocera() {
-  echo 33
+  echo 32 33 34
 }
 
 function editions_fedora() {
@@ -850,8 +850,23 @@ function get_arcolinux() {
 
 function get_batocera() {
     local HASH=""
-    local ISO="batocera-x86_64-${RELEASE}-20220203.img.gz"
-    local URL="https://updates.batocera.org/x86_64/stable/last"
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
+    local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+    local CURRENT_RELEASE=$(echo "${ISO}"| cut -d\- -f3)
+
+
+    case ${RELEASE} in
+      ${CURRENT_RELEASE})  #Current release
+         URL+=""
+         ;;
+      *)
+         URL+="/archives/${RELEASE}"
+         ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+         ;; # non-current are here
+
+    esac
+
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
