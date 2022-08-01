@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 30, 2022
+date: August 1, 2022
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -255,6 +255,10 @@ with your preferred flavour.
 
 `quickget` also supports:
 
+## Other Operating Systems
+
+`quickget` also supports:
+
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
@@ -426,6 +430,10 @@ quickemu --vm windows-11.conf
 
 -   Complete the installation as you normally would.
 -   All relevant drivers and services should be installed automatically.
+-   A local adminstrator user account is automatically created, with
+    these credentials:
+    -   Username: `Quickemu`
+    -   Password: `quickemu`
 
 ### Regional versions
 
@@ -466,7 +474,7 @@ Here are the usage instructions:
       --braille                         : Enable braille support. Requires SDL.
       --delete-disk                     : Delete the disk image and EFI variables
       --delete-vm                       : Delete the entire VM and it's configuration
-      --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'
+      --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'
       --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
       --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
       --screen <screen>                 : Use specified screen to determine the window size.
@@ -493,6 +501,8 @@ Here are the usage instructions:
       --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
       --extra_args <arguments>          : Pass additional arguments to qemu
       --version                         : Print version
+
+
 
 ## Desktop shortcuts
 

@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 30, 2022
+date: August 1, 2022
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -83,6 +83,10 @@ with your preferred flavour.
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
+
+## Other Operating Systems
+
+`quickget` also supports:
 
 ## Other Operating Systems
 
@@ -259,6 +263,10 @@ quickemu --vm windows-11.conf
 
 -   Complete the installation as you normally would.
 -   All relevant drivers and services should be installed automatically.
+-   A local adminstrator user account is automatically created, with
+    these credentials:
+    -   Username: `Quickemu`
+    -   Password: `quickemu`
 
 ### Regional versions
 
