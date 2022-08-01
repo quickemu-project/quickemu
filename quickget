@@ -1448,6 +1448,9 @@ function unattended_windows() {
        https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/
   -->
   <settings pass="offlineServicing">
+    <component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <EnableLUA>false</EnableLUA>
+    </component>
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <ComputerName>*</ComputerName>
     </component>
@@ -1456,6 +1459,9 @@ function unattended_windows() {
   <settings pass="generalize">
     <component name="Microsoft-Windows-PnPSysprep" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+    </component>
+    <component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <SkipRearm>1</SkipRearm>
     </component>
   </settings>
 
@@ -1474,6 +1480,7 @@ function unattended_windows() {
         <SupportURL>https://github.com/quickemu-project/quickemu/issues</SupportURL>
       </OEMInformation>
       <OEMName>Quickemu Project</OEMName>
+      <ProductKey>W269N-WFGWX-YVC9B-4J6C9-T83GX</ProductKey>
     </component>
     <component name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <CEIPEnabled>0</CEIPEnabled>
@@ -1584,8 +1591,11 @@ function unattended_windows() {
       </UpgradeData>
       <UserData>
         <AcceptEula>true</AcceptEula>
+        <FullName>Quickemu</FullName>
+        <Organization>Quickemu Project</Organization>
+        <!-- https://docs.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys -->
         <ProductKey>
-          <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+          <Key>W269N-WFGWX-YVC9B-4J6C9-T83GX</Key>
           <WillShowUI>Never</WillShowUI>
         </ProductKey>
       </UserData>
@@ -1640,19 +1650,45 @@ function unattended_windows() {
 
   <settings pass="oobeSystem">
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <AutoLogon>
+        <Password>
+          <Value>quickemu</Value>
+          <PlainText>true</PlainText>
+        </Password>
+        <Enabled>true</Enabled>
+        <Username>Quickemu</Username>
+      </AutoLogon>
+      <DisableAutoDaylightTimeSet>false</DisableAutoDaylightTimeSet>
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
-        <HideLocalAccountScreen>false</HideLocalAccountScreen>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <NetworkLocation>Home</NetworkLocation>
         <ProtectYourPC>3</ProtectYourPC>
-        <SkipUserOOBE>false</SkipUserOOBE>
-        <SkipMachineOOBE>false</SkipMachineOOBE>
+        <SkipUserOOBE>true</SkipUserOOBE>
+        <SkipMachineOOBE>true</SkipMachineOOBE>
         <VMModeOptimizations>
           <SkipWinREInitialization>true</SkipWinREInitialization>
         </VMModeOptimizations>
       </OOBE>
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Password>
+              <Value>quickemu</Value>
+              <PlainText>true</PlainText>
+            </Password>
+            <Description>Quickemu</Description>
+            <DisplayName>Quickemu</DisplayName>
+            <Group>Administrators</Group>
+            <Name>Quickemu</Name>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+      <RegisteredOrganization>Quickemu Project</RegisteredOrganization>
+      <RegisteredOwner>Quickemu</RegisteredOwner>
       <FirstLogonCommands>
         <SynchronousCommand wcm:action="add">
           <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
