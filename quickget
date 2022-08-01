@@ -245,7 +245,11 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 2022.01.09 2022.02.11
+    echo 220731
+}
+
+function editions_cachyos() {
+    echo kde gnome xfce
 }
 
 function releases_centos-stream() {
@@ -857,8 +861,9 @@ function get_batocera() {
 
 function get_cachyos() {
     local HASH=""
-    local ISO="cachyos-${RELEASE}-x86_64.iso"
-    local URL="https://mirror.cachyos.org/ISO"
+    local ISO="cachyos-${EDITION}-linux-${RELEASE}.iso"
+    local URL="https://mirror.cachyos.org/ISO/${EDITION}/${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
