@@ -263,6 +263,10 @@ quickemu --vm windows-11.conf
 
 -   Complete the installation as you normally would.
 -   All relevant drivers and services should be installed automatically.
+-   A local adminstrator user account is automatically created, with
+    these credentials:
+    -   Username: `Quickemu`
+    -   Password: `quickemu`
 
 ### Regional versions
 
