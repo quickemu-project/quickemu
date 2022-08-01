@@ -221,7 +221,6 @@ function vm_boot() {
   local HOST_CPU_SMT=""
   local HOST_CPU_SOCKETS=""
   local HOST_CPU_VENDOR=""
-  local GL="on"
   local GUEST_TWEAKS=""
   local KERNEL_NAME="Unknown"
   local KERNEL_NODE=""
@@ -734,24 +733,32 @@ function vm_boot() {
       DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
       # GL is not working with GTK and virtio-vga
       if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        GL="off"
+        gl="off"
       fi
       ;;
     none|spice)
       DISPLAY_RENDER="none";;
+    # spice-app has a bug where using spice-app,gl=off seems to enable gl, but
+    # if the gl param is omitted it works fine.
+    spice-app)
+      DISPLAY_RENDER="${OUTPUT}"
+      if [[ "${gl}" == "on" ]]; then
+        DISPLAY_RENDER+=",gl=on"
+      fi
+      ;;
     *)
-      DISPLAY_RENDER="${OUTPUT},gl=${GL}";;
+      DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
   esac
 
-  if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
+  if [ "${gl}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
     if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
       DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
     else
       DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
     fi
-    echo ", GL (${GL}), VirGL (on)"
+    echo ", GL (${gl}), VirGL (on)"
   else
-    echo ", GL (${GL}), VirGL (off)"
+    echo ", GL (${gl}), VirGL (off)"
   fi
 
   # Build the video configuration
@@ -1243,7 +1250,7 @@ function usage() {
   echo "  --braille                         : Enable braille support. Requires SDL."
   echo "  --delete-disk                     : Delete the disk image and EFI variables"
   echo "  --delete-vm                       : Delete the entire VM and it's configuration"
-  echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
+  echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
   echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>                 : Use specified screen to determine the window size."
@@ -1274,8 +1281,7 @@ function usage() {
 }
 
 function display_param_check() {
-  # @ASK: accept "spice-app" as output ?
-  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ] && [ "${OUTPUT}" != "spice-app" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
     exit 1
   fi
@@ -1612,22 +1618,26 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     disk_size="${disk}"
   fi
 
+  # Set the default OUTPUT if not provided by user
   if [ -z "${OUTPUT}" ]; then
-    # Braille support requires SDL. Override OUTPUT if braille was requested.
-    if [ -n "${BRAILLE}" ]; then
-      OUTPUT="sdl"
-    elif [ -z "${display}" ]; then
-      OUTPUT="sdl"
-    else
-      OUTPUT="${display}"
-      display_param_check
-    fi
+    OUTPUT="sdl"
+  fi
+
+  # Braille support requires SDL. Override OUTPUT if braille was requested.
+  if [ -n "${BRAILLE}" ]; then
+    OUTPUT="sdl"
   fi
 
   if [ -z "${VIEWER}" ]; then
     VIEWER="${viewer}"
   fi
   viewer_param_check
+
+  # Set the default 3d acceleration. Will be overridden to "off" if
+  # DISPLAY_DEVICE is determined to be virtio-vga since it doesn't work there.
+  if [ -z "${gl}" ]; then
+    gl="on"
+  fi
 
   if [ -z "${PUBLIC}" ]; then
     PUBLIC="${public_dir}"
