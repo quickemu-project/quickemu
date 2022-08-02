@@ -221,7 +221,6 @@ function vm_boot() {
   local HOST_CPU_SMT=""
   local HOST_CPU_SOCKETS=""
   local HOST_CPU_VENDOR=""
-  local GL="on"
   local GUEST_TWEAKS=""
   local KERNEL_NAME="Unknown"
   local KERNEL_NODE=""
@@ -231,7 +230,6 @@ function vm_boot() {
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
   local MAC_DISK_DEV="ide-hd,bus=ahci.2"
-  local MOUSE="usb-tablet"
   local NET_DEVICE="virtio-net"
   local OSK=""
   local SMM="off"
@@ -401,6 +399,10 @@ function vm_boot() {
         elif [ -e "/usr/share/qemu/edk2-x86_64-secure-code.fd" ]; then
           EFI_CODE="/usr/share/qemu/edk2-x86_64-secure-code.fd"
           efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
+        # Solus new place to hide
+        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd" ]; then
+          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd"
+          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
           echo "       Please install OVMF firmware."
@@ -429,6 +431,10 @@ function vm_boot() {
         elif [ -e "/usr/share/qemu/edk2-x86_64-code.fd" ]; then
           EFI_CODE="/usr/share/qemu/edk2-x86_64-code.fd"
           efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
+        # Solus
+        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.fd" ]; then
+          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.fd"
+          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
         else
           echo "ERROR! EFI boot requested but no EFI firmware found."
           echo "       Please install OVMF firmware."
@@ -470,7 +476,7 @@ function vm_boot() {
       fi
 
       if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
-        MOUSE="usb-mouse"
+        MOUSE="usb"
       elif [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "freedos" ]; then
         MACHINE_TYPE="pc"
         NET_DEVICE="rtl8139"
@@ -490,6 +496,15 @@ function vm_boot() {
         disk_size="16G"
       fi
       ;;
+    batocera)
+      CPU="-cpu host,kvm=on"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      MACHINE_TYPE="pc"
+      NET_DEVICE="rtl8139"
+      disk_size="8G"
+    ;;
     kolibrios)
       CPU="-cpu qemu32,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
@@ -633,7 +648,7 @@ function vm_boot() {
   fi
 
   if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
-    # Display MSRs alert if the guest is macOS
+    # Display MSRs alert if the guest is macOS or windows
     ignore_msrs_alert
   fi
 
@@ -722,24 +737,32 @@ function vm_boot() {
       DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
       # GL is not working with GTK and virtio-vga
       if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        GL="off"
+        gl="off"
       fi
       ;;
     none|spice)
       DISPLAY_RENDER="none";;
+    # spice-app has a bug where using spice-app,gl=off seems to enable gl, but
+    # if the gl param is omitted it works fine.
+    spice-app)
+      DISPLAY_RENDER="${OUTPUT}"
+      if [[ "${gl}" == "on" ]]; then
+        DISPLAY_RENDER+=",gl=on"
+      fi
+      ;;
     *)
-      DISPLAY_RENDER="${OUTPUT},gl=${GL}";;
+      DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
   esac
 
-  if [ "${GL}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
+  if [ "${gl}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
     if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
       DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
     else
       DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
     fi
-    echo ", GL (${GL}), VirGL (on)"
+    echo ", GL (${gl}), VirGL (on)"
   else
-    echo ", GL (${GL}), VirGL (off)"
+    echo ", GL (${gl}), VirGL (off)"
   fi
 
   # Build the video configuration
@@ -757,6 +780,11 @@ function vm_boot() {
     ati-vga|cirrus-vga|VGA) VIDEO="${VIDEO},vgamem_mb=64";;
   esac
 
+  # Configure multiscreen if max_outputs was provided in the .conf file
+  if [ -v max_outputs ]; then
+    VIDEO="${VIDEO},max_outputs=${max_outputs}"
+  fi
+
   # Add fullscreen options
   VIDEO="${VIDEO} ${FULLSCREEN}"
 
@@ -765,9 +793,11 @@ function vm_boot() {
 
   echo -n "" > "${VMDIR}/${VMNAME}.ports"
 
-  # Find a free port to expose ssh to the guest
-  local SSH_PORT=""
-  SSH_PORT=$(get_port 22220 9)
+  if [ -z "$SSH_PORT" ]; then
+    # Find a free port to expose ssh to the guest
+    SSH_PORT=$(get_port 22220 9)
+  fi
+
   if [ -n "${SSH_PORT}" ]; then
     echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
     NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
@@ -787,10 +817,12 @@ function vm_boot() {
     done
   fi
 
-  # Find a free port for spice
   local SPICE="disable-ticketing=on"
-  local SPICE_PORT=""
-  SPICE_PORT=$(get_port 5930 9)
+  if [ -z "${SPICE_PORT}" ]; then
+    # Find a free port for spice
+    SPICE_PORT=$(get_port 5930 9)
+  fi
+
   if [ -z "${SPICE_PORT}" ]; then
     echo " - SPICE:    All SPICE ports have been exhausted."
     if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
@@ -873,9 +905,6 @@ function vm_boot() {
          -m ${RAM_VM} ${BALLOON}
          -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
          ${VIDEO} -display ${DISPLAY_RENDER}
-         -device usb-ehci,id=input
-         -device usb-kbd,bus=input.0
-         -device ${MOUSE},bus=input.0
          -audiodev ${AUDIO_DEV}
          -device intel-hda -device hda-duplex,audiodev=audio0
          -rtc base=localtime,clock=host,driftfix=slew
@@ -900,14 +929,64 @@ function vm_boot() {
          -device usb-ccid
          -chardev spicevmc,id=ccid,name=smartcard
          -device ccid-card-passthru,chardev=ccid
-         -monitor none
-         -serial mon:stdio)
+         )
+
+
+  # setup usb-controller
+  [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
+  if [ "${USB_CONTROLLER}" == "ehci" ]; then
+    args+=(-device usb-ehci,id=input)
+  elif [ "${USB_CONTROLLER}" == "xhci" ]; then
+    args+=(-device qemu-xhci,id=input)
+  elif [ -z "${USB_CONTROLLER}" ] || [ "${USB_CONTROLLER}" == "none" ]; then
+    # add nothing
+    :
+  else
+    echo "WARNING! Unknown usb-controller value: '${USB_CONTROLLER}'"
+  fi
+
+  # setup keyboard
+  # @INFO: must be set after usb-controller
+  [ -z "${KEYBOARD}" ] && KEYBOARD="$keyboard"
+  if [ "${KEYBOARD}" == "usb" ]; then
+    args+=(-device usb-kbd,bus=input.0)
+  elif [ "${KEYBOARD}" == "virtio" ]; then
+    args+=(-device virtio-keyboard)
+  elif [ "${KEYBOARD}" == "ps2" ] || [ -z "${KEYBOARD}" ]; then
+    # add nothing, default is ps/2 keyboard
+    :
+  else
+    echo "WARNING! Unknown keyboard value: '${KEYBOARD}'; Fallback to ps2"
+  fi
+
+  # setup keyboard_layout
+  # @INFO: When using the VNC display, you must use the -k parameter to set the keyboard layout if you are not using en-us.
+  [ -z "${KEYBOARD_LAYOUT}" ] && KEYBOARD_LAYOUT="$keyboard_layout"
+  if [ -n "${KEYBOARD_LAYOUT}" ]; then
+    args+=(-k ${KEYBOARD_LAYOUT})
+  fi
 
   # FIXME: Check for device availability. qemu will fail to start otherwise
   if [ -n "${BRAILLE}" ]; then
-      # shellcheck disable=SC2054
-      args+=(-chardev braille,id=brltty
-             -device usb-braille,id=usbbrl,chardev=brltty)
+    # shellcheck disable=SC2054
+    args+=(-chardev braille,id=brltty
+           -device usb-braille,id=usbbrl,chardev=brltty)
+  fi
+
+  # setup mouse
+  # @INFO: must be set after usb-controller
+  [ -z "${MOUSE}" ] && MOUSE="$mouse"
+  if [ "${MOUSE}" == "usb" ]; then
+    args+=(-device usb-mouse,bus=input.0)
+  elif [ "${MOUSE}" == "tablet" ]; then
+    args+=(-device usb-tablet,bus=input.0)
+  elif [ "${MOUSE}" == "virtio" ]; then
+    args+=(-device virtio-mouse)
+  elif [ "${MOUSE}" == "ps2" ] || [ -z "${MOUSE}" ]; then
+    # add nothing, default is ps/2 mouse
+    :
+  else
+    echo "WARNING! Unknown mouse value: '${MOUSE}; Fallback to ps2'"
   fi
 
   if [ -n "${bridge}" ]; then
@@ -978,6 +1057,12 @@ function vm_boot() {
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  elif [ "${guest_os}" == "batocera" ] ; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device virtio-blk-pci,drive=BootDisk
+           -drive id=BootDisk,if=none,format=raw,file="${img}"
+           -device virtio-blk-pci,drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
@@ -1005,8 +1090,87 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
   fi
 
-  if [ -n "${extra_args}" ]; then
-      args+=("${extra_args}")
+  if [ -z "${MONITOR}" ]; then
+    MONITOR="${monitor:-none}"
+  fi
+
+  if [ -z "${MONITOR_TELNET_HOST}" ]; then
+    MONITOR_TELNET_HOST="${monitor_telnet_host:-localhost}"
+  fi
+  if [ -z "${MONITOR_TELNET_PORT}" ]; then
+    MONITOR_TELNET_PORT="${monitor_telnet_port}"
+  fi
+  if [ -n "${MONITOR_TELNET_PORT}" ] &&  ! is_numeric "${MONITOR_TELNET_PORT}"; then
+    echo "ERROR: telnet-port must be a number!"
+    exit 1
+  fi
+
+  if [ "${MONITOR}" == "none" ]; then
+    args+=(-monitor none)
+    echo " - Monitor:  (off)"
+  elif [ "${MONITOR}" == "telnet" ]; then
+    # Find a free port to expose monitor-telnet to the guest
+    local temp_port="$(get_port ${MONITOR_TELNET_PORT} 9)"
+    if [ -z "${temp_port}" ]; then
+      echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
+    else
+      MONITOR_TELNET_PORT="${temp_port}"
+      args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
+      echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
+      echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+    fi
+  elif [ "${MONITOR}" == "socket" ]; then
+    args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
+    echo " - Monitor:  On host:  nc -U \"${VM_MONITOR_SOCKETPATH}\""
+    echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_MONITOR_SOCKETPATH}"
+  else
+    echo "ERROR! \"${MONITOR}\" is an unknown monitor option."
+    exit 1
+  fi
+
+  if [ -z "${SERIAL}" ]; then
+    SERIAL="${serial:-none}"
+  fi
+
+  if [ -z "${SERIAL_TELNET_HOST}" ]; then
+    SERIAL_TELNET_HOST="${serial_telnet_host:-localhost}"
+  fi
+  if [ -z "${SERIAL_TELNET_PORT}" ]; then
+    SERIAL_TELNET_PORT="${serial_telnet_port}"
+  fi
+  if [ -n "${SERIAL_TELNET_PORT}" ] &&  ! is_numeric "${SERIAL_TELNET_PORT}"; then
+    echo "ERROR: serial-port must be a number!"
+    exit 1
+  fi
+
+  if [ "${SERIAL}" == "none" ]; then
+    args+=(-serial none)
+  elif [ "${SERIAL}" == "telnet" ]; then
+    # Find a free port to expose serial-telnet to the guest
+    local temp_port="$(get_port ${SERIAL_TELNET_PORT} 9)"
+    if [ -z "${temp_port}" ]; then
+      echo " - Serial:   All Serial-Telnet ports have been exhausted."
+    else
+      SERIAL_TELNET_PORT="${temp_port}"
+      args+=(-serial telnet:${SERIAL_TELNET_HOST}:${SERIAL_TELNET_PORT},server,nowait)
+      echo " - Serial:   On host:  telnet ${SERIAL_TELNET_HOST} ${SERIAL_TELNET_PORT}"
+      echo "serial-telnet,${SERIAL_TELNET_PORT},${SERIAL_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+    fi
+  elif [ "${SERIAL}" == "socket" ]; then
+    args+=(-serial unix:${VM_SERIAL_SOCKETPATH},server,nowait)
+    echo " - Serial:   On host:  nc -U \"${VM_SERIAL_SOCKETPATH}\""
+    echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_SERIAL_SOCKETPATH}"
+  else
+    echo "ERROR! \"${SERIAL}\" is an unknown serial option."
+    exit 1
+  fi
+
+
+  if [ -z "${EXTRA_ARGS}" ]; then
+    EXTRA_ARGS="${extra_args}"
+  fi
+  if [ -n "${EXTRA_ARGS}" ]; then
+      args+=(${EXTRA_ARGS})
   fi
 
   # The OSK parameter contains parenthesis, they need to be escaped in the shell
@@ -1017,19 +1181,53 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
-  echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
-  ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
+  if [ ${VM_UP} -eq 0 ]; then
+    echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
+    ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
+    sleep 0.25
+  fi
 
-  # If output is 'none' then SPICE was requested.
-  if [ "${OUTPUT}" == "spice" ]; then
-    if [ -n "${PUBLIC}" ]; then
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
-    else
-      spicy --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
+}
+
+function start_viewer {
+  errno=0
+  if [ "${VIEWER}" != "none" ]; then
+    echo "---"
+
+    # If output is 'none' then SPICE was requested.
+    if [ "${OUTPUT}" == "spice" ]; then
+      if [ "${VIEWER}" == "remote-viewer" ]; then
+        # show via viewer: remote-viewer
+
+        if [ -n "${PUBLIC}" ]; then
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+          errno=$?
+        else
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+          errno=$?
+        fi
+
+      elif [ "${VIEWER}" == "spicy" ]; then
+        # show via viewer: spicy
+
+        if [ -n "${PUBLIC}" ]; then
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
+          errno=$?
+        else
+          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+          errno=$?
+        fi
+      fi
+      if [ $errno -ne 0 ]; then
+        echo "WARNING! Could not start viewer(${VIEWER}) Err: $errno"
+      fi
     fi
   fi
-  sleep 0.25
-  echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
 }
 
 function shortcut_create {
@@ -1058,32 +1256,127 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --braille               : Enable braille support. Requires SDL."
-  echo "  --delete-disk           : Delete the disk image and EFI variables"
-  echo "  --delete-vm             : Delete the entire VM and it's configuration"
-  echo "  --display               : Select display backend. 'sdl' (default), 'gtk', 'none', or 'spice'"
-  echo "  --fullscreen            : Starts VM in full screen mode (Ctl+Alt+f to exit)"
-  echo "  --ignore-msrs-always    : Configure KVM to always ignore unhandled machine-specific registers"
-  echo "  --screen <screen>       : Use specified screen to determine the window size."
-  echo "  --shortcut              : Create a desktop shortcut"
-  echo "  --snapshot apply <tag>  : Apply/restore a snapshot."
-  echo "  --snapshot create <tag> : Create a snapshot."
-  echo "  --snapshot delete <tag> : Delete a snapshot."
-  echo "  --snapshot info         : Show disk/snapshot info."
-  echo "  --status-quo            : Do not commit any changes to disk/snapshot."
-  echo "  --version               : Print version"
+  echo "  --braille                         : Enable braille support. Requires SDL."
+  echo "  --delete-disk                     : Delete the disk image and EFI variables"
+  echo "  --delete-vm                       : Delete the entire VM and it's configuration"
+  echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
+  echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
+  echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
+  echo "  --screen <screen>                 : Use specified screen to determine the window size."
+  echo "  --shortcut                        : Create a desktop shortcut"
+  echo "  --snapshot apply <tag>            : Apply/restore a snapshot."
+  echo "  --snapshot create <tag>           : Create a snapshot."
+  echo "  --snapshot delete <tag>           : Delete a snapshot."
+  echo "  --snapshot info                   : Show disk/snapshot info."
+  echo "  --status-quo                      : Do not commit any changes to disk/snapshot."
+  echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+  echo "  --ssh-port <port>                 : Set ssh-port manually"
+  echo "  --spice-port <port>               : Set spice-port manually"
+  echo "  --public-dir <path>               : expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
+  echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
+  echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
+  echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')"
+  echo "  --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)"
+  echo "  --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'"
+  echo "  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')"
+  echo "  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')"
+  echo "  --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'"
+  echo "  --keyboard_layout <layout>        : Set keyboard layout."
+  echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
+  echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
+  echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
+  echo "  --version                         : Print version"
   exit 1
 }
 
 function display_param_check() {
-  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ]; then
+  if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ] && [ "${OUTPUT}" != "spice-app" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
-    exit 1
-  elif [ "${OUTPUT}" == "spice" ] && ! command -v spicy &>/dev/null; then
-    echo "ERROR! Requested SPICE display, but 'spicy' is not installed."
     exit 1
   fi
 }
+
+function viewer_param_check() {
+  if [ "${VIEWER}" != "none" ] && [ "${VIEWER}" != "spicy" ] && [ "${VIEWER}" != "remote-viewer" ]; then
+    echo "ERROR! Requested viewer '${VIEWER}' is not recognised."
+    exit 1
+  fi
+  if [ "${VIEWER}" == "spicy" ] && ! command -v spicy &>/dev/null; then
+    echo "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
+    exit 1
+  elif [ "${VIEWER}" == "remote-viewer" ] && ! command -v remote-viewer &>/dev/null; then
+    echo "ERROR! Requested 'remote-viewer' as viewer, but 'remote-viewer' is not installed."
+    exit 1
+  fi
+}
+
+function parse_ports_from_file {
+    local FILE="${VMDIR}/${VMNAME}.ports"
+
+    # parse ports
+    local port_name=( $(cat "$FILE" | cut -d, -f1) )
+    local port_number=( $(cat "$FILE" | cut -d, -f2) )
+    local host_name=( $(cat "$FILE" | gawk 'FS="," {print $3,"."}') )
+
+    for ((i=0; i<${#port_name[@]}; i++)); do
+      if [ "${port_name[$i]}" == "ssh" ]; then
+        SSH_PORT="${port_number[$i]}"
+      elif [ "${port_name[$i]}" == "spice" ]; then
+        SPICE_PORT="${port_number[$i]}"
+      elif [ "${port_name[$i]}" == "monitor-telnet" ]; then
+        MONITOR_TELNET_PORT="${port_number[$i]}"
+        MONITOR_TELNET_HOST="${host_name[$i]}"
+      elif [ "${port_name[$i]}" == "serial-telnet" ]; then
+        SERIAL_TELNET_PORT="${port_number[$i]}"
+        SERIAL_TELNET_HOST="${host_name[$i]}"
+      fi
+    done
+}
+
+function is_numeric {
+    [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+function monitor_send_cmd {
+    local MSG="${1}"
+
+    if [ -z "${MSG}" ]; then
+        echo "WARNING! Send to QEMU-Monitor: Message empty!"
+        return 1
+    fi
+
+    # Determine monitor channel
+    local monitor_channel=""
+
+    if [ -S "${VMDIR}/${VMNAME}-monitor.socket" ]; then
+        monitor_channel="socket"
+    elif [ -n "${MONITOR_TELNET_PORT}" ] && [ -n "${MONITOR_TELNET_HOST}" ]; then
+        monitor_channel="telnet"
+    else
+        echo "WARNING! No qemu-monitor channel available - Couldn't send message to monitor!"
+        return
+    fi
+
+
+    case "${monitor_channel}" in
+        socket)
+            echo -e " - MON-SEND: ${MSG}"
+            echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null
+            ;;
+        telnet)
+            echo -e " - MON-SEND: ${MSG}"
+            echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" 2>&1 > /dev/null
+            ;;
+        *)
+            echo "ERROR! This should never happen!"
+            exit 1
+            ;;
+    esac
+
+    return 0
+}
+
+### MAIN
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
@@ -1104,6 +1397,26 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
+viewer="spicy"
+ssh_port=""
+spice_port=""
+public_dir=""
+monitor="socket"
+monitor_telnet_port="4440"
+monitor_telnet_host="localhost"
+monitor_cmd=""
+serial="socket"
+serial_telnet_port="6660"
+serial_telnet_host="localhost"
+# options: ehci(USB2.0), xhci(USB3.0)
+usb_controller="ehci"
+# options: ps2, usb, virtio
+keyboard="usb"
+keyboard_layout="en-us"
+# options: ps2, usb, tablet, virtio
+mouse="tablet"
+# options: ehci, xhci
+usb_controller="ehci"
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1124,27 +1437,28 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
+VIEWER=""
+SSH_PORT=""
+SPICE_PORT=""
+MONITOR=""
+MONITOR_TELNET_PORT=""
+MONITOR_TELNET_HOST=""
+MONITOR_CMD=""
+VM_MONITOR_SOCKETPATH=""
+VM_SERIAL_SOCKETPATH=""
+SERIAL=""
+SERIAL_TELNET_PORT=""
+SERIAL_TELNET_HOST=""
+KEYBOARD=""
+KEYBOARD_LAYOUT=""
+MOUSE=""
+USB_CONTROLLER=""
+EXTRA_ARGS=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="3.15"
-
-# PUBLICSHARE is the only directory exposed to guest VMs for file
-# sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-if command -v xdg-user-dir &>/dev/null; then
-  PUBLIC=$(xdg-user-dir PUBLICSHARE)
-  if [ "${PUBLIC%/}" != "${HOME}" ]; then
-    if [ ! -d "${PUBLIC}" ]; then
-      mkdir -p "${PUBLIC}"
-    fi
-    PUBLIC_TAG="Public-${USER,,}"
-    # shellcheck disable=SC2012
-    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-  else
-    PUBLIC=""
-  fi
-fi
+readonly VERSION="4.0"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
@@ -1217,6 +1531,66 @@ else
             VM="${2}"
             shift
             shift;;
+          -viewer|--viewer)
+            VIEWER="${2}"
+            shift
+            shift;;
+          -ssh-port|--ssh-port)
+            SSH_PORT="${2}"
+            shift;
+            shift;;
+          -spice-port|--spice-port)
+            SPICE_PORT="${2}"
+            shift;
+            shift;;
+          -public-dir|--public-dir)
+            PUBLIC="${2}"
+            shift;
+            shift;;
+          -monitor|--monitor)
+            MONITOR="${2}"
+            shift;
+            shift;;
+          -monitor-cmd|--monitor-cmd)
+            MONITOR_CMD="${2}"
+            shift;
+            shift;;
+          -monitor-telnet-host|--monitor-telnet-host)
+            MONITOR_TELNET_HOST="${2}"
+            shift;
+            shift;;
+          -monitor-telnet-port|--monitor-telnet-port)
+            MONITOR_TELNET_PORT="${2}"
+            shift;
+            shift;;
+          -serial|--serial)
+            SERIAL="${2}"
+            shift;
+            shift;;
+          -serial-telnet-host|--serial-telnet-host)
+            SERIAL_TELNET_HOST="${2}"
+            shift;
+            shift;;
+          -serial-telnet-port|--serial-telnet-port)
+            SERIAL_TELNET_PORT="${2}"
+            shift;
+            shift;;
+          -keyboard|--keyboard)
+            KEYBOARD="${2}"
+            shift;
+            shift;;
+          -mouse|--mouse)
+            MOUSE="${2}"
+            shift;
+            shift;;
+          -usb-controller|--usb-controller)
+            USB_CONTROLLER="${2}"
+            shift;
+            shift;;
+          -extra_args|--extra_args)
+            EXTRA_ARGS="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1240,6 +1614,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   VMDIR=$(dirname "${disk_img}")
   VMNAME=$(basename "${VM}" .conf)
   VMPATH=$(realpath "$(dirname "${VM}")")
+  VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
+  VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
 
   # Backwards compatibility for ${driver_iso}
   if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
@@ -1251,15 +1627,77 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     disk_size="${disk}"
   fi
 
+  # Set the default OUTPUT if not provided by user
   if [ -z "${OUTPUT}" ]; then
-    # Braille support requires SDL. Override OUTPUT if braille was requested.
-    if [ -n "${BRAILLE}" ]; then
-      OUTPUT="sdl"
-    elif [ -z "${display}" ]; then
-      OUTPUT="sdl"
-    else
-      OUTPUT="${display}"
-      display_param_check
+    OUTPUT="sdl"
+  fi
+
+  # Braille support requires SDL. Override OUTPUT if braille was requested.
+  if [ -n "${BRAILLE}" ]; then
+    OUTPUT="sdl"
+  fi
+
+  if [ -z "${VIEWER}" ]; then
+    VIEWER="${viewer}"
+  fi
+  viewer_param_check
+
+  # Set the default 3d acceleration. Will be overridden to "off" if
+  # DISPLAY_DEVICE is determined to be virtio-vga since it doesn't work there.
+  if [ -z "${gl}" ]; then
+    gl="on"
+  fi
+
+  if [ -z "${PUBLIC}" ]; then
+    PUBLIC="${public_dir}"
+  fi
+
+  if [ "${PUBLIC}" == "none" ]; then
+    PUBLIC=""
+  else
+    # PUBLICSHARE is the only directory exposed to guest VMs for file
+    # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
+    if [ -z "${PUBLIC}" ]; then
+      if command -v xdg-user-dir &>/dev/null; then
+        PUBLIC=$(xdg-user-dir PUBLICSHARE)
+      fi
+    fi
+
+    if [ ! -d "${PUBLIC}" ]; then
+      echo "ERROR! Public directory: '${PUBLIC}' doesn't exist!"
+      exit 1
+    fi
+
+    PUBLIC_TAG="Public-${USER,,}"
+    # shellcheck disable=SC2012
+    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+  fi
+
+  if [ -z "${SSH_PORT}" ]; then
+    SSH_PORT=${ssh_port}
+  fi
+  if [ -n "${SSH_PORT}" ] &&  ! is_numeric "${SSH_PORT}"; then
+    echo "ERROR: ssh-port must be a number!"
+    exit 1
+  fi
+
+  if [ -z "${SPICE_PORT}" ]; then
+    SPICE_PORT=${spice_port}
+  fi
+  if [ -n "${SPICE_PORT}" ] && ! is_numeric "${SPICE_PORT}"; then
+    echo "ERROR: spice-port must be a number!"
+    exit 1
+  fi
+
+  # Check if vm is already run
+  VM_PID=0
+  VM_UP=0
+  if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+    VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
+    kill -0 ${VM_PID} 2>&1 >/dev/null
+    if [ $? -eq 0 ]; then
+        echo "VM already started!"
+        VM_UP=1
     fi
   fi
 
@@ -1313,6 +1751,14 @@ if [ ${SHORTCUT} -eq 1 ]; then
   exit
 fi
 
-vm_boot
+if [ $VM_UP -eq 0 ]; then
+    vm_boot
+    start_viewer
+else
+    parse_ports_from_file
+    start_viewer
+fi
+
+[ -n "${MONITOR_CMD}" ] && monitor_send_cmd "${MONITOR_CMD}"
 
 # vim:tabstop=2:shiftwidth=2:expandtab

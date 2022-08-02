@@ -36,8 +36,10 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
+    centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
+    endeavouros)        PRETTY_NAME="EndeavourOS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -45,6 +47,7 @@ function pretty_name() {
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
+    lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
@@ -160,11 +163,15 @@ function os_support() {
     android \
     archlinux \
     arcolinux \
+    batocera \
     cachyos \
+    centos-stream \
     debian \
+    deepin \
     devuan \
     dragonflybsd \
     elementary \
+    endeavouros \
     fedora \
     freebsd \
     freedos \
@@ -177,6 +184,7 @@ function os_support() {
     kolibrios \
     kubuntu \
     linuxmint \
+    lmde \
     manjaro \
     mxlinux \
     netboot \
@@ -206,7 +214,7 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.4 8.5
+    echo 8.6 9.0
 }
 
 function editions_alma() {
@@ -238,15 +246,31 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 2022.01.09 2022.02.11
+    echo 220731
+}
+
+function editions_cachyos() {
+    echo kde gnome xfce
+}
+
+function releases_centos-stream() {
+    echo 8 9
+}
+
+function editions_centos-stream() {
+    echo dvd1 boot
 }
 
 function releases_debian() {
-    echo 10.11.0 11.2.0 11.3.0
+    echo 10.11.0 11.2.0 11.3.0 11.4.0
 }
 
 function editions_debian() {
     echo standard cinnamon gnome kde lxde lxqt mate xfce netinst
+}
+
+function releases_deepin() {
+    echo 20 20.1 20.2 20.2.1 20.2.2 20.2.3 20.2.4 20.3 20.4 20.5
 }
 
 function releases_devuan() {
@@ -261,8 +285,18 @@ function releases_elementary() {
     echo 6.1
 }
 
+function releases_endeavouros() {
+    echo apollo_22_1 \
+    atlantis-21_4 \
+    atlantis_neo-21_5
+}
+
 function releases_fedora() {
-    echo 33 34 35
+    echo 33 34 35 36
+}
+
+function releases_batocera() {
+  echo 32 33 34
 }
 
 function editions_fedora() {
@@ -279,7 +313,7 @@ function editions_fedora() {
 }
 
 function releases_freebsd(){
-    echo 12.2 12.3 13.0
+    echo 12.3 13.0
 }
 
 function editions_freebsd(){
@@ -291,23 +325,12 @@ function releases_freedos() {
 }
 
 function releases_garuda() {
-    echo 220131
+  echo latest
 }
 
 function editions_garuda() {
-    echo dr460nized \
-    dr460nized-blackarch \
-    dr460nized-gaming \
-    bspwm \
-    cinnamon \
-    gnome \
-    i3 \
-    kde-barebones \
-    lxqt-kwin \
-    mate \
-    qtile \
-    sway \
-    xfce
+  URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
+  echo $(wget -q -O - ${URL} | grep '^<a href' | sed -e 's/^.*="//' -e 's/\/.*//')
 }
 
 function releases_gentoo() {
@@ -343,15 +366,22 @@ function releases_kolibrios() {
 }
 
 function releases_linuxmint(){
-    echo 20.2
+    echo 20.2 20.3
 }
 
 function editions_linuxmint(){
     echo cinnamon mate xfce
 }
 
+function editions_lmde(){
+    echo cinnamon
+}
+function releases_lmde(){
+    echo 5
+}
+
 function releases_mxlinux(){
-    echo 21
+    echo 21.1
 }
 
 function editions_mxlinux(){
@@ -381,7 +411,7 @@ function releases_netbsd() {
 }
 
 function releases_nixos(){
-    echo 21.05 21.11
+    echo 21.05 21.11 22.05
 }
 
 function editions_nixos(){
@@ -389,7 +419,7 @@ function editions_nixos(){
 }
 
 function releases_openbsd(){
-    echo 6.7 6.8 6.9 7.0
+    echo 6.8 6.9 7.0 7.1
 }
 
 function releases_openindiana(){
@@ -401,15 +431,15 @@ function editions_openindiana(){
 }
 
 function releases_opensuse(){
-    echo 15.0 15.1 15.2 15.3 microos tumbleweed
+    echo 15.0 15.1 15.2 15.3 15.4 microos tumbleweed
 }
 
 function releases_oraclelinux() {
-    echo 7.7 7.8 7.9 8.2 8.3 8.4 8.5
+    echo 7.7 7.8 7.9 8.4 8.5 8.6 9.0
 }
 
 function releases_popos() {
-    echo 20.04 21.10
+    echo 20.04 21.10 22.04
 }
 
 function editions_popos() {
@@ -425,12 +455,13 @@ function editions_regolith() {
 }
 
 function releases_rockylinux() {
-    echo 8.3 8.4 8.5
+    echo 8.3 8.4 8.5 9.0
 }
 
+# Rocky have renamed dvd1 -> dvd at 9.0
 function editions_rockylinux() {
     echo minimal \
-    dvd1
+    "dvd (dvd1 prior to 9.0)"
 }
 
 function releases_slackware() {
@@ -463,7 +494,6 @@ function releases_ubuntu() {
         ;;
     esac
     echo ${LTS_SUPPORT} \
-        21.10 \
         daily-live \
         daily-canary \
         eol-4.10 \
@@ -671,6 +701,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        batocera)
+            GUEST="batocera"
+            IMAGE_TYPE="img";;
         dragonflybsd)
             GUEST="dragonflybsd"
             IMAGE_TYPE="iso";;
@@ -712,18 +745,25 @@ function make_vm_config() {
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
         cat << EOF > "${CONF_FILE}"
+#!$(which quickemu) --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
+        echo "Giving user execute permissions on ${CONF_FILE},"
+        chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
         fi
 
         # OS specific tweaks
         case ${OS} in
-          alma|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          alma|centos-stream|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          deepin)
+            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+            echo "ram=\"4G\"" >> "${CONF_FILE}"
+            ;;
           freedos)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"4G\"" >> "${CONF_FILE}"
@@ -760,7 +800,7 @@ function get_alma() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
-    local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE}/isos/x86_64/"
+    local URL="http://lon.mirror.rackspace.com/almalinux/${RELEASE/beta-1/beta}/isos/x86_64/"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -821,10 +861,52 @@ function get_arcolinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_batocera() {
+    local HASH=""
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
+    local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+    local CURRENT_RELEASE=$(echo "${ISO}"| cut -d\- -f3)
+
+
+    case ${RELEASE} in
+      ${CURRENT_RELEASE})  #Current release
+         URL+=""
+         ;;
+      *)
+         URL+="/archives/${RELEASE}"
+         ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+         ;; # non-current are here
+
+    esac
+
+
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_cachyos() {
     local HASH=""
-    local ISO="cachyos-${RELEASE}-x86_64.iso"
-    local URL="https://mirror.cachyos.org/ISO"
+    local ISO="cachyos-${EDITION}-linux-${RELEASE}.iso"
+    local URL="https://mirror.cachyos.org/ISO/${EDITION}/${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_centos-stream() {
+    local HASH=""
+    local ISO=""
+    case ${RELEASE} in
+      8)
+        ISO="CentOS-Stream-${RELEASE}-x86_64-latest-${EDITION}.iso"
+        URL="https://mirrors.ocf.berkeley.edu/centos/8-stream/isos/x86_64"
+        HASH=$(wget -q -O- ${URL}/CHECKSUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        ;;
+      9)
+        ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
+        URL="https://mirrors.ocf.berkeley.edu/centos-stream/9-stream/BaseOS/x86_64/iso"
+        HASH=$(wget -q -O- ${URL}/${ISO}.SHA256SUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        ;;
+    esac
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -835,7 +917,7 @@ function get_debian() {
     local URL=""
 
     case ${RELEASE} in
-      11.3.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+      11.4.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
 
@@ -847,6 +929,30 @@ function get_debian() {
 
     HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_deepin() {
+    local HASH=""
+    local EDITION=""
+    local ISO="deepin-desktop-community-${RELEASE}-amd64.iso"
+    # deepin-desktop-community-20.3-amd64.iso
+    local URL="https://cdimage.deepin.com/releases/"${RELEASE}
+
+    # fix iso name
+    if [[ "${RELEASE}" == *"20" ]] ; then
+      EDITION="1003"
+      ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+    elif [[ "${RELEASE}" == *"20.1" ]]; then
+      EDITION="1010"
+      ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+    fi
+
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+
+    #echo "${URL}/${ISO} ${HASH}"
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
 }
 
 function get_devuan() {
@@ -876,6 +982,16 @@ function get_elementary() {
     local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
+}
+
+function get_endeavouros() {
+    local HASH=""
+    # Endeavour release names are Capitalized and our $RELEASE is forced to lowercase so we have to revert it
+    local ISO="EndeavourOS_${RELEASE@u}.iso"
+    local URL="https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive"
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_fedora() {
@@ -927,22 +1043,15 @@ function get_freedos() {
 }
 
 function get_garuda() {
-    local EDITION="${1:-}"
-    local HASH=""
-    local ISO=""
-    local URL=""
+  local EDITION="${1:-}"
+  local HASH=""
+  local ISO=""
+  local URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
 
-    case ${EDITION} in
-      cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
-      *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
-    esac
-    case ${EDITION} in
-        xfce|kde-barebones)  ISO="garuda-${EDITION}-linux-lts-${RELEASE}.iso";;
-        *) ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso";;
-    esac
+  ISO=${EDITION}/latest.iso
 
-    HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
-    echo "${URL}/${ISO} ${HASH}"
+  HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+  echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_gentoo() {
@@ -972,8 +1081,10 @@ function get_ghostbsd() {
 function get_haiku() {
     local EDITION="${1:-}"
     local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
-    local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}"
-    local HASH=""
+    # local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}" # domain gone
+    local URL="http://mirror.rit.edu/haiku/${RELEASE}" # NY, USA
+    # local URL="https://mirrors.tnonline.net/haiku/haiku-release/${RELEASE}" # Sweden
+    # local URL="https://mirror.aarnet.edu.au/pub/haiku/${RELEASE}" # Aus
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
@@ -1011,6 +1122,16 @@ function get_linuxmint() {
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_lmde() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
+    local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
 
     HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1193,8 +1314,8 @@ function get_oraclelinux() {
     local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
 
     case ${VER_MAJ} in
-      8) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
-      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+      7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+      *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
     esac
     HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1231,7 +1352,7 @@ function get_rockylinux() {
     local URL=""
 
     case ${RELEASE} in
-      8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
+      9.0) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
@@ -1293,11 +1414,11 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d'*' -f2)
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso |cut -d' ' -f1)
     else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f3)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
+        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
     fi
     #echo "${URL}/${ISO} ${HASH}"
 
@@ -1351,44 +1472,28 @@ function unattended_windows() {
        https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/
   -->
   <settings pass="offlineServicing">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <EnableLUA>false</EnableLUA>
+    </component>
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <ComputerName>*</ComputerName>
     </component>
   </settings>
 
   <settings pass="generalize">
-    <component name="Microsoft-Windows-PnPSysprep"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS">
+    <component name="Microsoft-Windows-PnPSysprep" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+    </component>
+    <component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <SkipRearm>1</SkipRearm>
     </component>
   </settings>
 
   <settings pass="specialize">
-    <component name="Microsoft-Windows-Security-SPP-UX"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <SkipAutoActivation>true</SkipAutoActivation>
     </component>
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <ComputerName>*</ComputerName>
       <OEMInformation>
         <Manufacturer>Quickemu Project</Manufacturer>
@@ -1399,26 +1504,15 @@ function unattended_windows() {
         <SupportURL>https://github.com/quickemu-project/quickemu/issues</SupportURL>
       </OEMInformation>
       <OEMName>Quickemu Project</OEMName>
+      <ProductKey>W269N-WFGWX-YVC9B-4J6C9-T83GX</ProductKey>
     </component>
-    <component name="Microsoft-Windows-SQMApi"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <CEIPEnabled>0</CEIPEnabled>
     </component>
   </settings>
 
   <settings pass="windowsPE">
-    <component name="Microsoft-Windows-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <Diagnostics>
         <OptIn>false</OptIn>
       </Diagnostics>
@@ -1521,18 +1615,17 @@ function unattended_windows() {
       </UpgradeData>
       <UserData>
         <AcceptEula>true</AcceptEula>
+        <FullName>Quickemu</FullName>
+        <Organization>Quickemu Project</Organization>
+        <!-- https://docs.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys -->
         <ProductKey>
-          <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+          <Key>W269N-WFGWX-YVC9B-4J6C9-T83GX</Key>
           <WillShowUI>Never</WillShowUI>
         </ProductKey>
       </UserData>
     </component>
 
-    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      processorArchitecture="amd64">
+    <component name="Microsoft-Windows-PnpCustomizationsWinPE" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" processorArchitecture="amd64" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <!--
            This makes the VirtIO drivers available to Windows, assuming that
            the VirtIO driver disk is available as drive E:
@@ -1580,26 +1673,46 @@ function unattended_windows() {
   </settings>
 
   <settings pass="oobeSystem">
-    <component name="Microsoft-Windows-Shell-Setup"
-      processorArchitecture="amd64"
-      publicKeyToken="31bf3856ad364e35"
-      language="neutral"
-      versionScope="nonSxS"
-      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <AutoLogon>
+        <Password>
+          <Value>quickemu</Value>
+          <PlainText>true</PlainText>
+        </Password>
+        <Enabled>true</Enabled>
+        <Username>Quickemu</Username>
+      </AutoLogon>
+      <DisableAutoDaylightTimeSet>false</DisableAutoDaylightTimeSet>
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
-        <HideLocalAccountScreen>false</HideLocalAccountScreen>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-        <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <NetworkLocation>Home</NetworkLocation>
         <ProtectYourPC>3</ProtectYourPC>
-        <SkipUserOOBE>false</SkipUserOOBE>
-        <SkipMachineOOBE>false</SkipMachineOOBE>
+        <SkipUserOOBE>true</SkipUserOOBE>
+        <SkipMachineOOBE>true</SkipMachineOOBE>
         <VMModeOptimizations>
           <SkipWinREInitialization>true</SkipWinREInitialization>
         </VMModeOptimizations>
       </OOBE>
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Password>
+              <Value>quickemu</Value>
+              <PlainText>true</PlainText>
+            </Password>
+            <Description>Quickemu</Description>
+            <DisplayName>Quickemu</DisplayName>
+            <Group>Administrators</Group>
+            <Name>Quickemu</Name>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+      <RegisteredOrganization>Quickemu Project</RegisteredOrganization>
+      <RegisteredOwner>Quickemu</RegisteredOwner>
       <FirstLogonCommands>
         <SynchronousCommand wcm:action="add">
           <CommandLine>msiexec /i E:\guest-agent\qemu-ga-x86_64.msi /quiet /passive /qn</CommandLine>
@@ -1693,8 +1806,16 @@ function get_windows() {
     dbg_windows "${DOWNLOAD_SHA1}"
     DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
     dbg_windows "${DOWNLOAD_ID}"
-    DOWNLOAD_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    REDIRECT_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+    dbg_windows "${REDIRECT_URL}"
+    DOWNLOAD_URL=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "${REDIRECT_URL}")
     dbg_windows "${DOWNLOAD_URL}"
+
+    MS_BASE_URL="https://software.download.prss.microsoft.com/"
+    if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
+        echo "Download URL not leading to Microsoft CDN"
+        exit 1
+    fi
 
     echo "Downloading ${WINDOWS_NAME}..."
     web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
@@ -1740,6 +1861,10 @@ create_vm() {
     if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+    if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
+        gzip -d "${VM_PATH}/${ISO}"
+        ISO="${ISO/.gz/}"
     fi
 
     make_vm_config "${ISO}"
@@ -1810,6 +1935,14 @@ if [ -n "${2}" ]; then
             echo " - Setting edition to: ${EDITION}"
           fi
         fi
+        # Handle odd missing fedora cominations
+        if [[ $OS == fedora ]] ; then
+            if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
+                echo "ERROR! Unsupported combination"
+                echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                exit 1;
+            fi
+        fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
@@ -1822,6 +1955,10 @@ if [ -n "${2}" ]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
         get_ubuntu
+    elif [[ "${OS}" == *"deepin"* ]]; then
+        # deepin doesn't use create_vm()
+        validate_release releases_deepin
+        get_deepin
     elif [ "${OS}" == "windows" ]; then
         LANG="English International"
         if [ -n "${3}" ]; then
