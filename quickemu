@@ -1422,8 +1422,6 @@ keyboard="usb"
 keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
 mouse="tablet"
-# options: ehci, xhci
-usb_controller="ehci"
 
 BRAILLE=""
 DELETE_DISK=0
