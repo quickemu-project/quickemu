@@ -423,7 +423,7 @@ function releases_openbsd(){
 }
 
 function releases_openindiana(){
-    echo 20210430
+    echo 20211031 20210430
 }
 
 function editions_openindiana(){
@@ -1279,7 +1279,8 @@ function get_openindiana(){
     local HASH=""
     local ISO=""
     local URL=""
-    URL="http://mirrors.dotsrc.org/openindiana/isos/hipster/${RELEASE}"
+    #
+    URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
     ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
