@@ -765,6 +765,12 @@ EOF
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
+          zorin)
+                case  ${EDITION} in
+                  education64|edulite64)
+                    echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                esac
+            ;;
           macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
         esac
 
