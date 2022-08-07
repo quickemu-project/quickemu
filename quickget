@@ -845,8 +845,8 @@ function get_android() {
     ISO=$(echo "${JSON_REL}" | jq -r .n)
     HASH=$(echo "${JSON_REL}" | jq -r .hash.sha256)
     # Traverse the directories to find the .iso location
-    for DIR in $(wget -q -O- "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
-        if wget -q -O- "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
+    for DIR in $(wget -4 -q -O- "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
+        if wget -4 -q -O- "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
             URL="${URL}/${DIR}"
             break
         fi
