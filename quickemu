@@ -808,6 +808,7 @@ function vm_boot() {
       GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
       echo "              - ${HOST_PORT} => ${GUEST_PORT}"
       NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
+      NET="${NET},hostfwd=udp::${HOST_PORT}-:${GUEST_PORT}"
     done
   fi
 
