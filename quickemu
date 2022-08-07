@@ -833,7 +833,7 @@ function vm_boot() {
         echo -n " --spice-shared-dir ${PUBLIC}"
       fi
       echo "${FULLSPICY}"
-      SPICE="${SPICE},port=${SPICE_PORT}"
+      SPICE="${SPICE},port=${SPICE_PORT},addr=127.0.0.1"
     fi
 
     if [ -n "${PUBLIC}" ]; then
