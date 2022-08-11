@@ -485,6 +485,7 @@ function releases_ubuntu() {
         ;;
     esac
     echo ${LTS_SUPPORT} \
+        jammy-daily \
         daily-live \
         daily-canary \
         eol-4.10 \
@@ -1380,6 +1381,10 @@ function get_ubuntu() {
 
     if [[ "${RELEASE}" == "eol-"* ]]; then
         URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
+    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+        URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        VM_PATH="${OS}-jammy-live"
+
     elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-daily-live"
