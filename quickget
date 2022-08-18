@@ -57,6 +57,7 @@ function pretty_name() {
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
+    reactos)            PRETTY_NAME="ReactOS";;
     regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -196,6 +197,7 @@ function os_support() {
     opensuse \
     oraclelinux \
     popos \
+    reactos \
     regolith \
     rockylinux \
     slackware \
@@ -435,6 +437,10 @@ function releases_popos() {
 
 function editions_popos() {
     echo intel nvidia
+}
+
+function releases_reactos() {
+    echo latest
 }
 
 function releases_regolith() {
@@ -719,6 +725,9 @@ function make_vm_config() {
         openbsd)
             GUEST="openbsd"
             IMAGE_TYPE="iso";;
+        reactos)
+            GUEST="reactos"
+            IMAGE_TYPE="iso";;
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
@@ -766,10 +775,15 @@ EOF
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
           zorin)
-                case  ${EDITION} in
-                  education64|edulite64)
-                    echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-                esac
+            case  ${EDITION} in
+              education64|edulite64)
+                echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+            esac
+            ;;
+          reactos)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"12G\"" >> "${CONF_FILE}"
+            echo "ram=\"2048M\"" >> "${CONF_FILE}"
             ;;
           macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
         esac
@@ -1313,6 +1327,16 @@ function get_popos() {
     echo "${URL} ${HASH}"
 }
 
+function get_reactos() {
+    local HASH=""
+    local URL=""
+    local TMPURL=""
+
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/reactos/files/latest/download" 2>&1 | grep Location | cut -d' ' -f4)
+    URL=${TMPURL%\?*}
+    echo "${URL} ${HASH}"
+}
+
 function get_regolith() {
     local EDITION="${1:-}"
     local HASH=""
@@ -1847,6 +1871,11 @@ create_vm() {
     if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
+    fi
+
+    if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
     fi
 
     make_vm_config "${ISO}"

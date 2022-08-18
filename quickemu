@@ -212,7 +212,7 @@ function vm_boot() {
   local DISK_USED=""
   local DISPLAY_DEVICE=""
   local DISPLAY_RENDER=""
-  local EFI_CODE=""
+  local EFI_CODE="${EFI_CODE}"
   local EFI_VARS=""
   local GUEST_CPU_CORES=""
   local GUEST_CPU_LOGICAL_CORES=""
@@ -226,13 +226,13 @@ function vm_boot() {
   local KERNEL_NODE=""
   local KERNEL_VER="?"
   local LSB_DESCRIPTION="Unknown OS"
-  local MACHINE_TYPE="q35"
+  local MACHINE_TYPE="${MACHINE_TYPE:-q35}"
   local MAC_BOOTLOADER=""
   local MAC_MISSING=""
-  local MAC_DISK_DEV="ide-hd,bus=ahci.2"
-  local NET_DEVICE="virtio-net"
+  local MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
+  local NET_DEVICE="${NET_DEVICE:-virtio-net}"
   local OSK=""
-  local SMM="off"
+  local SMM="${SMM:-off}"
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VIDEO=""
 
@@ -379,69 +379,59 @@ function vm_boot() {
     # does not support SMM.
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
-    case ${secureboot} in
-      on)
-         if [ -e "/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.secboot.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
-          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.secboot.fd"
-          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd" ]; then
-	        EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd"
-	        efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/qemu/ovmf-x86_64-smm-ms-code.bin" ]; then
-          EFI_CODE="/usr/share/qemu/ovmf-x86_64-smm-ms-code.bin"
-          efi_vars "/usr/share/qemu/ovmf-x86_64-smm-ms-vars.bin" "${EFI_VARS}"
-        elif [ -e "/usr/share/qemu/edk2-x86_64-secure-code.fd" ]; then
-          EFI_CODE="/usr/share/qemu/edk2-x86_64-secure-code.fd"
-          efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
-        # Solus new place to hide
-        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd" ]; then
-          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd"
-          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        else
-          echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
-          echo "       Please install OVMF firmware."
-          exit 1
+    if [ ! -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
+      case ${secureboot} in
+        on)
+          ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.secboot.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
+            "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
+            "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd","/usr/share/OVMF/x64/OVMF_VARS.fd" \
+            "/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd","/usr/share/edk2-ovmf/OVMF_VARS.fd" \
+            "/usr/share/qemu/ovmf-x86_64-smm-ms-code.bin","/usr/share/qemu/ovmf-x86_64-smm-ms-vars.bin" \
+            "/usr/share/qemu/edk2-x86_64-secure-code.fd","/usr/share/qemu/edk2-x86_64-code.fd" \
+            "/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd","/usr/share/edk2-ovmf/x64/OVMF_VARS.fd"
+          )
+          ;;
+        *)
+          ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
+            "/usr/share/edk2/ovmf/OVMF_CODE.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
+            "/usr/share/OVMF/OVMF_CODE.fd","/usr/share/OVMF/OVMF_VARS.fd" \
+            "/usr/share/OVMF/x64/OVMF_CODE.fd","/usr/share/OVMF/x64/OVMF_VARS.fd" \
+            "/usr/share/edk2-ovmf/OVMF_CODE.fd","/usr/share/edk2-ovmf/OVMF_VARS.fd" \
+            "/usr/share/qemu/ovmf-x86_64-4m-code.bin","/usr/share/qemu/ovmf-x86_64-4m-vars.bin" \
+            "/usr/share/qemu/edk2-x86_64-code.fd","/usr/share/qemu/edk2-x86_64-code.fd" \
+            "/usr/share/edk2-ovmf/x64/OVMF_CODE.fd","/usr/share/edk2-ovmf/x64/OVMF_VARS.fd"
+          )
+          ;;
+      esac
+      # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
+      # when an existing file is found.
+      _IFS=$IFS
+      IFS=","
+      for f in "${ovmfs[@]}"; do
+        set -- $f;
+        if [ -e "${1}" ]; then
+          EFI_CODE="${1}"
+          EFI_EXTRA_VARS="${2}"
         fi
-        ;;
-      *)
-        if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE_4M.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS_4M.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2/ovmf/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/edk2/ovmf/OVMF_CODE.fd"
-          efi_vars "/usr/share/edk2/ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/OVMF_CODE.fd"
-          efi_vars "/usr/share/OVMF/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/OVMF/x64/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/OVMF/x64/OVMF_CODE.fd"
-          efi_vars "/usr/share/OVMF/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/edk2-ovmf/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/edk2-ovmf/OVMF_CODE.fd"
-          efi_vars "/usr/share/edk2-ovmf/OVMF_VARS.fd" "${EFI_VARS}"
-        elif [ -e "/usr/share/qemu/ovmf-x86_64-4m-code.bin" ]; then
-          EFI_CODE="/usr/share/qemu/ovmf-x86_64-4m-code.bin"
-          efi_vars "/usr/share/qemu/ovmf-x86_64-4m-vars.bin" "${EFI_VARS}"
-        elif [ -e "/usr/share/qemu/edk2-x86_64-code.fd" ]; then
-          EFI_CODE="/usr/share/qemu/edk2-x86_64-code.fd"
-          efi_vars "/usr/share/qemu/edk2-x86_64-code.fd" "${EFI_VARS}"
-        # Solus
-        elif [ -e "/usr/share/edk2-ovmf/x64/OVMF_CODE.fd" ]; then
-          EFI_CODE="/usr/share/edk2-ovmf/x64/OVMF_CODE.fd"
-          efi_vars "/usr/share/edk2-ovmf/x64/OVMF_VARS.fd" "${EFI_VARS}"
-        else
-          echo "ERROR! EFI boot requested but no EFI firmware found."
-          echo "       Please install OVMF firmware."
-          exit 1
-        fi
-        ;;
-    esac
+      done
+      IFS=$_IFS
+    fi
+    if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
+      if [ "$secureboot" == "on" ]; then
+        echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
+      else
+        echo "ERROR! EFI boot requested but no EFI firmware found."
+      fi
+      echo "       Please install OVMF firmware."
+      exit 1
+    fi
+    if [ ! -z "${EFI_EXTRA_VARS}" ]; then
+      if [ ! -e "${EFI_EXTRA_VARS}" ]; then
+        echo " - EFI:      ERROR! EFI_EXTRA_VARS file ${EFI_EXTRA_VARS} does not exist."
+        exit 1
+      fi
+      efi_vars "${EFI_EXTRA_VARS}" "${EFI_VARS}"
+    fi
 
     # Make sure EFI_VARS references an actual, writeable, file
     if [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; then
@@ -508,6 +498,14 @@ function vm_boot() {
       fi
       MACHINE_TYPE="pc"
       NET_DEVICE="rtl8139"
+      ;;
+    reactos)
+      CPU="-cpu qemu32,kvm=on"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      MACHINE_TYPE="pc"
+      NET_DEVICE="e1000"
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
@@ -1003,6 +1001,27 @@ function vm_boot() {
            -drive if=pflash,format=raw,unit=1,file="${EFI_VARS}")
   fi
 
+  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
+    # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
+    # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
+    args+=(-boot order=dc)
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
+    # Since there is bug (probably) in KolibriOS: cdrom indexes 0 or 1 make system show an extra unexisting iso, so we use index=2
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=2,file="${iso}")
+    iso=""
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "reactos" ]; then
+    # shellcheck disable=SC2054
+    # https://reactos.org/wiki/QEMU
+    args+=(-boot order=d
+           -drive if=ide,index=2,media=cdrom,file="${iso}")
+    iso=""
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
+    # Attach the unattended configuration to Windows guests when booting from ISO
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
+  fi
+
   if [ -n "${floppy}" ]; then
     # shellcheck disable=SC2054
     args+=(-drive if=floppy,format=raw,file="${floppy}")
@@ -1016,21 +1035,6 @@ function vm_boot() {
   if [ -n "${fixed_iso}" ]; then
     # shellcheck disable=SC2054
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-  fi
-
-  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
-    # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
-    # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
-    args+=(-boot order=dc)
-  elif [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
-    # Since there is bug (probably) in KolibriOS: cdrom indexes 0 or 1 make system show an extra unexisting iso, so we use index=2
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${iso}")
-    iso=""
-  elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
-    # Attach the unattended configuration to Windows guests when booting from ISO
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -1053,12 +1057,19 @@ function vm_boot() {
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
   elif [ "${guest_os}" == "batocera" ] ; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=BootDisk
            -drive id=BootDisk,if=none,format=raw,file="${img}"
            -device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
+  elif [ "${guest_os}" == "reactos" ]; then
+    # shellcheck disable=SC2054,SC2206
+    # https://reactos.org/wiki/QEMU
+    args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
+
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
@@ -1411,8 +1422,6 @@ keyboard="usb"
 keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
 mouse="tablet"
-# options: ehci, xhci
-usb_controller="ehci"
 
 BRAILLE=""
 DELETE_DISK=0
