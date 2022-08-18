@@ -511,14 +511,9 @@ function vm_boot() {
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       # A CPU with SSE4.1 support is required for >= macOS Sierra
       if check_cpu_flag sse4_1; then
-        case ${HOST_CPU_VENDOR} in
-          GenuineIntel)
-            CPU="-cpu host,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt";;
-          AuthenticAMD|*)
-            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
-            # Warn on AMD:           +fma4,+pcid
-            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check";;
-        esac
+          # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
+          # Warn on AMD:           +fma4,+pcid
+          CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
       else
         echo "ERROR! macOS requires a CPU with SSE 4.1 support."
         exit 1
