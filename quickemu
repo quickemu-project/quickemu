@@ -173,7 +173,7 @@ function enable_usb_passthrough() {
     done
 
     if [ "${USB_NOT_READY}" -eq 1 ]; then
-        echo "               ERROR! USB permission changes are required 👆"
+      echo "               ERROR! USB permission changes are required 👆"
       exit 1
     fi
   fi
