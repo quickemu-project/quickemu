@@ -786,7 +786,13 @@ EOF
             echo "disk_size=\"12G\"" >> "${CONF_FILE}"
             echo "ram=\"2048M\"" >> "${CONF_FILE}"
             ;;
-          macos) echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}";;
+          macos)
+            echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
+            # https://github.com/quickemu-project/quickemu/issues/438
+            if [ "${RELEASE}" == "monterey" ]; then
+                echo "cpu_cores=2" >> "${CONF_FILE}"
+            fi
+            ;;
         esac
 
         # Enable TPM for Windows 11
