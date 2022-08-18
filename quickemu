@@ -384,7 +384,7 @@ function vm_boot() {
     # does not support SMM.
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
-    if [ ! -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
+    if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
       case ${secureboot} in
         on)
           ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.secboot.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
