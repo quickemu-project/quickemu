@@ -1752,8 +1752,13 @@ if [ ${SHORTCUT} -eq 1 ]; then
   exit
 fi
 
-if [ $VM_UP -eq 0 ]; then
+if [ ${VM_UP} -eq 0 ]; then
     vm_boot
+    # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
+    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
+      sleep 3.5
+      monitor_send_cmd "sendkey ret"
+    fi
     start_viewer
 else
     parse_ports_from_file
