@@ -509,6 +509,14 @@ function vm_boot() {
       MACHINE_TYPE="pc"
       NET_DEVICE="rtl8139"
       ;;
+    reactos)
+      CPU="-cpu qemu32,kvm=on"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      MACHINE_TYPE="pc"
+      NET_DEVICE="e1000"
+      ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       # A CPU with SSE4.1 support is required for >= macOS Sierra
@@ -1003,6 +1011,27 @@ function vm_boot() {
            -drive if=pflash,format=raw,unit=1,file="${EFI_VARS}")
   fi
 
+  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
+    # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
+    # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
+    args+=(-boot order=dc)
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
+    # Since there is bug (probably) in KolibriOS: cdrom indexes 0 or 1 make system show an extra unexisting iso, so we use index=2
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=2,file="${iso}")
+    iso=""
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "reactos" ]; then
+    # shellcheck disable=SC2054
+    # https://reactos.org/wiki/QEMU
+    args+=(-boot order=d
+           -drive if=ide,index=2,media=cdrom,file="${iso}")
+    iso=""
+  elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
+    # Attach the unattended configuration to Windows guests when booting from ISO
+    # shellcheck disable=SC2054
+    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
+  fi
+
   if [ -n "${floppy}" ]; then
     # shellcheck disable=SC2054
     args+=(-drive if=floppy,format=raw,file="${floppy}")
@@ -1016,21 +1045,6 @@ function vm_boot() {
   if [ -n "${fixed_iso}" ]; then
     # shellcheck disable=SC2054
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
-  fi
-
-  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
-    # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
-    # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
-    args+=(-boot order=dc)
-  elif [ -n "${iso}" ] && [ "${guest_os}" == "kolibrios" ]; then
-    # Since there is bug (probably) in KolibriOS: cdrom indexes 0 or 1 make system show an extra unexisting iso, so we use index=2
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${iso}")
-    iso=""
-  elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
-    # Attach the unattended configuration to Windows guests when booting from ISO
-    # shellcheck disable=SC2054
-    args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
   fi
 
   if [ "${guest_os}" == "macos" ]; then
@@ -1053,12 +1067,19 @@ function vm_boot() {
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
   elif [ "${guest_os}" == "batocera" ] ; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=BootDisk
            -drive id=BootDisk,if=none,format=raw,file="${img}"
            -device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
+  elif [ "${guest_os}" == "reactos" ]; then
+    # shellcheck disable=SC2054,SC2206
+    # https://reactos.org/wiki/QEMU
+    args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
+
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
