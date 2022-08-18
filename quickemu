@@ -1196,7 +1196,6 @@ function vm_boot() {
 function start_viewer {
   errno=0
   if [ "${VIEWER}" != "none" ]; then
-    echo "---"
 
     # If output is 'none' then SPICE was requested.
     if [ "${OUTPUT}" == "spice" ]; then
@@ -1204,11 +1203,11 @@ function start_viewer {
         # show via viewer: remote-viewer
 
         if [ -n "${PUBLIC}" ]; then
-          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
           ${VIEWER} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
           errno=$?
         else
-          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+          echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
           ${VIEWER} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
           errno=$?
         fi
@@ -1217,11 +1216,11 @@ function start_viewer {
         # show via viewer: spicy
 
         if [ -n "${PUBLIC}" ]; then
-          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
           ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
           errno=$?
         else
-          echo " - Start viewer: ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+          echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
           ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
           errno=$?
         fi
@@ -1360,14 +1359,13 @@ function monitor_send_cmd {
         return
     fi
 
-
     case "${monitor_channel}" in
         socket)
-            echo -e " - MON-SEND: ${MSG}"
+            echo -e " - Sending:  ${MSG}"
             echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null
             ;;
         telnet)
-            echo -e " - MON-SEND: ${MSG}"
+            echo -e " - Sending:  ${MSG}"
             echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" 2>&1 > /dev/null
             ;;
         *)
