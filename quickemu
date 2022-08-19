@@ -503,14 +503,27 @@ function vm_boot() {
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
       # A CPU with SSE4.1 support is required for >= macOS Sierra
-      if check_cpu_flag sse4_1; then
-          # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
-          # Warn on AMD:           +fma4,+pcid
-          CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
-      else
-        echo "ERROR! macOS requires a CPU with SSE 4.1 support."
-        exit 1
-      fi
+      # A CPU with AVX2 support is required for >= macOS Ventura
+      case ${macos_release} in
+        ventura)
+          if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
+            CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
+          else
+            echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 and AVX2 support."
+            exit 1
+          fi
+          ;;
+        *)
+          if check_cpu_flag sse4_1; then
+            # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
+            # Warn on AMD:           +fma4,+pcid
+            CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+          else
+            echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
+            exit 1
+          fi
+          ;;
+      esac
 
       OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
       # Disable S3 support in the VM to prevent macOS suspending during install
@@ -529,7 +542,7 @@ function vm_boot() {
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
-        big-sur|monterey)
+        big-sur|monterey|ventura)
           BALLOON="-device virtio-balloon"
           MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"

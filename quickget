@@ -1164,6 +1164,7 @@ function get_macos() {
     local CWD=""
     local MACRECOVERY=""
     local MLB=""
+    local OS_TYPE="default"
 
     case ${RELEASE} in
         high-sierra)
@@ -1214,6 +1215,7 @@ function get_macos() {
         ${MACRECOVERY} \
             --board-id "${BOARD_ID}" \
             --mlb "${MLB}" \
+            --os-type "${OS_TYPE}" \
             --basename RecoveryImage \
             --outdir "${VM_PATH}" \
             download
