@@ -928,7 +928,6 @@ function vm_boot() {
          -device ccid-card-passthru,chardev=ccid
          )
 
-
   # setup usb-controller
   [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
   if [ "${USB_CONTROLLER}" == "ehci" ]; then
@@ -1014,8 +1013,8 @@ function vm_boot() {
     args+=(-drive media=cdrom,index=2,file="${iso}")
     iso=""
   elif [ -n "${iso}" ] && [ "${guest_os}" == "reactos" ]; then
-    # shellcheck disable=SC2054
     # https://reactos.org/wiki/QEMU
+    # shellcheck disable=SC2054
     args+=(-boot order=d
            -drive if=ide,index=2,media=cdrom,file="${iso}")
     iso=""
@@ -1069,8 +1068,8 @@ function vm_boot() {
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
 
   elif [ "${guest_os}" == "reactos" ]; then
-    # shellcheck disable=SC2054,SC2206
     # https://reactos.org/wiki/QEMU
+    # shellcheck disable=SC2054,SC2206
     args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
 
   else
