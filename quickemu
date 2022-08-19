@@ -1008,8 +1008,15 @@ function vm_boot() {
   elif [ -n "${network}" ]; then
     # Enable bridge mode networking
     echo " - Network:  Bridged (${network})"
+
+    # If a persistent MAC address is provided, use it.
+    local MAC=""
+    if [ -n "${macaddr}" ]; then
+      MAC=",mac=${macaddr}"
+    fi
+
     # shellcheck disable=SC2054,SC2206
-    args+=(-nic bridge,br=${network},model=virtio-net-pci)
+    args+=(-nic bridge,br=${network},model=virtio-net-pci${MAC})
   else
     echo " - Network:  User (${NET_DEVICE})"
     # shellcheck disable=SC2054,SC2206
@@ -1418,6 +1425,7 @@ floppy=""
 guest_os="linux"
 img=""
 iso=""
+macaddr=""
 macos_release=""
 network=""
 port_forwards=()
