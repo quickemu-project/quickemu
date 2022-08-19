@@ -603,12 +603,30 @@ In the example above:
 -   Port 8123 on the host is forwarded to port 8123 on the guest.
 -   Port 8888 on the host is forwarded to port 80 on the guest.
 
+# Disable networking
+
+To completely disable all network interfaces in a guest VM add this additional
+line to your virtual machine configuration:
+
+-   `network="none"`
+
+# Restricted networking
+
+You can isolate the guest from the host (and broader network) using the restrict
+option, which will restrict networking to just the guest and any virtual devices.
+
+This can be used to prevent software running inside the guest from phoning home
+while still providing a network inside the guest. Add this additional line to
+your virtual machine configuration:
+
+-   `network="restrict"`
+
 # Bridged networking
 
 Connect your virtual machine to a preconfigured network bridge. Add an
 additional line to your virtual machine configuration
 
--   `bridge="br0"`
+-   `network="br0"`
 
 # USB redirection
 

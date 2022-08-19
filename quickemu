@@ -992,11 +992,26 @@ function vm_boot() {
     echo "WARNING! Unknown mouse value: '${MOUSE}; Fallback to ps2'"
   fi
 
+  # $bridge backwards compatibility for Quickemu <= 4.0
   if [ -n "${bridge}" ]; then
-    # Enable bridge mode networking
+    network="${bridge}"
+  fi
+
+  if [ "${network}" == "none" ]; then
+    # Disbale all networking
+    echo " - Network:  Disabled"
+    args+=(-nic none)
+  elif [ "${network}" == "restrict" ]; then
+    echo " - Network:  Restricted (${NET_DEVICE})"
     # shellcheck disable=SC2054,SC2206
-    args+=(-nic bridge,br=${bridge},model=virtio-net-pci)
+    args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},restrict=y,id=nic)
+  elif [ -n "${network}" ]; then
+    # Enable bridge mode networking
+    echo " - Network:  Bridged (${network})"
+    # shellcheck disable=SC2054,SC2206
+    args+=(-nic bridge,br=${network},model=virtio-net-pci)
   else
+    echo " - Network:  User (${NET_DEVICE})"
     # shellcheck disable=SC2054,SC2206
     args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
   fi
@@ -1394,7 +1409,6 @@ function monitor_send_cmd {
 
 # Lowercase variables are used in the VM config file only
 boot="efi"
-bridge=""
 cpu_cores=""
 disk_img=""
 disk_size=""
@@ -1405,6 +1419,7 @@ guest_os="linux"
 img=""
 iso=""
 macos_release=""
+network=""
 port_forwards=()
 preallocation="off"
 ram=""
