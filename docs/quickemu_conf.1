@@ -35,7 +35,6 @@ These are the options and defaults for the <vm>.conf file
 \f[C]
 # Lowercase variables are used in the VM config file only
 boot=\[dq]efi\[dq]
-bridge=\[dq]\[dq]
 cpu_cores=\[dq]\[dq]
 disk_img=\[dq]\[dq]
 disk_size=\[dq]\[dq]
@@ -44,7 +43,9 @@ floppy=\[dq]\[dq]
 guest_os=\[dq]linux\[dq]
 img=\[dq]\[dq]
 iso=\[dq]\[dq]
+macaddr=\[dq]\[dq]
 macos_release=\[dq]\[dq]
+network=\[dq]\[dq]
 port_forwards=()
 preallocation=\[dq]off\[dq]
 ram=\[dq]\[dq]
@@ -97,6 +98,7 @@ disk_img=\[dq]windows-11/disk.qcow2\[dq]
 iso=\[dq]windows-11/Win11_EnglishInternational_x64.iso\[dq]
 fixed_iso=\[dq]windows-11/virtio-win.iso\[dq]
 tpm=\[dq]on\[dq]
+secureboot=\[dq]on\[dq]
 \f[R]
 .fi
 .IP \[bu] 2
@@ -227,9 +229,19 @@ Add this additional line to your virtual machine configuration:
 .SH Bridged networking
 .PP
 Connect your virtual machine to a preconfigured network bridge.
-Add an additional line to your virtual machine configuration
+Add an additional line to your virtual machine configuration:
 .IP \[bu] 2
 \f[V]network=\[dq]br0\[dq]\f[R]
+.PP
+If you want to have a persistent MAC address for your bridged network
+interface in the guest VM you can add \f[V]macaddr\f[R] to the virtual
+machine configuration.
+QEMU requires that the MAC address is in the range:
+\f[B]52:54:00:AB:00:00 - 52:54:00:AB:FF:FF\f[R]
+.PP
+So you can generate your own MAC addresses with:
+.IP \[bu] 2
+\f[V]macaddr=\[dq]52:54:00:AB:51:AE\[dq]\f[R]
 .SH USB redirection
 .PP
 Quickemu supports USB redirection via SPICE pass-through and host
