@@ -234,6 +234,7 @@ function vm_boot() {
   local OSK=""
   local SMM="${SMM:-off}"
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+  local VGA=""
   local VIDEO=""
 
   KERNEL_NAME=$(uname --kernel-name)
@@ -707,12 +708,9 @@ function vm_boot() {
       *) DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
-    # Displays in System Preferences can be used to select a resolution if:
-    #  - Mojave only offers 4:3 resolutions
-    #  - High Sierra will run at the default 1920x1080 only.
-    # QXL prevents seamless mouse working with a SPICE client
-    #  - https://github.com/wimpysworld/quickemu/issues/222
-    DISPLAY_DEVICE="VGA"
+    # qxl-vga supports seamless mouse and sane resolutions if only one scanout
+    # is used. Which is whay '-vga none' is added to the QEMU command line.
+    DISPLAY_DEVICE="qxl-vga"
   elif [ "${guest_os}" == "windows" ]; then
     DISPLAY_DEVICE="qxl-vga"
   else
@@ -775,8 +773,15 @@ function vm_boot() {
     VIDEO="${VIDEO},max_outputs=${max_outputs}"
   fi
 
+  # Run QEMU with '-vga none' to avoid having two scanouts, one for VGA and
+  # another for virtio-vga-gl. This works around a GTK assertion failure and
+  # allows seamless mouse in macOS when using the qxl-vga device.
+  # https://www.collabora.com/news-and-blog/blog/2021/11/26/venus-on-qemu-enabling-new-virtual-vulkan-driver/
+  # https://github.com/quickemu-project/quickemu/issues/222
+  VGA="-vga none"
+
   # Add fullscreen options
-  VIDEO="${VIDEO} ${FULLSCREEN}"
+  VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
