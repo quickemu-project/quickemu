@@ -715,7 +715,12 @@ function vm_boot() {
     # is used. Which is whay '-vga none' is added to the QEMU command line.
     DISPLAY_DEVICE="qxl-vga"
   elif [ "${guest_os}" == "windows" ]; then
-    DISPLAY_DEVICE="qxl-vga"
+    case ${OUTPUT} in
+      # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues.
+      # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
+      gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
+      sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
+    esac
   else
     DISPLAY_DEVICE="qxl-vga"
   fi
