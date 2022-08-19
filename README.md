@@ -635,9 +635,10 @@ additional line to your virtual machine configuration:
 
 -   `network="br0"`
 
-If you want to have a persistent MAC address for your bridged network interface
-in the gust VM you can add `macaddr` to the virtual machine configuration. QEMU
-requires that the MAC address is in the range: **52:54:00:AB:00:00 - 52:54:00:AB:FF:FF**
+If you want to have a persistent MAC address for your bridged network
+interface in the guest VM you can add `macaddr` to the virtual machine
+configuration. QEMU requires that the MAC address is in the range:
+**52:54:00:AB:00:00 - 52:54:00:AB:FF:FF**
 
 So you can generate your own MAC addresses with:
 
