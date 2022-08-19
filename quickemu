@@ -727,25 +727,11 @@ function vm_boot() {
 
   # Map Quickemu OUTPUT to QEMU -display
   case ${OUTPUT} in
-    gtk)
-      DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off"
-      # GL is not working with GTK and virtio-vga
-      if [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        gl="off"
-      fi
-      ;;
-    none|spice)
-      DISPLAY_RENDER="none";;
-    # spice-app has a bug where using spice-app,gl=off seems to enable gl, but
-    # if the gl param is omitted it works fine.
-    spice-app)
-      DISPLAY_RENDER="${OUTPUT}"
-      if [[ "${gl}" == "on" ]]; then
-        DISPLAY_RENDER+=",gl=on"
-      fi
-      ;;
-    *)
-      DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
+    gtk)        DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
+    none|spice) DISPLAY_RENDER="none";;
+    sdl)        DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
+    spice-app)  DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
+    *)          DISPLAY_RENDER="${OUTPUT}";;
   esac
 
   # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
