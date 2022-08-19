@@ -382,8 +382,8 @@ There are some considerations when running macOS via Quickemu.
     -   UHCI (USB 2.0) on macOS Catalina and earlier.
     -   XHCI (USB 3.0) on macOS Big Sur and newer.
 -   Display resolution can only be changed via macOS System Preferences.
--   Full Duplex audio works on macOS High Sierra, Mojave and Catalina.
-    -   **macOS Big Sur and Monterey have no audio at all**.
+-   **Full Duplex audio requires [VoodooHDA OC](https://github.com/chris1111/VoodooHDA-OC) or pass-through a USB audio-device to the macOS guest VM**.
+    - NOTE! [Gatekeeper](https://disable-gatekeeper.github.io/) and [System Integrity Protection (SIP)](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection) need to be disabled to install VoodooHDA OC
 -   File sharing between guest and host is available via
     [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
