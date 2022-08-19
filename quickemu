@@ -718,8 +718,6 @@ function vm_boot() {
     DISPLAY_DEVICE="qxl-vga"
   fi
 
-  echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}"
-
   # Map Quickemu OUTPUT to QEMU -display
   case ${OUTPUT} in
     gtk)
@@ -749,9 +747,9 @@ function vm_boot() {
     else
       DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
     fi
-    echo ", GL (${gl}), VirGL (on)"
+    echo " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
   else
-    echo ", GL (${gl}), VirGL (off)"
+    echo " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
   fi
 
   # Build the video configuration
