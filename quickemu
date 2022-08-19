@@ -464,7 +464,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    *bsd|haiku|freedos|linux)
+    batocera|*bsd|freedos|haiku|linux)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
@@ -472,7 +472,7 @@ function vm_boot() {
 
       if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
         MOUSE="usb"
-      elif [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "freedos" ]; then
+      elif [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
         MACHINE_TYPE="pc"
         NET_DEVICE="rtl8139"
       fi
@@ -482,35 +482,23 @@ function vm_boot() {
         SMM="on"
       fi
 
-
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
       ;;
-    batocera)
-      CPU="-cpu host,kvm=on"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      MACHINE_TYPE="pc"
-      NET_DEVICE="rtl8139"
-      disk_size="8G"
-    ;;
-    kolibrios)
+    kolibrios|reactos)
       CPU="-cpu qemu32,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
       MACHINE_TYPE="pc"
-      NET_DEVICE="rtl8139"
-      ;;
-    reactos)
-      CPU="-cpu qemu32,kvm=on"
-      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        CPU="${CPU},topoext"
-      fi
-      MACHINE_TYPE="pc"
-      NET_DEVICE="e1000"
+      case ${guest_os} in
+        kolibrios) NET_DEVICE="rtl8139";;
+        reactos)
+          NET_DEVICE="e1000"
+          KEYBOARD="ps2"
+          ;;
+      esac
       ;;
     macos)
       #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/

@@ -759,8 +759,12 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|oraclelinux|rockylinux) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-          dragonflybsd|haiku|openbsd|netbsd|slackware|tails) echo "boot=\"legacy\"" >> "${CONF_FILE}";;
+          alma|centos-stream|oraclelinux|rockylinux)
+            echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          batocera)
+            echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+          dragonflybsd|haiku|openbsd|netbsd|slackware|tails)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           deepin)
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
             echo "ram=\"4G\"" >> "${CONF_FILE}"
