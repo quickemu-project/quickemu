@@ -705,8 +705,10 @@ function vm_boot() {
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
     case ${OUTPUT} in
-      none|spice) DISPLAY_DEVICE="qxl-vga";;
-      *) DISPLAY_DEVICE="virtio-vga";;
+      none|spice|spice-app)
+        DISPLAY_DEVICE="virtio-gpu";;
+      *)
+        DISPLAY_DEVICE="virtio-vga";;
     esac
   elif [ "${guest_os}" == "macos" ]; then
     # qxl-vga supports seamless mouse and sane resolutions if only one scanout
@@ -741,7 +743,8 @@ function vm_boot() {
       DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
   esac
 
-  if [ "${gl}" == "on" ] && [[ "${DISPLAY_DEVICE}" == *"virtio"* ]]; then
+  # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
+  if [ "${gl}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
     if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
       DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
     else
