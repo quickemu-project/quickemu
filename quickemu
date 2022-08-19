@@ -662,8 +662,9 @@ function vm_boot() {
 
   # Setup the appropriate audio device based on the display output
   case ${OUTPUT} in
-    spice|spice-app|none) AUDIO_DEV="spice,id=audio0";;
-    *) AUDIO_DEV="pa,id=audio0,out.mixing-engine=off,out.stream-name=${LAUNCHER}-${VMNAME},in.stream-name=${LAUNCHER}-${VMNAME}";;
+    none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
+    sdl) AUDIO_DEV="sdl,id=audio0";;
+    *) AUDIO_DEV="pa,id=audio0";;
   esac
 
   # Determine a sane resolution for Linux guests.
