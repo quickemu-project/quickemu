@@ -162,7 +162,10 @@ function enable_usb_passthrough() {
       USB_BUS=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f2)
       USB_DEV=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f4 | cut -d':' -f1)
       USB_NAME=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f7-)
-      if [ -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
+      if [ -z "${USB_NAME}" ]; then
+        echo "             ! USB device ${VENDOR_ID}:${PRODUCT_ID} not found. Check your configuration"
+        continue
+      elif [ -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
         echo "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
       else
         echo "             x ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} needs permission changes:"
