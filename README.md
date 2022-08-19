@@ -17,7 +17,7 @@ way to do it for you. For example:
 
 ``` bash
 quickget ubuntu-mate 22.04
-quickemu --vm ubuntu-mate-22.04-.conf
+quickemu --vm ubuntu-mate-22.04.conf
 ```
 
 The original objective of the project was to enable quick testing of
