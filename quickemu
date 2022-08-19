@@ -789,7 +789,7 @@ function vm_boot() {
 
   echo -n "" > "${VMDIR}/${VMNAME}.ports"
 
-  if [ -z "$SSH_PORT" ]; then
+  if [ -z "${SSH_PORT}" ]; then
     # Find a free port to expose ssh to the guest
     SSH_PORT=$(get_port 22220 9)
   fi
