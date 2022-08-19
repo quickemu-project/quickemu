@@ -1680,8 +1680,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   fi
   viewer_param_check
 
-  # Set the default 3d acceleration. Will be overridden to "off" if
-  # DISPLAY_DEVICE is determined to be virtio-vga since it doesn't work there.
+  # Set the default 3D acceleration.
   if [ -z "${gl}" ]; then
     gl="on"
   fi
