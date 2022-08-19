@@ -1163,7 +1163,7 @@ function get_macos() {
     local BOARD_ID=""
     local CWD=""
     local MACRECOVERY=""
-    local MLB=""
+    local MLB="00000000000000000"
     local OS_TYPE="default"
 
     case ${RELEASE} in
@@ -1174,11 +1174,10 @@ function get_macos() {
             BOARD_ID="Mac-7BA5B2DFE22DDD8C"
             MLB="00000000000KXPG00";;
         catalina)
-            BOARD_ID="Mac-CFF7D910A743CAAF"
+            BOARD_ID="Mac-C3EC7CD22292981F"
             MLB="00000000000PHCD00";;
         big-sur)
-            BOARD_ID="Mac-35C1E88140C3E6CF"
-            MLB="00000000000000000";;
+            BOARD_ID="Mac-3CBD00234E554E41";;
         monterey)
             BOARD_ID="Mac-06F11F11946D27C5"
             MLB="00000000000000000";;
