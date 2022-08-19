@@ -806,42 +806,52 @@ function vm_boot() {
     done
   fi
 
-  local SPICE="disable-ticketing=on"
-  if [ -z "${SPICE_PORT}" ]; then
-    # Find a free port for spice
-    SPICE_PORT=$(get_port 5930 9)
+  if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    local SPICE="disable-ticketing=on"
+    # gl=on can be use with 'spice' too, but only over local connections (not tcp ports)
+    if [ "${OUTPUT}" == "spice-app" ]; then
+      SPICE+=",gl=${gl}"
+    fi
+
+    # TODO: Don't use ports so local-only connections can be used with gl=on
+    if [ -z "${SPICE_PORT}" ]; then
+      # Find a free port for spice
+      SPICE_PORT=$(get_port 5930 9)
+    fi
+
+    if [ -z "${SPICE_PORT}" ]; then
+      echo " - SPICE:    All SPICE ports have been exhausted."
+      if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+        echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
+        exit 1
+      fi
+    else
+      if [ "${OUTPUT}" == "spice-app" ]; then
+        echo " - SPICE:    Enabled"
+      else
+        echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
+        echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
+        if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+          echo -n " --spice-shared-dir ${PUBLIC}"
+        fi
+        echo "${FULLSPICY}"
+        SPICE="${SPICE},port=${SPICE_PORT},addr=127.0.0.1"
+      fi
+    fi
   fi
 
-  if [ -z "${SPICE_PORT}" ]; then
-    echo " - SPICE:    All SPICE ports have been exhausted."
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
-      echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
-      exit 1
-    fi
-  else
-    if [ "${OUTPUT}" == "spice-app" ]; then
-      echo " - SPICE:    Enabled"
-    else
-      echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
-      echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
-      if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
-        echo -n " --spice-shared-dir ${PUBLIC}"
-      fi
-      echo "${FULLSPICY}"
-      SPICE="${SPICE},port=${SPICE_PORT},addr=127.0.0.1"
-    fi
-
-    if [ -n "${PUBLIC}" ]; then
-      case ${guest_os} in
-        macos)
+  if [ -n "${PUBLIC}" ]; then
+    case ${guest_os} in
+      macos)
+        if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
           # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
           echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
           echo " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
-          ;;
-        *)
-          echo " - WebDAV:   On guest: dav://localhost:9843/";;
-      esac
-    fi
+        fi
+        ;;
+      *)
+        echo " - WebDAV:   On guest: dav://localhost:9843/";;
+    esac
   fi
 
   if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
@@ -896,16 +906,21 @@ function vm_boot() {
          ${VIDEO} -display ${DISPLAY_RENDER}
          -audiodev ${AUDIO_DEV}
          -device intel-hda -device hda-duplex,audiodev=audio0
-         -rtc base=localtime,clock=host,driftfix=slew
-         -spice ${SPICE}
-         -device virtio-serial-pci
-         -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
-         -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
-         -chardev spicevmc,id=vdagent0,name=vdagent
-         -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
-         -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
-         -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0
-         -device virtio-rng-pci,rng=rng0
+         -rtc base=localtime,clock=host,driftfix=slew)
+
+  # Only enable SPICE is using SPICE display
+  if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    args+=(-spice ${SPICE}
+           -device virtio-serial-pci
+           -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
+           -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
+           -chardev spicevmc,id=vdagent0,name=vdagent
+           -device virtserialport,chardev=vdagent0,name=com.redhat.spice.0
+           -chardev spiceport,id=webdav0,name=org.spice-space.webdav.0
+           -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
+  fi
+
+  args+=(-device virtio-rng-pci,rng=rng0
          -object rng-random,id=rng0,filename=/dev/urandom
          -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
          -chardev spicevmc,id=usbredirchardev1,name=usbredir
