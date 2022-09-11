@@ -267,7 +267,6 @@ function releases_debian() {
     local DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- |grep -e '>[1-9][0-9]\.'|grep -v 'live' | cut -d\> -f9|cut -d\/ -f1 )
 
     echo  ${DEBOLD} ${DEBCURRENT}
-    #10.11.0 10.12.0 10.13.0 11.2.0 11.3.0 11.4.0 11.5.0
 }
 
 function editions_debian() {
