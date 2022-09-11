@@ -263,7 +263,11 @@ function editions_centos-stream() {
 }
 
 function releases_debian() {
-    echo 10.11.0 11.2.0 11.3.0 11.4.0
+    DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
+    local DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- |grep -e '>[1-9][0-9]\.'|grep -v 'live' | cut -d\> -f9|cut -d\/ -f1 )
+
+    echo  ${DEBOLD} ${DEBCURRENT}
+    #10.11.0 10.12.0 10.13.0 11.2.0 11.3.0 11.4.0 11.5.0
 }
 
 function editions_debian() {
@@ -937,9 +941,9 @@ function get_debian() {
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
-
-    case ${RELEASE} in
-      11.4.0) URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+    DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
+   case ${RELEASE} in
+      "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
 
