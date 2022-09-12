@@ -382,7 +382,7 @@ function releases_lmde(){
 }
 
 function releases_mxlinux(){
-    echo 21.1
+    echo 21.2
 }
 
 function editions_mxlinux(){
