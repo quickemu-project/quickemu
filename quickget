@@ -308,7 +308,6 @@ function editions_garuda() {
     mate \
     qtile \
     sway \
-    wayfire \
     xfce
 }
 
@@ -374,7 +373,6 @@ function releases_manjaro() {
     kde \
     budgie \
     cinnamon \
-    deepin \
     i3 \
     mate
 }
@@ -449,10 +447,19 @@ function releases_tails() {
 }
 
 function releases_ubuntu() {
-    echo 14.04 \
-        16.04 \
-        18.04 \
-        20.04 \
+    local LTS_SUPPORT="14.04 16.04 18.04 20.04"
+    case "${OS}" in
+        kubuntu|lubuntu|ubuntukylin|\
+        ubuntu-mate|ubuntustudio|xubuntu)
+        ## after 14.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        ;;
+        ubuntu-budgie)
+        #after 16.04
+        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        ;;
+    esac
+    echo ${LTS_SUPPORT} \
         21.10 \
         daily-live \
         daily-canary \
@@ -891,8 +898,9 @@ function get_fedora() {
 }
 
 function get_freebsd() {
+    local EDITION="${1}"
     local HASH=""
-    local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-dvd1.iso"
+    local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-${EDITION}.iso"
     local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
@@ -928,7 +936,11 @@ function get_garuda() {
       cinnamon|mate) URL="http://mirrors.fossho.st/garuda/iso/community/${EDITION}/${RELEASE}";;
       *) URL="http://mirrors.fossho.st/garuda/iso/garuda/${EDITION}/${RELEASE}";;
     esac
-    ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso"
+    case ${EDITION} in
+        xfce|kde-barebones)  ISO="garuda-${EDITION}-linux-lts-${RELEASE}.iso";;
+        *) ISO="garuda-${EDITION}-linux-zen-${RELEASE}.iso";;
+    esac
+
     HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1166,7 +1178,7 @@ function get_opensuse() {
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     fi
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |awk '{if(NR==4) print $0}'|cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1219,7 +1231,7 @@ function get_rockylinux() {
       8.5) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
-    HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1270,7 +1282,7 @@ function get_ubuntu() {
         URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
     elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-        VM_PATH="${OS}-devel"
+        VM_PATH="${OS}-daily-live"
     elif [ "${OS}" == "ubuntu" ]; then
         URL="https://releases.ubuntu.com/${RELEASE}"
     else
@@ -1727,6 +1739,10 @@ create_vm() {
         ISO=$(ls "${VM_PATH}" | grep -i '.iso')
     fi
     if [ "${IMAGE_TYPE}" == "img" ] && [[ "${ISO}" =~ ".gz" ]]; then
+        gzip -d "${VM_PATH}/${ISO}"
+        ISO="${ISO/.gz/}"
+    fi
+    if [[ ${OS} == "ludos" ]] && [[ ${ISO} =~ ".gz" ]] ; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
     fi

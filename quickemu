@@ -476,10 +476,25 @@ function vm_boot() {
         NET_DEVICE="rtl8139"
       fi
 
+      if [ "${guest_os}" == "freedos" ] ; then
+        # fix for #382
+        SMM="on"
+      fi
+
+
       if [ -z "${disk_size}" ]; then
         disk_size="16G"
       fi
       ;;
+    ludos)
+      CPU="-cpu host,kvm=on"
+      if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        CPU="${CPU},topoext"
+      fi
+      MACHINE_TYPE="pc"
+      NET_DEVICE="rtl8139"
+      disk_size="8G"
+    ;;
     kolibrios)
       CPU="-cpu qemu32,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
@@ -933,7 +948,7 @@ function vm_boot() {
     args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
   fi
 
-  if [ -n "{iso}" ] && [ "${guest_os}" == "freedos" ]; then
+  if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
     # FreeDOS reboots after partitioning the disk, and QEMU tries to boot from disk after first restart
     # This flag sets the boot order to cdrom,disk. It will persist until powering down the VM
     args+=(-boot order=dc)
@@ -967,6 +982,12 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  elif [ "${guest_os}" == "ludos" ] ; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device virtio-blk-pci,drive=BootDisk
+           -drive id=BootDisk,if=none,format=raw,file="${img}"
+           -device virtio-blk-pci,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   else
     # shellcheck disable=SC2054,SC2206
@@ -1118,7 +1139,7 @@ VMPATH=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="3.13"
+readonly VERSION="3.14"
 
 # PUBLICSHARE is the only directory exposed to guest VMs for file
 # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
