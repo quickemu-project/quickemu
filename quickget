@@ -58,7 +58,6 @@ function pretty_name() {
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
     reactos)            PRETTY_NAME="ReactOS";;
-    regolith)           PRETTY_NAME="Regolith Linux";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
@@ -198,7 +197,6 @@ function os_support() {
     oraclelinux \
     popos \
     reactos \
-    regolith \
     rockylinux \
     slackware \
     solus \
@@ -441,14 +439,6 @@ function editions_popos() {
 
 function releases_reactos() {
     echo latest
-}
-
-function releases_regolith() {
-    echo focal impish
-}
-
-function editions_regolith() {
-    echo 1.6.0 2.0.0
 }
 
 function releases_rockylinux() {
@@ -1349,20 +1339,6 @@ function get_reactos() {
     echo "${URL} ${HASH}"
 }
 
-function get_regolith() {
-    local EDITION="${1:-}"
-    local HASH=""
-    local ISO="Regolith_${EDITION}_${RELEASE}.iso"
-    local URL=""
-
-    case ${EDITION} in
-      1.6.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/release-release-${RELEASE}-${RELEASE}_standard-${EDITION}";;
-      2.0.0) URL="https://github.com/regolith-linux/regolith-ubuntu-iso-builder/releases/download/regolith-linux-2.0-${RELEASE}-latest";;
-    esac
-    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
 function get_rockylinux() {
     local EDITION="${1:-}"
     local HASH=""
@@ -1950,18 +1926,6 @@ if [ -n "${2}" ]; then
             fi
         fi
 
-        # Workaround for Regolith
-        if [ "${OS}" == "regolith" ]; then
-          if [ "${RELEASE}" == "focal" ] && [ "${EDITION}" == "2.0.0" ]; then
-            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
-            EDITION="1.6.0"
-            echo " - Setting edition to: ${EDITION}"
-          elif [ "${RELEASE}" == "impish" ] && [ "${EDITION}" == "1.6.0" ]; then
-            echo "WARNING! $(pretty_name "${OS}") ${EDITION} is not available for ${RELEASE}"
-            EDITION="2.0.0"
-            echo " - Setting edition to: ${EDITION}"
-          fi
-        fi
         # Handle odd missing fedora cominations
         if [[ $OS == fedora ]] ; then
             if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
