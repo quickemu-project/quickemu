@@ -380,7 +380,7 @@ function releases_lmde(){
 }
 
 function releases_mxlinux(){
-    echo 21.2
+    echo 21.2.1
 }
 
 function editions_mxlinux(){
@@ -1334,7 +1334,7 @@ function get_reactos() {
     local URL=""
     local TMPURL=""
 
-    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/reactos/files/latest/download" 2>&1 | grep Location | cut -d' ' -f4)
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/reactos/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
     URL=${TMPURL%\?*}
     echo "${URL} ${HASH}"
 }
