@@ -193,11 +193,11 @@ quickemu --vm ubuntu-22.04.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection
         -   `sudo apt install spice-vdagent`
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
         -   `sudo apt install spice-webdavd`
 
 ### Ubuntu devel (daily-live) images
@@ -268,7 +268,6 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
--   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
@@ -296,10 +295,10 @@ quickemu --vm debian-bullseye.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection.
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
 
 ## macOS Guest
 
@@ -739,7 +738,6 @@ You can also pass optional parameters
   --version                         : Print version
 
 ```
-
 <!-- [[[end]]] -->
 
 ## Desktop shortcuts
