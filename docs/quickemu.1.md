@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: September 1, 2022
+date: September 19, 2022
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -145,6 +145,7 @@ QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/wat
 -   [usbutils](https://github.com/gregkh/usbutils)
 -   [util-linux](https://github.com/karelzak/util-linux)
 -   [sed](https://www.gnu.org/software/sed/)
+-   [socat](http://www.dest-unreach.org/socat/)
 -   [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
 -   [swtpm](https://github.com/stefanberger/swtpm)
 -   [Wget](https://www.gnu.org/software/wget/)
@@ -216,11 +217,11 @@ quickemu --vm ubuntu-22.04.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection
         -   `sudo apt install spice-vdagent`
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
         -   `sudo apt install spice-webdavd`
 
 ### Ubuntu devel (daily-live) images
@@ -291,7 +292,6 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
--   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
@@ -319,10 +319,10 @@ quickemu --vm debian-bullseye.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection.
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
 
 ## macOS Guest
 

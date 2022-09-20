@@ -160,7 +160,7 @@ sudo apt install quickemu
 ## Other Linux
 
 ``` bash
-git clone --depth=1 https://github.com/wimpysworld/quickemu
+git clone --filter=blob:none https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
 
@@ -193,11 +193,11 @@ quickemu --vm ubuntu-22.04.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection
         -   `sudo apt install spice-vdagent`
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
         -   `sudo apt install spice-webdavd`
 
 ### Ubuntu devel (daily-live) images
@@ -268,7 +268,6 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
--   `regolith` (Regolith Linux)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
@@ -296,10 +295,10 @@ quickemu --vm debian-bullseye.conf
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection.
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
 
 ## macOS Guest
 
@@ -323,7 +322,11 @@ supported.
         -   On macOS Mojave and High Sierra
             -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list
                 and click **Erase**.
-    -   Enter a `Name:` for the disk and click **Erase**.
+    -   Enter a `Name:` for the disk
+    -   If your installing macOS Mojave or later (Catalina, Big Sur,
+        and Monterey), choose any of the APFS options as the filesystem.
+        MacOS Extended may not work.
+    -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
 -   From **macOS Utilities**
@@ -739,7 +742,6 @@ You can also pass optional parameters
   --version                         : Print version
 
 ```
-
 <!-- [[[end]]] -->
 
 ## Desktop shortcuts
