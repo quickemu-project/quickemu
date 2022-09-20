@@ -664,9 +664,9 @@ function vm_boot() {
   fi
 
   # Setup the appropriate audio device based on the display output
+  # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
   case ${OUTPUT} in
     none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
-    sdl) AUDIO_DEV="sdl,id=audio0";;
     *) AUDIO_DEV="pa,id=audio0";;
   esac
 
