@@ -388,7 +388,7 @@ function editions_mxlinux(){
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey
+    echo high-sierra mojave catalina big-sur monterey ventura
 }
 
 function releases_manjaro() {
@@ -1157,20 +1157,39 @@ function get_macos() {
     local OS_TYPE="default"
 
     case ${RELEASE} in
-        high-sierra)
-            BOARD_ID="Mac-7BA5B2D9E42DDD94"
+        lion)           #10.7
+            BOARD_ID="Mac-2E6FAB96566FE58C"
+            MLB="00000000000F25Y00";;
+        mountainlion)   #10.8
+            BOARD_ID="Mac-7DF2A3B5E5D671ED"
+            MLB="00000000000F65100";;
+        mavericks)      #10.9
+            BOARD_ID="Mac-F60DEB81FF30ACF6"
+            MLB="00000000000FNN100";;
+        yosemite)       #10.10
+            BOARD_ID="Mac-E43C1C25D4880AD6"
+            MLB="00000000000GDVW00";;
+        elcapitan)      #10.11
+            BOARD_ID="Mac-FFE5EF870D7BA81A"
+            MLB="00000000000GQRX00";;
+        sierra)         #10.12
+            BOARD_ID="Mac-77F17D7DA9285301"
+            MLB="00000000000J0DX00";;
+        high-sierra)    #10.13
+            BOARD_ID="Mac-BE088AF8C5EB4FA2"
             MLB="00000000000J80300";;
-        mojave)
+        mojave)         #10.14
             BOARD_ID="Mac-7BA5B2DFE22DDD8C"
             MLB="00000000000KXPG00";;
-        catalina)
-            BOARD_ID="Mac-C3EC7CD22292981F"
-            MLB="00000000000PHCD00";;
-        big-sur)
-            BOARD_ID="Mac-3CBD00234E554E41";;
-        monterey)
-            BOARD_ID="Mac-06F11F11946D27C5"
-            MLB="00000000000000000";;
+        catalina)       #10.15
+            BOARD_ID="Mac-00BE6ED71E35EB86";;
+        big-sur)        #11
+            BOARD_ID="Mac-42FD25EABCABB274";;
+        monterey)       #12
+            BOARD_ID="Mac-E43C1C25D4880AD6";;
+        ventura)        #13
+            echo "ERROR! Not yet supported: ${RELEASE}"
+            exit 1;;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
