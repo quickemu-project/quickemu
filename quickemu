@@ -1422,6 +1422,7 @@ boot="efi"
 cpu_cores=""
 disk_img=""
 disk_size=""
+display=""
 extra_args=""
 fixed_iso=""
 floppy=""
@@ -1665,6 +1666,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     disk_size="${disk}"
   fi
 
+  if [ -n "${display}" ]; then
+    OUTPUT="${display}"
+  fi
+
   # Set the default OUTPUT if not provided by user
   if [ -z "${OUTPUT}" ]; then
     OUTPUT="sdl"
@@ -1674,6 +1679,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
   if [ -n "${BRAILLE}" ]; then
     OUTPUT="sdl"
   fi
+  display_param_check
 
   if [ -z "${VIEWER}" ]; then
     VIEWER="${viewer}"
