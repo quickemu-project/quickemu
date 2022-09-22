@@ -572,11 +572,9 @@ function vm_boot() {
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
-      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard"
-
       # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
       #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-      GUEST_TWEAKS="${GUEST_TWEAKS} -global ICH9-LPC.disable_s3=1"
+      GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1"
 
       if [ -z "${disk_size}" ]; then
         disk_size="64G"
