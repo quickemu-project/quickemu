@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKEMU" "1" "September 19, 2022" "quickemu" "Quickemu User Manual"
+.TH "QUICKEMU" "1" "September 22, 2022" "quickemu" "Quickemu User Manual"
 .hy
 .SH NAME
 .PP
@@ -486,7 +486,15 @@ click \f[B]Erase\f[R].
 .RE
 .RE
 .IP \[bu] 2
-Enter a \f[V]Name:\f[R] for the disk and click \f[B]Erase\f[R].
+Enter a \f[V]Name:\f[R] for the disk
+.RS 2
+.IP \[bu] 2
+If you are installing macOS Mojave or later (Catalina, Big Sur, and
+Monterey), choose any of the APFS options as the filesystem.
+MacOS Extended may not work.
+.RE
+.IP \[bu] 2
+Click \f[B]Erase\f[R].
 .IP \[bu] 2
 Click \f[B]Done\f[R].
 .IP \[bu] 2
