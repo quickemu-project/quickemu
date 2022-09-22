@@ -905,7 +905,6 @@ function vm_boot() {
          -enable-kvm -machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
          ${CPU} ${SMP}
          -m ${RAM_VM} ${BALLOON}
-         -smbios type=2,manufacturer="Quickemu Project",product="Quickemu",version="${VERSION}",serial="0xDEADBEEF",location="quickemu.com",asset="${VMNAME}"
          ${VIDEO} -display ${DISPLAY_RENDER}
          -audiodev ${AUDIO_DEV}
          -device intel-hda -device hda-duplex,audiodev=audio0
