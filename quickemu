@@ -568,7 +568,7 @@ function vm_boot() {
       fi
       ;;
     windows)
-      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
