@@ -60,10 +60,10 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
-    ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
+    ubuntuserver)       PRETTY_NAME="Ubuntu Server";;
+    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
@@ -78,7 +78,7 @@ function validate_release() {
 
   DISPLAY_NAME="$(pretty_name "${OS}")"
   case ${OS} in
-    ubuntu-server) RELEASE_GENERATOR="releases_ubuntuserver";;
+    *ubuntuserver*) RELEASE_GENERATOR="releases_ubuntuserver";;
     *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
     *) RELEASE_GENERATOR="${1}";;
   esac
@@ -207,7 +207,7 @@ function os_support() {
     ubuntu-budgie \
     ubuntukylin \
     ubuntu-mate \
-    ubuntu-server \
+    ubuntuserver \
     ubuntustudio \
     void \
     windows \
@@ -381,6 +381,7 @@ function editions_linuxmint(){
 function editions_lmde(){
     echo cinnamon
 }
+
 function releases_lmde(){
     echo 5
 }
@@ -473,10 +474,6 @@ function releases_tails() {
     echo stable
 }
 
-function releases_ubuntuserver() {
-    echo live-server-20.04 live-server-22.04
-}
-
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
     case "${OS}" in
@@ -530,6 +527,10 @@ function releases_ubuntu() {
         eol-21.04 \
         eol-21.10 \
         ;
+}
+
+function releases_ubuntuserver() {
+    echo 20.04 20.04.5 22.04 22.04.1
 }
 
 function releases_void() {
@@ -1413,6 +1414,20 @@ function get_tails() {
     echo "${URL} ${HASH}"
 }
 
+function get_ubuntuserver() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO="ubuntu-${RELEASE}-live-server-amd64.iso"
+    local URL="https://releases.ubuntu.com/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_ubuntu() {
     local ISO=""
     local HASH=""
@@ -1441,23 +1456,12 @@ function get_ubuntu() {
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
 
-
-    if [ "${RELEASE}" == "ubuntu-server" ]; then
-    if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server\|install' | grep amd64 | grep iso | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server\|install' | grep amd64 | grep iso |cut -d' ' -f1)
-    else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server\|install' | grep amd64 | grep iso | cut -d' ' -f3)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server|install' | grep amd64 | grep iso | cut -d' ' -f1)
-    fi
-    else
     if wget -q --spider "${URL}/SHA256SUMS"; then
         ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d'*' -f2)
         HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso |cut -d' ' -f1)
     else
         ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
         HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
-    fi
     fi
 
     if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -1983,9 +1987,10 @@ if [ -n "${2}" ]; then
         validate_release releases_macos
         get_macos
     elif [[ "${OS}" == *"ubuntuserver"* ]]; then
+        # (Comes before regular Ubuntu, or the code tries to download the desktop) #
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntuserver
-        get_ubuntu
+        get_ubuntuserver
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
@@ -2016,7 +2021,7 @@ if [ -n "${2}" ]; then
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
-      *ubuntu-server*)
+      *ubuntuserver*)
         echo -n " - Releases: "
         releases_ubuntuserver | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
