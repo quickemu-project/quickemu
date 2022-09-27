@@ -1982,7 +1982,7 @@ if [ -n "${2}" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
         get_macos
-    elif [[ "${OS}" == "ubuntuserver" ]]; then
+    elif [[ "${OS}" == *"ubuntuserver"* ]]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntuserver
         get_ubuntu
