@@ -16,8 +16,8 @@ operating system you want to run and Quickemu will figure out the best
 way to do it for you. For example:
 
 ``` bash
-quickget ubuntu-mate 22.04
-quickemu --vm ubuntu-mate-22.04.conf
+quickget ubuntuserver 22.04.1
+quickemu --vm ubuntuserver-22.04.1.conf
 ```
 
 The original objective of the project was to enable quick testing of
@@ -227,6 +227,12 @@ with your preferred flavour.
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
+
+### Ubuntu Server
+
+This particular fork supports Ubuntu Server 20.04 and 22.04 too.
+
+-   `ubuntuserver` (Ubuntu Live Server Install)
 
 ## Other Operating Systems
 
