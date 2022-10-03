@@ -34,6 +34,7 @@ function pretty_name() {
     alpine)             PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
     archlinux)          PRETTY_NAME="Arch Linux";;
+    archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -162,6 +163,7 @@ function os_support() {
     alpine \
     android \
     archlinux \
+    archcraft \
     arcolinux \
     batocera \
     cachyos \
@@ -233,6 +235,10 @@ function editions_android() {
 }
 
 function releases_archlinux() {
+    echo latest
+}
+
+function releases_archcraft() {
     echo latest
 }
 
@@ -865,6 +871,16 @@ function get_archlinux() {
     ISO=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
     HASH=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha1_sum')
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_archcraft() {
+    local HASH=""
+    local URL=""
+    local TMPURL=""
+
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/archcraft/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+    URL=${TMPURL%\?*}
+    echo "${URL} ${HASH}"
 }
 
 function get_arcolinux() {
