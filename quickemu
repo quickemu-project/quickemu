@@ -542,13 +542,13 @@ function vm_boot() {
       case ${macos_release} in
         catalina)
           BALLOON=""
-          MAC_DISK_DEV="virtio-blk-pci"
+          MAC_DISK_DEV="ide-hd,bus=ahci.2"
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
         big-sur|monterey|ventura)
           BALLOON="-device virtio-balloon"
-          MAC_DISK_DEV="virtio-blk-pci"
+          MAC_DISK_DEV="ide-hd,bus=ahci.2"
           NET_DEVICE="virtio-net"
           USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
           GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
@@ -1071,18 +1071,19 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
-           -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
+           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0,rotation_rate=1
+           -drive id=BootLoader,if=none,format=qcow2,discard=unmap,file="${MAC_BOOTLOADER}")
 
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
-      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
-             -drive id=RecoveryImage,if=none,format=raw,file="${img}")
+      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage,rotation_rate=1
+             -drive id=RecoveryImage,if=none,format=raw,discard=unmap,file="${img}")
     fi
 
     # shellcheck disable=SC2054,SC2206
-    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk,rotation_rate=1
+           -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
+
   elif [ "${guest_os}" == "kolibrios" ]; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
