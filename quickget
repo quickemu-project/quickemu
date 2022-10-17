@@ -1323,7 +1323,7 @@ function get_nixos() {
 function get_openbsd() {
     local HASH=""
     local ISO="install${RELEASE//\./}.iso"
-    local URL="https://cdn.openbsd.org/pub/OpenBSD/${RELEASE}/amd64"
+    local URL="https://mirror.leaseweb.com/pub/OpenBSD/${RELEASE}/amd64"
     HASH=$(wget -q -O- "${URL}/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
