@@ -1103,8 +1103,9 @@ function vm_boot() {
 
   else
     # shellcheck disable=SC2054,SC2206
-    args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    args+=(-device virtio-scsi-pci,id=scsi0
+          -device scsi-hd,drive=SystemDisk,bus=scsi0.0,lun=0,rotation_rate=1
+          -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
