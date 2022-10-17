@@ -316,12 +316,8 @@ supported.
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
     -   Click **Disk Utility** and **Continue**
-        -   On macOS Catalina, Big Sur & Monterey
-            -   Select `Apple Inc. VirtIO Block Media` from the list and
-                click **Erase**.
-        -   On macOS Mojave and High Sierra
-            -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list
-                and click **Erase**.
+        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list
+            and click **Erase**.
     -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
             Sur, and Monterey), choose any of the APFS options as the
