@@ -478,6 +478,8 @@ function releases_tails() {
 
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
+    local INTERIM_SUPPORT="22.10"
+
     case "${OS}" in
         kubuntu|lubuntu|ubuntukylin|\
         ubuntu-mate|ubuntustudio|xubuntu)
@@ -489,7 +491,11 @@ function releases_ubuntu() {
         LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
         ;;
     esac
+
+    INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
+
     echo ${LTS_SUPPORT} \
+        ${INTERIM_SUPPORT} \
         jammy-daily \
         daily-live \
         daily-canary \
@@ -529,6 +535,7 @@ function releases_ubuntu() {
         eol-21.04 \
         eol-21.10 \
         ;
+
 }
 
 function releases_void() {
@@ -2015,6 +2022,7 @@ else
         echo -n " - Releases: "
         releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
+
       *)
         echo -n " - Releases: "
         releases_"${OS}"
