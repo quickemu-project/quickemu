@@ -427,7 +427,7 @@ function editions_nixos(){
 }
 
 function releases_openbsd(){
-    echo 6.8 6.9 7.0 7.1
+    echo 6.8 6.9 7.0 7.1 7.2
 }
 
 function releases_opensuse(){
