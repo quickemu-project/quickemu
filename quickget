@@ -427,7 +427,8 @@ function editions_nixos(){
 }
 
 function releases_openbsd(){
-    echo 6.8 6.9 7.0 7.1
+    local OBSD_RELEASES=$(curl -sL https://mirror.leaseweb.com/pub/OpenBSD/|grep -e '6\.[8-9]/' -e '[7-9]\.'|cut -d\" -f4|tr -d '/')
+    echo ${OBSD_RELEASES}
 }
 
 function releases_opensuse(){
