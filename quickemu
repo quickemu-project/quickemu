@@ -542,13 +542,13 @@ function vm_boot() {
       case ${macos_release} in
         catalina)
           BALLOON=""
-          MAC_DISK_DEV="virtio-blk-pci"
+          MAC_DISK_DEV="ide-hd,bus=ahci.2"
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
         big-sur|monterey|ventura)
           BALLOON="-device virtio-balloon"
-          MAC_DISK_DEV="virtio-blk-pci"
+          MAC_DISK_DEV="ide-hd,bus=ahci.2"
           NET_DEVICE="virtio-net"
           USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
           GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
@@ -1071,18 +1071,19 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
-           -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
+           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0,rotation_rate=1
+           -drive id=BootLoader,if=none,format=qcow2,discard=unmap,file="${MAC_BOOTLOADER}")
 
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
-      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
-             -drive id=RecoveryImage,if=none,format=raw,file="${img}")
+      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage,rotation_rate=1
+             -drive id=RecoveryImage,if=none,format=raw,discard=unmap,file="${img}")
     fi
 
     # shellcheck disable=SC2054,SC2206
-    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk,rotation_rate=1
+           -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
+
   elif [ "${guest_os}" == "kolibrios" ]; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
@@ -1103,8 +1104,9 @@ function vm_boot() {
 
   else
     # shellcheck disable=SC2054,SC2206
-    args+=(-device virtio-blk-pci,drive=SystemDisk
-           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+    args+=(-device virtio-scsi-pci,id=scsi0
+          -device scsi-hd,drive=SystemDisk,bus=scsi0.0,lun=0,rotation_rate=1
+          -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
@@ -1498,7 +1500,7 @@ EXTRA_ARGS=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="4.3"
+readonly VERSION="4.4"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)

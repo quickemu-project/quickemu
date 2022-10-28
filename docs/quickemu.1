@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKEMU" "1" "September 22, 2022" "quickemu" "Quickemu User Manual"
+.TH "QUICKEMU" "1" "October 21, 2022" "quickemu" "Quickemu User Manual"
 .hy
 .SH NAME
 .PP
@@ -335,6 +335,8 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[V]android\f[R] (Android x86)
 .IP \[bu] 2
+\f[V]archcraft\f[R] (Archcraft)
+.IP \[bu] 2
 \f[V]archlinux\f[R] (Arch Linux)
 .IP \[bu] 2
 \f[V]arcolinux\f[R] (Arco Linux)
@@ -471,23 +473,10 @@ From \f[B]macOS Utilities\f[R]
 Click \f[B]Disk Utility\f[R] and \f[B]Continue\f[R]
 .RS 2
 .IP \[bu] 2
-On macOS Catalina, Big Sur & Monterey
-.RS 2
-.IP \[bu] 2
-Select \f[V]Apple Inc. VirtIO Block Media\f[R] from the list and click
-\f[B]Erase\f[R].
-.RE
-.IP \[bu] 2
-On macOS Mojave and High Sierra
-.RS 2
-.IP \[bu] 2
 Select \f[V]QEMU HARDDISK Media\f[R] (\[ti]103.08GB) from the list and
 click \f[B]Erase\f[R].
-.RE
-.RE
 .IP \[bu] 2
 Enter a \f[V]Name:\f[R] for the disk
-.RS 2
 .IP \[bu] 2
 If you are installing macOS Mojave or later (Catalina, Big Sur, and
 Monterey), choose any of the APFS options as the filesystem.
@@ -516,6 +505,58 @@ Installer\f[R]
 On the subsequent reboots use cursor keys and enter key to select the
 disk you named
 .RE
+.IP \[bu] 2
+Once you have finished installing macOS you will be presented with an
+the out-of-the-box first-start wizard to configure various options and
+set up your username and password
+.IP \[bu] 2
+OPTIONAL: After you have concluded the out-of-the-box wizard, you may
+want to enable the TRIM feature that the computer industry created for
+SSD disks.
+This feature in our macOS installation will allow QuickEmu to compact
+(shrink) your macOS disk image whenever you delete files inside the
+Virtual Machine.
+Without this step your macOS disk image will only ever get larger and
+will not shrink even when you delete lots of data inside macOS.
+.RS 2
+.IP \[bu] 2
+To enable TRIM, open the Terminal application and type the following
+command followed by pressing enter to tell macos to use the TRIM command
+on the hard disk when files are deleted:
+.RE
+.IP
+.nf
+\f[C]
+sudo trimforce enable
+\f[R]
+.fi
+.PP
+You will be prompted to enter your account\[cq]s password to gain the
+privilege needed.
+Once you\[cq]ve entered your password and pressed enter the command will
+request confirmation in the form of two questions that require you to
+type y (for a \[lq]yes\[rq] response) followed by enter to confirm.
+If you press enter without first typing y the system will consider that
+a negative response as though you said \[lq]no\[rq]:
+.IP
+.nf
+\f[C]
+IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an \[dq]as is\[dq] basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
+Are you sure you with to proceed (y/N)?
+\f[R]
+.fi
+.PP
+And a second confirmation once you\[cq]ve confirmed the previous one:
+.IP
+.nf
+\f[C]
+Your system will immediately reboot when this is complete.
+Is this OK (y/N)?
+\f[R]
+.fi
+.PP
+As the last message states, your system will automatically reboot as
+soon as the command completes.
 .PP
 The default macOS configuration looks like this:
 .IP
@@ -567,10 +608,6 @@ Optimised by default, but no GPU acceleration is available.
 .RS 2
 .IP \[bu] 2
 Host CPU vendor is detected and guest CPU is optimised accordingly.
-.IP \[bu] 2
-VirtIO Block
-Media (https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is used
-for the system disk where supported.
 .IP \[bu] 2
 VirtIO \f[V]usb-tablet\f[R] (http://philjordan.eu/osx-virt/) is used for
 the mouse.
