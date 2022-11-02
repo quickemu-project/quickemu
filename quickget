@@ -64,6 +64,7 @@ function pretty_name() {
     ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
+    ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
@@ -208,6 +209,7 @@ function os_support() {
     ubuntukylin \
     ubuntu-mate \
     ubuntustudio \
+    ubuntu-unity \
     void \
     windows \
     xubuntu \
