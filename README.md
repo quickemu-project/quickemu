@@ -225,6 +225,7 @@ with your preferred flavour.
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
+-   `ubuntu-unity` (Ubuntu Unity)
 -   `ubuntu` (Ubuntu)
 -   `xubuntu` (Xubuntu)
 
