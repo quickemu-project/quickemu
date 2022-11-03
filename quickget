@@ -500,48 +500,57 @@ function releases_ubuntu() {
 
     INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
 
-    
-    echo ${LTS_SUPPORT} \
-        ${INTERIM_SUPPORT} \
-        jammy-daily \
-        daily-live \
-        daily-canary \
-        eol-4.10 \
-        eol-5.04 \
-        eol-5.10 \
-        eol-6.06.0 eol-6.06.1 eol-6.06.2 \
-        eol-6.10 \
-        eol-7.04 \
-        eol-7.10 \
-        eol-8.04.0 eol-8.04.1 eol-8.04.2 eol-8.04.3 eol-8.04.4 \
-        eol-8.10 \
-        eol-9.04 \
-        eol-9.10 \
-        eol-10.04.0 eol-10.04.1 eol-10.04.2 eol-10.04.3 eol-10.04.4 \
-        eol-10.10 \
-        eol-11.04 \
-        eol-11.10 \
-        eol-12.04 eol-12.04.0 eol-12.04.1 eol-12.04.2 eol-12.04.3 eol-12.04.4 eol-12.04.5 \
-        eol-12.10 \
-        eol-13.04 \
-        eol-13.10 \
-        eol-14.04.0 eol-14.04.1 eol-14.04.2 eol-14.04.3 eol-14.04.4 eol-14.04.5 \
-        eol-14.10 \
-        eol-15.04 \
-        eol-15.10 \
-        eol-16.04.0 eol-16.04.1 eol-16.04.2 eol-16.04.3 eol-16.04.4 eol-16.04.5 eol-16.04.6 \
-        eol-16.10 \
-        eol-17.04 \
-        eol-17.10 \
-        eol-18.04 eol-18.04.0 eol-18.04.1 eol-18.04.2 eol-18.04.3 eol-18.04.4 eol-18.04.5 \
-        eol-18.10 \
-        eol-19.04 \
-        eol-19.10 \
-        eol-20.04 eol-20.04.0 eol-20.04.1 eol-20.04.2 \
-        eol-20.10 \
-        eol-21.04 \
-        eol-21.10 \
-        ;
+    if [ "${OS}" == "ubuntu-unity" ]; then
+        echo ${LTS_SUPPORT} \
+             ${INTERIM_SUPPORT} \
+             daily-live \
+             daily-canary \
+             ;
+    fi
+
+    if [ "${OS}" != "ubuntu-unity" ]; then
+        echo ${LTS_SUPPORT} \
+            ${INTERIM_SUPPORT} \
+            jammy-daily \
+            daily-live \
+            daily-canary \
+            eol-4.10 \
+            eol-5.04 \
+            eol-5.10 \
+            eol-6.06.0 eol-6.06.1 eol-6.06.2 \
+            eol-6.10 \
+            eol-7.04 \
+            eol-7.10 \
+            eol-8.04.0 eol-8.04.1 eol-8.04.2 eol-8.04.3 eol-8.04.4 \
+            eol-8.10 \
+            eol-9.04 \
+            eol-9.10 \
+            eol-10.04.0 eol-10.04.1 eol-10.04.2 eol-10.04.3 eol-10.04.4 \
+            eol-10.10 \
+            eol-11.04 \
+            eol-11.10 \
+            eol-12.04 eol-12.04.0 eol-12.04.1 eol-12.04.2 eol-12.04.3 eol-12.04.4 eol-12.04.5 \
+            eol-12.10 \
+            eol-13.04 \
+            eol-13.10 \
+            eol-14.04.0 eol-14.04.1 eol-14.04.2 eol-14.04.3 eol-14.04.4 eol-14.04.5 \
+            eol-14.10 \
+            eol-15.04 \
+            eol-15.10 \
+            eol-16.04.0 eol-16.04.1 eol-16.04.2 eol-16.04.3 eol-16.04.4 eol-16.04.5 eol-16.04.6 \
+            eol-16.10 \
+            eol-17.04 \
+            eol-17.10 \
+            eol-18.04 eol-18.04.0 eol-18.04.1 eol-18.04.2 eol-18.04.3 eol-18.04.4 eol-18.04.5 \
+            eol-18.10 \
+            eol-19.04 \
+            eol-19.10 \
+            eol-20.04 eol-20.04.0 eol-20.04.1 eol-20.04.2 \
+            eol-20.10 \
+            eol-21.04 \
+            eol-21.10 \
+            ;
+    fi
 }
 
 function releases_void() {
