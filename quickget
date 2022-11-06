@@ -506,9 +506,9 @@ function releases_ubuntu() {
              daily-live \
              daily-canary \
              ;
-    fi
+    
 
-    if [ "${OS}" != "ubuntu-unity" ]; then
+    else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
             jammy-daily \
