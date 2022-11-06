@@ -507,7 +507,6 @@ function releases_ubuntu() {
              daily-canary \
              ;
     
-
     else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
