@@ -1487,8 +1487,8 @@ function get_void() {
 
     DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
-        glibc)      ISO="void-live-x86_64-${DATE}.iso";;
-        musl)       ISO="void-live-x86_64-musl-${DATE}.iso";;
+        glibc)      ISO="void-live-x86_64-${DATE}-base.iso";;
+        musl)       ISO="void-live-x86_64-musl-${DATE}-base.iso";;
         xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
         xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
