@@ -215,7 +215,7 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.6 9.0
+    echo 8.6 8.7 9.0 9.1-beta-1
 }
 
 function editions_alma() {
