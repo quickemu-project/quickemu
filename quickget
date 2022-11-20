@@ -494,16 +494,15 @@ function releases_ubuntu() {
         LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
         ;;
         ubuntu-unity)
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 18.04 20.04 22.04/}"
+        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
         ;;
     esac
 
     INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
 
     if [ "${OS}" == "ubuntu-unity" ]; then
-        echo ${LTS_SUPPORT} \
-             ${INTERIM_SUPPORT} \
-             daily-live \
+        echo ${INTERIM_SUPPORT} \
+            daily-live \
              daily-canary \
              ;
     
