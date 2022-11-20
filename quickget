@@ -300,7 +300,7 @@ function releases_endeavouros() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36
+    echo 33 34 35 36 37
 }
 
 function releases_batocera() {
