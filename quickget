@@ -253,11 +253,11 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 220731
+    echo 220919 221023
 }
 
 function editions_cachyos() {
-    echo kde gnome xfce
+    echo kde gnome
 }
 
 function releases_centos-stream() {
