@@ -770,7 +770,7 @@ You can also pass optional parameters
   --keyboard_layout <layout>        : Set keyboard layout.
   --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
   --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
-  --extra_args <arguments>          : Pass additional arguments to qemu
+  --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'
   --version                         : Print version
 
 ```
