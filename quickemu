@@ -1226,6 +1226,33 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
+  # Show all the compiled qemu & swmtp arguments as a human readable list
+
+  QemuArgsFile="${VMDIR}/QemuArgsList.txt"
+
+  printf "\n\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
+  printf "\n\n  Qemu:  %s\n" "$QEMU" >> "$QemuArgsFile"
+
+  for a in "${args[@]}"; do
+    if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
+    elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
+    else printf " %s" "$a" >> "$QemuArgsFile"
+    fi
+  done
+
+  if [[ $tpm == "on" ]]; then 
+    printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
+  else    
+    printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
+  fi
+    printf "\n\n\n"  >> "$QemuArgsFile"
+    
+  if [[ $ShowQemuArgs ]]; then
+    cat "$QemuArgsFile"
+    read -rp "  [enter] to continue, ctrl-c to quit >  "
+    printf "\n\n"
+  fi
+
   if [ ${VM_UP} -eq 0 ]; then
     # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
     case "${OUTPUT}" in
@@ -1333,6 +1360,7 @@ function usage() {
   echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
   echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
   echo "  --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'"
+  echo "  --show_args                       : Show all the compiled qemu & swmtp arguments as a human readable list, before starting VM"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1639,6 +1667,9 @@ else
             if [[ ! $EXTRA_ARGS ]]; then EXTRA_ARGS="$1" 
             else EXTRA_ARGS+=" $1" ; fi
             shift ;;
+          -show_args|--show_args|--show-qemu-args)
+            ShowQemuArgs=1
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;

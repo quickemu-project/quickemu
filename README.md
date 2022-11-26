@@ -771,6 +771,7 @@ You can also pass optional parameters
   --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
   --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
   --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'
+  --show_args                       : Show all the compiled qemu & swmtp arguments as a human readable list, before starting VM
   --version                         : Print version
 
 ```
