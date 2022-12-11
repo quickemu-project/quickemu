@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: October 21, 2022
+date: December 11, 2022
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -82,6 +82,7 @@ with your preferred flavour.
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
+-   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
 ## Other Operating Systems
@@ -266,6 +267,9 @@ There are some considerations when running macOS via Quickemu.
 -   Optimised by default, but no GPU acceleration is available.
     -   Host CPU vendor is detected and guest CPU is optimised
         accordingly.
+    -   [VirtIO Block
+        Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is
+        used for the system disk where supported.
     -   [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used
         for the mouse.
     -   VirtIO Network (`virtio-net`) is supported and enabled on macOS
