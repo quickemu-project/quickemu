@@ -357,7 +357,7 @@ function editions_ghostbsd() {
 }
 
 function releases_haiku() {
-    echo r1beta3
+    echo r1beta3 r1beta4
 }
 
 function editions_haiku() {
