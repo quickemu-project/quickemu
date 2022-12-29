@@ -67,6 +67,7 @@ function pretty_name() {
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
+    truenas)            PRETTY_NAME="TrueNAS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
   echo "${PRETTY_NAME}"
@@ -204,6 +205,7 @@ function os_support() {
     slackware \
     solus \
     tails \
+    truenas \
     ubuntu \
     ubuntu-budgie \
     ubuntukylin \
@@ -478,6 +480,14 @@ function editions_solus() {
 
 function releases_tails() {
     echo stable
+}
+
+function editions_truenas() {
+    echo core scale # enterprise is proprietary and paid
+}
+
+function releases_truenas() {
+
 }
 
 function releases_ubuntu() {
