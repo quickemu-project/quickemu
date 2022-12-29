@@ -487,7 +487,7 @@ function editions_truenas() {
 }
 
 function releases_truenas() {
-
+    echo 22.12 13.0
 }
 
 function releases_ubuntu() {
@@ -759,6 +759,9 @@ function make_vm_config() {
         reactos)
             GUEST="reactos"
             IMAGE_TYPE="iso";;
+        truenas)
+            GUEST="truenas"
+            IMAGE_TYPE="iso";;
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
@@ -808,6 +811,13 @@ EOF
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
+          truenas)
+            echo 
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+            echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+            echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
             ;;
           zorin)
             case  ${EDITION} in
@@ -1451,6 +1461,18 @@ function get_tails() {
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     echo "${URL} ${HASH}"
+}
+
+function get_truenas() {
+    local ISO=""
+    local URL=""
+
+    if [[ "${RELEASE}" == "13.0"* ]] && [ "${OS}" == "CORE" ]; then
+    URL="$(wget https://download.freenas.org/13.0/STABLE/U3.1/x64/${OS}.iso)"
+    
+    elif [[ "${RELEASE}" == "22.12"]] && [ "${OS}" == "SCALE"]; then
+    URL="$(https://download.truenas.com/TrueNAS-SCALE-Bluefin/${RELEASE}.0/TrueNAS-${OS}-22.12.0.iso)"
+    fi
 }
 
 function get_ubuntu() {
