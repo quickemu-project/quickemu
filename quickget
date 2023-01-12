@@ -299,8 +299,13 @@ function releases_elementary() {
 
 function releases_endeavouros() {
     echo apollo_22_1 \
+    artemis-22_6 \
+    artemis_neo_22_7 \
+    artemis_neo_22_8 \
+    artemis_nova_22_9 \
     atlantis-21_4 \
-    atlantis_neo-21_5
+    atlantis_neo-21_5 \
+    cassini_22_12
 }
 
 function releases_fedora() {
