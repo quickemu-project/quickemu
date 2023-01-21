@@ -284,6 +284,7 @@ with your preferred flavour.
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
 -   `lmde` (Linux Mint Debian Edition)
+-   `mageia` (Mageia)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
