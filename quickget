@@ -1924,7 +1924,8 @@ function get_windows() {
 
     MS_BASE_URL="https://software.download.prss.microsoft.com/"
     if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
-        echo "Download URL not leading to Microsoft CDN"
+        echo "Download URL (${DOWNLOAD_URL}) not leading to Microsoft CDN"
+        echo "Please download a Windows .ISO manaully and configure quickemu accordingly"
         exit 1
     fi
 
