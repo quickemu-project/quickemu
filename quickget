@@ -516,7 +516,7 @@ function releases_ubuntu() {
             daily-live \
              daily-canary \
              ;
-    
+
     else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
@@ -813,7 +813,7 @@ EOF
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
           truenas)
-            echo 
+            echo
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
             echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
