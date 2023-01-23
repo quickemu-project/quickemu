@@ -1467,9 +1467,9 @@ function get_truenas() {
     local ISO=""
     local URL=""
 
-    if [[ "${RELEASE}" == "13.0"* ]] && [ "${OS}" == "CORE" ]; then
+    if [ "${RELEASE}" == "13.0" ] && [ "${OS}" == "CORE" ]; then
         URL="$(wget https://download.freenas.org/13.0/STABLE/U3.1/x64/${OS}.iso)"
-    elif [[ "${RELEASE}" == "22.12"]] && [ "${OS}" == "SCALE" ]; then
+    elif [ "${RELEASE}" == "22.12" ] && [ "${OS}" == "SCALE" ]; then
         URL="$(https://download.truenas.com/TrueNAS-SCALE-Bluefin/${RELEASE}.0/TrueNAS-${OS}-22.12.0.iso)"
     fi
 }
