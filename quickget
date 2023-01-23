@@ -49,6 +49,7 @@ function pretty_name() {
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
     lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
+    mageia)             PRETTY_NAME="Mageia";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
@@ -189,6 +190,7 @@ function os_support() {
     kubuntu \
     linuxmint \
     lmde \
+    mageia \
     manjaro \
     mxlinux \
     netboot \
@@ -299,8 +301,13 @@ function releases_elementary() {
 
 function releases_endeavouros() {
     echo apollo_22_1 \
+    artemis-22_6 \
+    artemis_neo_22_7 \
+    artemis_neo_22_8 \
+    artemis_nova_22_9 \
     atlantis-21_4 \
-    atlantis_neo-21_5
+    atlantis_neo-21_5 \
+    cassini_22_12
 }
 
 function releases_fedora() {
@@ -391,6 +398,14 @@ function editions_lmde(){
 }
 function releases_lmde(){
     echo 5
+}
+
+function releases_mageia(){
+    echo 8
+}
+
+function editions_mageia(){
+    echo Plasma GNOME Xfce
 }
 
 function releases_mxlinux(){
@@ -1296,6 +1311,13 @@ function get_macos() {
     fi
 
     make_vm_config RecoveryImage.img
+}
+
+function get_mageia() {
+    local EDITION="${1:-}"
+    local ISO=$(wget -q https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" -O- | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
+    local HASH=$(wget -q -O- "${ISO}.sha512" | cut -d' ' -f1)
+    echo "${ISO} ${HASH}"
 }
 
 function get_manjaro() {
