@@ -62,6 +62,8 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    truenas-core)       PRETTY_NAME="TrueNAS Core";;
+    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -69,7 +71,6 @@ function pretty_name() {
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
-    truenas)            PRETTY_NAME="TrueNAS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
   echo "${PRETTY_NAME}"
@@ -209,7 +210,8 @@ function os_support() {
     slackware \
     solus \
     tails \
-    truenas \
+    truenas-core \
+    truenas-scale \
     ubuntu \
     ubuntu-budgie \
     ubuntukylin \
@@ -509,12 +511,19 @@ function releases_tails() {
     echo stable
 }
 
-function editions_truenas() {
-    echo core scale # enterprise is proprietary and paid
+function releases_truenas() {
+  if [[ $OS == truenas ]] ; then
+    echo "ERROR! The supported TrueNAS OS values are truenas-core or truenas-scale"
+    exit 1;
+  fi
+  }
+
+function releases_truenas-core() {
+   echo 12.0 13.0
 }
 
-function releases_truenas() {
-    echo 22.12 13.0
+function releases_truenas-scale() {
+    echo 22.02 22.12
 }
 
 function releases_ubuntu() {
@@ -786,7 +795,7 @@ function make_vm_config() {
         reactos)
             GUEST="reactos"
             IMAGE_TYPE="iso";;
-        truenas)
+        truenas*)
             GUEST="truenas"
             IMAGE_TYPE="iso";;
         windows)
@@ -839,7 +848,7 @@ EOF
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
-          truenas)
+          truenas-scale|truenas-core)
             echo
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
@@ -1504,15 +1513,27 @@ function get_tails() {
     echo "${URL} ${HASH}"
 }
 
-function get_truenas() {
+function get_truenas-scale() {
     local ISO=""
     local URL=""
 
-    if [ "${RELEASE}" == "13.0" ] && [ "${OS}" == "CORE" ]; then
-        URL="$(wget https://download.freenas.org/13.0/STABLE/U3.1/x64/${OS}.iso)"
-    elif [ "${RELEASE}" == "22.12" ] && [ "${OS}" == "SCALE" ]; then
-        URL="$(https://download.truenas.com/TrueNAS-SCALE-Bluefin/${RELEASE}.0/TrueNAS-${OS}-22.12.0.iso)"
-    fi
+    local DLINFO="https://www.truenas.com/download-truenas-scale/"
+
+    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1 )
+
+    echo "${URL} ${HASH}"
+}
+
+function get_truenas-core() {
+    local ISO=""
+    local URL=""
+
+    local DLINFO="https://www.truenas.com/download-truenas-core/"
+    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1)
+
+    echo "${URL} ${HASH}"
 }
 
 function get_ubuntu() {
@@ -2067,6 +2088,7 @@ if [ -n "${2}" ]; then
                 exit 1;
             fi
         fi
+
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
