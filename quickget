@@ -839,9 +839,10 @@ EOF
           truenas-scale|truenas-core)
             echo
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
-            echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
-            echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
-            echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+           # the rest is non-functional
+           # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+           # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+           # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
             ;;
           zorin)
             case  ${EDITION} in
