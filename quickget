@@ -60,6 +60,7 @@ function pretty_name() {
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
     reactos)            PRETTY_NAME="ReactOS";;
+    rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
@@ -203,6 +204,7 @@ function os_support() {
     oraclelinux \
     popos \
     reactos \
+    rebornos \
     rockylinux \
     slackware \
     solus \
@@ -469,6 +471,16 @@ function editions_popos() {
 
 function releases_reactos() {
     echo latest
+}
+
+function releases_rebornos() {
+    echo latest
+}
+
+function get_rebornos() {
+   local ISO=$(curl -s 'https://www.rebornos.org/download/' | grep -ohE 'https://pub-cb7a4d4f7a974896b3bf40c52d1defbc.r2.dev/RebornOS-ISO/(rebornos_xfce_minimal|rebornos_iso)-[0-9]{4}.[0-9]{2}.[0-9]{2}-x86_64.iso' | tail -n1)
+   local HASH=$(curl -s 'https://www.rebornos.org/download/' | grep -ozP 'Checksum MD5:.*[0-9a-fA-F]{32}' | grep -zoP '[0-9a-fA-F]{32}' | cut -d '' -f1)
+   echo "${ISO} ${HASH}"
 }
 
 function releases_rockylinux() {
