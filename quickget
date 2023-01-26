@@ -1046,7 +1046,7 @@ function get_deepin() {
 function get_devuan() {
     local HASH=""
     local ISO=""
-    local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
+    local URL="http://files.devuan.org/devuan_${RELEASE}/desktop-live"
 
     case ${RELEASE} in
       beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
