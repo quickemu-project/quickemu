@@ -225,8 +225,8 @@ with your preferred flavour.
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
--   `ubuntu-unity` (Ubuntu Unity)
 -   `ubuntu` (Ubuntu)
+-   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
 ## Other Operating Systems
@@ -260,6 +260,7 @@ with your preferred flavour.
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
 -   `lmde` (Linux Mint Debian Edition)
+-   `mageia` (Mageia)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
@@ -270,10 +271,13 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
+-   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `truenas-core` (TrueNAS Core)
+-   `truenas-scale` (TrueNAS Scale)
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
 
@@ -776,9 +780,8 @@ You can also pass optional parameters
   --extra_args <arguments>          : Pass additional arguments to qemu
   --version                         : Print version
 
-```
 <!-- [[[end]]] -->
-
+```
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in

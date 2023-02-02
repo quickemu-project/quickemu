@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: December 11, 2022
+date: February 2, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -127,10 +127,13 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
+-   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `truenas-core` (TrueNAS Core)
+-   `truenas-scale` (TrueNAS Scale)
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
 
