@@ -486,7 +486,7 @@ function get_rebornos() {
 }
 
 function releases_rockylinux() {
-    echo 8.3 8.4 8.5 9.0
+    echo 8.3 8.4 8.5 9.0 9.1
 }
 
 # Rocky have renamed dvd1 -> dvd at 9.0
@@ -1477,7 +1477,7 @@ function get_rockylinux() {
     local URL=""
 
     case ${RELEASE} in
-      9.0) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
+      9.1) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
