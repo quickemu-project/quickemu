@@ -413,7 +413,7 @@ function editions_mageia(){
 }
 
 function releases_mxlinux(){
-    echo 21.2.1
+    echo 21.3
 }
 
 function editions_mxlinux(){
