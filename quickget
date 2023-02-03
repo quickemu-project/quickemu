@@ -296,7 +296,7 @@ function releases_devuan() {
 }
 
 function releases_dragonflybsd() {
-    echo 6.2.1
+    echo 6.4.0
 }
 
 function releases_elementary() {
