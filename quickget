@@ -300,7 +300,7 @@ function releases_dragonflybsd() {
 }
 
 function releases_elementary() {
-    echo 6.1 7.0
+    echo 7.0
 }
 
 function releases_endeavouros() {
