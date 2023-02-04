@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKGET" "1" "February 3, 2023" "quickget" "Quickget User Manual"
+.TH "QUICKGET" "1" "February 4, 2023" "quickget" "Quickget User Manual"
 .hy
 .SH NAME
 .PP
@@ -459,8 +459,15 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 .fi
 .PP
 Now reboot, and the App Store should work.
-.SS Windows 8.1, 10 & 11 Guests
+.SS Windows 10 & 11 Guests
 .PP
+\f[V]quickget\f[R] can not download
+Windows10 (https://www.microsoft.com/software-download/windows10) and
+Windows 11 (https://www.microsoft.com/software-download/windows11)
+automatically, but does automatically create an optimised virtual
+machine configuration that you can just add an Windows .iso image to.
+This configuration also includes the VirtIO drivers for
+Windows (https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 \f[V]quickget\f[R] can automatically download Windows 8.1, Windows
 10 (https://www.microsoft.com/en-gb/software-download/windows10ISO) and
 Windows 11 (https://www.microsoft.com/en-gb/software-download/windows11)
@@ -487,17 +494,6 @@ Username: \f[V]Quickemu\f[R]
 .IP \[bu] 2
 Password: \f[V]quickemu\f[R]
 .RE
-.SS Regional versions
-.PP
-By default \f[V]quickget\f[R] will download the \f[I]\[lq]English
-International\[rq]\f[R] release, but you can optionally specify one of
-the supported languages: For example:
-.IP
-.nf
-\f[C]
-quickget windows 11 \[dq]Chinese (Traditional)\[dq]
-\f[R]
-.fi
 .PP
 The default Windows 11 configuration looks like this:
 .IP
@@ -505,7 +501,7 @@ The default Windows 11 configuration looks like this:
 \f[C]
 guest_os=\[dq]windows\[dq]
 disk_img=\[dq]windows-11/disk.qcow2\[dq]
-iso=\[dq]windows-11/Win11_EnglishInternational_x64.iso\[dq]
+iso=\[dq]windows-11/windows-11.iso\[dq]
 fixed_iso=\[dq]windows-11/virtio-win.iso\[dq]
 tpm=\[dq]on\[dq]
 secureboot=\[dq]on\[dq]

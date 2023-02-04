@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: February 3, 2023
+date: February 4, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -480,8 +480,15 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8.1, 10 & 11 Guests
+## Windows 10 & 11 Guests
 
+`quickget` can not download
+[Windows10](https://www.microsoft.com/software-download/windows10) and
+[Windows 11](https://www.microsoft.com/software-download/windows11)
+automatically, but does automatically create an optimised virtual
+machine configuration that you can just add an Windows .iso image to.
+This configuration also includes the [VirtIO drivers for
+Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 `quickget` can automatically download Windows 8.1, [Windows
 10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
 [Windows
@@ -502,22 +509,12 @@ quickemu --vm windows-11.conf
     -   Username: `Quickemu`
     -   Password: `quickemu`
 
-### Regional versions
-
-By default `quickget` will download the *"English International"*
-release, but you can optionally specify one of the supported languages:
-For example:
-
-``` bash
-quickget windows 11 "Chinese (Traditional)"
-```
-
 The default Windows 11 configuration looks like this:
 
 ``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
-iso="windows-11/Win11_EnglishInternational_x64.iso"
+iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
 secureboot="on"

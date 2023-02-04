@@ -450,14 +450,22 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8.1, 10 & 11 Guests
+## Windows 10 & 11 Guests
 
 `quickget` can not download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
-[Windows 11](https://www.microsoft.com/software-download/windows11) automatically,
-but does automatically create an optimised virtual machine configuration that
-you can just add an Windows .iso image to. This configuration also includes the
-[VirtIO drivers for Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
+[Windows 11](https://www.microsoft.com/software-download/windows11)
+automatically, but does automatically create an optimised virtual
+machine configuration that you can just add an Windows .iso image to.
+This configuration also includes the [VirtIO drivers for
+Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
+`quickget` can automatically download Windows 8.1, [Windows
+10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
+[Windows
+11](https://www.microsoft.com/en-gb/software-download/windows11) along
+with the [VirtIO drivers for
+Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
+and creates a virtual machine configuration.
 
 ``` bash
 quickget windows 11
@@ -769,9 +777,9 @@ You can also pass optional parameters
   --extra_args <arguments>          : Pass additional arguments to qemu
   --version                         : Print version
 
+```
 <!-- [[[end]]] -->
 ```
-
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
