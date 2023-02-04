@@ -103,9 +103,9 @@ above requirements or their equivalents.
 
 These examples may save a little typing
 
-Debian:
+Debian (and direct derivatives such as MX Linux):
 
-    sudo apt install qemu bash coreutils ovmf grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-client-gtk swtpm wget xdg-user-dirs zsync unzip
+    sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 
 Fedora:
 
