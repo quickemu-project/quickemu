@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
@@ -172,6 +173,7 @@ function os_support() {
     archcraft \
     arcolinux \
     batocera \
+    blendos \
     cachyos \
     centos-stream \
     debian \
@@ -261,6 +263,10 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+
+function releases_blendos() {
+    echo 23.01
 }
 
 function releases_cachyos() {
@@ -989,6 +995,13 @@ function get_arcolinux() {
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_blendos() {
+    local HASH=""
+    local URL="$(wget -q https://api.github.com/repos/blend-os/blendOS/releases -O- |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
+    HASH=$(wget -q -O- "${URL}.sha256sum" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
 }
 
 function get_batocera() {
