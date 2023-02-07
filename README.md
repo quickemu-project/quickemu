@@ -240,6 +240,7 @@ with your preferred flavour.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
+-   `blendos` (BlendOS)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
@@ -779,7 +780,7 @@ You can also pass optional parameters
 
 ```
 <!-- [[[end]]] -->
-```
+
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in

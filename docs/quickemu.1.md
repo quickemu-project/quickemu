@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: February 4, 2023
+date: February 7, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -264,6 +264,7 @@ with your preferred flavour.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
+-   `blendos` (BlendOS)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
