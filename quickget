@@ -263,7 +263,8 @@ function editions_arcolinux() {
 }
 
 function releases_blendos() {
-    echo 23.01
+    curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+'
+
 }
 
 function releases_cachyos() {
@@ -978,8 +979,8 @@ function get_arcolinux() {
 
 function get_blendos() {
     local HASH=""
-    local URL="$(wget -q https://api.github.com/repos/blend-os/blendOS/releases -O- |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
-    HASH=$(wget -q -O- "${URL}.sha256sum" | cut -d' ' -f1)
+    local URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
+    HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
