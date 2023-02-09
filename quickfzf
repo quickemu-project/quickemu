@@ -1,0 +1,66 @@
+#!/usr/bin/bash
+
+# Author: zenobit
+# Description: Uses fzf to provide a simple GUI for quickemu and quickget
+# script must be in same directory as quickget and quickemu!
+# License MIT
+#
+progname="${progname:="${0##*/}"}"
+version="0.2"
+if [ ! -f /usr/bin/fzf ]; then
+	echo "You are missing fzf..."
+	exit 255
+fi
+echo
+echo "Enjoy using quickemu!"
+echo
+echo "Press ctrl + c anytime for killing script..."
+echo
+echo "Prepared VMs:"
+echo "-------------"
+echo "$(ls *.conf 2>/dev/null | cut -d'.' -f1)"
+echo "-------------"
+echo
+read -p "Do you want to create new VM? (c)
+run created one? (just Enter)" start
+case $start in
+	c )
+		todo="create"
+	;;
+esac
+if [ "$todo" = "create" ]; then
+	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
+	if [ "$os" = windows ]; then
+		answer=$(echo "Default English
+Choose other language" | fzf)
+		if [ "$answer" = "Choose other language" ]; then
+			release=$(echo "8
+10
+11" | fzf)
+			wlstart=$(cat quickget | grep -n '(A' | cut -d':' -f1)
+			wlend=$(($(cat quickget | sed '/Arabic/,$!d' | grep -n '}' | cut -d':' -f1 | head -n 1) - 1))
+			wlang=$(cat quickget | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf)
+			echo
+			echo "Trying to download..."
+			quickget "windows" "$release" "$wlang"
+		fi
+	fi
+	choices=$(quickget "$os" | sed 1d)
+	if [ $(echo "$choices" | wc -l) = 1 ]; then
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
+		echo
+		echo "Trying to download..."
+		quickget "$os" "$release"
+	else
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
+		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
+		echo
+		echo "Trying to download..."
+		quickget "$os" "$release" "$edition"
+	fi
+fi
+choosed=$(echo "$(ls *.conf 2>/dev/null)" | fzf)
+echo
+quickemu -vm "$choosed"
+echo
+exit 0
