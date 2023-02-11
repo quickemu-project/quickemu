@@ -4,63 +4,93 @@
 # Description: Uses fzf to provide a simple GUI for quickemu and quickget
 # script must be in same directory as quickget and quickemu!
 # License MIT
-#
+
+# Define variables
 progname="${progname:="${0##*/}"}"
-version="0.2"
-if [ ! -f /usr/bin/fzf ]; then
-	echo "You are missing fzf..."
-	exit 255
+version="0.21"
+vms=(*.conf)
+
+# Set traps to catch the signals and exit gracefully
+trap "exit" INT
+trap "exit" EXIT
+
+# Dependency check: check if fzf is installed and can be executed
+if ! command -v fzf >/dev/null 2>&1; then
+	echo "You are missing fzf..." && exit 255
 fi
-echo
-echo "Enjoy using quickemu!"
-echo
-echo "Press ctrl + c anytime for killing script..."
-echo
-echo "Prepared VMs:"
+# Dispaly version and prepared VMs
+#printf " $progname: $version\n quickemu: $(quickemu --version)\n\n Prepared VMs:\n-------------\n"
+printf '%s: v.%s\nquickemu: v.%s\n\n Prepared VMs:\n-------------\n' "$progname" "$version" "$(quickemu --version)"
+# Check if there are any VMs
+if [ ${#vms[@]} -eq 0 ]; then
+    echo "No VMs found."
+    exit 1
+fi
+
+# Print the names of the available VMs
+printf "%s\n" "${vms[@]%.*}"
 echo "-------------"
-echo "$(ls *.conf 2>/dev/null | cut -d'.' -f1)"
-echo "-------------"
-echo
-read -p "Do you want to create new VM? (c)
-run created one? (just Enter)" start
+
+# Action prompt
+printf " Do you want to create a new VM? (c)
+ or run an existing one? (press anything)\n"
+read -rn 1 -s start
 case $start in
 	c )
 		todo="create"
 	;;
 esac
+
+# If the user chose to create a new VM
 if [ "$todo" = "create" ]; then
-	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
+	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose OS to download
+ or CTRL-c or ESC to quit')
+	# If the OS is Windows
 	if [ "$os" = windows ]; then
 		answer=$(echo "Default English
 Choose other language" | fzf)
+		# If the user wants another windows language
 		if [ "$answer" = "Choose other language" ]; then
-			release=$(echo "8
+			wrelease=$(echo "8
 10
 11" | fzf)
-			wlstart=$(cat quickget | grep -n '(A' | cut -d':' -f1)
+			# get window language list
 			wlend=$(($(cat quickget | sed '/Arabic/,$!d' | grep -n '}' | cut -d':' -f1 | head -n 1) - 1))
-			wlang=$(cat quickget | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf)
-			echo
-			echo "Trying to download..."
-			quickget "windows" "$release" "$wlang"
+			# get windows language
+			wlang=$(cat quickget | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --header='Choose Language
+ or CTRL-c or ESC to quit')
+			# downloading windows
+			printf '\n Trying to download Windows %s %s...\n\n' "$wrelease" "$wlang"
+			quickget "windows" "$wrelease" "$wlang"
 		fi
 	fi
+	# Get the release and edition to download, if necessary
 	choices=$(quickget "$os" | sed 1d)
-	if [ $(echo "$choices" | wc -l) = 1 ]; then
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
-		echo
-		echo "Trying to download..."
+	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
+		# get release
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Release
+ or CTRL-c or ESC to quit')
+		# downloading
+		printf '\n Trying to download %s %s...\n\n' "$os" "$release"
 		quickget "$os" "$release"
 	else
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
-		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf)
-		echo
-		echo "Trying to download..."
+		# get release
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Release
+ or CTRL-c or ESC to quit')
+		# get edition
+		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Edition
+ or CTRL-c or ESC to quit')
+		# downloading
+		printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
 		quickget "$os" "$release" "$edition"
 	fi
 fi
-choosed=$(echo "$(ls *.conf 2>/dev/null)" | fzf)
-echo
-quickemu -vm "$choosed"
-echo
+# choose VM to run
+choosed=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --header='Choose VM to run
+ or CTRL-c or ESC to quit')
+
+# Run choosed VM
+printf '\n Starting %s...\n\n' "$choosed"
+quickemu -vm "$choosed.conf"
+
 exit 0
