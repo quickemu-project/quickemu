@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: February 4, 2023
+date: February 12, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -321,13 +321,6 @@ automatically, but does automatically create an optimised virtual
 machine configuration that you can just add an Windows .iso image to.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
-`quickget` can automatically download Windows 8.1, [Windows
-10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
-[Windows
-11](https://www.microsoft.com/en-gb/software-download/windows11) along
-with the [VirtIO drivers for
-Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
-and creates a virtual machine configuration.
 
 ``` bash
 quickget windows 11
