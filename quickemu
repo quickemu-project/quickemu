@@ -1230,6 +1230,7 @@ function vm_boot() {
       sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
     esac
     echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
+    sed -i -e 's/ -/\n    -/g' ${VMDIR}/${VMNAME}.sh
     ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
     sleep 0.25
   fi
