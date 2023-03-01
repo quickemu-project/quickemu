@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKEMU_CONF" "1" "October 21, 2022" "quickemu_conf" "Quickemu Configuration Manual"
+.TH "QUICKEMU_CONF" "1" "February 4, 2023" "quickemu_conf" "Quickemu Configuration Manual"
 .hy
 .SH NAME
 .PP
@@ -38,6 +38,8 @@ boot=\[dq]efi\[dq]
 cpu_cores=\[dq]\[dq]
 disk_img=\[dq]\[dq]
 disk_size=\[dq]\[dq]
+display=\[dq]\[dq]
+extra_args=\[dq]\[dq]
 fixed_iso=\[dq]\[dq]
 floppy=\[dq]\[dq]
 guest_os=\[dq]linux\[dq]
@@ -52,6 +54,24 @@ ram=\[dq]\[dq]
 secureboot=\[dq]off\[dq]
 tpm=\[dq]off\[dq]
 usb_devices=()
+viewer=\[dq]spicy\[dq]
+ssh_port=\[dq]\[dq]
+spice_port=\[dq]\[dq]
+public_dir=\[dq]\[dq]
+monitor=\[dq]socket\[dq]
+monitor_telnet_port=\[dq]4440\[dq]
+monitor_telnet_host=\[dq]localhost\[dq]
+monitor_cmd=\[dq]\[dq]
+serial=\[dq]socket\[dq]
+serial_telnet_port=\[dq]6660\[dq]
+serial_telnet_host=\[dq]localhost\[dq]
+# options: ehci(USB2.0), xhci(USB3.0)
+usb_controller=\[dq]ehci\[dq]
+# options: ps2, usb, virtio
+keyboard=\[dq]usb\[dq]
+keyboard_layout=\[dq]en-us\[dq]
+# options: ps2, usb, tablet, virtio
+mouse=\[dq]tablet\[dq]
 \f[R]
 .fi
 .SH EXAMPLES

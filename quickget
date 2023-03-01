@@ -49,6 +49,7 @@ function pretty_name() {
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
     lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
+    mageia)             PRETTY_NAME="Mageia";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
@@ -59,7 +60,10 @@ function pretty_name() {
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
     reactos)            PRETTY_NAME="ReactOS";;
+    rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    truenas-core)       PRETTY_NAME="TrueNAS Core";;
+    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
@@ -188,6 +192,7 @@ function os_support() {
     kubuntu \
     linuxmint \
     lmde \
+    mageia \
     manjaro \
     mxlinux \
     netboot \
@@ -200,10 +205,13 @@ function os_support() {
     oraclelinux \
     popos \
     reactos \
+    rebornos \
     rockylinux \
     slackware \
     solus \
     tails \
+    truenas-core \
+    truenas-scale \
     ubuntu \
     ubuntu-budgie \
     ubuntukylin \
@@ -217,7 +225,7 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.6 8.7 9.0 9.1-beta-1
+    echo 8.6 8.7 9.0 9.1
 }
 
 function editions_alma() {
@@ -253,7 +261,7 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 220919 221023
+    echo 230121
 }
 
 function editions_cachyos() {
@@ -288,17 +296,22 @@ function releases_devuan() {
 }
 
 function releases_dragonflybsd() {
-    echo 6.2.1
+    echo 6.4.0
 }
 
 function releases_elementary() {
-    echo 6.1
+    echo 7.0
 }
 
 function releases_endeavouros() {
     echo apollo_22_1 \
+    artemis-22_6 \
+    artemis_neo_22_7 \
+    artemis_neo_22_8 \
+    artemis_nova_22_9 \
     atlantis-21_4 \
-    atlantis_neo-21_5
+    atlantis_neo-21_5 \
+    cassini_22_12
 }
 
 function releases_fedora() {
@@ -357,7 +370,7 @@ function editions_ghostbsd() {
 }
 
 function releases_haiku() {
-    echo r1beta3
+    echo r1beta3 r1beta4
 }
 
 function editions_haiku() {
@@ -377,7 +390,7 @@ function releases_kolibrios() {
 }
 
 function releases_linuxmint(){
-    echo 20.2 20.3 21
+    echo 20.2 20.3 21 21.1
 }
 
 function editions_linuxmint(){
@@ -391,8 +404,16 @@ function releases_lmde(){
     echo 5
 }
 
+function releases_mageia(){
+    echo 8
+}
+
+function editions_mageia(){
+    echo Plasma GNOME Xfce
+}
+
 function releases_mxlinux(){
-    echo 21.2.1
+    echo 21.3
 }
 
 function editions_mxlinux(){
@@ -422,7 +443,7 @@ function releases_netbsd() {
 }
 
 function releases_nixos(){
-    echo 21.05 21.11 22.05
+    echo 21.05 21.11 22.05 22.11
 }
 
 function editions_nixos(){
@@ -454,8 +475,18 @@ function releases_reactos() {
     echo latest
 }
 
+function releases_rebornos() {
+    echo latest
+}
+
+function get_rebornos() {
+   local ISO=$(curl -s 'https://www.rebornos.org/download/' | grep -ohE 'https://pub-cb7a4d4f7a974896b3bf40c52d1defbc.r2.dev/RebornOS-ISO/(rebornos_xfce_minimal|rebornos_iso)-[0-9]{4}.[0-9]{2}.[0-9]{2}-x86_64.iso' | tail -n1)
+   local HASH=$(curl -s 'https://www.rebornos.org/download/' | grep -ozP 'Checksum MD5:.*[0-9a-fA-F]{32}' | grep -zoP '[0-9a-fA-F]{32}' | cut -d '' -f1)
+   echo "${ISO} ${HASH}"
+}
+
 function releases_rockylinux() {
-    echo 8.3 8.4 8.5 9.0
+    echo 8.3 8.4 8.5 9.0 9.1
 }
 
 # Rocky have renamed dvd1 -> dvd at 9.0
@@ -478,6 +509,21 @@ function editions_solus() {
 
 function releases_tails() {
     echo stable
+}
+
+function releases_truenas() {
+  if [[ $OS == truenas ]] ; then
+    echo "ERROR! The supported TrueNAS OS values are truenas-core or truenas-scale"
+    exit 1;
+  fi
+  }
+
+function releases_truenas-core() {
+   echo 12.0 13.0
+}
+
+function releases_truenas-scale() {
+    echo 22.02 22.12
 }
 
 function releases_ubuntu() {
@@ -506,7 +552,7 @@ function releases_ubuntu() {
             daily-live \
              daily-canary \
              ;
-    
+
     else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
@@ -749,6 +795,9 @@ function make_vm_config() {
         reactos)
             GUEST="reactos"
             IMAGE_TYPE="iso";;
+        truenas*)
+            GUEST="truenas"
+            IMAGE_TYPE="iso";;
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
@@ -779,7 +828,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|oraclelinux|rockylinux)
+          alma|centos-stream|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
@@ -798,6 +847,14 @@ EOF
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
+          truenas-scale|truenas-core)
+            echo
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+           # the rest is non-functional
+           # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+           # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+           # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
             ;;
           zorin)
             case  ${EDITION} in
@@ -1032,7 +1089,14 @@ function get_dragonflybsd() {
 
 function get_elementary() {
     local HASH=""
-    local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
+    case ${RELEASE} in
+      6.2)
+        local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
+        ;;
+      7.0)
+        local ISO="elementaryos-${RELEASE}-stable.20230129rc.iso"
+        ;;
+    esac
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
 }
@@ -1278,6 +1342,13 @@ function get_macos() {
     make_vm_config RecoveryImage.img
 }
 
+function get_mageia() {
+    local EDITION="${1:-}"
+    local ISO=$(wget -q https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" -O- | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
+    local HASH=$(wget -q -O- "${ISO}.sha512" | cut -d' ' -f1)
+    echo "${ISO} ${HASH}"
+}
+
 function get_manjaro() {
     local HASH=""
     local ISO=""
@@ -1406,7 +1477,7 @@ function get_rockylinux() {
     local URL=""
 
     case ${RELEASE} in
-      9.0) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
+      9.1) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
@@ -1440,6 +1511,29 @@ function get_tails() {
     JSON="$(wget -q -O- "https://tails.boum.org/install/v2/Tails/amd64/${RELEASE}/latest.json")"
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
+    echo "${URL} ${HASH}"
+}
+
+function get_truenas-scale() {
+    local ISO=""
+    local URL=""
+
+    local DLINFO="https://www.truenas.com/download-truenas-scale/"
+
+    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1 )
+
+    echo "${URL} ${HASH}"
+}
+
+function get_truenas-core() {
+    local ISO=""
+    local URL=""
+
+    local DLINFO="https://www.truenas.com/download-truenas-core/"
+    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1)
+
     echo "${URL} ${HASH}"
 }
 
@@ -1813,12 +1907,19 @@ function dbg_windows() {
 
 # Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
+    # Use the API to automatically download a Windows .iso image
+    # The API we were using is unmaintained and not currently functional
+    #  0 : Prompt for a manual ISO download
+    #  1 : Use the API for automated download
+    local API_GUIDED_DOWNLOAD=0
+
     local ARCH="x64"
     local INDEX=0
     local LANG_CODE="en"
     local LANG_EDITION="${1}"
     local LATEST_WINDOWS_VERSION=""
     local WINDOWS_NAME=""
+    local WINDOWS_ISO_URL=""
     local VERSION_ID=""
     local EDITION_ID=""
     local LANGUAGE_ID=""
@@ -1828,59 +1929,72 @@ function get_windows() {
     local DOWNLOAD_ID=""
     local DOWNLOAD_URL=""
 
-    # Ignore the most recent Windows 10 release for now.
-    case ${RELEASE} in
-      10) INDEX=0;;
-      11) INDEX=0;;
-    esac
+    if [ ${API_GUIDED_DOWNLOAD} -eq 1 ]; then
+        # Ignore the most recent Windows 10 release for now.
+        case ${RELEASE} in
+        10) INDEX=0;;
+        11) INDEX=0;;
+        esac
 
-    echo "Getting Windows ${RELEASE} URL..."
-    WINDOWS_VERSIONS=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-    dbg_windows "${WINDOWS_VERSIONS}"
-    LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '"${RELEASE}"'")))['${INDEX}']')
-    dbg_windows "${LATEST_WINDOWS_VERSION}"
-    WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
-    dbg_windows "${WINDOWS_NAME}"
-    VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
-    dbg_windows "${VERSION_ID}"
+        echo "Getting Windows ${RELEASE} URL..."
+        WINDOWS_VERSIONS=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
+        dbg_windows "${WINDOWS_VERSIONS}"
+        LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '"${RELEASE}"'")))['${INDEX}']')
+        dbg_windows "${LATEST_WINDOWS_VERSION}"
+        WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
+        dbg_windows "${WINDOWS_NAME}"
+        VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
+        dbg_windows "${VERSION_ID}"
 
-    case ${RELEASE} in
-        8) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
-        10|11) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '"${RELEASE}"'").edition_id');;
-    esac
-    dbg_windows "${EDITION_ID}"
+        case ${RELEASE} in
+            8) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
+            10|11) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '"${RELEASE}"'").edition_id');;
+        esac
+        dbg_windows "${EDITION_ID}"
 
-    LANGUAGE_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_EDITION}"'").language_id')
-    dbg_windows "${LANGUAGE_ID}"
-    ARCH_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
-    dbg_windows "${ARCH_INFO}"
-    FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
-    dbg_windows "${FILE_NAME}"
-    ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
-    dbg_windows "${ARCH_ID}"
-    DOWNLOAD_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
-    dbg_windows "${DOWNLOAD_INFO}"
-    DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
-    dbg_windows "${DOWNLOAD_SHA1}"
-    DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
-    dbg_windows "${DOWNLOAD_ID}"
-    REDIRECT_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
-    dbg_windows "${REDIRECT_URL}"
-    DOWNLOAD_URL=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "${REDIRECT_URL}")
-    dbg_windows "${DOWNLOAD_URL}"
+        LANGUAGE_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_EDITION}"'").language_id')
+        dbg_windows "${LANGUAGE_ID}"
+        ARCH_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
+        dbg_windows "${ARCH_INFO}"
+        FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
+        dbg_windows "${FILE_NAME}"
+        ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
+        dbg_windows "${ARCH_ID}"
+        DOWNLOAD_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
+        dbg_windows "${DOWNLOAD_INFO}"
+        DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
+        dbg_windows "${DOWNLOAD_SHA1}"
+        DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
+        dbg_windows "${DOWNLOAD_ID}"
+        REDIRECT_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
+        dbg_windows "${REDIRECT_URL}"
+        DOWNLOAD_URL=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "${REDIRECT_URL}")
+        dbg_windows "${DOWNLOAD_URL}"
 
-    MS_BASE_URL="https://software.download.prss.microsoft.com/"
-    if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
-        echo "Download URL not leading to Microsoft CDN"
-        exit 1
-    fi
+        MS_BASE_URL="https://software.download.prss.microsoft.com/"
+        if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
+            echo "Download URL not leading to Microsoft CDN"
+            exit 1
+        fi
 
-    echo "Downloading ${WINDOWS_NAME}..."
-    web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+        echo "Downloading ${WINDOWS_NAME}..."
+        web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
 
-    # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
-    if [ -n "${DOWNLOAD_SHA1}" ]; then
-      check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+        # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
+        if [ -n "${DOWNLOAD_SHA1}" ]; then
+            check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
+        fi
+    else
+        case ${RELEASE} in
+            10) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows10";;
+            11) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows11";;
+        esac
+        echo "######################################################################"
+        echo "# Download a Windows ${RELEASE} .iso image from:"
+        echo "#  - ${WINDOWS_ISO_URL}"
+        echo "# Put the .iso image in the ${VM_PATH} directory and rename"
+        echo "# it to windows-${RELEASE}.iso."
+        echo "######################################################################"
     fi
 
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
@@ -1897,7 +2011,11 @@ function get_windows() {
             mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
             ;;
     esac
-    make_vm_config "${FILE_NAME}" "virtio-win.iso"
+
+    case "${API_GUIDED_DOWNLOAD}" in
+        0) make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso";;
+        1) make_vm_config "${FILE_NAME}" "virtio-win.iso";;
+    esac
 }
 
 create_vm() {
@@ -1994,6 +2112,7 @@ if [ -n "${2}" ]; then
                 exit 1;
             fi
         fi
+
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"

@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: October 21, 2022
+date: February 4, 2023
 footer: quickemu_conf
 header: Quickemu Configuration Manual
 section: 1
@@ -29,6 +29,8 @@ boot="efi"
 cpu_cores=""
 disk_img=""
 disk_size=""
+display=""
+extra_args=""
 fixed_iso=""
 floppy=""
 guest_os="linux"
@@ -43,6 +45,24 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
+viewer="spicy"
+ssh_port=""
+spice_port=""
+public_dir=""
+monitor="socket"
+monitor_telnet_port="4440"
+monitor_telnet_host="localhost"
+monitor_cmd=""
+serial="socket"
+serial_telnet_port="6660"
+serial_telnet_host="localhost"
+# options: ehci(USB2.0), xhci(USB3.0)
+usb_controller="ehci"
+# options: ps2, usb, virtio
+keyboard="usb"
+keyboard_layout="en-us"
+# options: ps2, usb, tablet, virtio
+mouse="tablet"
 ```
 
 # EXAMPLES

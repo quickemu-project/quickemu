@@ -542,13 +542,13 @@ function vm_boot() {
       case ${macos_release} in
         catalina)
           BALLOON=""
-          MAC_DISK_DEV="ide-hd,bus=ahci.2"
+          MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="vmxnet3"
           USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
           ;;
         big-sur|monterey|ventura)
           BALLOON="-device virtio-balloon"
-          MAC_DISK_DEV="ide-hd,bus=ahci.2"
+          MAC_DISK_DEV="virtio-blk-pci"
           NET_DEVICE="virtio-net"
           USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
           GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
@@ -568,7 +568,11 @@ function vm_boot() {
       fi
       ;;
     windows)
-      CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+      if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
+        CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+      else
+        CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+      fi
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
       fi
@@ -1071,19 +1075,18 @@ function vm_boot() {
   if [ "${guest_os}" == "macos" ]; then
     # shellcheck disable=SC2054
     args+=(-device ahci,id=ahci
-           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0,rotation_rate=1
-           -drive id=BootLoader,if=none,format=qcow2,discard=unmap,file="${MAC_BOOTLOADER}")
+           -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
+           -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
 
     if [ -n "${img}" ]; then
       # shellcheck disable=SC2054
-      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage,rotation_rate=1
-             -drive id=RecoveryImage,if=none,format=raw,discard=unmap,file="${img}")
+      args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
+             -drive id=RecoveryImage,if=none,format=raw,file="${img}")
     fi
 
     # shellcheck disable=SC2054,SC2206
-    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk,rotation_rate=1
-           -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
-
+    args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   elif [ "${guest_os}" == "kolibrios" ]; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
@@ -1109,9 +1112,8 @@ function vm_boot() {
 
   else
     # shellcheck disable=SC2054,SC2206
-    args+=(-device virtio-scsi-pci,id=scsi0
-          -device scsi-hd,drive=SystemDisk,bus=scsi0.0,lun=0,rotation_rate=1
-          -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
+    args+=(-device virtio-blk-pci,drive=SystemDisk
+           -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
   fi
 
   # https://wiki.qemu.org/Documentation/9psetup
@@ -1226,33 +1228,6 @@ function vm_boot() {
   SHELL_ARGS="${SHELL_ARGS//)/\\)}"
   SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
-  # Show all the compiled qemu & swmtp arguments as a human readable list
-
-  QemuArgsFile="${VMDIR}/QemuArgsList.txt"
-
-  printf "\n\n  Present Working Directory:  %s"  "$(pwd)" > "$QemuArgsFile"
-  printf "\n\n  Qemu:  %s\n" "$QEMU" >> "$QemuArgsFile"
-
-  for a in "${args[@]}"; do
-    if [[ "$a" == -dev* ]]; then printf "\n\n  %s" "$a" >> "$QemuArgsFile"
-    elif [[ "$a" == -* ]]; then printf "\n  %s" "$a" >> "$QemuArgsFile" 
-    else printf " %s" "$a" >> "$QemuArgsFile"
-    fi
-  done
-
-  if [[ $tpm == "on" ]]; then 
-    printf "\n\n\n  Secure Boot:  %s \n\n  %s " "$SWTPM" "${tpm_args[*]}" >> "$QemuArgsFile"
-  else    
-    printf "\n\n\n  Secure Boot:  Not Set" >> "$QemuArgsFile"
-  fi
-    printf "\n\n\n"  >> "$QemuArgsFile"
-    
-  if [[ $ShowQemuArgs ]]; then
-    cat "$QemuArgsFile"
-    read -rp "  [enter] to continue, ctrl-c to quit >  "
-    printf "\n\n"
-  fi
-
   if [ ${VM_UP} -eq 0 ]; then
     # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
     case "${OUTPUT}" in
@@ -1360,7 +1335,6 @@ function usage() {
   echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
   echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
   echo "  --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'"
-  echo "  --show_args                       : Show all the compiled qemu & swmtp arguments as a human readable list, before starting VM"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1533,7 +1507,7 @@ EXTRA_ARGS=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="4.4"
+readonly VERSION="4.6"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
@@ -1667,9 +1641,6 @@ else
             if [[ ! $EXTRA_ARGS ]]; then EXTRA_ARGS="$1" 
             else EXTRA_ARGS+=" $1" ; fi
             shift ;;
-          -show_args|--show_args|--show-qemu-args)
-            ShowQemuArgs=1
-            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;

@@ -225,8 +225,8 @@ with your preferred flavour.
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
--   `ubuntu-unity` (Ubuntu Unity)
 -   `ubuntu` (Ubuntu)
+-   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
 ## Other Operating Systems
@@ -260,6 +260,7 @@ with your preferred flavour.
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
 -   `lmde` (Linux Mint Debian Edition)
+-   `mageia` (Mageia)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
@@ -270,10 +271,13 @@ with your preferred flavour.
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
+-   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `truenas-core` (TrueNAS Core)
+-   `truenas-scale` (TrueNAS Scale)
 -   `void` (Void Linux)
 -   `zorin` (Zorin OS)
 
@@ -405,6 +409,9 @@ There are some considerations when running macOS via Quickemu.
 -   Optimised by default, but no GPU acceleration is available.
     -   Host CPU vendor is detected and guest CPU is optimised
         accordingly.
+    -   [VirtIO Block
+        Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is
+        used for the system disk where supported.
     -   [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used
         for the mouse.
     -   VirtIO Network (`virtio-net`) is supported and enabled on macOS
@@ -443,8 +450,15 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8.1, 10 & 11 Guests
+## Windows 10 & 11 Guests
 
+`quickget` can not download
+[Windows10](https://www.microsoft.com/software-download/windows10) and
+[Windows 11](https://www.microsoft.com/software-download/windows11)
+automatically, but does automatically create an optimised virtual
+machine configuration that you can just add an Windows .iso image to.
+This configuration also includes the [VirtIO drivers for
+Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 `quickget` can automatically download Windows 8.1, [Windows
 10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
 [Windows
@@ -465,22 +479,12 @@ quickemu --vm windows-11.conf
     -   Username: `Quickemu`
     -   Password: `quickemu`
 
-### Regional versions
-
-By default `quickget` will download the *"English International"*
-release, but you can optionally specify one of the supported languages:
-For example:
-
-``` bash
-quickget windows 11 "Chinese (Traditional)"
-```
-
 The default Windows 11 configuration looks like this:
 
 ``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
-iso="windows-11/Win11_EnglishInternational_x64.iso"
+iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
 secureboot="on"
@@ -771,12 +775,11 @@ You can also pass optional parameters
   --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
   --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
   --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'
-  --show_args                       : Show all the compiled qemu & swmtp arguments as a human readable list, before starting VM
   --version                         : Print version
 
 ```
 <!-- [[[end]]] -->
-
+```
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
