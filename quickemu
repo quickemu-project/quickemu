@@ -1105,11 +1105,6 @@ function vm_boot() {
     # shellcheck disable=SC2054,SC2206
     args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
 
-  elif [ "${guest_os}" == "windows" ]; then
-  # shellcheck disable=SC2054,SC2206
-  args+=(-device virtio-blk-pci,drive=SystemDisk
-        -drive id=SystemDisk,if=none,format=qcow2,discard=unmap,file="${disk_img}" ${STATUS_QUO})
-
   else
     # shellcheck disable=SC2054,SC2206
     args+=(-device virtio-blk-pci,drive=SystemDisk
