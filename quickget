@@ -43,6 +43,7 @@ function pretty_name() {
     endeavouros)        PRETTY_NAME="EndeavourOS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     freedos)            PRETTY_NAME="FreeDOS";;
+    fvoid)              PRETTY_NAME="F-Void";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
@@ -182,6 +183,7 @@ function os_support() {
     fedora \
     freebsd \
     freedos \
+    fvoid \
     garuda \
     gentoo \
     ghostbsd \
@@ -346,6 +348,10 @@ function editions_freebsd(){
 
 function releases_freedos() {
     echo 1.2 1.3
+}
+
+function releases_fvoid() {
+    echo latest
 }
 
 function releases_garuda() {
@@ -1157,6 +1163,16 @@ function get_freedos() {
     esac
 
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_fvoid() {
+    local HASH=""
+    local URL=""
+    local TMPURL=""
+
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/f-void/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+    URL=${TMPURL%\?*}
+    echo "${URL} ${HASH}"
 }
 
 function get_garuda() {
