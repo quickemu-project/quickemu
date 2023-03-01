@@ -648,6 +648,24 @@ if [[ $MultiInstanceError -gt 1 ]]; then
 
 fi
 
+check_instance_runtime() {
+
+  # https://www.qemu.org/docs/master/tools/qemu-img.html
+
+  InstancePID="$(pgrep "$VM_InstanceName")"
+
+  if [[ $InstancePID ]]; then 
+
+    printColor "\n\n  WARNING snapshots operations should NOT be carried out when VM running \n\n"
+
+    read -rp "  Close down the VM, then press [enter] to continue  > "
+
+  fi
+
+}
+
+check_instance_runtime
+
 # MAIN MENU  (select VM then choose actions to do)
 
 while true ; do
@@ -704,12 +722,14 @@ while true ; do
 
   elif  [[ $MainMenuChoice == "sl" ]] ; then
 
+    check_instance_runtime
     function_snapshot_list
     printf "\n\n  [enter] to return to menu \n\n "
     read -rp "  >  "  
   
   elif  [[ $MainMenuChoice == "sc" ]] ; then
 
+    check_instance_runtime
     function_snapshot_list
     printColor "\n\n  Give [title] or [enter] for date.time  [b] back to menu " 
     SnapTitle=
@@ -727,6 +747,8 @@ while true ; do
   elif  [[ $MainMenuChoice == "sd" ]] ; then
 
     printColor "\n\n Quickemu-Tools Snapshot Deletion:"
+
+    check_instance_runtime
     function_snapshot_list
 
     # Create range-selectable array 
@@ -803,6 +825,7 @@ while true ; do
           
   elif  [[ $MainMenuChoice == "sa" ]] ; then
 
+    check_instance_runtime
     function_snapshot_list
     printColor "\n\n  Give number of snapshot to use  [enter] to return to menu "
     SnapNumber=
