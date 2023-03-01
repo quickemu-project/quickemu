@@ -38,6 +38,7 @@ function pretty_name() {
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
+    dietpi)             PRETTY_NAME="DietPi";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     endeavouros)        PRETTY_NAME="EndeavourOS";;
@@ -173,6 +174,7 @@ function os_support() {
     batocera \
     cachyos \
     centos-stream \
+    dietpi \
     debian \
     deepin \
     devuan \
@@ -274,6 +276,14 @@ function releases_centos-stream() {
 
 function editions_centos-stream() {
     echo dvd1 boot
+}
+
+function releases_dietpi() {
+    echo bios uefi
+}
+
+function editions_dietpi() {
+    echo bookworm bookworm-installer bullseye bullseye-installer
 }
 
 function releases_debian() {
@@ -832,6 +842,11 @@ EOF
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+          dietpi)
+            if [ "${RELEASE}" == "bios" ]; then
+                echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            fi
+            ;;
           dragonflybsd|haiku|openbsd|netbsd|slackware|tails)
             echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           deepin)
@@ -1073,6 +1088,42 @@ function get_devuan() {
     case ${RELEASE} in
       beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
       chimaera) ISO="devuan_${RELEASE}_4.0.2_amd64_desktop-live.iso";;
+    esac
+    HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_dietpi() {
+    local HASH=""
+    local ISO=""
+    local URL="https://dietpi.com/downloads/images"
+    case ${RELEASE} in
+      bios)
+        case ${EDITION} in
+          bookworm)
+            local ISO="DietPi_NativePC-BIOS-x86_64-Bookworm.7z"
+            ;;
+          bullseye)
+            local ISO="DietPi_NativePC-BIOS-x86_64-Bullseye.7z"
+            ;;
+          bookworm-installer)
+            local ISO="DietPi_NativePC-BIOS-x86_64-Bookworm_Installer.7z"
+            ;;
+          bullseye-installer)
+            local ISO="DietPi_NativePC-BIOS-x86_64-Bullseye_Installer.7z"
+            ;;
+        esac
+      ;;
+      uefi)
+        case ${EDITION} in
+          bookworm-installer)
+            local ISO="DietPi_NativePC-UEFI-x86_64-Bookworm_Installer.7z"
+            ;;
+          bullseye-installer)
+            local ISO="DietPi_NativePC-UEFI-x86_64-Bullseye_Installer.7z"
+            ;;
+        esac
+      ;;
     esac
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -2043,6 +2094,11 @@ create_vm() {
         ISO="${ISO/.gz/}"
     fi
 
+    if [ ${OS} == "dietpi" ] && [[ $ISO =~ ".7z" ]]; then
+        7zip x -o${VM_PATH} ${VM_PATH}/${ISO}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+    fi
+
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
@@ -2113,6 +2169,14 @@ if [ -n "${2}" ]; then
             fi
         fi
 
+        # Handle odd missing dietpi cominations
+        if [[ $OS == dietpi ]] ; then
+            if [[ ${RELEASE} = "uefi"  &&  ${EDITION} = "bookworm"  ]] || [[  ${RELEASE} = "uefi"  &&  ${EDITION} = "bullseye"   ]] ; then
+                echo "ERROR! Unsupported combination"
+                echo "Only installers are supported for uefi, please choose another Release or Edition"
+                exit 1;
+            fi
+        fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
