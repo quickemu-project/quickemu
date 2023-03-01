@@ -39,6 +39,7 @@ function pretty_name() {
     arcolinux)          PRETTY_NAME="Arco Linux";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
+    cereus)             PRETTY_NAME="Cereus Linux";;
     dietpi)             PRETTY_NAME="DietPi";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
@@ -181,10 +182,11 @@ function os_support() {
     batocera \
     cachyos \
     centos-stream \
-    dietpi \
+    cereus \
     debian \
     deepin \
     devuan \
+    dietpi \ 
     dragonflybsd \
     elementary \
     endeavouros \
@@ -294,12 +296,12 @@ function editions_centos-stream() {
     echo dvd1 boot
 }
 
-function releases_dietpi() {
-    echo bios uefi
+function releases_cereus() {
+    echo latest
 }
 
-function editions_dietpi() {
-    echo bookworm bookworm-installer bullseye bullseye-installer
+function editions_cereus() {
+    echo base lxqt xfce
 }
 
 function releases_debian() {
@@ -319,6 +321,14 @@ function releases_deepin() {
 
 function releases_devuan() {
     echo beowulf chimaera
+}
+
+function releases_dietpi() {
+    echo bios uefi
+}
+
+function editions_dietpi() {
+    echo bookworm bookworm-installer bullseye bullseye-installer
 }
 
 function releases_dragonflybsd() {
@@ -1101,6 +1111,30 @@ function get_centos-stream() {
         ;;
     esac
 
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_cereus() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    case ${EDITION} in
+      base)
+        ISO="cereus-beta-live-x86_64-xfce-2023.02.17.iso"
+        URL="https://sourceforge.net/projects/cereus-linux/files/isos/beta/latest/base"
+        HASH=$(wget -q -O- ${URL}/SHA256 | grep "${ISO}" | cut -d' ' -f2)
+        ;;
+      lxqt)
+        ISO="cereus-beta-live-x86_64-lxqt-2023.02.17.iso"
+        URL="https://sourceforge.net/projects/cereus-linux/files/isos/beta/latest/lxqt"
+        HASH=$(wget -q -O- ${URL}/SHA256 | grep "${ISO}" | cut -d' ' -f4)
+        ;;
+      xfce)
+        ISO="cereus-beta-live-x86_64-xfce-2023.02.17.iso"
+        URL="https://sourceforge.net/projects/cereus-linux/files/isos/beta/latest/xfce"
+        HASH=$(wget -q -O- ${URL}/SHA256 | grep "${ISO}" | cut -d' ' -f4)
+        ;;
+    esac
     echo "${URL}/${ISO} ${HASH}"
 }
 
