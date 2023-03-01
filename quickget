@@ -637,16 +637,17 @@ function releases_ubuntu() {
 }
 
 function releases_void() {
-    echo current
+    echo current 20221001 20210316 20210930 20210218 20191109 20190526 20190217 20181111 20171007 20170825 20170220
 }
 
 function editions_void() {
-    echo glibc musl xfce-glibc xfce-musl
+    echo base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl gnome gnome-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl
 }
 
 function releases_voidpup() {
     echo latest
 }
+
 
 function releases_windows() {
     echo 8 10 11
@@ -1743,15 +1744,35 @@ function get_void() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local URL="https://alpha.de.repo.voidlinux.org/live/current"
-
-    DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
-    case ${EDITION} in
-        glibc)      ISO="void-live-x86_64-${DATE}-base.iso";;
-        musl)       ISO="void-live-x86_64-musl-${DATE}-base.iso";;
-        xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
-        xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
-    esac
+    local URL="https://alpha.de.repo.voidlinux.org/live/${RELEASE}"
+    if [[ "${RELEASE}" == "current" ]]; then
+        DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
+        case ${EDITION} in
+            base)      ISO="void-live-x86_64-${DATE}-base.iso";;
+            base-musl) ISO="void-live-x86_64-musl-${DATE}-base.iso";;
+            xfce)      ISO="void-live-x86_64-${DATE}-xfce.iso";;
+            xfce-musl) ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+        esac
+    else
+        case ${EDITION} in
+            cinnamon)           ISO="void-live-x86_64-${RELEASE}-cinnamon.iso";;
+            cinnamon-musl)      ISO="void-live-x86_64-musl-${RELEASE}-cinnamon.iso";;
+            enlightenment)      ISO="void-live-x86_64-${RELEASE}-enlightenment.iso";;
+            enlightenment-musl) ISO="void-live-x86_64-musl-${RELEASE}-enlightenment.iso";;
+            gnome)              ISO="void-live-x86_64-${RELEASE}-gnome.iso";;
+            gnome-musl)         ISO="void-live-x86_64-musl-${RELEASE}-gnome.iso";;        
+            lxde)               ISO="void-live-x86_64-${RELEASE}-lxde.iso";;
+            lxde-musl)          ISO="void-live-x86_64-musl-${RELEASE}-lxde.iso";;
+            lxqt)               ISO="void-live-x86_64-${RELEASE}-lxqt.iso";;
+            lxqt-musl)          ISO="void-live-x86_64-musl-${RELEASE}-lxqt.iso";;
+            mate)               ISO="void-live-x86_64-${RELEASE}-mate.iso";;
+            mate-musl)          ISO="void-live-x86_64-musl-${RELEASE}-mate.iso";;
+            xfce)               ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+            xfce-musl)          ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+            base)               ISO="void-live-x86_64-${RELEASE}.iso";;
+            base-musl)          ISO="void-live-x86_64-musl-${RELEASE}.iso";;
+        esac
+    fi
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2300,6 +2321,65 @@ if [ -n "${2}" ]; then
                 exit 1;
             fi
         fi
+
+        # Handle void missing edition
+        case "${RELEASE}-${EDITION}" in
+          "20170220-gnome"|"20170220-gnome-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Posible editions are: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl"
+            exit 1;
+            ;;
+          "20170825-gnome"|"20170825-gnome-musl"|"20170825-enlightenment"|"20170825-enlightenment-musl"|"20170825-lxqt"|"20170825-lxqt-musl"|"20170825-base"|"20170825-mate-musl"|"20170825-lxde"|"20170825-lxde-musl"|"20170825-cinnamon"|"20170825-cinnamon-musl"|"20170825-xfce"|"20170825-xfce-musl"|"20170825-base-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Only one possible edition: mate"
+            exit 1;
+            ;;
+          "20171007-gnome"|"20171007-gnome-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Posible editions are: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl"
+            exit 1;
+            ;;
+          "20181111-gnome"|"20181111-gnome-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Posible editions are: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl"
+            exit 1;
+            ;;
+          "20190217-gnome"|"20190217-gnome-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Posible editions are: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl"
+            exit 1;
+            ;;
+          "20190526-gnome"|"20190526-gnome-musl"|"20190526-enlightenment"|"20190526-enlightenment-musl"|"20190526-lxqt"|"20190526-lxqt-musl"|"20190526-mate"|"20190526-mate-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Posible editions are only: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl"
+            exit 1;
+            ;;
+          "20191109:gnome"|"20191109:gnome-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Possible editions are: base base-musl cinnamon cinnamon-musl enlightenment enlightenment-musl lxde lxde-musl lxqt lxqt-musl mate mate-musl xfce xfce-musl"
+            exit 1
+            ;;
+          "20210316:gnome"|"20210316:gnome-musl"|"20210316:enlightenment"|"20210316:enlightenment-musl"|"20210316:lxqt"|"20210316:lxqt-musl"|"20210316:mate"|"20210316:mate-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Possible editions are only: base base-musl cinnamon cinnamon-musl lxde lxde-musl xfce xfce-musl"
+            exit 1
+            ;;
+          "20210930:gnome"|"20210930:gnome-musl"|"20210930:enlightenment"|"20210930:enlightenment-musl"|"20210930:lxqt"|"20210930:lxqt-musl"|"20210930:mate"|"20210930:mate-musl"|"20210930:lxde"|"20210930:lxde-musl"|"20210930:cinnamon"|"20210930:cinnamon-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Possible editions are only: base base-musl xfce xfce-musl"
+            exit 1
+            ;;
+          "20221001:gnome"|"20221001:gnome-musl"|"20221001:enlightenment"|"20221001:enlightenment-musl"|"20221001:lxqt"|"20221001:lxqt-musl"|"20221001:mate"|"20221001:mate-musl"|"20221001:lxde"|"20221001:lxde-musl"|"20221001:cinnamon"|"20221001:cinnamon-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Possible editions are only: base base-musl xfce xfce-musl"
+            exit 1
+            ;;
+          "current:gnome"|"current:gnome-musl"|"current:enlightenment"|"current:enlightenment-musl"|"current:lxqt"|"current:lxqt-musl"|"current:mate"|"current:mate-musl"|"current:lxde"|"current:lxde-musl"|"current:cinnamon"|"current:cinnamon-musl")
+            echo "ERROR! Unsupported combination"
+            echo "Possible editions are only: base base-musl xfce xfce-musl"
+            exit 1
+            ;;
+        esac
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
