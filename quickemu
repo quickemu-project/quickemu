@@ -1334,7 +1334,7 @@ function usage() {
   echo "  --keyboard_layout <layout>        : Set keyboard layout."
   echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
   echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
-  echo "  --extra_args|--xa <arguments>     : Pass additional arguments to qemu. 1 per element eg --xa '-device' --xa 'tpm-tis,tpmdev=tpm0'"
+  echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
   echo "  --version                         : Print version"
   exit 1
 }
@@ -1636,11 +1636,10 @@ else
             USB_CONTROLLER="${2}"
             shift;
             shift;;
-          -extra_args|--extra_args|--xa)
-            shift
-            if [[ ! $EXTRA_ARGS ]]; then EXTRA_ARGS="$1" 
-            else EXTRA_ARGS+=" $1" ; fi
-            shift ;;
+          -extra_args|--extra_args)
+            EXTRA_ARGS="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
