@@ -43,21 +43,21 @@ esac
 
 # If the user chose to create a new VM
 if [ "$todo" = "create" ]; then
-	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose OS to download
+	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download
  or CTRL-c or ESC to quit')
 	# If the OS is Windows
 	if [ "$os" = windows ]; then
 		answer=$(echo "Default English
-Choose other language" | fzf)
+Choose other language" | fzf --cycle)
 		# If the user wants another windows language
 		if [ "$answer" = "Choose other language" ]; then
 			wrelease=$(echo "8
 10
-11" | fzf)
+11" | fzf --cycle)
 			# get window language list
 			wlend=$(($(cat quickget | sed '/Arabic/,$!d' | grep -n '}' | cut -d':' -f1 | head -n 1) - 1))
 			# get windows language
-			wlang=$(cat quickget | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --header='Choose Language
+			wlang=$(cat quickget | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --cycle --header='Choose Language
  or CTRL-c or ESC to quit')
 			# downloading windows
 			printf '\n Trying to download Windows %s %s...\n\n' "$wrelease" "$wlang"
@@ -68,17 +68,17 @@ Choose other language" | fzf)
 	choices=$(quickget "$os" | sed 1d)
 	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
 		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Release
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release
  or CTRL-c or ESC to quit')
 		# downloading
 		printf '\n Trying to download %s %s...\n\n' "$os" "$release"
 		quickget "$os" "$release"
 	else
 		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Release
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release
  or CTRL-c or ESC to quit')
 		# get edition
-		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --header='Choose Edition
+		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition
  or CTRL-c or ESC to quit')
 		# downloading
 		printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
@@ -86,7 +86,7 @@ Choose other language" | fzf)
 	fi
 fi
 # choose VM to run
-choosed=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --header='Choose VM to run
+choosed=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run
  or CTRL-c or ESC to quit')
 
 # Run choosed VM
