@@ -70,6 +70,7 @@ function pretty_name() {
     ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
+    voidpup)            PRETTY_NAME="Void Puppy";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -219,6 +220,7 @@ function os_support() {
     ubuntustudio \
     ubuntu-unity \
     void \
+    voidpup \
     windows \
     xubuntu \
     zorin
@@ -604,6 +606,10 @@ function releases_void() {
 
 function editions_void() {
     echo glibc musl xfce-glibc xfce-musl
+}
+
+function releases_voidpup() {
+    echo latest
 }
 
 function releases_windows() {
@@ -1600,6 +1606,16 @@ function get_void() {
     esac
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_voidpup() {
+    local HASH=""
+    local URL=""
+    local TMPURL=""
+
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/vpup/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+    URL=${TMPURL%\?*}
+    echo "${URL} ${HASH}"
 }
 
 function get_zorin() {
