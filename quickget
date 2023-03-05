@@ -64,6 +64,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;    
     steamos)            PRETTY_NAME="SteamOS HoloISO";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
@@ -215,6 +216,7 @@ function os_support() {
     rebornos \
     rockylinux \
     slackware \
+    slitaz \
     solus \
     steamos \
     tails \
@@ -515,6 +517,10 @@ function editions_rockylinux() {
 
 function releases_slackware() {
     echo 14.2 15.0
+}
+
+function releases_slitaz() {
+    echo preferred core core64 loram core-5in1 preinit
 }
 
 function releases_solus() {
@@ -877,6 +883,11 @@ EOF
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
+          slitaz)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+            echo "ram=\"512M\"" >> "${CONF_FILE}"
             ;;
           truenas-scale|truenas-core)
             echo
@@ -1558,6 +1569,20 @@ function get_slackware() {
     local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_slitaz() {
+    local HASH=""
+    local ISO="slitaz-rolling-${RELEASE}"
+    local URL="http://mirror.slitaz.org/iso/rolling"
+
+    case ${RELEASE} in
+      preferred) ISO="slitaz-rolling";;
+      *)   ISO="slitaz-rolling-${RELEASE}";;
+    esac
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
+    echo "${URL}/${ISO}.iso ${HASH}"
 }
 
 function get_solus() {
