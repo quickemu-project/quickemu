@@ -64,6 +64,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    holoiso)            PRETTY_NAME="HoloISO";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -216,6 +217,7 @@ function os_support() {
     siduction \
     slackware \
     solus \
+    holoiso \
     tails \
     truenas-core \
     truenas-scale \
@@ -543,6 +545,10 @@ function releases_solus() {
 
 function editions_solus() {
     echo Budgie GNOME MATE Plasma
+}
+
+function releases_holoiso() {
+    echo 4.0
 }
 
 function releases_tails() {
@@ -1587,6 +1593,16 @@ function get_solus() {
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_holoiso() {
+    local HASH=""
+    local DATE="20221211"
+    local ISO="HoloISO_${RELEASE}_OfflineInstaller-${DATE}_1636-x86_64.iso"
+    local URL="http://holoiso.itsvixano.me"
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
