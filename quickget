@@ -630,11 +630,11 @@ function releases_ubuntu() {
              ;
 
     else
-              # daily-canary \ # seems to have vanished, to be replaced by daily-legacy
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
             jammy-daily \
             daily-live \
+            daily-canary \
             daily-legacy \
             eol-4.10 \
             eol-5.04 \
@@ -1011,6 +1011,10 @@ EOF
             ;;
         esac
 
+        if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
+        # wont install  lobster testing with less than 18GB
+          echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+        fi
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
