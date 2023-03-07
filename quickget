@@ -148,7 +148,9 @@ function list_csv() {
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+        DOWNLOADER="zsync"
+      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-legacy" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
@@ -628,11 +630,12 @@ function releases_ubuntu() {
              ;
 
     else
+              # daily-canary \ # seems to have vanished, to be replaced by daily-legacy
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
             jammy-daily \
             daily-live \
-            daily-canary \
+            daily-legacy \
             eol-4.10 \
             eol-5.04 \
             eol-5.10 \
@@ -1818,6 +1821,9 @@ function get_ubuntu() {
     elif [ "${RELEASE}" == "daily-canary" ] && [ "${OS}" != "ubuntu" ]; then
         # daily-canary is only available for Ubuntu, switch flavours to daily-live
         RELEASE="daily-live"
+    elif [ "${RELEASE}" == "daily-legacy" ] && [ "${OS}" != "ubuntu" ]; then
+        # daily-legacy is only available for Ubuntu, switch flavours to daily-live
+        RELEASE="daily-live"
     fi
 
     if [[ "${RELEASE}" == "eol-"* ]]; then
@@ -1825,10 +1831,12 @@ function get_ubuntu() {
     elif [[ "${RELEASE}" == "jammy-daily" ]]; then
         URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
         VM_PATH="${OS}-jammy-live"
-
+    elif [[ "${RELEASE}" == "daily-legacy" ]]; then
+        URL="https://cdimage.ubuntu.com/${RELEASE}/current"
+        VM_PATH="${OS}-${RELEASE}"
     elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-        VM_PATH="${OS}-daily-live"
+        VM_PATH="${OS}-${RELEASE}"
     elif [ "${OS}" == "ubuntu" ]; then
         URL="https://releases.ubuntu.com/${RELEASE}"
     else
