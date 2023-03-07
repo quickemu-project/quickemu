@@ -79,6 +79,7 @@ function pretty_name() {
     vanillaos)          PRETTY_NAME="Vanilla OS";;
     void)               PRETTY_NAME="Void Linux";;
     vxlinux)            PRETTY_NAME="VX Linux";;
+    xerolinux)          PRETTY_NAME="XeroLinux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -242,6 +243,7 @@ function os_support() {
     void \
     vxlinux \
     windows \
+    xerolinux \
     xubuntu \
     zorin
 }
@@ -742,6 +744,10 @@ function languages_windows() {
     Thai
     Turkish
     Ukrainian)
+}
+
+function releases_xerolinux() {
+    echo kde
 }
 
 function releases_zorin() {
@@ -1903,6 +1909,17 @@ function get_void() {
         xfce-musl)  ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
     HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+
+function get_xerolinux() {
+    local HASH=""
+    local URL=""
+    local ISO="xerolinux-2022.12-x86_64.iso"
+    local URL="https://sourceforge.net/projects/xerolinux/files/Releases"
+    
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
