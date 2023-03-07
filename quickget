@@ -66,7 +66,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;    
+    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
     steamos)            PRETTY_NAME="SteamOS HoloISO";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
@@ -186,7 +186,7 @@ function os_support() {
     debian \
     deepin \
     devuan \
-    dietpi \ 
+    dietpi \
     dragonflybsd \
     elementary \
     endeavouros \
@@ -1794,7 +1794,7 @@ function get_void() {
             enlightenment)      ISO="void-live-x86_64-${RELEASE}-enlightenment.iso";;
             enlightenment-musl) ISO="void-live-x86_64-musl-${RELEASE}-enlightenment.iso";;
             gnome)              ISO="void-live-x86_64-${RELEASE}-gnome.iso";;
-            gnome-musl)         ISO="void-live-x86_64-musl-${RELEASE}-gnome.iso";;        
+            gnome-musl)         ISO="void-live-x86_64-musl-${RELEASE}-gnome.iso";;
             lxde)               ISO="void-live-x86_64-${RELEASE}-lxde.iso";;
             lxde-musl)          ISO="void-live-x86_64-musl-${RELEASE}-lxde.iso";;
             lxqt)               ISO="void-live-x86_64-${RELEASE}-lxqt.iso";;
@@ -1826,7 +1826,7 @@ function get_xerolinux() {
     local URL=""
     local ISO="xerolinux-2022.12-x86_64.iso"
     local URL="https://sourceforge.net/projects/xerolinux/files/Releases"
-    
+
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
