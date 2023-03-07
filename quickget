@@ -281,7 +281,7 @@ function editions_arcolinux() {
 }
 
 function releases_cachyos() {
-    echo 230121
+    echo 230305
 }
 
 function editions_cachyos() {
