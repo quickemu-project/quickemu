@@ -47,6 +47,7 @@ function pretty_name() {
     freebsd)            PRETTY_NAME="FreeBSD";;
     freedos)            PRETTY_NAME="FreeDOS";;
     fvoid)              PRETTY_NAME="F-Void";;
+    gabeeos)            PRETTY_NAME="gabeeOS Linux";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
@@ -194,6 +195,7 @@ function os_support() {
     freebsd \
     freedos \
     fvoid \
+    gabeeos \
     garuda \
     gentoo \
     ghostbsd \
@@ -385,6 +387,10 @@ function releases_freedos() {
 }
 
 function releases_fvoid() {
+    echo latest
+}
+
+function releases_gabeeos() {
     echo latest
 }
 
@@ -1320,6 +1326,16 @@ function get_fvoid() {
     local TMPURL=""
 
     TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/f-void/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+    URL=${TMPURL%\?*}
+    echo "${URL} ${HASH}"
+}
+
+function get_gabeeos() {
+    local HASH=""
+    local URL=""
+    local TMPURL=""
+
+    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/gabeeos/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
     URL=${TMPURL%\?*}
     echo "${URL} ${HASH}"
 }
