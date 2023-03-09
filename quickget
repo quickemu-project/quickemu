@@ -848,6 +848,9 @@ EOF
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
+          nixos)
+            echo "disk_size=\"25G\"" >> "${CONF_FILE}"
+            ;;
           truenas-scale|truenas-core)
             echo
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
