@@ -70,6 +70,7 @@ function pretty_name() {
     ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
+    vxlinux)            PRETTY_NAME="VX Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -219,6 +220,7 @@ function os_support() {
     ubuntustudio \
     ubuntu-unity \
     void \
+    vxlinux \
     windows \
     xubuntu \
     zorin
@@ -604,6 +606,10 @@ function releases_void() {
 
 function editions_void() {
     echo glibc musl xfce-glibc xfce-musl
+}
+
+function releases_vxlinux() {
+    echo 6.1 5.0 4.2 4.1 4.0
 }
 
 function releases_windows() {
@@ -1611,6 +1617,19 @@ function get_zorin() {
     # Parse out the iso URL from the redirector
     URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}${EDITION}" 2>&1 | grep Location | cut -d' ' -f4)
     echo "${URL} ${HASH}"
+}
+
+function get_vxlinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://github.com/dessington/vx-linux/releases/download/${RELEASE}"
+
+    if [ "$RELEASE" == "4.0" ]; then
+        ISO="vx-linux-4.0-qt.iso"
+    else
+        ISO="vx-linux-${RELEASE}.iso"
+    fi
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function unattended_windows() {
