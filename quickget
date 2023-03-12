@@ -222,6 +222,7 @@ function os_support() {
     reactos \
     rebornos \
     rockylinux \
+    siduction \
     slackware \
     slitaz \
     solus \
@@ -541,6 +542,14 @@ function releases_rockylinux() {
 function editions_rockylinux() {
     echo minimal \
     "dvd (dvd1 prior to 9.0)"
+}
+
+function releases_siduction() {
+    echo latest
+}
+
+function editions_siduction() {
+    echo kde lxqt nox xfce xorg
 }
 
 function releases_slackware() {
@@ -1667,6 +1676,17 @@ function get_rockylinux() {
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_siduction() {
+    local HASH=""
+    local DATE=""
+    local ISO=""
+    local URL="https://mirrors.dotsrc.org/siduction/iso/Masters_of_War/${EDITION}"
+    DATE=$(wget -q -O- "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5" | cut -d' ' -f1)
+    ISO="siduction-22.1.1-Masters_of_War-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
 
