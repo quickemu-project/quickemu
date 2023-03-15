@@ -439,7 +439,8 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-    echo 9.0 9.1 9.2
+    local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '\"[[:digit:]]+\.[[:digit:]]+/\"' |tr -d '"/' |sort -nr )
+    echo ${NBSD_RELEASES}
 }
 
 function releases_nixos(){
