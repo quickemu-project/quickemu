@@ -1259,7 +1259,7 @@ function get_macos() {
     local CWD=""
     local MACRECOVERY=""
     local MLB="00000000000000000"
-    local OS_TYPE="default"
+    local OS_TYPE="latest"
 
     case ${RELEASE} in
         lion)           #10.7
@@ -1293,8 +1293,7 @@ function get_macos() {
         monterey)       #12
             BOARD_ID="Mac-E43C1C25D4880AD6";;
         ventura)        #13
-            echo "ERROR! Not yet supported: ${RELEASE}"
-            exit 1;;
+            BOARD_ID="Mac-7BA5B2D9E42DDD94";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
