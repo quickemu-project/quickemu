@@ -511,7 +511,7 @@ function vm_boot() {
       case ${macos_release} in
         ventura)
           if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
-            CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
+            CPU="-cpu Haswell,vendor=GenuineIntel,kvm=on,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc,+avx2"
           else
             echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 and AVX2 support."
             exit 1
