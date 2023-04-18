@@ -317,7 +317,7 @@ function releases_endeavouros() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37
+    echo 33 34 35 36 37 38
 }
 
 function releases_batocera() {
@@ -326,6 +326,7 @@ function releases_batocera() {
 
 function editions_fedora() {
   echo Workstation \
+  Budgie \
   Cinnamon \
   i3 \
   KDE \
@@ -334,6 +335,9 @@ function editions_fedora() {
   Mate \
   Xfce \
   Silverblue \
+  Sericea \
+  Kinoite \
+  Sway \
   Server
 }
 
@@ -1124,7 +1128,7 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Silverblue|Workstation) VARIANT="${EDITION}";;
+      Server|Kinoite|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
 
