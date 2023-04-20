@@ -528,7 +528,7 @@ function releases_truenas-scale() {
 
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="22.10"
+    local INTERIM_SUPPORT="22.10 23.04"
 
     case "${OS}" in
         kubuntu|lubuntu|ubuntukylin|\
@@ -544,8 +544,6 @@ function releases_ubuntu() {
         INTERIM_SUPPORT="${INTERIM_SUPPORT}"
         ;;
     esac
-
-    INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
 
     if [ "${OS}" == "ubuntu-unity" ]; then
         echo ${INTERIM_SUPPORT} \
