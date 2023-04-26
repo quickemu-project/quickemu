@@ -72,6 +72,7 @@ function pretty_name() {
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
+    vanillaos)          PRETTY_NAME="Vanilla OS";;
     void)               PRETTY_NAME="Void Linux";;
     vxlinux)            PRETTY_NAME="VX Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
@@ -226,6 +227,7 @@ function os_support() {
     ubuntu-mate \
     ubuntustudio \
     ubuntu-unity \
+    vanillaos \
     void \
     vxlinux \
     windows \
@@ -638,6 +640,10 @@ function releases_ubuntu() {
     fi
 }
 
+function releases_vanillaos() {
+    echo 22.10
+}
+
 function releases_void() {
     echo current
 }
@@ -899,6 +905,10 @@ EOF
            # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
            # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
             ;;
+          vanillaos)
+          ## Minimum 50G for abroot
+           echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+           ;;
           zorin)
             case  ${EDITION} in
               education64|edulite64)
@@ -1017,6 +1027,17 @@ function get_blendos() {
     local HASH=""
     local URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
     HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
+function get_vanillaos() {
+  # maybe use github api and dynamism for R2.0 but for 22.10 just
+  # hit their CDN
+  #
+  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.md5.txt
+  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt
+    local HASH=$(curl -s "https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt" | cut -d' ' -f1)
+    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.iso"
     echo "${URL} ${HASH}"
 }
 
