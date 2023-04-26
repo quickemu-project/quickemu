@@ -893,7 +893,6 @@ EOF
             echo "ram=\"128M\"" >> "${CONF_FILE}"
             ;;
           truenas-scale|truenas-core)
-            echo
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
            # the rest is non-functional
            # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
