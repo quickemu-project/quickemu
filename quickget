@@ -67,7 +67,7 @@ function pretty_name() {
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntucinnamon)    PRETTY_NAME="Ubuntu Cinnamon";;
+    ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
     ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
     ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
