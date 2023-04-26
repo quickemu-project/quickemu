@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
@@ -66,9 +67,10 @@ function pretty_name() {
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntukylin)       PRETTY_NAME="Ubuntu Kylin";;
+    ubuntucinnamon)    PRETTY_NAME="Ubuntu Cinnamon";;
+    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntustudio)      PRETTY_NAME="Ubuntu Studio";;
+    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
     zorin)              PRETTY_NAME="Zorin OS";;
@@ -172,6 +174,7 @@ function os_support() {
     archcraft \
     arcolinux \
     batocera \
+    blendos \
     cachyos \
     centos-stream \
     debian \
@@ -209,6 +212,7 @@ function os_support() {
     reactos \
     rebornos \
     rockylinux \
+    siduction \
     slackware \
     solus \
     tails \
@@ -216,6 +220,7 @@ function os_support() {
     truenas-scale \
     ubuntu \
     ubuntu-budgie \
+    ubuntucinnamon \
     ubuntukylin \
     ubuntu-mate \
     ubuntustudio \
@@ -262,6 +267,11 @@ function editions_arcolinux() {
     echo large small
 }
 
+function releases_blendos() {
+    curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+'
+
+}
+
 function releases_cachyos() {
     echo 230121
 }
@@ -298,7 +308,10 @@ function releases_devuan() {
 }
 
 function releases_dragonflybsd() {
-    echo 6.4.0
+    # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
+    # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
+    DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '\"dfly-x86_64-.*_REL.iso.bz2\"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
+    echo $DBSD_RELEASES
 }
 
 function releases_elementary() {
@@ -325,7 +338,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37
+    echo 33 34 35 36 37 38
 }
 
 function releases_batocera() {
@@ -334,6 +347,7 @@ function releases_batocera() {
 
 function editions_fedora() {
   echo Workstation \
+  Budgie \
   Cinnamon \
   i3 \
   KDE \
@@ -342,6 +356,9 @@ function editions_fedora() {
   Mate \
   Xfce \
   Silverblue \
+  Sericea \
+  Kinoite \
+  Sway \
   Server
 }
 
@@ -449,7 +466,8 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-    echo 9.0 9.1 9.2
+    local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '\"[[:digit:]]+\.[[:digit:]]+/\"' |tr -d '"/' |sort -nr )
+    echo ${NBSD_RELEASES}
 }
 
 function releases_nixos(){
@@ -505,6 +523,14 @@ function editions_rockylinux() {
     "dvd (dvd1 prior to 9.0)"
 }
 
+function releases_siduction() {
+    echo latest
+}
+
+function editions_siduction() {
+    echo kde lxqt nox xfce xorg
+}
+
 function releases_slackware() {
     echo 14.2 15.0
 }
@@ -538,7 +564,7 @@ function releases_truenas-scale() {
 
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="22.10"
+    local INTERIM_SUPPORT="22.10 23.04"
 
     case "${OS}" in
         kubuntu|lubuntu|ubuntukylin|\
@@ -553,14 +579,16 @@ function releases_ubuntu() {
         ubuntu-unity)
         INTERIM_SUPPORT="${INTERIM_SUPPORT}"
         ;;
+        ubuntucinnamon)
+        INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
+        ;;
     esac
 
-    INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
 
-    if [ "${OS}" == "ubuntu-unity" ]; then
+    if [ "${OS}" == "ubuntu-unity" ]  ||  [ "${OS}" == "ubuntucinnamon" ]; then
         echo ${INTERIM_SUPPORT} \
             daily-live \
-             daily-canary \
+            daily-canary \
              ;
 
     else
@@ -838,7 +866,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|endless|oraclelinux|popos|rockylinux)
+          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
@@ -980,6 +1008,13 @@ function get_arcolinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_blendos() {
+    local HASH=""
+    local URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
+    HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
 function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
@@ -1090,7 +1125,7 @@ function get_devuan() {
 
 function get_dragonflybsd() {
     local HASH=""
-    local ISO="dfly-x86_64-${RELEASE}_REL.iso"
+    local ISO="dfly-x86_64-${RELEASE}_REL.iso.bz2"
     local URL="http://mirror-master.dragonflybsd.org/iso-images"
 
     HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
@@ -1158,7 +1193,7 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Silverblue|Workstation) VARIANT="${EDITION}";;
+      Server|Kinoite|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
 
@@ -1519,6 +1554,17 @@ function get_rockylinux() {
       *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_siduction() {
+    local HASH=""
+    local DATE=""
+    local ISO=""
+    local URL="https://mirrors.dotsrc.org/siduction/iso/Masters_of_War/${EDITION}"
+    DATE=$(wget -q -O- "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5" | cut -d' ' -f1)
+    ISO="siduction-22.1.1-Masters_of_War-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2079,6 +2125,13 @@ create_vm() {
     if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
+    fi
+
+    #  Could be other OS iso files compressed with bzip2 or gzip
+    #  but for now we'll keep this to know cases
+    if [[ ${OS} == "dragonflybsd" ]] && [[ ${ISO} =~ ".bz2" ]]; then
+        bzip2 -d  "${VM_PATH}/${ISO}"
+        ISO="${ISO/.bz2/}"
     fi
 
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then

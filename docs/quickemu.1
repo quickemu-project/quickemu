@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKEMU" "1" "February 4, 2023" "quickemu" "Quickemu User Manual"
+.TH "QUICKEMU" "1" "February 7, 2023" "quickemu" "Quickemu User Manual"
 .hy
 .SH NAME
 .PP
@@ -209,11 +209,11 @@ to install the above requirements or their equivalents.
 .PP
 These examples may save a little typing
 .PP
-Debian:
+Debian (and direct derivatives such as MX Linux):
 .IP
 .nf
 \f[C]
-sudo apt install qemu bash coreutils ovmf grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-client-gtk swtpm wget xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 \f[R]
 .fi
 .PP
@@ -344,6 +344,8 @@ All the official Ubuntu flavours are supported, just replace
 \f[V]arcolinux\f[R] (Arco Linux)
 .IP \[bu] 2
 \f[V]batocera\f[R] (Batocera)
+.IP \[bu] 2
+\f[V]blendos\f[R] (BlendOS)
 .IP \[bu] 2
 \f[V]cachyos\f[R] (CachyOS)
 .IP \[bu] 2
