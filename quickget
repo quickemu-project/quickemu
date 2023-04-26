@@ -273,7 +273,7 @@ function releases_blendos() {
 }
 
 function releases_cachyos() {
-    echo 230121
+    echo 2300305
 }
 
 function editions_cachyos() {
