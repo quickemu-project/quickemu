@@ -776,7 +776,7 @@ You can also pass optional parameters
 
 ```
 <!-- [[[end]]] -->
-```
+
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
