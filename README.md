@@ -222,6 +222,7 @@ with your preferred flavour.
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
+-   `ubuntucinnamon` (Ubuntu Cinnamon)
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
@@ -249,10 +250,10 @@ with your preferred flavour.
 -   `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
+-   `endless` (Endless OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
--   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
@@ -274,12 +275,14 @@ with your preferred flavour.
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
+-   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
 -   `void` (Void Linux)
+-   `vxlinux` (VX Linux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
@@ -460,13 +463,6 @@ automatically, but does automatically create an optimised virtual
 machine configuration that you can just add an Windows .iso image to.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
-`quickget` can automatically download Windows 8.1, [Windows
-10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
-[Windows
-11](https://www.microsoft.com/en-gb/software-download/windows11) along
-with the [VirtIO drivers for
-Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
-and creates a virtual machine configuration.
 
 ``` bash
 quickget windows 11
@@ -780,7 +776,7 @@ You can also pass optional parameters
 
 ```
 <!-- [[[end]]] -->
-
+```
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
