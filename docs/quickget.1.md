@@ -1,35 +1,31 @@
 ---
 author: Martin Wimpress
-date: 'February 20, 2022'
+date: April 26, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
 title: QUICKGET
 ---
 
-NAME
-====
+# NAME
 
 quickget - download and prepare materials for building a quickemu VM
 
-SYNOPSIS
-========
+# SYNOPSIS
 
 **quickget** \[*os*\] \[*release*\] \[*edition*\] \| \[*OPTION*\]\*
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 **quickget** will download the requisite materials and prepare a
 configuration for `quickemu` to use to build and run
 
-OPTIONS
-=======
+# OPTIONS
 
 **version \| -version \| --version**
 :   show version (from Quickemu)
 
-**list \| list\_csv \| list\_json**
+**list \| list_csv \| list_json**
 :   provide a csv list of all supported guest OSes, versions and
     variants.
 
@@ -39,27 +35,25 @@ OPTIONS
     script will exit. Editions may not apply and will be defaulted if
     not provided.
 
-NOTES
-=====
+# NOTES
 
-Ubuntu Guest
-------------
+## Ubuntu Guest
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` {.bash}
-quickget ubuntu 20.04
-quickemu --vm ubuntu-20.04.conf
+``` bash
+quickget ubuntu 22.04
+quickemu --vm ubuntu-22.04.conf
 ```
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection
         -   `sudo apt install spice-vdagent`
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
         -   `sudo apt install spice-webdavd`
 
 ### Ubuntu devel (daily-live) images
@@ -67,7 +61,7 @@ quickemu --vm ubuntu-20.04.conf
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
 
-``` {.bash}
+``` bash
 quickget ubuntu devel
 quickemu --vm ubuntu-devel.conf
 ```
@@ -84,31 +78,38 @@ with your preferred flavour.
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
+-   `ubuntucinnamon` (Ubuntu Cinnamon)
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
+-   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
-Other Operating Systems
------------------------
+## Other Operating Systems
 
 `quickget` also supports:
 
 -   `alma` (Alma Linux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
+-   `archcraft` (Archcraft)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
+-   `batocera` (Batocera)
+-   `blendos` (BlendOS)
 -   `cachyos` (CachyOS)
+-   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
+-   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
+-   `endeavouros` (EndeavourOS)
+-   `endless` (Endless OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
--   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
@@ -116,6 +117,8 @@ Other Operating Systems
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
 -   `linuxmint` (Linux Mint)
+-   `lmde` (Linux Mint Debian Edition)
+-   `mageia` (Mageia)
 -   `manjaro` (Manjaro)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
@@ -125,12 +128,17 @@ Other Operating Systems
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
--   `regolith` (Regolith Linux)
+-   `reactos` (ReactOS)
+-   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
+-   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `truenas-core` (TrueNAS Core)
+-   `truenas-scale` (TrueNAS Scale)
 -   `void` (Void Linux)
+-   `vxlinux` (VX Linux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
@@ -139,7 +147,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` {.bash}
+``` bash
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -147,24 +155,23 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` {.bash}
+``` bash
 quickemu --vm debian-bullseye.conf
 ```
 
 -   Complete the installation as normal.
 -   Post-install:
-    -   Install the SPICE agent (`spice-vdagent`) to enable copy/paste
-        and USB redirection.
-    -   Install the SPICE WebDAV agent (`spice-webdavd`) to enable file
-        sharing.
+    -   Install the SPICE agent (`spice-vdagent`) in the guest to enable
+        copy/paste and USB redirection.
+    -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
+        enable file sharing.
 
-macOS Guest
------------
+## macOS Guest
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` {.bash}
+``` bash
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -175,13 +182,13 @@ supported.
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
     -   Click **Disk Utility** and **Continue**
-        -   On macOS Catalina, Big Sur & Monterey
-            -   Select `Apple Inc. VirtIO Block Media` from the list and
-                click **Erase**.
-        -   On macOS Mojave and High Sierra
-            -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list
-                and click **Erase**.
-    -   Enter a `Name:` for the disk and click **Erase**.
+        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list and
+            click **Erase**.
+        -   Enter a `Name:` for the disk
+        -   If you are installing macOS Mojave or later (Catalina, Big
+            Sur, and Monterey), choose any of the APFS options as the
+            filesystem. MacOS Extended may not work.
+    -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
 -   From **macOS Utilities**
@@ -191,10 +198,53 @@ supported.
         **macOS Installer**
     -   On the subsequent reboots use cursor keys and enter key to
         select the disk you named
+-   Once you have finished installing macOS you will be presented with
+    an the out-of-the-box first-start wizard to configure various
+    options and set up your username and password
+-   OPTIONAL: After you have concluded the out-of-the-box wizard, you
+    may want to enable the TRIM feature that the computer industry
+    created for SSD disks. This feature in our macOS installation will
+    allow QuickEmu to compact (shrink) your macOS disk image whenever
+    you delete files inside the Virtual Machine. Without this step your
+    macOS disk image will only ever get larger and will not shrink even
+    when you delete lots of data inside macOS.
+    -   To enable TRIM, open the Terminal application and type the
+        following command followed by pressing
+        `<kbd>`{=html}enter`</kbd>`{=html} to tell macos to use the TRIM
+        command on the hard disk when files are deleted:
+
+``` bash
+sudo trimforce enable
+```
+
+You will be prompted to enter your account's password to gain the
+privilege needed. Once you've entered your password and pressed
+`<kbd>`{=html}enter`</kbd>`{=html} the command will request confirmation
+in the form of two questions that require you to type
+`<kbd>`{=html}y`</kbd>`{=html} (for a "yes" response) followed by
+`<kbd>`{=html}enter`</kbd>`{=html} to confirm. If you press
+`<kbd>`{=html}enter`</kbd>`{=html} without first typing
+`<kbd>`{=html}y`</kbd>`{=html} the system will consider that a negative
+response as though you said "no":
+
+``` plain
+IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
+Are you sure you with to proceed (y/N)?
+```
+
+And a second confirmation once you've confirmed the previous one:
+
+``` plain
+Your system will immediately reboot when this is complete.
+Is this OK (y/N)?
+```
+
+As the last message states, your system will automatically reboot as
+soon as the command completes.
 
 The default macOS configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -238,50 +288,65 @@ There are some considerations when running macOS via Quickemu.
     -   UHCI (USB 2.0) on macOS Catalina and earlier.
     -   XHCI (USB 3.0) on macOS Big Sur and newer.
 -   Display resolution can only be changed via macOS System Preferences.
--   Full Duplex audio works on macOS High Sierra, Mojave and Catalina.
-    -   **macOS Big Sur and Monterey have no audio at all**.
+-   **Full Duplex audio requires [VoodooHDA
+    OC](https://github.com/chris1111/VoodooHDA-OC) or pass-through a USB
+    audio-device to the macOS guest VM**.
+-   NOTE! [Gatekeeper](https://disable-gatekeeper.github.io/) and
+    [System Integrity Protection
+    (SIP)](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)
+    need to be disabled to install VoodooHDA OC
 -   File sharing between guest and host is available via
     [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-Windows 8.1, 10 & 11 Guests
----------------------------
+### macOS App Store
 
-`quickget` can automatically download Windows 8.1, [Windows
-10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
-[Windows
-11](https://www.microsoft.com/en-gb/software-download/windows11) along
-with the [VirtIO drivers for
-Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
-and creates a virtual machine configuration.
+If you see *"Your device or computer could not be verified"* when you
+try to login to the App Store, make sure that your wired ethernet device
+is `en0`. Use `ifconfig` in a terminal to verify this.
 
-``` {.bash}
+If the wired ethernet device is not `en0`, then then go to *System
+Preferences* -\> *Network*, delete all the network devices and apply the
+changes. Next, open a terminal and run the following:
+
+``` bash
+sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
+```
+
+Now reboot, and the App Store should work.
+
+## Windows 10 & 11 Guests
+
+`quickget` can not download
+[Windows10](https://www.microsoft.com/software-download/windows10) and
+[Windows 11](https://www.microsoft.com/software-download/windows11)
+automatically, but does automatically create an optimised virtual
+machine configuration that you can just add an Windows .iso image to.
+This configuration also includes the [VirtIO drivers for
+Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
+
+``` bash
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
 
 -   Complete the installation as you normally would.
 -   All relevant drivers and services should be installed automatically.
-
-### Regional versions
-
-By default `quickget` will download the *"English International"*
-release, but you can optionally specify one of the supported languages:
-For example:
-
-``` {.bash}
-quickget windows 11 "Chinese (Traditional)"
-```
+-   A local adminstrator user account is automatically created, with
+    these credentials:
+    -   Username: `Quickemu`
+    -   Password: `quickemu`
 
 The default Windows 11 configuration looks like this:
 
-``` {.bash}
+``` bash
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
-iso="windows-11/Win11_EnglishInternational_x64.iso"
+iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
+secureboot="on"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
@@ -289,20 +354,17 @@ tpm="on"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-AUTHORS
-=======
+# AUTHORS
 
 Written by Martin Wimpress.
 
-BUGS
-====
+# BUGS
 
 Submit bug reports online at:
 <https://github.com/quickemu-project/quickemu/issues>
 
-SEE ALSO
-========
+# SEE ALSO
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu(1), quickemu\_conf(1), quickgui(1)
+quickemu(1), quickemu_conf(1), quickgui(1)
