@@ -42,6 +42,7 @@ function pretty_name() {
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     elementary)         PRETTY_NAME="elementary OS";;
     endeavouros)        PRETTY_NAME="EndeavourOS";;
+    endless)            PRETTY_NAME="Endless OS";;
     freebsd)            PRETTY_NAME="FreeBSD";;
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
@@ -182,6 +183,7 @@ function os_support() {
     dragonflybsd \
     elementary \
     endeavouros \
+    endless \
     fedora \
     freebsd \
     freedos \
@@ -325,6 +327,14 @@ function releases_endeavouros() {
     atlantis-21_4 \
     atlantis_neo-21_5 \
     cassini_22_12
+}
+
+function releases_endless() {
+  echo 5.0.0
+}
+
+function editions_endless() {
+  echo base en fr pt_BR es
 }
 
 function releases_fedora() {
@@ -856,7 +866,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|oraclelinux|popos|rockylinux|nixos)
+          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
@@ -1144,6 +1154,34 @@ function get_endeavouros() {
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_endless() {
+    local HASH="" # No hash - there is a signature in .asc signed by
+    #https://d1anzknqnc1kmb.cloudfront.net/eos-image-keyring.gpg
+    # (4096R: CB50 0F7B C923 3FAD 32B4 E720 9E0C 1250 587A 279C)
+    local FILE_TS=""
+    # https://support.endlessos.org/en/installation/direct-download gives the info but computes the URLS in js
+    # so parsing out the useful info is not happening tonight
+    # Endless edition names are "base" for the small minimal one or the Language for the large full release
+    # The isos are stamped as they are finished so ....
+    case ${EDITION} in
+      base)
+          FILE_TS="230127-211122";;
+        fr)
+          FILE_TS="230127-213415";;
+        en)
+          FILE_TS="230127-212436";;
+        es)
+          FILE_TS="230127-212646";;
+        pt_BR)
+          FILE_TS="230127-220328";;
+      esac
+
+      URL="https://images-dl.endlessm.com/release/${RELEASE}/eos-amd64-amd64/${EDITION}"
+      ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
+
+      echo "${URL}/${ISO}"
 }
 
 function get_fedora() {
