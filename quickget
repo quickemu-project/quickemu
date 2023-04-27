@@ -58,6 +58,7 @@ function pretty_name() {
     nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
+    openindiana)        PRETTY_NAME="OpenIndiana";;
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
@@ -487,7 +488,7 @@ function releases_openbsd(){
 }
 
 function releases_openindiana(){
-    echo 20210430
+    echo 20230421
 }
 
 function editions_openindiana(){
@@ -844,6 +845,9 @@ function make_vm_config() {
             IMAGE_TYPE="iso";;
         openbsd)
             GUEST="openbsd"
+            IMAGE_TYPE="iso";;
+        openindiana)
+            GUEST="solaris"
             IMAGE_TYPE="iso";;
         reactos)
             GUEST="reactos"
@@ -1502,16 +1506,10 @@ function get_openbsd() {
 }
 
 function get_openindiana(){
-    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-gui-20210430.iso
-    #http://www.ftp.ne.jp/OS/OpenIndiana/isos/hipster/20210430/OI-hipster-gui-20210430.iso
-    #https://dlc.openindiana.org/isos/hipster/20210430/OI-hipster-gui-20210430.iso
-    #https://dlc.openindiana.org/isos/hipster/20210430/OI-hipster-gui-20210430.iso.sha256sum
-    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-text-20210430.iso
-    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-minimal-20210430.iso
     local HASH=""
     local ISO=""
     local URL=""
-    URL="http://mirrors.dotsrc.org/openindiana/isos/hipster/${RELEASE}"
+    URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
     ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
