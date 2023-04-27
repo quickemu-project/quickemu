@@ -488,7 +488,6 @@ function vm_boot() {
 
       if [[ "${guest_os}" == *"solaris" ]]; then
         MACHINE_TYPE="pc"
-        USB_HOST_PASSTHROUGH_CONTROLLER="pci-ohci"
       fi
 
       if [ -z "${disk_size}" ]; then
@@ -731,6 +730,8 @@ function vm_boot() {
       gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
       sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
     esac
+  elif [ "${guest_os}" == "solaris" ]; then
+    DISPLAY_DEVICE="vmware-svga"
   else
     DISPLAY_DEVICE="qxl-vga"
   fi
@@ -768,7 +769,7 @@ function vm_boot() {
   case ${DISPLAY_DEVICE} in
     bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
     qxl|qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
-    ati-vga|cirrus-vga|VGA) VIDEO="${VIDEO},vgamem_mb=64";;
+    ati-vga|cirrus-vga|VGA|vmware-svga) VIDEO="${VIDEO},vgamem_mb=64";;
   esac
 
   # Configure multiscreen if max_outputs was provided in the .conf file
