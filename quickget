@@ -207,6 +207,7 @@ function os_support() {
     lubuntu \
     macos \
     openbsd \
+    openindiana \
     opensuse \
     oraclelinux \
     popos \
@@ -483,6 +484,14 @@ function editions_nixos(){
 function releases_openbsd(){
     local OBSD_RELEASES=$(curl -sL https://mirror.leaseweb.com/pub/OpenBSD/|grep -e '6\.[8-9]/' -e '[7-9]\.'|cut -d\" -f4|tr -d '/')
     echo ${OBSD_RELEASES}
+}
+
+function releases_openindiana(){
+    echo 20210430
+}
+
+function editions_openindiana(){
+    echo gui text minimal
 }
 
 function releases_opensuse(){
@@ -1492,6 +1501,21 @@ function get_openbsd() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_openindiana(){
+    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-gui-20210430.iso
+    #http://www.ftp.ne.jp/OS/OpenIndiana/isos/hipster/20210430/OI-hipster-gui-20210430.iso
+    #https://dlc.openindiana.org/isos/hipster/20210430/OI-hipster-gui-20210430.iso
+    #https://dlc.openindiana.org/isos/hipster/20210430/OI-hipster-gui-20210430.iso.sha256sum
+    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-text-20210430.iso
+    #http://mirrors.dotsrc.org/openindiana/isos/hipster/20210430/OI-hipster-minimal-20210430.iso
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="http://mirrors.dotsrc.org/openindiana/isos/hipster/${RELEASE}"
+    ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 function get_opensuse() {
     local HASH=""
     local ISO=""
