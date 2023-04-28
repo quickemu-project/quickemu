@@ -277,7 +277,7 @@ function releases_blendos() {
 }
 
 function editions_blendos() {
-    echo GNOME KDE
+    echo gnome kde
 }
 
 function releases_cachyos() {
@@ -1021,36 +1021,28 @@ function get_arcolinux() {
 }
 
 function get_blendos() {
+    local EDITION="${1:-}"
     local HASH=""
     local URL=""
-    # GNOME ISO: https://sourceforge.net/projects/blendos/files/23.04-1/GNOME/blendOS-2023.04.22-x86_64-gnome.iso/download
-    # KDE Plasma ISO: https://sourceforge.net/projects/blendos/files/23.04-1/Plasma/blendOS-2023.04.22-x86_64-plasma.iso/download
     case ${RELEASE} in
       23.01)
         URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
         HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
         ;;
       23.04)
-        case ${EDITION:-GNOME} in
-        #KDE} in
-          GNOME)
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/GNOME/blendOS-2023.04.22-x86_64-gnome.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+        case ${EDITION} in
+          gnome)
+            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${EDITION^^}/blendOS-2023.04.22-x86_64-${EDITION,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
             URL=${TMPURL%\?*}
-            # URL=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"https:.*\.iso"'|head -n1)
             HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
             ;;
-          KDE)
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/Plasma/blendOS-2023.04.22-x86_64-plasma.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+          kde|plasma)
+            local ED_DE="Plasma"
+            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${ED_DE^}/blendOS-2023.04.22-x86_64-${ED_DE,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
             URL=${TMPURL%\?*}
-            # URL=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"https:.*\.iso"'|head -n1)
             HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/Plasma/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
             ;;
         esac
-        ;;
-      *)
-        echo Unsupported Release ; exit 20
-        URL=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"https:.*\.iso/download\"'|head -n1 | tr -d '"' )
-        HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
         ;;
     esac
     echo "${URL} ${HASH}"
