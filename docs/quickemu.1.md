@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 26, 2023
+date: April 28, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -350,7 +350,8 @@ supported.
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
     -   Click **Disk Utility** and **Continue**
-        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list and
+        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list (on
+            Big Sur and above use `Apple Inc. VirtIO Block Device`) and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
