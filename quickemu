@@ -235,6 +235,7 @@ function vm_boot() {
   local MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
   local NET_DEVICE="${NET_DEVICE:-virtio-net}"
   local OSK=""
+  local SOUND=""
   local SMM="${SMM:-off}"
   local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
   local VGA=""
@@ -487,11 +488,13 @@ function vm_boot() {
       if [ "${guest_os}" == "freedos" ] ; then
         # fix for #382
         SMM="on"
+        SOUND_CARD="sb16"
       fi
 
       if [[ "${guest_os}" == *"solaris" ]]; then
         MACHINE_TYPE="pc"
         USB_CONTROLLER="xhci"
+        SOUND_CARD="ac97"
       fi
 
       if [ -z "${disk_size}" ]; then
@@ -792,6 +795,16 @@ function vm_boot() {
   # Add fullscreen options
   VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
 
+  # Build the sound hardware configuration
+  if [ "${SOUND_CARD}" == "intel-hda" ]; then
+    SOUND="-device intel-hda -device hda-duplex,audiodev=audio0"
+  elif [ "${SOUND_CARD}" == "ac97" ] || [ "${SOUND_CARD}" == "es1370" ] || [ "${SOUND_CARD}" == "sb16" ]; then
+    SOUND="-device ${SOUND_CARD},audiodev=audio0"
+  elif [ "${SOUND_CARD}" == "none" ]; then
+    SOUND=""
+  fi
+  echo " - Sound:    ${SOUND_CARD}"
+
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
 
@@ -920,7 +933,7 @@ function vm_boot() {
          -m ${RAM_VM} ${BALLOON}
          ${VIDEO} -display ${DISPLAY_RENDER}
          -audiodev ${AUDIO_DEV}
-         -device intel-hda -device hda-duplex,audiodev=audio0
+         ${SOUND}
          -rtc base=localtime,clock=host,driftfix=slew)
 
   # Only enable SPICE is using SPICE display
@@ -1330,7 +1343,7 @@ function usage() {
   echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
   echo "  --ssh-port <port>                 : Set ssh-port manually"
   echo "  --spice-port <port>               : Set spice-port manually"
-  echo "  --public-dir <path>               : expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
+  echo "  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
   echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
   echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
   echo "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')"
@@ -1342,6 +1355,7 @@ function usage() {
   echo "  --keyboard_layout <layout>        : Set keyboard layout."
   echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
   echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
+  echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'"
   echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
   echo "  --version                         : Print version"
   exit 1
@@ -1350,6 +1364,13 @@ function usage() {
 function display_param_check() {
   if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ] && [ "${OUTPUT}" != "spice-app" ]; then
     echo "ERROR! Requested output '${OUTPUT}' is not recognised."
+    exit 1
+  fi
+}
+
+function sound_card_param_check() {
+  if [ "${SOUND_CARD}" != "intel-hda" ] && [ "${SOUND_CARD}" != "ac97" ] && [ "${SOUND_CARD}" != "es1370" ] && [ "${SOUND_CARD}" != "sb16" ] && [ "${SOUND_CARD}" != "none" ]; then
+    echo "ERROR! Requested sound card '${SOUND_CARD}' is not recognised."
     exit 1
   fi
 }
@@ -1474,6 +1495,8 @@ keyboard="usb"
 keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
 mouse="tablet"
+# options: intel-hda, ac97, es1370, sb16, none
+sound_card="intel-hda"
 
 BRAILLE=""
 DELETE_DISK=0
@@ -1512,6 +1535,7 @@ KEYBOARD_LAYOUT=""
 MOUSE=""
 USB_CONTROLLER=""
 EXTRA_ARGS=""
+SOUND_CARD=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1665,6 +1689,10 @@ else
             EXTRA_ARGS="${2}"
             shift;
             shift;;
+          -sound-card|--sound-card)
+            SOUND_CARD="${2}"
+            shift;
+            shift;;
           -version|--version)
             echo "${VERSION}"
             exit;;
@@ -1766,6 +1794,11 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     echo "ERROR: spice-port must be a number!"
     exit 1
   fi
+
+  if [ -z "${SOUND_CARD}" ]; then
+    SOUND_CARD="${sound_card}"
+  fi
+  sound_card_param_check
 
   # Check if vm is already run
   VM_PID=0
