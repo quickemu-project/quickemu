@@ -305,8 +305,7 @@ function vm_boot() {
     GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
   fi
 
-  local SMP="-smp cores=4,threads=1,sockets=1"
-  #local SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
+  local SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
   echo " - CPU:      ${HOST_CPU_MODEL}"
   echo -n " - CPU VM:   ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
 
@@ -781,6 +780,10 @@ function vm_boot() {
 
   # Add fullscreen options
   VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
+  
+  if [ "${guest_os}" == "macos" ]; then
+    VIDEO="-device vmware-svga"
+  fi
 
   # Set the hostname of the VM
   local NET="user,hostname=${VMNAME}"
