@@ -488,6 +488,7 @@ function vm_boot() {
 
       if [[ "${guest_os}" == *"solaris" ]]; then
         MACHINE_TYPE="pc"
+        USB_CONTROLLER="xhci"
       fi
 
       if [ -z "${disk_size}" ]; then

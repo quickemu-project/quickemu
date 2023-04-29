@@ -885,7 +885,10 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux|openindiana)
+          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
+            echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          openindiana)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
