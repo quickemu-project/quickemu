@@ -276,8 +276,14 @@ function editions_arcolinux() {
 }
 
 function releases_blendos() {
-    curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+'
+    local RLIST
+    RLIST=$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+' | tr ' \r\n' ' ')
+    echo ${RLIST}
 
+}
+
+function editions_blendos() {
+    echo gnome kde
 }
 
 function releases_cachyos() {
@@ -1046,9 +1052,30 @@ function get_arcolinux() {
 }
 
 function get_blendos() {
+    local EDITION="${1:-}"
     local HASH=""
-    local URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
-    HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
+    local URL=""
+    case ${RELEASE} in
+      23.01)
+        URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
+        HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
+        ;;
+      23.04)
+        case ${EDITION} in
+          gnome)
+            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${EDITION^^}/blendOS-2023.04.22-x86_64-${EDITION,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+            URL=${TMPURL%\?*}
+            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
+            ;;
+          kde|plasma)
+            local ED_DE="Plasma"
+            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${ED_DE^}/blendOS-2023.04.22-x86_64-${ED_DE,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
+            URL=${TMPURL%\?*}
+            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/Plasma/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
+            ;;
+        esac
+        ;;
+    esac
     echo "${URL} ${HASH}"
 }
 
