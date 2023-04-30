@@ -70,7 +70,7 @@ function pretty_name() {
     ubuntucinnamon)    PRETTY_NAME="Ubuntu Cinnamon";;
     ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntuserver)       PRETTY_NAME="Ubuntu Server";;
+    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
     ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
@@ -88,7 +88,7 @@ function validate_release() {
 
   DISPLAY_NAME="$(pretty_name "${OS}")"
   case ${OS} in
-    *ubuntuserver*) RELEASE_GENERATOR="releases_ubuntuserver";;
+    *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
     *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
     *) RELEASE_GENERATOR="${1}";;
   esac
@@ -226,7 +226,7 @@ function os_support() {
     ubuntucinnamon \
     ubuntukylin \
     ubuntu-mate \
-    ubuntuserver \
+    ubuntu-server \
     ubuntustudio \
     ubuntu-unity \
     void \
@@ -642,8 +642,12 @@ function releases_ubuntu() {
     fi
 }
 
-function releases_ubuntuserver() {
-    echo 20.04 20.04.5 22.04 22.04.1
+function releases_ubuntu-server() {
+   local LTS_SUPPORT="18.04 20.04 22.04"
+   local INTERIM_SUPPORT="22.10 23.04"
+    echo ${LTS_SUPPORT} \
+         ${INTERIM_SUPPORT} \
+         daily-live
 }
 
 function releases_void() {
@@ -908,7 +912,7 @@ EOF
            # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
            # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
             ;;
-          ubuntuserver)
+          ubuntu-server)
             # 22.04+ fails on LVM build if disk size is < 10G
             # 22.04.1 fails on auto-install if TPM is disabled
             echo "disk_size=\"10G\"" >> "${CONF_FILE}"
@@ -1644,18 +1648,31 @@ function get_truenas-core() {
     echo "${URL} ${HASH}"
 }
 
-function get_ubuntuserver() {
-    local EDITION="${1:-}"
-    local HASH=""
-    local ISO="ubuntu-${RELEASE}-live-server-amd64.iso"
-    local URL="https://releases.ubuntu.com/${RELEASE}"
+function get_ubuntu-server() {
 
-    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
+      local HASH=""
+      local ISO=""
+      local URL="https://releases.ubuntu.com/${RELEASE}"
 
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+      if wget -q --spider "${URL}/SHA256SUMS"; then
+          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
+          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
+      else
+          ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f3)
+          HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
+      fi
+
+      if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+          URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
+          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
+          zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+          make_vm_config "${OS}-devel.iso"
+      else
+          web_get "${URL}/${ISO}" "${VM_PATH}"
+          check_hash "${ISO}" "${HASH}"
+          make_vm_config "${ISO}"
+      fi
 }
 
 function get_ubuntu() {
@@ -2261,11 +2278,11 @@ if [ -n "${2}" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
         get_macos
-    elif [[ "${OS}" == *"ubuntuserver"* ]]; then
+    elif [[ "${OS}" == *"ubuntu-server"* ]]; then
         # (Comes before regular Ubuntu, or the code tries to download the desktop) #
         # Ubuntu doesn't use create_vm()
-        validate_release releases_ubuntuserver
-        get_ubuntuserver
+        validate_release releases_ubuntu-server
+        get_ubuntu-server
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
@@ -2296,9 +2313,9 @@ if [ -n "${2}" ]; then
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
-      *ubuntuserver*)
+      *ubuntu-server*)
         echo -n " - Releases: "
-        releases_ubuntuserver | sed -Ee 's/eol-\S+//g' # hide eol releases
+        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
       *ubuntu*)
         echo -n " - Releases: "
