@@ -257,6 +257,7 @@ with your preferred flavour.
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
+-   `holoiso` (HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -269,6 +270,7 @@ with your preferred flavour.
 -   `netbsd` (NetBSD)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
+-   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
@@ -281,6 +283,7 @@ with your preferred flavour.
 -   `tails` (Tails)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
+-   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
 -   `zorin` (Zorin OS)
@@ -326,8 +329,8 @@ supported.
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
     -   Click **Disk Utility** and **Continue**
-        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list
-            (on Big Sur and above use `Apple Inc. VirtIO Block Device`) and
+        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list (on
+            Big Sur and above use `Apple Inc. VirtIO Block Device`) and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
