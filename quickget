@@ -70,6 +70,7 @@ function pretty_name() {
     ubuntucinnamon)    PRETTY_NAME="Ubuntu Cinnamon";;
     ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
+    ubuntuserver)       PRETTY_NAME="Ubuntu Server";;
     ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     void)               PRETTY_NAME="Void Linux";;
@@ -87,6 +88,7 @@ function validate_release() {
 
   DISPLAY_NAME="$(pretty_name "${OS}")"
   case ${OS} in
+    *ubuntuserver*) RELEASE_GENERATOR="releases_ubuntuserver";;
     *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
     *) RELEASE_GENERATOR="${1}";;
   esac
@@ -224,6 +226,7 @@ function os_support() {
     ubuntucinnamon \
     ubuntukylin \
     ubuntu-mate \
+    ubuntuserver \
     ubuntustudio \
     ubuntu-unity \
     void \
@@ -429,6 +432,7 @@ function editions_linuxmint(){
 function editions_lmde(){
     echo cinnamon
 }
+
 function releases_lmde(){
     echo 5
 }
@@ -636,6 +640,10 @@ function releases_ubuntu() {
             eol-21.10 \
             ;
     fi
+}
+
+function releases_ubuntuserver() {
+    echo 20.04 20.04.5 22.04 22.04.1
 }
 
 function releases_void() {
@@ -899,6 +907,15 @@ EOF
            # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
            # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
            # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+            ;;
+          ubuntuserver)
+            # 22.04+ fails on LVM build if disk size is < 10G
+            # 22.04.1 fails on auto-install if TPM is disabled
+            echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+            echo "ram=\"4G\"" >> "${CONF_FILE}"
+            if [[ "${RELEASE}" == *"22.04"* ]]; then
+            echo "tpm=\"on\"" >> "${CONF_FILE}"
+            fi
             ;;
           zorin)
             case  ${EDITION} in
@@ -1627,6 +1644,20 @@ function get_truenas-core() {
     echo "${URL} ${HASH}"
 }
 
+function get_ubuntuserver() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO="ubuntu-${RELEASE}-live-server-amd64.iso"
+    local URL="https://releases.ubuntu.com/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+
+    web_get "${URL}/${ISO}" "${VM_PATH}"
+    check_hash "${ISO}" "${HASH}"
+    make_vm_config "${ISO}"
+}
+
 function get_ubuntu() {
     local ISO=""
     local HASH=""
@@ -1662,7 +1693,6 @@ function get_ubuntu() {
         ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
         HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
     fi
-    #echo "${URL}/${ISO} ${HASH}"
 
     if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
@@ -2231,6 +2261,11 @@ if [ -n "${2}" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
         get_macos
+    elif [[ "${OS}" == *"ubuntuserver"* ]]; then
+        # (Comes before regular Ubuntu, or the code tries to download the desktop) #
+        # Ubuntu doesn't use create_vm()
+        validate_release releases_ubuntuserver
+        get_ubuntuserver
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
@@ -2261,6 +2296,10 @@ if [ -n "${2}" ]; then
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
+      *ubuntuserver*)
+        echo -n " - Releases: "
+        releases_ubuntuserver | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
       *ubuntu*)
         echo -n " - Releases: "
         releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
