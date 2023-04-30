@@ -125,6 +125,7 @@ with your preferred flavour.
 -   `netbsd` (NetBSD)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
+-   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
