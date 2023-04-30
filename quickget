@@ -58,6 +58,7 @@ function pretty_name() {
     nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
+    openindiana)        PRETTY_NAME="OpenIndiana";;
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
@@ -209,6 +210,7 @@ function os_support() {
     lubuntu \
     macos \
     openbsd \
+    openindiana \
     opensuse \
     oraclelinux \
     popos \
@@ -487,6 +489,14 @@ function editions_nixos(){
 function releases_openbsd(){
     local OBSD_RELEASES=$(curl -sL https://mirror.leaseweb.com/pub/OpenBSD/|grep -e '6\.[8-9]/' -e '[7-9]\.'|cut -d\" -f4|tr -d '/')
     echo ${OBSD_RELEASES}
+}
+
+function releases_openindiana(){
+    echo 20230421
+}
+
+function editions_openindiana(){
+    echo gui text minimal
 }
 
 function releases_opensuse(){
@@ -848,6 +858,9 @@ function make_vm_config() {
         openbsd)
             GUEST="openbsd"
             IMAGE_TYPE="iso";;
+        openindiana)
+            GUEST="solaris"
+            IMAGE_TYPE="iso";;
         reactos)
             GUEST="reactos"
             IMAGE_TYPE="iso";;
@@ -885,6 +898,9 @@ EOF
         # OS specific tweaks
         case ${OS} in
           alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
+            echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+          openindiana)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
@@ -1518,6 +1534,15 @@ function get_openbsd() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_openindiana(){
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
+    ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 function get_opensuse() {
     local HASH=""
     local ISO=""
