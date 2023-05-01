@@ -686,32 +686,33 @@ function vm_boot() {
     local X_RES=1152
     local Y_RES=648
     if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-      local LOWEST_WIDTH=""
       if [ -z "${SCREEN}" ]; then
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
       else
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
       fi
+
       if [ "${FULLSCREEN}" ]; then
-        if [ -z "${SCREEN}" ]; then
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-        else
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
-        fi
-      elif [ "${LOWEST_WIDTH}" -ge 3840 ]; then
+        :
+      elif [ "${SCREENPCT}" ] ; then
+        X_RES=$(( X_RES*SCREENPCT/100 ))
+        Y_RES=$(( Y_RES*SCREENPCT/100 ))
+      elif [ "${X_RES}" -ge 3840 ]; then
         X_RES=3200
         Y_RES=1800
-      elif [ "${LOWEST_WIDTH}" -ge 2560 ]; then
+      elif [ "${X_RES}" -ge 2560 ]; then
         X_RES=2048
         Y_RES=1152
-      elif [ "${LOWEST_WIDTH}" -ge 1920 ]; then
+      elif [ "${X_RES}" -ge 1920 ]; then
         X_RES=1664
         Y_RES=936
-      elif [ "${LOWEST_WIDTH}" -ge 1280 ]; then
+      elif [ "${X_RES}" -ge 1280 ]; then
         X_RES=1152
         Y_RES=648
+      else
+        :
       fi
     fi
   fi
@@ -1325,6 +1326,7 @@ function usage() {
   echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>                 : Use specified screen to determine the window size."
+  echo "  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified."
   echo "  --shortcut                        : Create a desktop shortcut"
   echo "  --snapshot apply <tag>            : Apply/restore a snapshot."
   echo "  --snapshot create <tag>           : Create a snapshot."
@@ -1489,6 +1491,7 @@ PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
 SCREEN=""
+SCREENPCT=""
 SHORTCUT=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
@@ -1566,6 +1569,22 @@ else
             exit;;
           -screen|--screen)
             SCREEN="${2}"
+            shift
+            shift;;
+          -screenpct|--screenpct)
+            if [ ! -z "${2##*[!0-9]*}" ] ; then
+              if [[ ${2} -ge 25 && ${2} -lt 100 ]] ; then
+                SCREENPCT=${2}
+              else
+                echo "screenpct invalid must be 25 <= pct < 100"
+                usage
+                exit 1
+              fi
+            else
+              echo "screenpct needs to be an integer in range 25 <= pct < 100"
+              usage
+              exit 1
+            fi
             shift
             shift;;
           -snapshot|--snapshot)
