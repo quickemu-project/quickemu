@@ -542,13 +542,11 @@ function get_rebornos() {
 }
 
 function releases_rockylinux() {
-    echo 8.3 8.4 8.5 9.0 9.1
+    echo 8.3 8.4 8.5 8.6 8.7 9.0 9.1
 }
 
-# Rocky have renamed dvd1 -> dvd at 9.0
 function editions_rockylinux() {
-    echo minimal \
-    "dvd (dvd1 prior to 9.0)"
+    echo minimal dvd boot
 }
 
 function releases_siduction() {
@@ -1657,13 +1655,18 @@ function get_reactos() {
 
 function get_rockylinux() {
     local EDITION="${1:-}"
+    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]
+    then
+      EDITION="dvd1"
+    fi
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
 
     case ${RELEASE} in
-      9.1) URL="https://download.rockylinux.org/pub/rocky/${RELEASE}/isos/x86_64";;
-      *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64/";;
+      9.1) URL="https://download.rockylinux.org/pub/rocky/9/isos/x86_64";;
+      8.7) URL="https://download.rockylinux.org/pub/rocky/8/isos/x86_64";;
+      *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64";;
     esac
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
