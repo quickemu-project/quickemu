@@ -468,7 +468,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    batocera|*bsd|freedos|haiku|linux|*solaris)
+    arosone|batocera|*bsd|freedos|haiku|linux|*solaris)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
@@ -476,10 +476,14 @@ function vm_boot() {
 
       if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
         MOUSE="usb"
-      elif [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
+      elif [ "${guest_os}" == "arosone" ] || [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
         MACHINE_TYPE="pc"
         NET_DEVICE="rtl8139"
       fi
+
+      # if [ "${guest_os}" == "arosone" ] ; then
+      #   #MAC_DISK_DEV="ide-hd,bus=ahci.0,drive=0"
+      # fi
 
       if [ "${guest_os}" == "freedos" ] ; then
         # fix for #382
@@ -1099,6 +1103,11 @@ function vm_boot() {
     args+=(-device ahci,id=ahci
            -device ide-hd,bus=ahci.0,drive=SystemDisk
            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+  elif [ "${guest_os}" == "arosone" ]; then
+    # shellcheck disable=SC2054,SC2206
+    args+=(-device ahci,id=ahci
+            #-device ide-hd,bus=ahci.0,drive=SystemDisk
+           -drive id=SystemDisk,if=ide,index=1,format=qcow2,file="${disk_img}" ${STATUS_QUO})
 
   elif [ "${guest_os}" == "batocera" ] ; then
     # shellcheck disable=SC2054,SC2206

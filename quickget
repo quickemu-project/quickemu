@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    arosone)            PRETTY_NAME="AROS One";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -177,6 +178,7 @@ function os_support() {
     archlinux \
     archcraft \
     arcolinux \
+    arosone \
     batocera \
     blendos \
     cachyos \
@@ -273,6 +275,10 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+
+function releases_arosone() {
+  echo 2.0
 }
 
 function releases_blendos() {
@@ -774,19 +780,37 @@ function web_get() {
       exit 1
     fi
 
-    if command -v aria2c &>/dev/null; then
-        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
+  #  if [[ "${URL}" =~ drive.google.com ]]; then
+  #     ## Google Drive needs special handling for large files
+  #     # FILEID="FILEIDENTIFIER"
+  #     # FILENAME="FILENAME"
+  #        FILEID="1ARgQSsxFxHWF7orcZvX27eBUY9mERPH2"
+  #        #FILENAME="ArosOne-x86-v2.0-ISO-DVD.zip"
+  #     echo "DEBUG:  Downloading ${URL} to ${DIR}/${FILE} from Google Drive"
+  #     local GDRESPONSE
+  #     GDRESPONSE=$(curl -c /tmp/qggdcookie -s -L "https://drive.google.com/uc?export=download&id=${FILEID}")
+
+  #     if ! curl -Lb /tmp/qggdcookie  "https://drive.google.com/uc?export=download&$(echo ${GDRESPONSE}|grep -Po '(confirm=[a-zA-Z0-9\-_]+)')&id=${FILEID}" -o "${ISO}" --output-dir "${DIR}"; then
+  #       echo "ERROR! Failed to download ${URL} with curl. Try running 'quickget' again."
+  #       exit 1
+  #     fi
+
+
+  #   else
+      if command -v aria2c &>/dev/null; then
+          if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
+            echo #Necessary as aria2c in suppressed mode does not have new lines
+            echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
+            exit 1
+          fi
           echo #Necessary as aria2c in suppressed mode does not have new lines
-          echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
-          exit 1
-        fi
-        echo #Necessary as aria2c in suppressed mode does not have new lines
-    else
-        if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-          echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
-          exit 1
-        fi
-    fi
+      else
+          if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+            echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+            exit 1
+          fi
+      fi
+    # fi
 }
 
 function zsync_get() {
@@ -837,6 +861,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        arosone)
+            GUEST="arosone"
+            IMAGE_TYPE="iso";;
         batocera)
             GUEST="batocera"
             IMAGE_TYPE="img";;
@@ -948,6 +975,9 @@ EOF
             echo "disk_size=\"12G\"" >> "${CONF_FILE}"
             echo "ram=\"2048M\"" >> "${CONF_FILE}"
             ;;
+          arosone|icaros)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            ;;
           macos)
             echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
             # https://github.com/quickemu-project/quickemu/issues/438
@@ -1050,6 +1080,20 @@ function get_arcolinux() {
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function get_arosone() {
+    local ISO=""
+    local URL=""
+    FILEID="1ARgQSsxFxHWF7orcZvX27eBUY9mERPH2"
+    FILENAME="ArosOne-x86-v2.0-ISO-DVD.zip"
+    #ISO=${FILENAME}
+    ISO="ArosOne-x86-v2.0-ISO-DVD.zip"
+    URL="https://drive.google.com/uc?export=download&id=${FILEID}"
+    local GDRESPONSE=$(curl -c /tmp/gdcookie -s -L "https://drive.google.com/uc?export=download&id=${FILEID}")
+    curl -s -Lb /tmp/gdcookie "https://drive.google.com/uc?export=download&$(echo ${GDRESPONSE}|grep -Po '(confirm=[a-zA-Z0-9\-_]+)')&id=${FILEID}" -o "${FILENAME}" --output-dir "${DIR}"
+    #echo "${URL}"/"${ISO}"
+    #make_vm_config "${FILENAME}"
+    }
 
 function get_blendos() {
     local EDITION="${1:-}"
@@ -2244,6 +2288,13 @@ create_vm() {
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+    fi
+
+    if [ ${OS} == "arosone" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+        mv "${VM_PATH}/${ISO}" "${VM_PATH}/${ISO// /_}" # remove spaces
+        ISO=${ISO// /_}
     fi
 
     make_vm_config "${ISO}"
