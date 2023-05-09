@@ -1106,8 +1106,9 @@ function vm_boot() {
   elif [ "${guest_os}" == "arosone" ]; then
     # shellcheck disable=SC2054,SC2206
     args+=(-device ahci,id=ahci
-            #-device ide-hd,bus=ahci.0,drive=SystemDisk
-           -drive id=SystemDisk,if=ide,index=1,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+           -device ide-hd,bus=ahci.0,drive=SystemDisk
+           -drive id=SystemDisk,if=none,index=1,format=qcow2,file="${disk_img}" ${STATUS_QUO}
+           -boot order=d,menu=on)
 
   elif [ "${guest_os}" == "batocera" ] ; then
     # shellcheck disable=SC2054,SC2206
