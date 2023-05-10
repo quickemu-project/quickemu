@@ -1674,6 +1674,56 @@ function get_holoiso() {
     echo "${URL}/${ISO} #${HASH}"
 }
 
+function get_icaros() {
+
+    local EDITION="${1:-}"
+    local ISO="Icaros${EDITION^}_${RELEASE//./_}.zip"
+    local URL="http://www.icarosdesktop.com/icarosfiles/"
+    local HASH=""
+    case ${EDITION} in
+      Live|live)
+        case ${RELEASE} in
+        2.3.0)
+          HASH="f2e4fdbc71f48e35dccfe6c26ae07a8f" #
+          ;;
+        2.2.8)
+          HASH="abb77ec6968f3a0823ba527bc0f73ce2"
+          ;;
+        2.2.7)
+          HASH="d75c1fdc3a3ec6813c0ae768ea43eb47"
+          ;;
+        2.2.6)
+          HASH="a518574abd6fcbb846f9fd6ae7fa36ec"
+          ;;
+        2.2.5)
+          HASH="a89ec32c30a10bd4c551bee3b902740d"
+          ;;
+          esac
+      ;;
+      Light|light)
+        case ${RELEASE} in
+        2.3.0)
+          HASH="a469a92982842303bbe904efe1d09ea6"
+          ;;
+        2.2.8)
+          HASH="d8a626c732a6ab3be256ab0007d72b94"
+          ;;
+        2.2.7)
+          HASH="50a2dc2c544b38c48e44f865c84d7824"
+          ;;
+        2.2.6)
+          HASH="57366ac7a629f8dbe8da999f9b84eb91"
+          ;;
+        2.2.5)
+          HASH="e4f5817ec32086b698948c6fc899aec3"
+          ;;
+        esac
+      ;;
+    esac
+
+    echo "${URL}"/"${ISO}" "${HASH}"
+    }
+
 function get_kali() {
     local HASH=""
     local ISO=""
