@@ -36,6 +36,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    icaros)             PRETTY_NAME="icaros desktop";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -195,6 +196,7 @@ function os_support() {
     gentoo \
     ghostbsd \
     haiku \
+    icaros \
     kali \
     kdeneon \
     kolibrios \
@@ -273,6 +275,12 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+function editions_icaros() {
+    echo live light
+}
+function releases_icaros() {
+  echo 2.3.0 2.2.8 2.2.7 2.2.6 2.2.5
 }
 
 function releases_blendos() {
@@ -774,19 +782,19 @@ function web_get() {
       exit 1
     fi
 
-    if command -v aria2c &>/dev/null; then
-        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
+      if command -v aria2c &>/dev/null; then
+          if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
+            echo #Necessary as aria2c in suppressed mode does not have new lines
+            echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
+            exit 1
+          fi
           echo #Necessary as aria2c in suppressed mode does not have new lines
-          echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
-          exit 1
-        fi
-        echo #Necessary as aria2c in suppressed mode does not have new lines
-    else
-        if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-          echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
-          exit 1
-        fi
-    fi
+      else
+          if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+            echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+            exit 1
+          fi
+      fi
 }
 
 function zsync_get() {
@@ -837,6 +845,9 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
+        icaros)
+            GUEST="icaros"
+            IMAGE_TYPE="iso";;
         batocera)
             GUEST="batocera"
             IMAGE_TYPE="img";;
@@ -948,6 +959,9 @@ EOF
             echo "disk_size=\"12G\"" >> "${CONF_FILE}"
             echo "ram=\"2048M\"" >> "${CONF_FILE}"
             ;;
+          arosone|icaros)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            ;;
           macos)
             echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
             # https://github.com/quickemu-project/quickemu/issues/438
@@ -1050,6 +1064,56 @@ function get_arcolinux() {
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function get_icaros() {
+
+    local EDITION="${1:-}"
+    local ISO="Icaros${EDITION^}_${RELEASE//./_}.zip"
+    local URL="http://www.icarosdesktop.com/icarosfiles/"
+    local HASH=""
+    case ${EDITION} in
+      Live|live)
+        case ${RELEASE} in
+        2.3.0)
+          HASH="f2e4fdbc71f48e35dccfe6c26ae07a8f" #
+          ;;
+        2.2.8)
+          HASH="abb77ec6968f3a0823ba527bc0f73ce2"
+          ;;
+        2.2.7)
+          HASH="d75c1fdc3a3ec6813c0ae768ea43eb47"
+          ;;
+        2.2.6)
+          HASH="a518574abd6fcbb846f9fd6ae7fa36ec"
+          ;;
+        2.2.5)
+          HASH="a89ec32c30a10bd4c551bee3b902740d"
+          ;;
+          esac
+      ;;
+      Light|light)
+        case ${RELEASE} in
+        2.3.0)
+          HASH="a469a92982842303bbe904efe1d09ea6"
+          ;;
+        2.2.8)
+          HASH="d8a626c732a6ab3be256ab0007d72b94"
+          ;;
+        2.2.7)
+          HASH="50a2dc2c544b38c48e44f865c84d7824"
+          ;;
+        2.2.6)
+          HASH="57366ac7a629f8dbe8da999f9b84eb91"
+          ;;
+        2.2.5)
+          HASH="e4f5817ec32086b698948c6fc899aec3"
+          ;;
+        esac
+      ;;
+    esac
+
+    echo "${URL}"/"${ISO}" "${HASH}"
+    }
 
 function get_blendos() {
     local EDITION="${1:-}"
@@ -2243,6 +2307,11 @@ create_vm() {
 
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+        ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+    fi
+
+    if [ ${OS} == "icaros" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip -j ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
     fi
 
