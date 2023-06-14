@@ -1542,8 +1542,8 @@ function get_macos() {
     # Get firmware
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
     web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
-    if [ ! -e "${VM_PATH}/OVMF_VARS-1024x768.fd" ]; then
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1024x768.fd" "${VM_PATH}"
+    if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
     fi
 
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
