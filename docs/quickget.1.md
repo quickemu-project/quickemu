@@ -324,17 +324,16 @@ Now reboot, and the App Store should work.
 
 ## Windows 10 & 11 Guests
 
-`quickget` can not download
+`quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
 [Windows 11](https://www.microsoft.com/software-download/windows11)
-automatically, but does automatically create an optimised virtual
-machine configuration that you can just add an Windows .iso image to.
+automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
 ``` bash
 quickget windows 11
-quickemu --vm windows-11.conf
+quickemu --vm windows-11-22H2.conf
 ```
 
 -   Complete the installation as you normally would.
