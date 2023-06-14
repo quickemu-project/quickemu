@@ -225,6 +225,7 @@ with your preferred flavour.
 -   `ubuntucinnamon` (Ubuntu Cinnamon)
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
+-   `ubuntu-server` (Ubuntu Server)
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `ubuntu-unity` (Ubuntu Unity)
@@ -286,6 +287,7 @@ with your preferred flavour.
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
+-   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
@@ -753,6 +755,7 @@ You can also pass optional parameters
   --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
   --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
   --screen <screen>                 : Use specified screen to determine the window size.
+  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified.
   --shortcut                        : Create a desktop shortcut
   --snapshot apply <tag>            : Apply/restore a snapshot.
   --snapshot create <tag>           : Create a snapshot.
@@ -834,6 +837,11 @@ The above uses the 2560x1440 screen to compute the size of the window,
 which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
+
+The '--screenpct' is an optional interger value between 25 \<= pct \<
+100 which will override system default screen sizes. The VM size will be
+'pct' of the chosen screen. **If --fullscreen is chosen screen will be
+fullsize instead of being scaled down by --screenpct value.**
 
 # References
 
