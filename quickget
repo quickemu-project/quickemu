@@ -1853,7 +1853,7 @@ function get_xerolinux() {
     local URL=""
     local ISO="xerolinux-2022.12-x86_64.iso"
     local URL="https://sourceforge.net/projects/xerolinux/files/Releases"
-    
+
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
