@@ -700,48 +700,7 @@ function releases_vxlinux() {
 }
 
 function releases_windows() {
-    echo 8 10 11
-}
-
-function languages_windows() {
-    LANGS=(Arabic
-    "Brazilian Portuguese"
-    Bulgarian
-    "Chinese (Simplified)"
-    "Chinese (Traditional)"
-    Croatian
-    Czech
-    Danish
-    Dutch
-    English
-    "English International"
-    Estonian
-    Finnish
-    French
-    "French Canadian"
-    German
-    Greek
-    Hebrew
-    Hungarian
-    Italian
-    Japanese
-    Korean
-    Latvian
-    Lithuanian
-    Norwegian
-    Polish
-    Portuguese
-    Romanian
-    Russian
-    "Serbian Latin"
-    Slovak
-    Slovenian
-    Spanish
-    "Spanish (Mexico)"
-    Swedish
-    Thai
-    Turkish
-    Ukrainian)
+    echo 10 11
 }
 
 function releases_xerolinux() {
@@ -2211,92 +2170,35 @@ function unattended_windows() {
 EOF
 }
 
-function dbg_windows() {
-  local DEBUG=0
-  if [ ${DEBUG} -eq 1 ]; then
-    echo "${1}"
-  fi
-}
 
-# Adapted from https://gist.github.com/hongkongkiwi/15a5bf16437315df256c118c163607cb
 function get_windows() {
-    # Use the API to automatically download a Windows .iso image
-    # The API we were using is unmaintained and not currently functional
+    # Use the iTechtics CDN to download the ISOs.
+    # - https://www.itechtics.com/windows-10-download-iso/
+    # - https://www.itechtics.com/windows-11-download-iso/
     #  0 : Prompt for a manual ISO download
-    #  1 : Use the API for automated download
-    local API_GUIDED_DOWNLOAD=0
-
-    local ARCH="x64"
-    local INDEX=0
-    local LANG_CODE="en"
-    local LANG_EDITION="${1}"
-    local LATEST_WINDOWS_VERSION=""
-    local WINDOWS_NAME=""
-    local WINDOWS_ISO_URL=""
-    local VERSION_ID=""
-    local EDITION_ID=""
-    local LANGUAGE_ID=""
-    local FILE_NAME=""
-    local ARCH_ID=""
-    local DOWNLOAD_INFO=""
-    local DOWNLOAD_ID=""
+    #  1 : Download automatically
+    local AUTO_DOWNLOAD=1
     local DOWNLOAD_URL=""
 
-    if [ ${API_GUIDED_DOWNLOAD} -eq 1 ]; then
+    if [ ${AUTO_DOWNLOAD} -eq 1 ]; then
         # Ignore the most recent Windows 10 release for now.
         case ${RELEASE} in
-        10) INDEX=0;;
-        11) INDEX=0;;
+            10) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=173"
+                EDITION="22H2"
+                FILE_NAME="Win${RELEASE}_${EDITION}_EnglishInternational_x64v1.iso"
+                FILE_HASH="dc3982ad27e2d4e03b680630c28f824cb78bcd47"
+                ;;
+            11) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=168"
+                EDITION="22H2"
+                FILE_NAME="Win${RELEASE}_${EDITION}_English_x64v1.iso"
+                FILE_HASH="c5341ba26e420684468fa4d4ab434823c9d1b61f"
+                ;;
         esac
 
-        echo "Getting Windows ${RELEASE} URL..."
-        WINDOWS_VERSIONS=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_version.php?type_id=1" | jq '.versions | sort_by(-(.version_id | tonumber))')
-        dbg_windows "${WINDOWS_VERSIONS}"
-        LATEST_WINDOWS_VERSION=$(echo "${WINDOWS_VERSIONS}" | jq -c 'map(select(.name | contains("Windows '"${RELEASE}"'")))['${INDEX}']')
-        dbg_windows "${LATEST_WINDOWS_VERSION}"
-        WINDOWS_NAME=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .name)
-        dbg_windows "${WINDOWS_NAME}"
-        VERSION_ID=$(echo "${LATEST_WINDOWS_VERSION}" | jq -r .version_id)
-        dbg_windows "${VERSION_ID}"
-
-        case ${RELEASE} in
-            8) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows 8.1 Pro + Core").edition_id');;
-            10|11) EDITION_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_edition.php?version_id=${VERSION_ID}&lang=name_${LANG_CODE}" | jq -r '.editions[] | select(.name_'${LANG_CODE}'=="Windows '"${RELEASE}"'").edition_id');;
-        esac
-        dbg_windows "${EDITION_ID}"
-
-        LANGUAGE_ID=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_language.php?edition_id=${EDITION_ID}&lang=name_${LANG_CODE}" | jq -r '.languages[] | select(.name_'${LANG_CODE}'=="'"${LANG_EDITION}"'").language_id')
-        dbg_windows "${LANGUAGE_ID}"
-        ARCH_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/php/get_arch.php?language_id=${LANGUAGE_ID}")
-        dbg_windows "${ARCH_INFO}"
-        FILE_NAME=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).name')
-        dbg_windows "${FILE_NAME}"
-        ARCH_ID=$(echo "${ARCH_INFO}" | jq -r '.archs[] | select(.name | contains("'${ARCH}'")).arch_id')
-        dbg_windows "${ARCH_ID}"
-        DOWNLOAD_INFO=$(wget -4 -q -O- "https://tb.rg-adguard.net/dl.php?fileName=${ARCH_ID}&lang=en")
-        dbg_windows "${DOWNLOAD_INFO}"
-        DOWNLOAD_SHA1=$(echo "${DOWNLOAD_INFO}" | sed -e 's/<[^>]*>//g' | grep -o -P '(?<=SHA1: ).*(?= expire)' | sed 's/Link//')
-        dbg_windows "${DOWNLOAD_SHA1}"
-        DOWNLOAD_ID=$(echo "${DOWNLOAD_INFO}" | grep -oP '(?<=https:\/\/tb\.rg-adguard\.net/dl\.php\?go=)[0-9a-z]+')
-        dbg_windows "${DOWNLOAD_ID}"
-        REDIRECT_URL="https://tb.rg-adguard.net/dl.php?go=${DOWNLOAD_ID}"
-        dbg_windows "${REDIRECT_URL}"
-        DOWNLOAD_URL=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "${REDIRECT_URL}")
-        dbg_windows "${DOWNLOAD_URL}"
-
-        MS_BASE_URL="https://software.download.prss.microsoft.com/"
-        if [[ ! ${DOWNLOAD_URL} =~ ^${MS_BASE_URL} ]]; then
-            echo "Download URL not leading to Microsoft CDN"
-            exit 1
-        fi
-
-        echo "Downloading ${WINDOWS_NAME}..."
+        echo "Downloading Windows ${RELEASE} ${EDITION}..."
         web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
 
-        # Windows 10 doesn't include a SHA1, so only check the integrity if the SHA1 is available.
-        if [ -n "${DOWNLOAD_SHA1}" ]; then
-            check_hash "${FILE_NAME}" "${DOWNLOAD_SHA1}"
-        fi
+        check_hash "${FILE_NAME}" "${FILE_HASH}"
     else
         case ${RELEASE} in
             10) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows10";;
@@ -2325,7 +2227,7 @@ function get_windows() {
             ;;
     esac
 
-    case "${API_GUIDED_DOWNLOAD}" in
+    case "${AUTO_DOWNLOAD}" in
         0) make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso";;
         1) make_vm_config "${FILE_NAME}" "virtio-win.iso";;
     esac
@@ -2386,7 +2288,6 @@ if ((BASH_VERSINFO[0] < 4)); then
 fi
 
 LANGS=()
-languages_windows
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
@@ -2462,20 +2363,9 @@ if [ -n "${2}" ]; then
         validate_release releases_deepin
         get_deepin
     elif [ "${OS}" == "windows" ]; then
-        LANG="English International"
-        if [ -n "${3}" ]; then
-            LANG="${3}"
-            if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
-                echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
-                for LANG in "${LANGS[@]}"; do
-                  echo -n "${LANG} "
-                done
-                exit 1
-            fi
-        fi
         # Windows doesn't use create_vm()
         validate_release releases_windows
-        get_windows "${LANG}"
+        get_windows
     else
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
