@@ -465,7 +465,7 @@ Now reboot, and the App Store should work.
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
 [Windows 11](https://www.microsoft.com/software-download/windows11)
-automatically and create an optimised virtual  machine configuration.
+automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
