@@ -73,6 +73,7 @@ function pretty_name() {
     ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
     ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
     ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
+    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
     ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     vanillaos)          PRETTY_NAME="Vanilla OS";;
@@ -91,6 +92,7 @@ function validate_release() {
 
   DISPLAY_NAME="$(pretty_name "${OS}")"
   case ${OS} in
+    *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
     *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
     *) RELEASE_GENERATOR="${1}";;
   esac
@@ -231,6 +233,7 @@ function os_support() {
     ubuntucinnamon \
     ubuntukylin \
     ubuntu-mate \
+    ubuntu-server \
     ubuntustudio \
     ubuntu-unity \
     vanillaos \
@@ -449,6 +452,7 @@ function editions_linuxmint(){
 function editions_lmde(){
     echo cinnamon
 }
+
 function releases_lmde(){
     echo 5
 }
@@ -668,6 +672,14 @@ function releases_ubuntu() {
             eol-21.10 \
             ;
     fi
+}
+
+function releases_ubuntu-server() {
+   local LTS_SUPPORT="18.04 20.04 22.04"
+   local INTERIM_SUPPORT="22.10 23.04"
+    echo ${LTS_SUPPORT} \
+         ${INTERIM_SUPPORT} \
+         daily-live
 }
 
 function releases_vanillaos() {
@@ -943,6 +955,15 @@ EOF
            # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
            # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
            # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+            ;;
+          ubuntu-server)
+            # 22.04+ fails on LVM build if disk size is < 10G
+            # 22.04.1 fails on auto-install if TPM is disabled
+            echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+            echo "ram=\"4G\"" >> "${CONF_FILE}"
+            if [[ "${RELEASE}" == *"22.04"* ]]; then
+            echo "tpm=\"on\"" >> "${CONF_FILE}"
+            fi
             ;;
           vanillaos)
           ## Minimum 50G for abroot
@@ -1779,6 +1800,33 @@ function get_truenas-core() {
     echo "${URL} ${HASH}"
 }
 
+function get_ubuntu-server() {
+
+      local HASH=""
+      local ISO=""
+      local URL="https://releases.ubuntu.com/${RELEASE}"
+
+      if wget -q --spider "${URL}/SHA256SUMS"; then
+          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
+          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
+      else
+          ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f3)
+          HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
+      fi
+
+      if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+          URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
+          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
+          zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+          make_vm_config "${OS}-devel.iso"
+      else
+          web_get "${URL}/${ISO}" "${VM_PATH}"
+          check_hash "${ISO}" "${HASH}"
+          make_vm_config "${ISO}"
+      fi
+}
+
 function get_ubuntu() {
     local ISO=""
     local HASH=""
@@ -1814,7 +1862,6 @@ function get_ubuntu() {
         ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
         HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
     fi
-    #echo "${URL}/${ISO} ${HASH}"
 
     if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
@@ -2388,6 +2435,11 @@ if [ -n "${2}" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
         get_macos
+    elif [[ "${OS}" == *"ubuntu-server"* ]]; then
+        # (Comes before regular Ubuntu, or the code tries to download the desktop) #
+        # Ubuntu doesn't use create_vm()
+        validate_release releases_ubuntu-server
+        get_ubuntu-server
     elif [[ "${OS}" == *"ubuntu"* ]]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
@@ -2418,6 +2470,10 @@ if [ -n "${2}" ]; then
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
+      *ubuntu-server*)
+        echo -n " - Releases: "
+        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
       *ubuntu*)
         echo -n " - Releases: "
         releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
