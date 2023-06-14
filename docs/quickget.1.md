@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 30, 2023
+date: June 14, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -81,6 +81,7 @@ with your preferred flavour.
 -   `ubuntucinnamon` (Ubuntu Cinnamon)
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
+-   `ubuntu-server` (Ubuntu Server)
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `ubuntu-unity` (Ubuntu Unity)
@@ -142,6 +143,7 @@ with your preferred flavour.
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
+-   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
