@@ -351,6 +351,9 @@ function vm_boot() {
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
       EFI_CODE="${VMDIR}/OVMF_CODE.fd"
       EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+    elif [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1920x1080.fd" ]; then
+      EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+      EFI_VARS="${VMDIR}/OVMF_VARS-1920x1080.fd"
     else
       MAC_MISSING="Firmware"
     fi
