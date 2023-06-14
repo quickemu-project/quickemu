@@ -102,7 +102,7 @@ Windows\f[R].
 .IP \[bu] 2
 \f[B]macOS\f[R] Monterey, Big Sur, Catalina, Mojave & High Sierra
 .IP \[bu] 2
-\f[B]Windows\f[R] 8.1, 10 and 11 including TPM 2.0
+\f[B]Windows\f[R] 10 and 11 including TPM 2.0
 .IP \[bu] 2
 Ubuntu (https://ubuntu.com/desktop) and all the \f[B]official Ubuntu
 flavours (https://ubuntu.com/download/flavours)\f[R]
@@ -697,18 +697,17 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 Now reboot, and the App Store should work.
 .SS Windows 10 & 11 Guests
 .PP
-\f[V]quickget\f[R] can not download
+\f[V]quickget\f[R] can download
 Windows10 (https://www.microsoft.com/software-download/windows10) and
 Windows 11 (https://www.microsoft.com/software-download/windows11)
-automatically, but does automatically create an optimised virtual
-machine configuration that you can just add an Windows .iso image to.
+automatically and create an optimised virtual machine configuration.
 This configuration also includes the VirtIO drivers for
 Windows (https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 .IP
 .nf
 \f[C]
 quickget windows 11
-quickemu --vm windows-11.conf
+quickemu --vm windows-11-22H2.conf
 \f[R]
 .fi
 .IP \[bu] 2
