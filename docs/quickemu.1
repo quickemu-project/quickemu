@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "QUICKEMU" "1" "June 14, 2023" "quickemu" "Quickemu User Manual"
+.TH "QUICKEMU" "1" "June 27, 2023" "quickemu" "Quickemu User Manual"
 .hy
 .SH NAME
 .PP
@@ -490,7 +490,8 @@ quickemu --vm macos-catalina.conf
 .fi
 .PP
 macOS \f[V]high-sierra\f[R], \f[V]mojave\f[R], \f[V]catalina\f[R],
-\f[V]big-sur\f[R] and \f[V]monterey\f[R] are supported.
+\f[V]big-sur\f[R], \f[V]monterey\f[R] and \f[V]ventura\f[R] are
+supported.
 .IP \[bu] 2
 Use cursor keys and enter key to select the \f[B]macOS Base System\f[R]
 .IP \[bu] 2
@@ -506,8 +507,8 @@ click \f[B]Erase\f[R].
 .IP \[bu] 2
 Enter a \f[V]Name:\f[R] for the disk
 .IP \[bu] 2
-If you are installing macOS Mojave or later (Catalina, Big Sur, and
-Monterey), choose any of the APFS options as the filesystem.
+If you are installing macOS Mojave or later (Catalina, Big Sur, Monterey
+and Ventura), choose any of the APFS options as the filesystem.
 MacOS Extended may not work.
 .RE
 .IP \[bu] 2
@@ -626,6 +627,8 @@ Catalina \f[B](Recommended)\f[R]
 Big Sur
 .IP \[bu] 2
 Monterey
+.IP \[bu] 2
+Ventura
 .RE
 .IP \[bu] 2
 \f[V]quickemu\f[R] will automatically download the required

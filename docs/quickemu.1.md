@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: June 14, 2023
+date: June 27, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -349,8 +349,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur` and `monterey` are
-supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
+`ventura` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
@@ -360,8 +360,8 @@ supported.
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
-            Sur, and Monterey), choose any of the APFS options as the
-            filesystem. MacOS Extended may not work.
+            Sur, Monterey and Ventura), choose any of the APFS options
+            as the filesystem. MacOS Extended may not work.
     -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
@@ -443,6 +443,7 @@ There are some considerations when running macOS via Quickemu.
     -   Catalina **(Recommended)**
     -   Big Sur
     -   Monterey
+    -   Ventura
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
