@@ -266,7 +266,6 @@ with your preferred flavour.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
--   `biglinux` (BigLinux)
 -   `blendos` (BlendOS)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
