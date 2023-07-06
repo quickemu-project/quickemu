@@ -1051,10 +1051,10 @@ function get_arcolinux() {
 function get_biglinux() {
     local HASH=""
     local ISO=""
-    local URL="https://iso.biglinux.com.br/"
+    local URL="https://iso.biglinux.com.br"
     ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- ${URL}) | sort -u | tail -n2 | head -n1)
-    HASH=$(curl -s ${URL}${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
-    echo "${URL}${ISO} ${HASH}"
+    HASH=$(curl -s ${URL}/${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_blendos() {
