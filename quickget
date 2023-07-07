@@ -283,15 +283,16 @@ function editions_arcolinux() {
 }
 
 function releases_blendos() {
+
+# Pull the rss feed
+wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
+
     local RLIST
-    RLIST=$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+' | tr ' \r\n' ' ')
+    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
     echo ${RLIST}
 
 }
 
-function editions_blendos() {
-    echo gnome kde
-}
 
 function releases_cachyos() {
     echo 2300305
@@ -1043,30 +1044,17 @@ function get_arcolinux() {
 }
 
 function get_blendos() {
-    local EDITION="${1:-}"
+
     local HASH=""
     local URL=""
-    case ${RELEASE} in
-      23.01)
-        URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
-        HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
-        ;;
-      23.04)
-        case ${EDITION} in
-          gnome)
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${EDITION^^}/blendOS-2023.04.22-x86_64-${EDITION,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-            URL=${TMPURL%\?*}
-            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
-            ;;
-          kde|plasma)
-            local ED_DE="Plasma"
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${ED_DE^}/blendOS-2023.04.22-x86_64-${ED_DE,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-            URL=${TMPURL%\?*}
-            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/Plasma/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
-            ;;
-        esac
-        ;;
-    esac
+
+    # BlendOS has more editions and releases but there's a tracker indirect and other issues
+    # so easier to use the rss feed
+    #
+    # We have to provide edition/release as RELEASE or have a major refactor
+    # But this works for now ...
+    URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
+    HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
     echo "${URL} ${HASH}"
 }
 
