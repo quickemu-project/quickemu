@@ -275,7 +275,9 @@ function releases_archcraft() {
 }
 
 function releases_arcolinux() {
-    echo v21.09.11 v21.11.05 v22.01.10
+    local RLIST
+    RLIST=$(curl -s https://ant.seedhost.eu/arcolinux/iso/ | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | tr '\r\n' ' ')
+    echo ${RLIST}
 }
 
 function editions_arcolinux() {
