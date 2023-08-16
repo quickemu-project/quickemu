@@ -921,7 +921,7 @@ EOF
             fi
             ;;
           vanillaos)
-          ## Minimum 50G for abroot
+          ## Minimum 64G for abroot
            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
            ;;
           zorin)
@@ -945,7 +945,7 @@ EOF
         esac
 
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
-        # wont install  lobster testing with less than 18GB
+        # won't install lobster testing with less than 32GB
           echo "disk_size=\"32G\"" >> "${CONF_FILE}"
         fi
         # Enable TPM for Windows 11

@@ -31,7 +31,7 @@ function ignore_msrs_alert() {
       echo
       echo "             If you are unable to run macOS or Windows VMs then run the above 👆"
       echo "             This will enable ignoring of unhandled MSRs until you reboot the host."
-      echo "             You can make this change permenant by running: 'quickemu --ignore-msrs-always'"
+      echo "             You can make this change permanent by running: 'quickemu --ignore-msrs-always'"
     fi
   fi
 }
@@ -1013,7 +1013,7 @@ function vm_boot() {
   fi
 
   if [ "${network}" == "none" ]; then
-    # Disbale all networking
+    # Disable all networking
     echo " - Network:  Disabled"
     args+=(-nic none)
   elif [ "${network}" == "restrict" ]; then
