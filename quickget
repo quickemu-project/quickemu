@@ -288,7 +288,7 @@ function releases_blendos() {
 wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
 
     local RLIST
-    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
+    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
     echo ${RLIST}
 
 }
@@ -1052,10 +1052,16 @@ function get_blendos() {
     # so easier to use the rss feed
     #
     # We have to provide edition/release as RELEASE or have a major refactor
-    # But this works for now ...
+    # But this works for now ... or does it ....
     URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
     HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
-    echo "${URL} ${HASH}"
+    # ## fix up variables for path naming
+      EDITION=${RELEASE%%/*}
+      RELEASE=${RELEASE##*/}
+      # For UX maybe show the date of the release
+      #echo ${RELEASE##*/} "(" $(date -d @${RELEASE##*/}) ")"
+      # maybe $(date -d @${RELEASE##*/} '+%Y%m%d')
+      echo "${URL} ${HASH}"
 }
 
 function get_vanillaos() {
