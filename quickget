@@ -1513,7 +1513,7 @@ function get_manjaro() {
     if [[ ${RELEASE} != "sway" ]]; then 
         URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
     else
-        URL="$(echo ${MANIFEST} | jq -r .[0].url)"
+        URL="echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url'"
     fi
     
     HASH=$(wget -qO- "${URL}.sha512" | cut -d' ' -f1)
