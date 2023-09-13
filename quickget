@@ -66,6 +66,7 @@ function pretty_name() {
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     holoiso)            PRETTY_NAME="HoloISO";;
+    tuxedoos)           PRETTY_NAME="TuxedoOS";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -227,6 +228,7 @@ function os_support() {
     solus \
     holoiso \
     tails \
+    tuxedoos \
     truenas-core \
     truenas-scale \
     ubuntu \
@@ -577,6 +579,10 @@ function releases_holoiso() {
 
 function releases_tails() {
     echo stable
+}
+
+function releases_tuxedoos() {
+    echo 2
 }
 
 function releases_truenas() {
@@ -1685,6 +1691,16 @@ function get_tails() {
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     echo "${URL} ${HASH}"
+}
+
+function get_tuxedoos() {
+    local DATE="202309111354"
+    local HASH=""
+    local ISO="TUXEDO-OS-${RELEASE}-${DATE}.iso"
+    local URL="https://os.tuxedocomputers.com/"
+
+    HASH=$(wget -q -O- "${URL}/checksums" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_truenas-scale() {
