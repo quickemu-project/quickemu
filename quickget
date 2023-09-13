@@ -705,7 +705,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    echo 6.1.2 6.1 5.0 4.2 4.1 4.0
+    wget -q https://github.com/VX-Linux/main/releases/latest -O- |grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+'|head -1|cut -d/ -f3
 }
 
 function releases_windows() {
@@ -1866,6 +1866,14 @@ function get_void() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_vxlinux() {
+    local HASH=""
+    local ISO="vx-${RELEASE}.iso"
+    local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/vx-${RELEASE}.md5" | cut  -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 
 function get_xerolinux() {
     local HASH=""
@@ -1886,19 +1894,6 @@ function get_zorin() {
     # Parse out the iso URL from the redirector
     URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}${EDITION}" 2>&1 | grep Location | cut -d' ' -f4)
     echo "${URL} ${HASH}"
-}
-
-function get_vxlinux() {
-    local HASH=""
-    local ISO=""
-    local URL="https://github.com/dessington/vx-linux/releases/download/${RELEASE}"
-
-    if [ "$RELEASE" == "4.0" ]; then
-        ISO="vx-linux-4.0-qt.iso"
-    else
-        ISO="vx-linux-${RELEASE}.iso"
-    fi
-    echo "${URL}/${ISO} ${HASH}"
 }
 
 function unattended_windows() {
