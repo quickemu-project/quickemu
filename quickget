@@ -61,6 +61,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    biglinux)           PRETTY_NAME="BigLinux";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -211,6 +212,7 @@ function os_support() {
     archcraft \
     arcolinux \
     batocera \
+    biglinux \
     blendos \
     bodhi \
     bunsenlabs \
@@ -416,6 +418,10 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+
+function releases_biglinux() {
+    echo kde
 }
 
 function releases_blendos() {
@@ -1268,6 +1274,15 @@ function get_bunsenlabs() {
     local URL="https://ddl.bunsenlabs.org/ddl"
     HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_biglinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.biglinux.com.br/"
+    ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- ${URL}) | sort -u | tail -n2 | head -n1)
+    HASH=$(curl -s ${URL}${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
+    echo "${URL}${ISO} ${HASH}"
 }
 
 function get_blendos() {
