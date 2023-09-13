@@ -6,7 +6,7 @@
 
 # Define variables
 progname="${progname:="${0##*/}"}"
-version="0.21"
+version="0.22"
 vms=(*.conf)
 
 # Set traps to catch the signals and exit gracefully
