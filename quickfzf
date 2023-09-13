@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Author: zenobit
-# Description: Uses fzf to provide a simple GUI for quickemu and quickget
+# Description: Uses fzf to provide a simple TUI for quickemu and quickget
 # License MIT
 
 # Define variables
