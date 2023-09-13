@@ -777,7 +777,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    wget -q https://github.com/VX-Linux/main/releases/latest -O- |grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+'|head -1|cut -d/ -f3
+    wget -q https://github.com/VX-Linux/main/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_windows() {
