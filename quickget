@@ -1640,10 +1640,10 @@ function get_siduction() {
     local HASH=""
     local DATE=""
     local ISO=""
-    local URL="https://mirrors.dotsrc.org/siduction/iso/Masters_of_War/${EDITION}"
+    local URL="https://mirrors.dotsrc.org/siduction/iso/Standing_on_the_Shoulders_of_Giants/${EDITION}"
     DATE=$(wget -q -O- "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" | cut -d' ' -f1)
-    ISO="siduction-22.1.1-Masters_of_War-${EDITION}-amd64-${DATE}.iso"
+    ISO="siduction-2023.1.1-Standing_on_the_Shoulders_of_Giants-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
 
