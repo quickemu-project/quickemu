@@ -18,7 +18,7 @@ trap "exit" EXIT
 if ! command -v fzf >/dev/null 2>&1; then
 	echo "You are missing fzf..." && exit 255
 fi
-# Dispaly version and prepared VMs
+# Display version and prepared VMs
 #printf " $progname: $version\n quickemu: $(quickemu --version)\n\n Prepared VMs:\n-------------\n"
 printf '%s: v.%s\nquickemu: v.%s\n\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$progname" "$version" "$(quickemu --version)" "$(pwd)"
 # Check if there are any VMs
@@ -86,11 +86,11 @@ Choose other language" | fzf --cycle)
 	fi
 fi
 # choose VM to run
-choosed=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run
+chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run
  or CTRL-c or ESC to quit')
 
-# Run choosed VM
-printf '\n Starting %s...\n\n' "$choosed"
-quickemu -vm "$choosed.conf"
+# Run chosen VM
+printf '\n Starting %s...\n\n' "$chosen"
+quickemu -vm "$chosen.conf"
 
 exit 0
