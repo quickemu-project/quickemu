@@ -52,6 +52,7 @@ function pretty_name() {
     linuxmint)          PRETTY_NAME="Linux Mint";;
     lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
     mageia)             PRETTY_NAME="Mageia";;
+    miyo)               PRETTY_NAME="Miyo Linux";;
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
@@ -208,6 +209,7 @@ function os_support() {
     lmde \
     mageia \
     manjaro \
+    miyo \
     mxlinux \
     netboot \
     netbsd \
@@ -459,6 +461,14 @@ function releases_mageia(){
 
 function editions_mageia(){
     echo Plasma GNOME Xfce
+}
+
+function releases_miyo() {
+    echo 2022
+}
+
+function editions_miyo(){
+    echo Kwin Deboot-Ceres JWM Openbox MATE
 }
 
 function releases_mxlinux(){
@@ -1501,6 +1511,23 @@ function get_manjaro() {
     URL="$(wget -qO- "${MANIFESTURL}" | grep "Download_x64 =" | cut -d'"' -f2)"
     HASH=$(wget -qO- "${MANIFESTURL}" | grep "Download_x64_Checksum =" | cut -d'"' -f2)
     echo "${URL} ${HASH}"
+}
+
+function get_miyo() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local URL="https://sourceforge.net/projects/miyolinux/files/${RELEASE}-Release/${EDITION}"
+    
+    case ${EDITION} in
+      Kwin) ISO="miyo-kwin-x86_64-BIOS-20220526.iso";;
+      Deboot-Ceres) ISO="Deboot-Ceres-x86-64-BIOS-20220415.iso";;
+      JWM) ISO="miyolinux-jwm-x86_64-BIOS-20220226.iso";;
+      Openbox) ISO="MiyoLinux-x86_64-BIOS-20220129.iso";;
+      MATE) ISO="mate-minimal-x86_64-BIOS-20220107.iso";;
+    esac
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_mxlinux() {
