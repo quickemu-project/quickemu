@@ -30,6 +30,7 @@ function pretty_name() {
   local PRETTY_NAME=""
   SIMPLE_NAME="${1}"
   case ${SIMPLE_NAME} in
+    agarimos)           PRETTY_NAME="AgarimOS";;
     alma)               PRETTY_NAME="Alma Linux";;
     alpine)             PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
@@ -176,7 +177,8 @@ function list_csv() {
 }
 
 function os_support() {
-    echo alma \
+    echo agarimos \
+    alma \
     alpine \
     android \
     archlinux \
@@ -244,6 +246,14 @@ function os_support() {
     xerolinux \
     xubuntu \
     zorin
+}
+
+function releases_agarimos() {
+    echo latest
+}
+
+function editions_agarimos() {
+    echo plasma xfce lxqt gnome
 }
 
 function releases_alma() {
@@ -965,6 +975,34 @@ EOF
     echo "    quickemu --vm ${CONF_FILE}"
     echo
     exit 0
+}
+
+function get_agarimos() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+    case ${EDITION} in
+        gnome)
+            URL="https://sourceforge.net/projects/agarimos/files/Gnome"
+            ISO="AgarimOS-Gnome-Catppuccin-Liv-x86_64-6.3.13_1-20230914.iso"
+            ;;
+        plasma)
+            URL="https://sourceforge.net/projects/agarimos/files/Plasma"
+            ISO="AgarimOS-Plasma-Dracula-Live-x86_64-6.3.13_1-20230913.iso"
+            ;;
+        xfce)
+            URL="https://sourceforge.net/projects/agarimos/files/XFCE4"
+            ISO="AgarimOS-XFCE4-Catppuccin-Live-x86_64-6.3.13_1-20230916.iso"
+            ;;
+        lxqt)
+            URL="https://sourceforge.net/projects/agarimos/files/LXQT-KWIN"
+            ISO="AgarimOS-LXQT-KWIN-Dracula-Live-x86_64-6.3.13_1-20230915.iso"
+            ;;
+    esac
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_alma() {
