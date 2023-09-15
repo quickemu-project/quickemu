@@ -190,6 +190,7 @@ function os_support() {
     deepin \
     devuan \
     dragonflybsd \
+    edubuntu \
     elementary \
     endeavouros \
     endless \
@@ -333,6 +334,10 @@ function releases_dragonflybsd() {
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '\"dfly-x86_64-.*_REL.iso.bz2\"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
     echo $DBSD_RELEASES
+}
+
+function releases_edubuntu() {
+    echo 23.04
 }
 
 function releases_elementary() {
@@ -622,6 +627,8 @@ function releases_ubuntu() {
             daily-live \
             daily-canary \
              ;
+    elif [ "${OS}" == "edubuntu" ]; then
+        echo "23.04"
 
     else
         echo ${LTS_SUPPORT} \
@@ -1708,6 +1715,15 @@ function get_truenas-core() {
     HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1)
 
     echo "${URL} ${HASH}"
+}
+
+function get_edubuntu() {
+    local HASH=""
+    local ISO="edubuntu-${RELEASE}-desktop-amd64.iso"
+    local URL="https://cdimages.ubuntu.com/edubuntu/releases/${RELEASE}/release"
+
+    HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_ubuntu-server() {
