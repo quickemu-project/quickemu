@@ -240,6 +240,7 @@ function os_support() {
     vanillaos \
     void \
     vxlinux \
+    whonix \
     windows \
     xerolinux \
     xubuntu \
@@ -699,6 +700,10 @@ function releases_windows() {
 
 function releases_xerolinux() {
     echo kde
+}
+
+function releases_whonix() {
+    echo 17.0.3.0
 }
 
 function releases_zorin() {
@@ -1841,6 +1846,16 @@ function get_vxlinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_whonix() {
+    local HASH=""
+    local URL=""
+    local ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+    local URL="https://download.whonix.org/libvirt/${RELEASE}/"
+
+    HASH=$(wget -q -O- "${URL}/Whonix-Xfce-${RELEASE}.sha512sums" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function unattended_windows() {
     cat << 'EOF' > "${1}"
 <?xml version="1.0" encoding="utf-8"?>
@@ -2224,6 +2239,13 @@ create_vm() {
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+    fi
+
+    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]]; then
+        cd ${VM_PATH}
+        tar -xvf Whonix*.libvirt.xz        
+        more WHONIX_BINARY_LICENSE_AGREEMENT
+        touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted || touch WHONIX_BINARY_LICENSE_AGREEMENT_denied
     fi
 
     make_vm_config "${ISO}"
