@@ -351,6 +351,9 @@ function vm_boot() {
     if [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1024x768.fd" ]; then
       EFI_CODE="${VMDIR}/OVMF_CODE.fd"
       EFI_VARS="${VMDIR}/OVMF_VARS-1024x768.fd"
+    elif [ -e "${VMDIR}/OVMF_CODE.fd" ] && [ -e "${VMDIR}/OVMF_VARS-1920x1080.fd" ]; then
+      EFI_CODE="${VMDIR}/OVMF_CODE.fd"
+      EFI_VARS="${VMDIR}/OVMF_VARS-1920x1080.fd"
     else
       MAC_MISSING="Firmware"
     fi
@@ -468,7 +471,7 @@ function vm_boot() {
 
   # Make any OS specific adjustments
   case ${guest_os} in
-    batocera|*bsd|freedos|haiku|linux)
+    batocera|*bsd|freedos|haiku|linux|*solaris)
       CPU="-cpu host,kvm=on"
       if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         CPU="${CPU},topoext"
@@ -484,6 +487,11 @@ function vm_boot() {
       if [ "${guest_os}" == "freedos" ] ; then
         # fix for #382
         SMM="on"
+      fi
+
+      if [[ "${guest_os}" == *"solaris" ]]; then
+        MACHINE_TYPE="pc"
+        USB_CONTROLLER="xhci"
       fi
 
       if [ -z "${disk_size}" ]; then
@@ -511,7 +519,7 @@ function vm_boot() {
       case ${macos_release} in
         ventura)
           if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
-            CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt"
+            CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc,+avx2"
           else
             echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 and AVX2 support."
             exit 1
@@ -677,32 +685,33 @@ function vm_boot() {
     local X_RES=1152
     local Y_RES=648
     if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-      local LOWEST_WIDTH=""
       if [ -z "${SCREEN}" ]; then
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
       else
-        LOWEST_WIDTH=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+        X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+        Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
       fi
+
       if [ "${FULLSCREEN}" ]; then
-        if [ -z "${SCREEN}" ]; then
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-        else
-          X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-          Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
-        fi
-      elif [ "${LOWEST_WIDTH}" -ge 3840 ]; then
+        :
+      elif [ "${SCREENPCT}" ] ; then
+        X_RES=$(( X_RES*SCREENPCT/100 ))
+        Y_RES=$(( Y_RES*SCREENPCT/100 ))
+      elif [ "${X_RES}" -ge 3840 ]; then
         X_RES=3200
         Y_RES=1800
-      elif [ "${LOWEST_WIDTH}" -ge 2560 ]; then
+      elif [ "${X_RES}" -ge 2560 ]; then
         X_RES=2048
         Y_RES=1152
-      elif [ "${LOWEST_WIDTH}" -ge 1920 ]; then
+      elif [ "${X_RES}" -ge 1920 ]; then
         X_RES=1664
         Y_RES=936
-      elif [ "${LOWEST_WIDTH}" -ge 1280 ]; then
+      elif [ "${X_RES}" -ge 1280 ]; then
         X_RES=1152
         Y_RES=648
+      else
+        :
       fi
     fi
   fi
@@ -726,6 +735,8 @@ function vm_boot() {
       gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
       sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
     esac
+  elif [ "${guest_os}" == "solaris" ]; then
+    DISPLAY_DEVICE="vmware-svga"
   else
     DISPLAY_DEVICE="qxl-vga"
   fi
@@ -763,7 +774,7 @@ function vm_boot() {
   case ${DISPLAY_DEVICE} in
     bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
     qxl|qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
-    ati-vga|cirrus-vga|VGA) VIDEO="${VIDEO},vgamem_mb=64";;
+    ati-vga|cirrus-vga|VGA|vmware-svga) VIDEO="${VIDEO},vgamem_mb=64";;
   esac
 
   # Configure multiscreen if max_outputs was provided in the .conf file
@@ -1229,6 +1240,7 @@ function vm_boot() {
       sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
     esac
     echo "${QEMU}" "${SHELL_ARGS}" >> "${VMDIR}/${VMNAME}.sh"
+    sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
     ${QEMU} "${args[@]}" > "${VMDIR}/${VMNAME}.log" &
     sleep 0.25
   fi
@@ -1308,6 +1320,7 @@ function usage() {
   echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
   echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
   echo "  --screen <screen>                 : Use specified screen to determine the window size."
+  echo "  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified."
   echo "  --shortcut                        : Create a desktop shortcut"
   echo "  --snapshot apply <tag>            : Apply/restore a snapshot."
   echo "  --snapshot create <tag>           : Create a snapshot."
@@ -1472,6 +1485,7 @@ PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
 SCREEN=""
+SCREENPCT=""
 SHORTCUT=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
@@ -1502,7 +1516,7 @@ EXTRA_ARGS=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="4.6"
+readonly VERSION="4.8"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
@@ -1549,6 +1563,22 @@ else
             exit;;
           -screen|--screen)
             SCREEN="${2}"
+            shift
+            shift;;
+          -screenpct|--screenpct)
+            if [ ! -z "${2##*[!0-9]*}" ] ; then
+              if [[ ${2} -ge 25 && ${2} -lt 100 ]] ; then
+                SCREENPCT=${2}
+              else
+                echo "screenpct invalid must be 25 <= pct < 100"
+                usage
+                exit 1
+              fi
+            else
+              echo "screenpct needs to be an integer in range 25 <= pct < 100"
+              usage
+              exit 1
+            fi
             shift
             shift;;
           -snapshot|--snapshot)

@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: February 4, 2023
+date: June 14, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -93,7 +93,7 @@ Windows**.
 ## Features
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
--   **Windows** 8.1, 10 and 11 including TPM 2.0
+-   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
 -   **Over 360 operating system editions are supported!**
@@ -166,9 +166,9 @@ above requirements or their equivalents.
 
 These examples may save a little typing
 
-Debian:
+Debian (and direct derivatives such as MX Linux):
 
-    sudo apt install qemu bash coreutils ovmf grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-client-gtk swtpm wget xdg-user-dirs zsync unzip
+    sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 
 Fedora:
 
@@ -246,8 +246,10 @@ with your preferred flavour.
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
+-   `ubuntucinnamon` (Ubuntu Cinnamon)
 -   `ubuntukylin` (Ubuntu Kylin)
 -   `ubuntu-mate` (Ubuntu MATE)
+-   `ubuntu-server` (Ubuntu Server)
 -   `ubuntustudio` (Ubuntu Studio)
 -   `ubuntu` (Ubuntu)
 -   `ubuntu-unity` (Ubuntu Unity)
@@ -264,6 +266,7 @@ with your preferred flavour.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
+-   `blendos` (BlendOS)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
@@ -272,13 +275,14 @@ with your preferred flavour.
 -   `dragonflybsd` (DragonFlyBSD)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
+-   `endless` (Endless OS)
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
--   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
+-   `holoiso` (HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -291,18 +295,23 @@ with your preferred flavour.
 -   `netbsd` (NetBSD)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
+-   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
+-   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
+-   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
+-   `vxlinux` (VX Linux)
+-   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
 
 Or you can download a Linux image and manually create a VM
@@ -346,7 +355,8 @@ supported.
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
     -   Click **Disk Utility** and **Continue**
-        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list and
+        -   Select `QEMU HARDDISK Media` (\~103.08GB) from the list (on
+            Big Sur and above use `Apple Inc. VirtIO Block Device`) and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
@@ -482,24 +492,16 @@ Now reboot, and the App Store should work.
 
 ## Windows 10 & 11 Guests
 
-`quickget` can not download
+`quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
 [Windows 11](https://www.microsoft.com/software-download/windows11)
-automatically, but does automatically create an optimised virtual
-machine configuration that you can just add an Windows .iso image to.
+automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
-`quickget` can automatically download Windows 8.1, [Windows
-10](https://www.microsoft.com/en-gb/software-download/windows10ISO) and
-[Windows
-11](https://www.microsoft.com/en-gb/software-download/windows11) along
-with the [VirtIO drivers for
-Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/)
-and creates a virtual machine configuration.
 
 ``` bash
 quickget windows 11
-quickemu --vm windows-11.conf
+quickemu --vm windows-11-22H2.conf
 ```
 
 -   Complete the installation as you normally would.
@@ -541,6 +543,7 @@ Here are the usage instructions:
       --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
       --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
       --screen <screen>                 : Use specified screen to determine the window size.
+      --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified.
       --shortcut                        : Create a desktop shortcut
       --snapshot apply <tag>            : Apply/restore a snapshot.
       --snapshot create <tag>           : Create a snapshot.
@@ -619,6 +622,11 @@ The above uses the 2560x1440 screen to compute the size of the window,
 which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
+
+The '--screenpct' is an optional interger value between 25 \<= pct \<
+100 which will override system default screen sizes. The VM size will be
+'pct' of the chosen screen. **If --fullscreen is chosen screen will be
+fullsize instead of being scaled down by --screenpct value.**
 
 # References
 
