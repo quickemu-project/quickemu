@@ -397,12 +397,11 @@ function releases_freedos() {
 }
 
 function releases_garuda() {
-  echo latest
+    echo latest
 }
 
 function editions_garuda() {
-  URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
-  echo $(wget -q -O - ${URL} | grep '^<a href' | sed -e 's/^.*="//' -e 's/\/.*//')
+    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
 }
 
 function releases_gentoo() {
@@ -1302,7 +1301,7 @@ function get_garuda() {
   local EDITION="${1:-}"
   local HASH=""
   local ISO=""
-  local URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
+  local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
 
   ISO=${EDITION}/latest.iso
 
