@@ -68,6 +68,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    tinycore)           PRETTY_NAME="Tiny Core Linux";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -233,6 +234,7 @@ function os_support() {
     slackware \
     solus \
     tails \
+    tinycore \
     trisquel \
     truenas-core \
     truenas-scale \
@@ -617,6 +619,13 @@ function releases_tails() {
     echo stable
 }
 
+function releases_tinycore() {
+    echo 14.0
+}
+
+function editions_tinycore() {                              echo Core TinyCore CorePlus CorePure64 TinyCorePure64
+}
+
 function releases_trisquel() {
    echo 10.0.1 11.0
 }
@@ -937,7 +946,7 @@ EOF
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
-          dragonflybsd|haiku|openbsd|netbsd|slackware|tails)
+          dragonflybsd|haiku|openbsd|netbsd|slackware|tails|tinycore)
             echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           deepin)
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
@@ -1797,6 +1806,21 @@ function get_tails() {
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     echo "${URL} ${HASH}"
+}
+
+function get_tinycore() {
+    local HASH=""
+    local ISO="${EDITION}-${RELEASE}.iso"
+    local URL=""
+
+    if [ "${EDITION}" == "Core" ] || [ "${EDITION}" == "TinyCore" ] || [ "${EDITION}" == "CorePlus" ]; then
+        URL="http://www.tinycorelinux.net/14.x/x86/release"
+    elif [ "${EDITION}" == "CorePure64" ] || [ "${EDITION}" == "TinyCorePure64" ]; then
+        URL="http://www.tinycorelinux.net/14.x/x86_64/release"
+    fi
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_trisquel() {
