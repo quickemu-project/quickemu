@@ -297,7 +297,7 @@ wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -
 
 
 function releases_cachyos() {
-    echo 2300305
+    echo 230813
 }
 
 function editions_cachyos() {
