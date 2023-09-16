@@ -444,7 +444,7 @@ function releases_kolibrios() {
 }
 
 function releases_linuxmint(){
-    echo 20.2 20.3 21 21.1
+    echo 20.2 20.3 21 21.1 21.2
 }
 
 function editions_linuxmint(){
