@@ -656,7 +656,8 @@ function releases_tinycore() {
     echo 14.0
 }
 
-function editions_tinycore() {                              echo Core TinyCore CorePlus CorePure64 TinyCorePure64
+function editions_tinycore() {
+    echo Core TinyCore CorePlus CorePure64 TinyCorePure64
 }
 
 function releases_trisquel() {
