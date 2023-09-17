@@ -253,6 +253,7 @@ function os_support() {
     gentoo \
     ghostbsd \
     gnomeos \
+    guix \
     haiku \
     holoiso \
     kali \
@@ -347,6 +348,7 @@ function os_homepages(){
         gentoo)            HOMEPAGE="https://www.gentoo.org/";;
         ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
         gnomeos)           HOMEPAGE="https://os.gnome.org/";;
+        guix)              HOMEPAGE="https://guix.gnu.org/";;
         haiku)             HOMEPAGE="https://www.haiku-os.org/";;
         holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
         kali)              HOMEPAGE="https://www.kali.org/";;
@@ -667,6 +669,10 @@ function editions_ghostbsd() {
 function releases_gnomeos() {
     local GNOMEOS_RELEASES=$(curl -s https://download.gnome.org/gnomeos/ | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
     echo nightly ${GNOMEOS_RELEASES}
+}
+
+function releases_guix() {
+    echo 1.4.0 1.3.0
 }
 
 function releases_haiku() {
@@ -1840,6 +1846,16 @@ function get_gnomeos() {
     esac
 
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_guix() {
+    #local HASH=""
+    #local ISO="guix-system-vm-image-1.4.0.x86_64-linux.qcow2"
+    local ISO="guix-system-install-1.4.0.x86_64-linux.iso"
+    local URL="https://ftpmirror.gnu.org/gnu/guix"
+
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sig")
+    echo "${URL}/${ISO}" #${HASH}"
 }
 
 function get_haiku() {
@@ -3145,6 +3161,11 @@ create_vm() {
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
     fi
+
+    #if [ ${OS} == "guix" ] && [[ $ISO =~ ".qcow2" ]]; then
+        #cp ${VM_PATH}/${ISO} ${VM_PATH}/disc.qcow2
+    #fi
+
     if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
