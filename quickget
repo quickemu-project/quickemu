@@ -231,6 +231,7 @@ function os_support() {
     slackware \
     solus \
     tails \
+    trisquel \
     truenas-core \
     truenas-scale \
     ubuntu \
@@ -600,6 +601,14 @@ function editions_solus() {
 
 function releases_tails() {
     echo stable
+}
+
+function releases_trisquel() {
+   echo 10.0.1 11.0
+}
+
+function editions_trisquel() {
+    echo mate lxde kde sugar
 }
 
 function releases_truenas() {
@@ -1781,6 +1790,22 @@ function get_tails() {
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     echo "${URL} ${HASH}"
+}
+
+function get_trisquel() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
+
+    case ${EDITION} in
+        mate)  ISO="trisquel_${RELEASE}_amd64.iso";;
+        lxde)  ISO="trisquel-mini_${RELEASE}_amd64.iso";;
+        kde)   ISO="triskel_${RELEASE}_amd64.iso";;
+        sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
+    esac
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_truenas-scale() {
