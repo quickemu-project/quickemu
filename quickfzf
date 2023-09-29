@@ -6,7 +6,8 @@
 
 # Define variables
 progname="${progname:="${0##*/}"}"
-version="0.22"
+version="0.23"
+#EDITOR="nano"
 vms=(*.conf)
 
 # Set traps to catch the signals and exit gracefully
@@ -22,11 +23,18 @@ if ! command -v quickemu >/dev/null 2>&1; then
 	echo "You are missing quickemu..." && exit 255
 fi
 
-QUICKGET=$(command -v quickget)   || exit 255
+QUICKGET=$(command -v quickget) || exit 255
 
-# Display version and prepared VMs
-#printf " $progname: $version\n quickemu: $(quickemu --version)\n\n Prepared VMs:\n-------------\n"
-printf '%s: v.%s\nquickemu: v.%s\n\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$progname" "$version" "$(quickemu --version)" "$(pwd)"
+# Display header
+printf '%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
+if [ -z "$EDITOR" ]
+then
+      echo "editor: Not set! edit configs will not work!"
+else
+      echo "editor: $EDITOR"
+fi
+printf '\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$(pwd)"
+
 # Check if there are any VMs
 if [ ${#vms[@]} -eq 0 ]; then
     echo "No VMs found."
@@ -37,20 +45,21 @@ fi
 printf "%s\n" "${vms[@]%.*}"
 echo "-------------"
 
+printf 'Press CTRL+c anytime to kill %s\n\n' "$progname"
+
 # Action prompt
 printf " Do you want to create a new VM? (c)
+ edit VM's config file (e)
  or run an existing one? (press anything)\n"
 read -rn 1 -s start
 case $start in
-	c )
-		todo="create"
-	;;
+	c ) todo="create";;
+	e ) todo="edit";;
 esac
 
 # If the user chose to create a new VM
 if [ "$todo" = "create" ]; then
-	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download
- or CTRL-c or ESC to quit')
+	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
 	# If the OS is Windows
 	if [ "$os" = windows ]; then
 		answer=$(echo "Default English
@@ -63,8 +72,7 @@ Choose other language" | fzf --cycle)
 			# get window language list
 			wlend=$(($(cat $QUICKGET  | sed '/Arabic/,$!d' | grep -n '}' | cut -d':' -f1 | head -n 1) - 1))
 			# get windows language
-			wlang=$(cat $QUICKGET | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --cycle --header='Choose Language
- or CTRL-c or ESC to quit')
+			wlang=$(cat $QUICKGET | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --cycle --header='Choose Language')
 			# downloading windows
 			printf '\n Trying to download Windows %s %s...\n\n' "$wrelease" "$wlang"
 			quickget "windows" "$wrelease" "$wlang"
@@ -74,26 +82,26 @@ Choose other language" | fzf --cycle)
 	choices=$(quickget "$os" | sed 1d)
 	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
 		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release
- or CTRL-c or ESC to quit')
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
 		# downloading
 		printf '\n Trying to download %s %s...\n\n' "$os" "$release"
 		quickget "$os" "$release"
 	else
 		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release
- or CTRL-c or ESC to quit')
+		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
 		# get edition
-		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition
- or CTRL-c or ESC to quit')
+		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
 		# downloading
 		printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
 		quickget "$os" "$release" "$edition"
 	fi
+elif [ "$todo" = "edit" ]; then
+	editconfig=$(ls | grep '.conf' | fzf --cycle --header='Choose config to edit')
+	"$EDITOR" "$editconfig" 
 fi
+
 # choose VM to run
-chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run
- or CTRL-c or ESC to quit')
+chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run')
 
 # Run chosen VM
 printf '\n Starting %s...\n\n' "$chosen"
