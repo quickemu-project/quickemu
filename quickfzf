@@ -16,11 +16,11 @@ trap "exit" EXIT
 
 # Dependency check: check if fzf is installed and can be executed
 if ! command -v fzf >/dev/null 2>&1; then
-	echo "You are missing fzf..." && exit 255
+    echo "You are missing fzf..." && exit 255
 fi
 
 if ! command -v quickemu >/dev/null 2>&1; then
-	echo "You are missing quickemu..." && exit 255
+    echo "You are missing quickemu..." && exit 255
 fi
 
 QUICKGET=$(command -v quickget) || exit 255
@@ -29,9 +29,9 @@ QUICKGET=$(command -v quickget) || exit 255
 printf '%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
 if [ -z "$EDITOR" ]
 then
-      echo "editor: Not set! edit configs will not work!"
+    echo "editor: Not set! edit configs will not work!"
 else
-      echo "editor: $EDITOR"
+    echo "editor: $EDITOR"
 fi
 printf '\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$(pwd)"
 
@@ -53,51 +53,34 @@ printf " Do you want to create a new VM? (c)
  or run an existing one? (press anything)\n"
 read -rn 1 -s start
 case $start in
-	c ) todo="create";;
-	e ) todo="edit";;
+    c ) todo="create";;
+    e ) todo="edit";;
 esac
 
 # If the user chose to create a new VM
 if [ "$todo" = "create" ]; then
-	os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
-	# If the OS is Windows
-	if [ "$os" = windows ]; then
-		answer=$(echo "Default English
-Choose other language" | fzf --cycle)
-		# If the user wants another windows language
-		if [ "$answer" = "Choose other language" ]; then
-			wrelease=$(echo "8
-10
-11" | fzf --cycle)
-			# get window language list
-			wlend=$(($(cat $QUICKGET  | sed '/Arabic/,$!d' | grep -n '}' | cut -d':' -f1 | head -n 1) - 1))
-			# get windows language
-			wlang=$(cat $QUICKGET | sed '/Arabic/,$!d' | head -n $wlend | cut -d'=' -f2 | tail -c +2 | head -c -2 | sed 's/^[ \t]*//' | fzf --cycle --header='Choose Language')
-			# downloading windows
-			printf '\n Trying to download Windows %s %s...\n\n' "$wrelease" "$wlang"
-			quickget "windows" "$wrelease" "$wlang"
-		fi
-	fi
-	# Get the release and edition to download, if necessary
-	choices=$(quickget "$os" | sed 1d)
-	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
-		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-		# downloading
-		printf '\n Trying to download %s %s...\n\n' "$os" "$release"
-		quickget "$os" "$release"
-	else
-		# get release
-		release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-		# get edition
-		edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
-		# downloading
-		printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
-		quickget "$os" "$release" "$edition"
-	fi
-elif [ "$todo" = "edit" ]; then
-	editconfig=$(ls | grep '.conf' | fzf --cycle --header='Choose config to edit')
-	"$EDITOR" "$editconfig" 
+    os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
+fi
+
+# Get the release and edition to download, if necessary
+choices=$(quickget "$os" | sed 1d)
+if [ "$todo" = "edit" ]; then
+    editconfig=$(ls | grep '.conf' | fzf --cycle --header='Choose config to edit')
+    "$EDITOR" "$editconfig" 
+elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
+    # get release
+    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
+    # downloading
+    printf '\n Trying to download %s %s...\n\n' "$os" "$release"
+    quickget "$os" "$release"
+else
+    # get release
+    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
+    # get edition
+    edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
+    # downloading
+    printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
+    quickget "$os" "$release" "$edition"
 fi
 
 # choose VM to run
