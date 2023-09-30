@@ -50,6 +50,7 @@ function pretty_name() {
     holoiso)            PRETTY_NAME="HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
+    linuxlite)          PRETTY_NAME="Linux Lite";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
     lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
     mageia)             PRETTY_NAME="Mageia";;
@@ -208,6 +209,7 @@ function os_support() {
     kdeneon \
     kolibrios \
     kubuntu \
+    linuxlite \
     linuxmint \
     lmde \
     mageia \
@@ -458,6 +460,10 @@ function releases_kdeneon() {
 
 function releases_kolibrios() {
     echo latest
+}
+
+function releases_linuxlite() {
+	echo 6.0 6.2 6.4 6.6
 }
 
 function releases_linuxmint(){
@@ -1439,6 +1445,15 @@ function get_kolibrios() {
     local HASH=""
     local ISO="kolibri.iso"
     local URL="https://builds.kolibrios.org/eng"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_linuxlite() {
+    local HASH=""
+    local ISO="linux-lite-${RELEASE}-64bit.iso"
+    local URL="https://sourceforge.net/projects/linux-lite/files/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
