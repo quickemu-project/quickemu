@@ -6,46 +6,42 @@
 
 # Define variables
 progname="${progname:="${0##*/}"}"
-version="0.23"
+version="0.24"
 #EDITOR="nano"
+configfile=~/.config/quickfzf/config
 vms=(*.conf)
-
 # Set traps to catch the signals and exit gracefully
 trap "exit" INT
 trap "exit" EXIT
-
 # Dependency check: check if fzf is installed and can be executed
 if ! command -v fzf >/dev/null 2>&1; then
     echo "You are missing fzf..." && exit 255
 fi
-
 if ! command -v quickemu >/dev/null 2>&1; then
     echo "You are missing quickemu..." && exit 255
 fi
-
 QUICKGET=$(command -v quickget) || exit 255
 
 # Display header
-printf '%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
+printf 'Simple TUI for quickemu\n%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
+if [ -f "$configfile" ]; then
+	printf 'custom command:\nquickemu %s\n' "$(cat "$configfile")"
+fi
 if [ -z "$EDITOR" ]; then
     echo "editor: Not set! edit configs will not work!"
 else
     echo "editor: $EDITOR"
 fi
 printf '\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$(pwd)"
-
 # Check if there are any VMs
 if [ ${#vms[@]} -eq 0 ]; then
     echo "No VMs found."
     exit 1
 fi
-
 # Print the names of the available VMs
 printf "%s\n" "${vms[@]%.*}"
 echo "-------------"
-
-printf 'Press CTRL+c anytime to kill %s\n\n' "$progname"
-
+printf '\nPress CTRL+c anytime to kill %s\n\n' "$progname"
 # Action prompt
 printf " Do you want to create a new VM? (c)
  edit VM's config file (e)
@@ -87,7 +83,16 @@ elif [ "$todo" = "edit" ]; then
 
 # create quickemu custom command
 elif [ "$todo" = "custom" ]; then
-	echo "custom"
+	custom=$(echo "edit delete"| grep -o '[^ ]*' | fzf --cycle --header='Edit or delete custom command?')
+	if [ "$custom" = "edit" ]; then
+		quickemu
+		printf '\nEnter quickemu custom command:\n'
+		read -r qcommand
+		mkdir -p ~/.config/quickfzf
+		echo "$qcommand" > "$configfile"
+	elif [ "$custom" = "delete" ]; then
+		rm -r ~/.config/quickfzf
+	fi
 
 # run VM
 elif [ "$todo" = "run" ]; then
@@ -96,7 +101,10 @@ elif [ "$todo" = "run" ]; then
 
 	# Run chosen VM
 	printf '\n Starting %s...\n\n' "$chosen"
-	quickemu -vm "$chosen.conf"
+	if [ -f "$configfile" ]; then
+		quickemu $(cat "$configfile") -vm "$chosen".conf
+	else
+		quickemu -vm "$chosen".conf
+	fi
 fi
-
 exit 0
