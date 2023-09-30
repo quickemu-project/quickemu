@@ -27,8 +27,7 @@ QUICKGET=$(command -v quickget) || exit 255
 
 # Display header
 printf '%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
-if [ -z "$EDITOR" ]
-then
+if [ -z "$EDITOR" ]; then
     echo "editor: Not set! edit configs will not work!"
 else
     echo "editor: $EDITOR"
@@ -50,44 +49,54 @@ printf 'Press CTRL+c anytime to kill %s\n\n' "$progname"
 # Action prompt
 printf " Do you want to create a new VM? (c)
  edit VM's config file (e)
- or run an existing one? (press anything)\n"
+ quickemu custom command (q) 
+ or run an existing one? (press anything else)\n"
 read -rn 1 -s start
 case $start in
     c ) todo="create";;
     e ) todo="edit";;
+    q ) todo="custom";;
+    * ) todo="run";;
 esac
 
 # If the user chose to create a new VM
 if [ "$todo" = "create" ]; then
     os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
-fi
+	choices=$(quickget "$os" | sed 1d)
+	# Get the release and edition to download, if necessary
+	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
+	    # get release
+	    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
+	    # downloading
+	    printf '\n Trying to download %s %s...\n\n' "$os" "$release"
+	    quickget "$os" "$release"
+	else
+	    # get release
+	    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
+	    # get edition
+	    edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
+	    # downloading
+	    printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
+	    quickget "$os" "$release" "$edition"
+	fi
 
-# Get the release and edition to download, if necessary
-choices=$(quickget "$os" | sed 1d)
-if [ "$todo" = "edit" ]; then
+# edit VM's config'
+elif [ "$todo" = "edit" ]; then
     editconfig=$(ls | grep '.conf' | fzf --cycle --header='Choose config to edit')
-    "$EDITOR" "$editconfig" 
-elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
-    # get release
-    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-    # downloading
-    printf '\n Trying to download %s %s...\n\n' "$os" "$release"
-    quickget "$os" "$release"
-else
-    # get release
-    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-    # get edition
-    edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
-    # downloading
-    printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
-    quickget "$os" "$release" "$edition"
+    "$EDITOR" "$editconfig"
+
+# create quickemu custom command
+elif [ "$todo" = "custom" ]; then
+	echo "custom"
+
+# run VM
+elif [ "$todo" = "run" ]; then
+	# choose VM to run
+	chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run')
+
+	# Run chosen VM
+	printf '\n Starting %s...\n\n' "$chosen"
+	quickemu -vm "$chosen.conf"
 fi
-
-# choose VM to run
-chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run')
-
-# Run chosen VM
-printf '\n Starting %s...\n\n' "$chosen"
-quickemu -vm "$chosen.conf"
 
 exit 0
