@@ -249,11 +249,11 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.6 8.7 9.0 9.1
+    echo 8 9
 }
 
 function editions_alma() {
-    echo minimal dvd
+    echo boot minimal dvd
 }
 
 function releases_alpine() {
@@ -992,8 +992,8 @@ EOF
 function get_alma() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
-    local URL="https://mirror.rackspace.com/almalinux/${RELEASE/beta-1/beta}/isos/x86_64/"
+    local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
+    local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
