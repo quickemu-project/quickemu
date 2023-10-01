@@ -253,7 +253,7 @@ function vm_boot() {
   echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
   echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
 
-  HOST_CPU_CORES=$(nproc --all)
+  HOST_CPU_CORES=$(nproc)
   HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
   HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
   HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
