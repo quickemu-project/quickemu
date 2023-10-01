@@ -83,6 +83,7 @@ function pretty_name() {
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
+    chimeralinux)       PRETTY_NAME="Chimera Linux";;
     crunchbang++)       PRETTY_NAME="Crunchbang++";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     easyos)             PRETTY_NAME="EasyOS";;
@@ -239,6 +240,7 @@ function os_support() {
     bunsenlabs \
     cachyos \
     centos-stream \
+    chimeralinux \
     crunchbang++ \
     debian \
     deepin \
@@ -331,6 +333,7 @@ function os_homepage(){
         bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
         cachyos)           HOMEPAGE="https://cachyos.org/";;
         centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
+        chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
         crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
         debian)            HOMEPAGE="https://www.debian.org/";;
         deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
@@ -533,6 +536,14 @@ function releases_centos-stream() {
 
 function editions_centos-stream() {
     echo dvd1 boot
+}
+
+function releases_chimeralinux() {
+    echo latest
+}
+
+function editions_chimeralinux() {
+    echo base gnome
 }
 
 function releases_crunchbang++() {
@@ -1532,6 +1543,19 @@ function get_centos-stream() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_chimeralinux() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local DATE=""
+    local ISO=""
+    local URL="https://repo.chimera-linux.org/live/${RELEASE}"
+
+    DATE=$(wget -q -O- "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
+    ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
+    HASH=$(wget -q -O- "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_crunchbang++() {
     local HASH=""
     local ISO=""
@@ -1540,7 +1564,6 @@ function get_crunchbang++() {
     local URLPART2=""
 
     URLPART="https://github.com/CBPP/cbpp"
-
     case ${RELEASE} in
         8)
             URLPART2="releases/download/v1.0-amd64"
@@ -1563,7 +1586,6 @@ function get_crunchbang++() {
             ISO="cbpp-12.0-amd64-20230611.iso"
             ;;
     esac
-
     URL="${URLPART}/${URLPART2}"
     echo "${URL}/${ISO} ${HASH}"
 }
