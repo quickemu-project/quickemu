@@ -33,9 +33,9 @@ function pretty_name() {
     alma)               PRETTY_NAME="Alma Linux";;
     alpine)             PRETTY_NAME="Alpine Linux";;
     android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
+    arch)               PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
+    arco)               PRETTY_NAME="Arco Linux";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -49,10 +49,10 @@ function pretty_name() {
     ghostbsd)           PRETTY_NAME="GhostBSD";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
+    mint)               PRETTY_NAME="Linux Mint";;
     lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
     mageia)             PRETTY_NAME="Mageia";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
+    mx)                 PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
     nixos)              PRETTY_NAME="NixOS";;
@@ -60,11 +60,11 @@ function pretty_name() {
     openbsd)            PRETTY_NAME="OpenBSD";;
     openindiana)        PRETTY_NAME="OpenIndiana";;
     opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
+    oracle)             PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
+    rocky)              PRETTY_NAME="Rocky Linux";;
     holoiso)            PRETTY_NAME="HoloISO";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
@@ -77,8 +77,8 @@ function pretty_name() {
     ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
     vanillaos)          PRETTY_NAME="Vanilla OS";;
     void)               PRETTY_NAME="Void Linux";;
-    vxlinux)            PRETTY_NAME="VX Linux";;
-    xerolinux)          PRETTY_NAME="XeroLinux";;
+    vx)                 PRETTY_NAME="VX Linux";;
+    xero)               PRETTY_NAME="XeroLinux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -179,9 +179,9 @@ function os_support() {
     echo alma \
     alpine \
     android \
-    archlinux \
+    arch \
     archcraft \
-    arcolinux \
+    arco \
     batocera \
     blendos \
     cachyos \
@@ -204,11 +204,11 @@ function os_support() {
     kdeneon \
     kolibrios \
     kubuntu \
-    linuxmint \
+    mint \
     lmde \
     mageia \
     manjaro \
-    mxlinux \
+    mx \
     netboot \
     netbsd \
     nixos \
@@ -217,11 +217,11 @@ function os_support() {
     openbsd \
     openindiana \
     opensuse \
-    oraclelinux \
+    oracle \
     popos \
     reactos \
     rebornos \
-    rockylinux \
+    rocky \
     siduction \
     slackware \
     solus \
@@ -239,9 +239,9 @@ function os_support() {
     ubuntu-unity \
     vanillaos \
     void \
-    vxlinux \
+    vx \
     windows \
-    xerolinux \
+    xero \
     xubuntu \
     zorin
 }
@@ -266,7 +266,7 @@ function editions_android() {
     echo x86 x86_64
 }
 
-function releases_archlinux() {
+function releases_arch() {
     echo latest
 }
 
@@ -274,11 +274,11 @@ function releases_archcraft() {
     echo latest
 }
 
-function releases_arcolinux() {
+function releases_arco() {
     echo v21.09.11 v21.11.05 v22.01.10
 }
 
-function editions_arcolinux() {
+function editions_arco() {
     echo large small
 }
 
@@ -437,11 +437,11 @@ function releases_kolibrios() {
     echo latest
 }
 
-function releases_linuxmint(){
+function releases_mint(){
     echo 20.2 20.3 21 21.1
 }
 
-function editions_linuxmint(){
+function editions_mint(){
     echo cinnamon mate xfce
 }
 
@@ -461,11 +461,11 @@ function editions_mageia(){
     echo Plasma GNOME Xfce
 }
 
-function releases_mxlinux(){
+function releases_mx(){
     echo 21.3
 }
 
-function editions_mxlinux(){
+function editions_mx(){
     echo Xfce KDE Fluxbox
 }
 
@@ -517,7 +517,7 @@ function releases_opensuse(){
     echo 15.0 15.1 15.2 15.3 15.4 microos tumbleweed
 }
 
-function releases_oraclelinux() {
+function releases_oracle() {
     echo 7.7 7.8 7.9 8.4 8.5 8.6 9.0
 }
 
@@ -543,11 +543,11 @@ function get_rebornos() {
    echo "${ISO} ${HASH}"
 }
 
-function releases_rockylinux() {
+function releases_rocky() {
     echo 8.3 8.4 8.5 8.6 8.7 9.0 9.1
 }
 
-function editions_rockylinux() {
+function editions_rocky() {
     echo minimal dvd boot
 }
 
@@ -689,7 +689,7 @@ function editions_void() {
     echo glibc musl xfce-glibc xfce-musl
 }
 
-function releases_vxlinux() {
+function releases_vx() {
     echo 6.1.2 6.1 5.0 4.2 4.1 4.0
 }
 
@@ -697,7 +697,7 @@ function releases_windows() {
     echo 10 11
 }
 
-function releases_xerolinux() {
+function releases_xero() {
     echo kde
 }
 
@@ -881,7 +881,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
+          alma|centos-stream|endless|nixos|oracle|popos|rocky)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           openindiana)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -1014,7 +1014,7 @@ function get_android() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_archlinux() {
+function get_arch() {
     local HASH=""
     local ISO=""
     local URL="https://mirror.rackspace.com/archlinux"
@@ -1033,7 +1033,7 @@ function get_archcraft() {
     echo "${URL} ${HASH}"
 }
 
-function get_arcolinux() {
+function get_arco() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
@@ -1373,7 +1373,7 @@ function get_kolibrios() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_linuxmint() {
+function get_mint() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
@@ -1503,7 +1503,7 @@ function get_manjaro() {
     echo "${URL} ${HASH}"
 }
 
-function get_mxlinux() {
+function get_mx() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
@@ -1582,7 +1582,7 @@ function get_opensuse() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_oraclelinux() {
+function get_oracle() {
     local HASH=""
     local ISO=""
     local VER_MAJ=${RELEASE::1}
@@ -1617,7 +1617,7 @@ function get_reactos() {
     echo "${URL} ${HASH}"
 }
 
-function get_rockylinux() {
+function get_rocky() {
     local EDITION="${1:-}"
     if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]
     then
@@ -1807,7 +1807,7 @@ function get_void() {
 }
 
 
-function get_xerolinux() {
+function get_xero() {
     local HASH=""
     local URL=""
     local ISO="xerolinux-2022.12-x86_64.iso"
@@ -1828,7 +1828,7 @@ function get_zorin() {
     echo "${URL} ${HASH}"
 }
 
-function get_vxlinux() {
+function get_vx() {
     local HASH=""
     local ISO=""
     local URL="https://github.com/dessington/vx-linux/releases/download/${RELEASE}"
