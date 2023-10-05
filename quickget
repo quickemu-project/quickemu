@@ -1348,7 +1348,6 @@ function get_haiku() {
 
 function get_holoiso() {
     local HASH=""
-    local DATE="20221211"
     local ISO="HoloISO_${RELEASE}_ux_changes-20230626_66f7c74061_bootchoice_fixes-1-x86_64.iso"
     local URL="http://holoiso.itsvixano.me"
 
