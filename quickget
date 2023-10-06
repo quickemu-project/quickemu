@@ -184,6 +184,7 @@ function os_support() {
     arcolinux \
     batocera \
     blendos \
+    bunsenlabs \
     cachyos \
     centos-stream \
     debian \
@@ -291,6 +292,10 @@ function releases_blendos() {
 
 function editions_blendos() {
     echo gnome kde
+}
+
+function releases_bunsenlabs() {
+    echo latest
 }
 
 function releases_cachyos() {
@@ -1039,6 +1044,14 @@ function get_arcolinux() {
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_bunsenlabs() {
+    local HASH=""
+    local ISO="beryllium-1-amd64.hybrid.iso"
+    local URL="https://ddl.bunsenlabs.org/ddl"
+    HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
