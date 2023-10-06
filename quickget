@@ -62,6 +62,7 @@ function pretty_name() {
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
     popos)              PRETTY_NAME="Pop!_OS";;
+    pureos)             PRETTY_NAME="PureOS";;
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
@@ -219,6 +220,7 @@ function os_support() {
     opensuse \
     oraclelinux \
     popos \
+    pureos \
     reactos \
     rebornos \
     rockylinux \
@@ -527,6 +529,14 @@ function releases_popos() {
 
 function editions_popos() {
     echo intel nvidia
+}
+
+function releases_pureos() {
+    echo 9.0 10.3
+}
+
+function editions_pureos() {
+    echo gnome plasma
 }
 
 function releases_reactos() {
@@ -1605,6 +1615,26 @@ function get_popos() {
     URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
     HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
     echo "${URL} ${HASH}"
+}
+
+function get_pureos() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+	case ${RELEASE} in
+      9)
+		URL="https://downloads.puri.sm/9/live/${EDITION}/2020-08-06"
+		ISO="pureos-${RELEASE}-${EDITION}-live_20200806-amd64.hybrid.iso"
+		HASH=$(wget -q -O- "${URL}/checksums.sha256sum" | grep "${ISO}" | cut -d' ' -f1)
+		;;
+      10)
+		URL="https://downloads.puri.sm/10/${EDITION}/2023-06-14"
+		ISO="pureos-${RELEASE}-${EDITION}-live-20230614_amd64.iso"
+		HASH=$(wget -q -O- "${URL}/pureos-${RELEASE}-${EDITION}-live-20230614_amd64.checksums_sha256.txt" | head -1 | cut -d' ' -f1)
+    esac
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_reactos() {
