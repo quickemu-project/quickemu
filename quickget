@@ -118,6 +118,7 @@ function pretty_name() {
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
     slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
+    sparkylinux)        PRETTY_NAME="SparkyLinux";;
     tinycore)           PRETTY_NAME="Tiny Core Linux";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
@@ -292,6 +293,7 @@ function os_support() {
     slax \
     slitaz \
     solus \
+    sparkylinux \
     spiral \
     tails \
     tinycore \
@@ -386,6 +388,7 @@ function os_homepage(){
         slax)              HOMEPAGE="https://www.slax.org/";;
         slitaz)            HOMEPAGE="https://www.slitaz.org/";;
         solus)             HOMEPAGE="https://getsol.us/";;
+        sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
         spiral)            HOMEPAGE="https://spirallinux.github.io/";;
         tails)             HOMEPAGE="https://tails.net/";;
         tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
@@ -865,6 +868,15 @@ function releases_solus() {
 
 function editions_solus() {
     echo Budgie GNOME MATE Plasma
+}
+
+function releases_sparkylinux() {
+    local SPARKY_RELEASES=$(wget -qO- "https://sourceforge.net/projects/sparkylinux/rss?path=/" | grep 'link' | grep '.iso' | cut -d'-' -f2 | uniq | tr '\r\n' ' ')
+    echo "${SPARKY_RELEASES}"
+}
+
+function editions_sparkylinux() {
+    echo lxqt mate xfce kde minimalgui minimalcli gameover multimedia rescue
 }
 
 function releases_spiral() {
@@ -2307,6 +2319,23 @@ function get_solus() {
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_sparkylinux() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    ISO="sparkylinux-${RELEASE}-x86_64-${EDITION}.iso"
+    case ${EDITION} in
+      minimalcli) URL="https://sourceforge.net/projects/sparkylinux/files/cli";;
+      minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
+      *)   URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
+    esac
+
+    HASH=$(wget -q -O- ${URL}/${ISO}.allsums.txt | head -2 | grep 'iso' | cut -d' ' -f1)
+    echo "${URL}/${ISO}" "${HASH}"
 }
 
 function get_spiral() {
