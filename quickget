@@ -334,7 +334,7 @@ function releases_deepin() {
 }
 
 function releases_devuan() {
-    echo beowulf chimaera
+    echo beowulf chimaera daedalus
 }
 
 function releases_dragonflybsd() {
@@ -1229,6 +1229,7 @@ function get_devuan() {
     case ${RELEASE} in
       beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
       chimaera) ISO="devuan_${RELEASE}_4.0.2_amd64_desktop-live.iso";;
+      daedalus) ISO="devuan_${RELEASE}_5.0.0_amd64_desktop-live.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
