@@ -255,7 +255,7 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    echo 3.12 3.13 3.14 3.15 latest
+    echo 3.12 3.13 3.14 3.15 3.16 3.17 3.18 latest
 }
 
 function releases_android() {
