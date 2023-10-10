@@ -336,7 +336,7 @@ function releases_dragonflybsd() {
 }
 
 function releases_elementary() {
-    echo 7.0
+    echo 7.0 7.1
 }
 
 function releases_endeavouros() {
@@ -1201,11 +1201,11 @@ function get_dragonflybsd() {
 function get_elementary() {
     local HASH=""
     case ${RELEASE} in
-      6.2)
-        local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
-        ;;
       7.0)
         local ISO="elementaryos-${RELEASE}-stable.20230129rc.iso"
+        ;;
+      7.1)
+        local ISO="elementaryos-${RELEASE}-stable.20230926rc.iso"
         ;;
     esac
     local URL="https://ams3.dl.elementary.io/download"
