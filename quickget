@@ -250,6 +250,7 @@ function os_support() {
     windows \
     xerolinux \
     xubuntu \
+    zephix \
     zorin
 }
 
@@ -748,6 +749,14 @@ function releases_windows() {
 
 function releases_xerolinux() {
     echo kde
+}
+
+function releases_zephix() {
+    echo 7
+}
+
+function editions_zephix() {
+    echo base cinnamon gnome kde lxde lxqt mate xfce
 }
 
 function releases_zorin() {
@@ -1950,6 +1959,19 @@ function get_xerolinux() {
     local URL="https://sourceforge.net/projects/xerolinux/files/Releases"
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_zephix() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local URL="https://sourceforge.net/projects/zephix-linux/files/ISO"
+
+    case ${EDITION} in
+        base) ISO="Zephix-${RELEASE}R-x86_64.iso";;
+        *)    ISO="Zephix-${RELEASE}R-${EDITION}.iso";;
+    esac
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
