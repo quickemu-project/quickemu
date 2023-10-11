@@ -230,6 +230,7 @@ function os_support() {
     oraclelinux \
     peppermint \
     popos \
+    porteus \
     reactos \
     rebornos \
     rockylinux \
@@ -586,6 +587,14 @@ function releases_popos() {
 
 function editions_popos() {
     echo intel nvidia
+}
+
+function releases_porteus() {
+    echo 5.0 5.01
+}
+
+function editions_porteus() {
+    echo cinnamon gnome kde lxde lxqt mate openbox xfce
 }
 
 function releases_reactos() {
@@ -1823,6 +1832,19 @@ function get_popos() {
     URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
     HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
     echo "${URL} ${HASH}"
+}
+
+function get_porteus() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    edition="${EDITION~~}"
+    ISO="Porteus-${edition}-v${RELEASE}-x86_64.iso"
+    URL="https://mirrors.dotsrc.org/porteus/x86_64/Porteus-v${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/sha256sums.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_reactos() {
