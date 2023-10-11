@@ -438,11 +438,11 @@ function releases_kolibrios() {
 }
 
 function releases_linuxmint(){
-    echo 20.2 20.3 21 21.1
+    echo 20.2 20.3 21 21.1 21.2
 }
 
 function editions_linuxmint(){
-    echo cinnamon mate xfce
+    echo cinnamon mate xfce edge
 }
 
 function editions_lmde(){
@@ -1376,9 +1376,13 @@ function get_kolibrios() {
 function get_linuxmint() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
+    local ISO=""
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
 
+    case ${EDITION} in
+      edge) ISO="linuxmint-${RELEASE}-cinnamon-64bit-edge.iso";;
+      *) ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso";;
+    esac
     HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2290,6 +2294,14 @@ if [ -n "${2}" ]; then
             fi
         fi
 
+        # Handle linux mint edge
+        if [[ $OS == linuxmint ]] ; then
+            if [[ ! ${RELEASE} = "21.2"  &&  ${EDITION} = "edge"  ]] ; then
+                echo "ERROR! Unsupported combination"
+                echo "       Linux Mint edge started from version 21.2, please choose another Release or Edition"
+                exit 1;
+            fi
+        fi
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         validate_release "releases_${OS}"
