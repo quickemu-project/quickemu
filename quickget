@@ -1206,6 +1206,7 @@ function get_elementary() {
         ;;
       7.1)
         local ISO="elementaryos-${RELEASE}-stable.20230926rc.iso"
+        HASH="5c7f6b388e5787c366587985301ea05ab16e4cc0de3be2b3d6a559ce81a2f102"
         ;;
     esac
     local URL="https://ams3.dl.elementary.io/download"
