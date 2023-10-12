@@ -190,6 +190,7 @@ function os_support() {
     bunsenlabs \
     cachyos \
     centos-stream \
+    crowz \
     debian \
     deepin \
     devuan \
@@ -329,6 +330,14 @@ function releases_centos-stream() {
 
 function editions_centos-stream() {
     echo dvd1 boot
+}
+
+function releases_crowz() {
+    echo 3.0 4.0 5.0
+}
+
+function editions_crowz() {
+    echo openbox jwm fluxbox
 }
 
 function releases_debian() {
@@ -1192,6 +1201,32 @@ function get_centos-stream() {
     esac
 
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_crowz() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/crowz/files"
+
+   case ${EDITION} in
+      openbox) EDIT="ob";;
+      fluxbox) EDIT="fb";;
+      jwm) EDIT="jwm";;
+    esac
+
+   case ${RELEASE} in
+      5.0) ISO="crowz-${RELEASE}-daedalus_2023.10-${EDIT}-amd64.iso";;
+      4.0) ISO="crowz-${RELEASE}-chimaera-2022.7-${EDIT}-amd64.iso";;
+      3.0) ISO="crowz-${RELEASE}-beowulf-2020.8-${EDIT}-amd64.iso";;
+    esac
+
+    if [[ ${RELEASE} = "4.0" && ${EDITION} = "openbox" ]] ; then
+        ISO="crowz-4.0-chimaera-2022-7-ob-amd64.iso"
+    fi
+
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} #${HASH}"
 }
 
 function get_debian() {
