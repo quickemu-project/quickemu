@@ -183,6 +183,7 @@ function os_support() {
     echo alma \
     alpine \
     android \
+    antix \
     archlinux \
     archcraft \
     arcolinux \
@@ -275,6 +276,14 @@ function releases_android() {
 
 function editions_android() {
     echo x86 x86_64
+}
+
+function releases_antix() {
+	echo 21 22 23
+}
+
+function editions_antix() {
+	echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
 }
 
 function releases_archlinux() {
@@ -1083,6 +1092,40 @@ function get_android() {
             break
         fi
     done
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_antix() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/antix-linux/files/Final/antiX-${RELEASE}"
+
+    case ${RELEASE} in
+        21) URL_runit="${URL}/runit-bullseye";;
+         *) URL_runit="${URL}/runit-antiX-${RELEASE}";;
+    esac
+
+    case ${EDITION} in
+      net-sysv)  ISO="antiX-${RELEASE}-net_x64-net.iso";;
+      core-sysv) ISO="antiX-${RELEASE}_x64-core.iso";;
+      base-sysv) ISO="antiX-${RELEASE}_x64-base.iso";;
+      full-sysv) ISO="antiX-${RELEASE}_x64-full.iso";;
+      net-runit)  ISO="antiX-${RELEASE}-runit-net_x64-net.iso"
+                  URL="${URL_runit}"
+      ;;
+      core-runit) ISO="antiX-${RELEASE}-runit_x64-core.iso"
+                  URL="${URL_runit}"
+      ;;
+      base-runit) ISO="antiX-${RELEASE}-runit_x64-base.iso"
+                  URL="${URL_runit}"
+      ;;
+      full-runit) ISO="antiX-${RELEASE}-runit_x64-full.iso"
+                  URL="${URL_runit}"
+      ;;
+    esac
+
+    HASH=$(wget -q -O- ${URL}/README.txt | grep "${ISO}" | cut -d' ' -f1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
