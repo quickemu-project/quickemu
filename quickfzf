@@ -4,107 +4,257 @@
 # Description: Uses fzf to provide a simple TUI for quickemu and quickget
 # License MIT
 
-# Define variables
-progname="${progname:="${0##*/}"}"
-version="0.24"
-#EDITOR="nano"
-configfile=~/.config/quickfzf/config
-vms=(*.conf)
-# Set traps to catch the signals and exit gracefully
-trap "exit" INT
-trap "exit" EXIT
-# Dependency check: check if fzf is installed and can be executed
-if ! command -v fzf >/dev/null 2>&1; then
-    echo "You are missing fzf..." && exit 255
-fi
-if ! command -v quickemu >/dev/null 2>&1; then
-    echo "You are missing quickemu..." && exit 255
-fi
-QUICKGET=$(command -v quickget) || exit 255
-
-# Display header
-printf 'Simple TUI for quickemu\n%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
-if [ -f "$configfile" ]; then
-	printf 'custom command:\nquickemu %s\n' "$(cat "$configfile")"
-fi
-if [ -z "$EDITOR" ]; then
-    echo "editor: Not set! edit configs will not work!"
-else
-    echo "editor: $EDITOR"
-fi
-printf '\n Workdir: %s\n\n Prepared VMs:\n-------------\n' "$(pwd)"
-# Check if there are any VMs
-if [ ${#vms[@]} -eq 0 ]; then
-    echo "No VMs found."
-    exit 1
-fi
-# Print the names of the available VMs
-printf "%s\n" "${vms[@]%.*}"
-echo "-------------"
-printf '\nPress CTRL+c anytime to kill %s\n\n' "$progname"
-# Action prompt
-printf " Do you want to create a new VM? (c)
- edit VM's config file (e)
- quickemu custom command (q) 
- or run an existing one? (press anything else)\n"
-read -rn 1 -s start
-case $start in
-    c ) todo="create";;
-    e ) todo="edit";;
-    q ) todo="custom";;
-    * ) todo="run";;
-esac
-
-# If the user chose to create a new VM
-if [ "$todo" = "create" ]; then
-    os=$(quickget | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
-	choices=$(quickget "$os" | sed 1d)
-	# Get the release and edition to download, if necessary
-	if [ "$(echo "$choices" | wc -l)" = 1 ]; then
-	    # get release
-	    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-	    # downloading
-	    printf '\n Trying to download %s %s...\n\n' "$os" "$release"
-	    quickget "$os" "$release"
-	else
-	    # get release
-	    release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
-	    # get edition
-	    edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
-	    # downloading
-	    printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
-	    quickget "$os" "$release" "$edition"
+tui_define_variables() {
+	progname="${progname:="${0##*/}"}"
+	version='0.3'
+	#EDITOR='nano'
+	configdir="$HOME/.config/$progname"
+	vms=(*.conf)
+	TMP="/tmp/$progname"
+	# Set traps to catch the signals and exit gracefully
+	trap 'exit' INT
+	trap 'exit' EXIT
+	# Dependency check: check if fzf,quickemu is installed and can be executed
+	if ! command -v quickemu >/dev/null 2>&1; then
+		echo 'You are missing quickemu...' && exit 1
 	fi
-
-# edit VM's config'
-elif [ "$todo" = "edit" ]; then
-    editconfig=$(ls | grep '.conf' | fzf --cycle --header='Choose config to edit')
-    "$EDITOR" "$editconfig"
-
-# create quickemu custom command
-elif [ "$todo" = "custom" ]; then
+	QUICKGET=$(command -v quickget) || exit 2
+	if ! command -v fzf >/dev/null 2>&1; then
+		echo 'You are missing fzf...' && exit 3
+	fi
+	qcommand="quickemu < ${configdir}/command -vm"
+}
+tui_display_header() {
+	printf 'Simple TUI for quickemu\n%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
+	if [ -z "$EDITOR" ]; then
+		echo 'editor: Not set! edit configs will not work!'
+	else
+		echo "editor: $EDITOR"
+	fi
+	printf 'Workdir:\n %s\n' "$(pwd)"
+	if [ -f "${configdir}/command" ]; then
+		printf '\ncustom command:\n quickemu %s\n' "$(cat "${configdir}/command")"
+	fi
+	if [ -f "${configdir}/vm" ]; then
+		printf '\nVMs config:\n-------------\n%s\n' "$(cat "${configdir}/vm")"
+	fi
+	printf '\nPrepared VMs:\n-------------\n'
+}
+tui_print_available_VMs() {
+	if [ ${#vms[@]} -eq 0 ]; then
+		echo 'No VMs found.'
+		exit 1
+	else
+		printf '%s\n' "${vms[@]%.*}"
+		echo '-------------'
+		printf 'Press CTRL+c anytime to kill %s' "$progname"
+	fi
+}
+tui_action_prompt_fzf() {
+	start=$(printf "Do you want to...
+run VM
+create new VM
+advance settings" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
+	case $start in
+		c|'create new VM' ) todo='create';;
+		a|'advance settings' ) todo='advanced';;
+		r|'run VM' ) todo='run';;
+	esac
+}
+fzf_get_releases() {
+	release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
+}
+fzf_get_editions() {
+	edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
+}
+tui_create_VM() {
+	os=$("$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
+	choices=$("$QUICKGET" "$os" | sed 1d)
+	# Get the release and edition to download, if necessary
+	if [ -z "$os" ]; then exit 100
+	elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
+		fzf_get_releases || exit 101
+		printf '\n Trying to download %s %s...\n\n' "$os" "$release"
+		"$QUICKGET" "$os" "$release" || exit 104
+		cat "${configdir}/vm" >> $(ls -t | head -n1)
+	else
+		fzf_get_releases || exit 102
+		fzf_get_editions || exit 103
+		printf '\n Trying to download %s %s %s...\n\n' "$os" "$release" "$edition"
+		"$QUICKGET" "$os" "$release" "$edition" || exit 105
+		echo "${configdir}/vm" >> ./"$(ls -t | head -n1)"
+	fi
+}
+tui_edit_default_VMs_config() {
+	printf 'For example:\ncpu_cores="2"\nram="4G"\n'
+	${EDITOR} ${configdir}/vm
+}
+tui_edit_VM_config() {
+	find *.conf | fzf --cycle --header='Choose config to edit' --height 10% --layout=reverse --info=inline --preview 'cat {}' --bind 'enter:become($EDITOR {})' || exit 104
+}
+tui_custom_quickemu_command() {
 	custom=$(echo "edit delete"| grep -o '[^ ]*' | fzf --cycle --header='Edit or delete custom command?')
 	if [ "$custom" = "edit" ]; then
 		quickemu
-		printf '\nEnter quickemu custom command:\n'
-		read -r qcommand
-		mkdir -p ~/.config/quickfzf
-		echo "$qcommand" > "$configfile"
+		printf '\nEnter quickemu custom command:\n For example:--public-dir ~/Downloads\n:'
+		read -r command
+		mkdir -p "$configdir"
+		echo "$command" > "${configdir}/command"
 	elif [ "$custom" = "delete" ]; then
-		rm -r ~/.config/quickfzf
+		rm "${configdir}/command"
 	fi
-
-# run VM
-elif [ "$todo" = "run" ]; then
-	# choose VM to run
-	chosen=$(echo "$(ls *.conf 2>/dev/null | sed 's/\.conf$//')" | fzf --cycle --header='Choose VM to run')
-
-	# Run chosen VM
+}
+tui_choose_VM_to_run() {
+	chosen=$(printf '%s\n' "${vms[@]%.*}" | fzf --cycle --header='Choose VM to run' --height 50% --layout=reverse --info=inline --preview 'cat {}.conf')
+}
+tui_run_VM() {
 	printf '\n Starting %s...\n\n' "$chosen"
-	if [ -f "$configfile" ]; then
-		quickemu $(cat "$configfile") -vm "$chosen".conf
+	if [ -f "${configdir}/command" ]; then
+		quickemu < "${configdir}/command" -vm "$chosen".conf
 	else
 		quickemu -vm "$chosen".conf
 	fi
-fi
-exit 0
+}
+quickget_add_distro() {
+	echo "for now with yad only" #TODO
+	yad --form --field="Pretty name" "" --field="Name" "" --field="Releases" "" --field="Editions" "" --field="URL" "" --field="ISO" "" --field="Checksum file" "" > "${TMP}/template"
+	PRETTY_NAME="$(cat "${TMP}/template" | cut -d'|' -f1)"
+	NAME="$("${TMP}/template" > cut -d'|' -f2)"
+	RELEASES="$(cat "${TMP}/template" | cut -d'|' -f3)"
+	EDITIONS="$(cat "${TMP}/template" | cut -d'|' -f4)"
+	URL="$(cat "${TMP}/template" | cut -d'|' -f5)"
+	ISO="$(cat "${TMP}/template" | cut -d'|' -f6)"
+	CHECKSUM_FILE="$(cat "${TMP}/template" | cut -d'|' -f7)"
+	cat <<EOF > "${TMP}/template"
+#32
+
+$NAME)           PRETTY_NAME="$PRETTY_NAME";;
+
+#line 184+
+
+$NAME \\
+
+#line 262+
+
+function releases_$NAME() {
+echo $RELEASES
+}
+
+function editions_$NAME() {
+echo $EDITIONS
+}
+
+#line 1052+
+
+function get_$NAME() {
+local EDITION="\${1:-}"
+local HASH=""
+local ISO="$ISO"
+local URL="$URL"
+HASH="\$(wget -q -O- \${URL}/\${CHECKSUM_FILE} | grep (\${ISO} | cut -d' ' -f4)"
+echo "\${URL}/\${ISO}" "\${HASH}"
+}
+
+EOF
+	diff "${TMP}/template" "quickget"
+}
+function quickget_get_releases_and_editions() {
+	result=$(quickget "$os" | sed 1d | cut -d':' -f2)
+	releases=$(echo "$result" | head -1)
+	editions=$(echo "$result" | tail -1)
+}
+function desktop_entry_create() {
+	cat <<EOF > "${DESKTOP_FILE}"
+[Desktop Entry]
+Version=$version
+Type=$type
+Name=$name
+GenericName=$progname
+Comment=$comment
+Exec=$execmd
+Icon=$icon
+Terminal=$terminal
+X-MultipleArgs=$args
+Type=$type
+Categories=$categories
+StartupNotify=$notify
+MimeType=$mime
+Keywords=$keyword
+
+EOF
+}
+quickget_test_download_ISOs() {
+	rm -r "${TMP}"
+	mkdir -p "$TMP" && cd "$TMP"
+	touch "${TMP}/test"
+	"$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' > supported
+	while read -r get_name; do
+		echo "Trying $get_name..."
+		mkdir -p "${TMP}/_distros/$get_name" && cd "${TMP}/_distros/$get_name"
+		releases=$("$QUICKGET" "$get_name" | grep 'Releases' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+		echo "$releases" > releases
+		editions=$("$QUICKGET" "$get_name" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+		echo "$editions" > editions
+		if [ -z "$editions" ]; then
+			for release in $releases; do
+				echo "$get_name" >> "${TMP}/test"
+				timeout 3 "$QUICKGET" -t "$get_name" "${release}" >> "${TMP}/test" && $(killall zsync >> /dev/null)
+			done
+		else
+			while read -r release; do
+				for edition in $editions; do
+					echo "$get_name" >> "${TMP}/test"
+					timeout 3 "$QUICKGET" -t "$get_name" "${release}" "${edition}" >> "${TMP}/test" && $(killall zsync >> /dev/null)
+				done
+			done < releases
+		fi
+		cd "$TMP"
+	done < supported
+	printf "\nDone"
+}
+tui_advanced_menu() {
+	advance=$(printf "Do you want to...
+default VMs config
+edit VM config
+quickemu custom command
+quickget add distro
+quickget test ISOs URLs
+quickget show ISOs URLs
+open distro homepage" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
+	case $advance in
+		'default VMs config' ) tui_edit_default_VMs_config;;
+		'edit VM config' ) tui_edit_VM_config;;
+		'quickemu custom command' ) tui_custom_quickemu_command;;
+		'quickget add distro' ) quickget_add_distro;;
+		'quickget test ISOs URLs' ) quickget_test_download_ISOs;;
+		'quickget show ISOs URLs' ) quickget_show_isos_urls;;
+		'open distro homepage' ) quickget_open_distro_homepage;;
+	esac
+}
+tui_what_to_do() {
+	if [ "$#" -eq  "1" ]; then
+		todo="$1"
+	fi
+	case $todo in
+		advanced ) tui_advanced_menu;;
+		create ) tui_create_VM || exit 200;;
+		edit ) tui_edit_VM_config || exit 201;;
+		custom ) tui_custom_quickemu_command || exit 202;;
+		run )
+			tui_choose_VM_to_run || exit 203
+			tui_run_VM || exit 204
+			;;
+	esac
+}
+tui_run() {
+	tui_define_variables || exit 4
+	tui_display_header || exit 5
+	tui_print_available_VMs || exit 6
+	tui_action_prompt_fzf || exit 7
+	tui_what_to_do || exit 8
+}
+while true
+do
+	tui_run
+	exit 0
+done
