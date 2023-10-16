@@ -47,6 +47,7 @@ function pretty_name() {
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
+    holoiso)            PRETTY_NAME="HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxmint)          PRETTY_NAME="Linux Mint";;
@@ -61,11 +62,11 @@ function pretty_name() {
     openindiana)        PRETTY_NAME="OpenIndiana";;
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
+    peppermint)         PRETTY_NAME="PeppermintOS";;
     popos)              PRETTY_NAME="Pop!_OS";;
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
-    holoiso)            PRETTY_NAME="HoloISO";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
@@ -185,6 +186,7 @@ function os_support() {
     batocera \
     blendos \
     bodhi \
+    bunsenlabs \
     cachyos \
     centos-stream \
     debian \
@@ -201,6 +203,7 @@ function os_support() {
     gentoo \
     ghostbsd \
     haiku \
+    holoiso \
     kali \
     kdeneon \
     kolibrios \
@@ -219,6 +222,7 @@ function os_support() {
     openindiana \
     opensuse \
     oraclelinux \
+    peppermint \
     popos \
     reactos \
     rebornos \
@@ -226,8 +230,8 @@ function os_support() {
     siduction \
     slackware \
     solus \
-    holoiso \
     tails \
+    trisquel \
     truenas-core \
     truenas-scale \
     ubuntu \
@@ -248,15 +252,15 @@ function os_support() {
 }
 
 function releases_alma() {
-    echo 8.6 8.7 9.0 9.1
+    echo 8 9
 }
 
 function editions_alma() {
-    echo minimal dvd
+    echo boot minimal dvd
 }
 
 function releases_alpine() {
-    echo 3.12 3.13 3.14 3.15 latest
+    echo 3.12 3.13 3.14 3.15 3.16 3.17 3.18 latest
 }
 
 function releases_android() {
@@ -276,7 +280,9 @@ function releases_archcraft() {
 }
 
 function releases_arcolinux() {
-    echo v21.09.11 v21.11.05 v22.01.10
+    local RLIST
+    RLIST=$(curl -s https://ant.seedhost.eu/arcolinux/iso/ | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | tr '\r\n' ' ')
+    echo ${RLIST}
 }
 
 function editions_arcolinux() {
@@ -284,14 +290,19 @@ function editions_arcolinux() {
 }
 
 function releases_blendos() {
+
+# Pull the rss feed
+wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
+
     local RLIST
-    RLIST=$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep tag_name | grep -o -E '[[:digit:]]+\.[[:digit:]]+' | tr ' \r\n' ' ')
+    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
     echo ${RLIST}
 
 }
 
-function editions_blendos() {
-    echo gnome kde
+
+function releases_bunsenlabs() {
+    echo latest
 }
 
 function releases_bodhi() {
@@ -303,7 +314,7 @@ function editions_bodhi() {
 }
 
 function releases_cachyos() {
-    echo 2300305
+    echo 230813
 }
 
 function editions_cachyos() {
@@ -334,18 +345,18 @@ function releases_deepin() {
 }
 
 function releases_devuan() {
-    echo beowulf chimaera
+    echo beowulf chimaera daedalus
 }
 
 function releases_dragonflybsd() {
     # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
-    DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '\"dfly-x86_64-.*_REL.iso.bz2\"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
+    DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
     echo $DBSD_RELEASES
 }
 
 function releases_elementary() {
-    echo 7.0
+    echo 7.0 7.1
 }
 
 function releases_endeavouros() {
@@ -406,12 +417,11 @@ function releases_freedos() {
 }
 
 function releases_garuda() {
-  echo latest
+    echo latest
 }
 
 function editions_garuda() {
-  URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
-  echo $(wget -q -O - ${URL} | grep '^<a href' | sed -e 's/^.*="//' -e 's/\/.*//')
+    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
 }
 
 function releases_gentoo() {
@@ -434,6 +444,10 @@ function editions_haiku() {
     echo x86_64 x86_gcc2h
 }
 
+function releases_holoiso() {
+    echo 4.5
+}
+
 function releases_kali() {
     echo current kali-weekly
 }
@@ -447,7 +461,7 @@ function releases_kolibrios() {
 }
 
 function releases_linuxmint(){
-    echo 20.2 20.3 21 21.1
+    echo 20.2 20.3 21 21.1 21.2
 }
 
 function editions_linuxmint(){
@@ -478,6 +492,10 @@ function editions_mxlinux(){
     echo Xfce KDE Fluxbox
 }
 
+function editions_manjaro(){
+    echo full minimal
+}
+
 function releases_macos() {
     echo high-sierra mojave catalina big-sur monterey ventura
 }
@@ -485,11 +503,12 @@ function releases_macos() {
 function releases_manjaro() {
     echo xfce \
     gnome \
-    kde \
+    plasma \
     budgie \
     cinnamon \
     i3 \
-    mate
+    mate \
+    sway
 }
 
 function releases_netboot() {
@@ -497,7 +516,7 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-    local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '\"[[:digit:]]+\.[[:digit:]]+/\"' |tr -d '"/' |sort -nr )
+    local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' |tr -d '"/' |sort -nr )
     echo ${NBSD_RELEASES}
 }
 
@@ -530,6 +549,14 @@ function releases_oraclelinux() {
     echo 7.7 7.8 7.9 8.4 8.5 8.6 9.0
 }
 
+function releases_peppermint() {
+    echo latest
+}
+
+function editions_peppermint() {
+    echo devuan-xfce devuan-gnome debian-xfce debian-gnome
+}
+
 function releases_popos() {
     echo 20.04 21.10 22.04
 }
@@ -547,9 +574,9 @@ function releases_rebornos() {
 }
 
 function get_rebornos() {
-   local ISO=$(curl -s 'https://www.rebornos.org/download/' | grep -ohE 'https://pub-cb7a4d4f7a974896b3bf40c52d1defbc.r2.dev/RebornOS-ISO/(rebornos_xfce_minimal|rebornos_iso)-[0-9]{4}.[0-9]{2}.[0-9]{2}-x86_64.iso' | tail -n1)
-   local HASH=$(curl -s 'https://www.rebornos.org/download/' | grep -ozP 'Checksum MD5:.*[0-9a-fA-F]{32}' | grep -zoP '[0-9a-fA-F]{32}' | cut -d '' -f1)
-   echo "${ISO} ${HASH}"
+    local ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    local HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    echo "${ISO} ${HASH}"
 }
 
 function releases_rockylinux() {
@@ -580,12 +607,16 @@ function editions_solus() {
     echo Budgie GNOME MATE Plasma
 }
 
-function releases_holoiso() {
-    echo 4.0
-}
-
 function releases_tails() {
     echo stable
+}
+
+function releases_trisquel() {
+   echo 10.0.1 11.0
+}
+
+function editions_trisquel() {
+    echo mate lxde kde sugar
 }
 
 function releases_truenas() {
@@ -605,9 +636,12 @@ function releases_truenas-scale() {
 
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="22.10 23.04"
+    local INTERIM_SUPPORT="23.04 23.10"
 
     case "${OS}" in
+        edubuntu)
+        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        ;;
         kubuntu|lubuntu|ubuntukylin|\
         ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
@@ -621,17 +655,16 @@ function releases_ubuntu() {
         INTERIM_SUPPORT="${INTERIM_SUPPORT}"
         ;;
         ubuntucinnamon)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT/22.10 /}"
+        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
         ;;
     esac
 
 
-    if [ "${OS}" == "ubuntu-unity" ]  ||  [ "${OS}" == "ubuntucinnamon" ]; then
+    if [ "${OS}" == "edubuntu" ] || [ "${OS}" == "ubuntu-unity" ] || [ "${OS}" == "ubuntucinnamon" ]; then
         echo ${INTERIM_SUPPORT} \
             daily-live \
             daily-canary \
              ;
-
     else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
@@ -674,13 +707,14 @@ function releases_ubuntu() {
             eol-20.10 \
             eol-21.04 \
             eol-21.10 \
+            eol-22.10 \
             ;
     fi
 }
 
 function releases_ubuntu-server() {
    local LTS_SUPPORT="18.04 20.04 22.04"
-   local INTERIM_SUPPORT="22.10 23.04"
+   local INTERIM_SUPPORT="23.04 23.10"
     echo ${LTS_SUPPORT} \
          ${INTERIM_SUPPORT} \
          daily-live
@@ -699,7 +733,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    echo 6.1.2 6.1 5.0 4.2 4.1 4.0
+    wget -q https://github.com/VX-Linux/main/releases/latest -O- |grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+'|head -1|cut -d/ -f3
 }
 
 function releases_windows() {
@@ -890,7 +924,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|endless|nixos|oraclelinux|popos|rockylinux)
+          alma|centos-stream|endless|garuda|nixos|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           openindiana)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -930,7 +964,7 @@ EOF
             fi
             ;;
           vanillaos)
-          ## Minimum 50G for abroot
+          ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
            ;;
           zorin)
@@ -954,7 +988,7 @@ EOF
         esac
 
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
-        # wont install  lobster testing with less than 18GB
+        # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
           echo "disk_size=\"32G\"" >> "${CONF_FILE}"
         fi
         # Enable TPM for Windows 11
@@ -979,8 +1013,8 @@ EOF
 function get_alma() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO="AlmaLinux-${RELEASE}-x86_64-${EDITION}.iso"
-    local URL="https://mirror.rackspace.com/almalinux/${RELEASE/beta-1/beta}/isos/x86_64/"
+    local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
+    local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1051,32 +1085,33 @@ function get_arcolinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_bunsenlabs() {
+    local HASH=""
+    local ISO="beryllium-1-amd64.hybrid.iso"
+    local URL="https://ddl.bunsenlabs.org/ddl"
+    HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_blendos() {
-    local EDITION="${1:-}"
+
     local HASH=""
     local URL=""
-    case ${RELEASE} in
-      23.01)
-        URL="$(curl -s https://api.github.com/repos/blend-os/blendOS/releases  |grep 'browser_download_url'|grep ${RELEASE} | grep -o '\"http.*\.iso\"'| cut -d\" -f 2| head -1)"
-        HASH=$(curl -s "${URL}.sha256sum" | cut -d' ' -f1)
-        ;;
-      23.04)
-        case ${EDITION} in
-          gnome)
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${EDITION^^}/blendOS-2023.04.22-x86_64-${EDITION,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-            URL=${TMPURL%\?*}
-            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/${EDITION:-GNOME}/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
-            ;;
-          kde|plasma)
-            local ED_DE="Plasma"
-            TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/blendos/files/23.04-1/${ED_DE^}/blendOS-2023.04.22-x86_64-${ED_DE,,}.iso/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-            URL=${TMPURL%\?*}
-            HASH=$(curl -s https://sourceforge.net/projects/blendos/files/${RELEASE}-1/Plasma/|grep  -o -E '\"sha1\":\".*\"'|cut -d\" -f4)
-            ;;
-        esac
-        ;;
-    esac
-    echo "${URL} ${HASH}"
+
+    # BlendOS has more editions and releases but there's a tracker indirect and other issues
+    # so easier to use the rss feed
+    #
+    # We have to provide edition/release as RELEASE or have a major refactor
+    # But this works for now ... or does it ....
+    URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
+    HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
+    # ## fix up variables for path naming
+      EDITION=${RELEASE%%/*}
+      RELEASE=${RELEASE##*/}
+      # For UX maybe show the date of the release
+      #echo ${RELEASE##*/} "(" $(date -d @${RELEASE##*/}) ")"
+      # maybe $(date -d @${RELEASE##*/} '+%Y%m%d')
+      echo "${URL} ${HASH}"
 }
 
 function get_vanillaos() {
@@ -1207,6 +1242,7 @@ function get_devuan() {
     case ${RELEASE} in
       beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
       chimaera) ISO="devuan_${RELEASE}_4.0.2_amd64_desktop-live.iso";;
+      daedalus) ISO="devuan_${RELEASE}_5.0.0_amd64_desktop-live.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1224,11 +1260,12 @@ function get_dragonflybsd() {
 function get_elementary() {
     local HASH=""
     case ${RELEASE} in
-      6.2)
-        local ISO="elementaryos-${RELEASE}-stable.20211218-rc.iso"
-        ;;
       7.0)
         local ISO="elementaryos-${RELEASE}-stable.20230129rc.iso"
+        ;;
+      7.1)
+        local ISO="elementaryos-${RELEASE}-stable.20230926rc.iso"
+        HASH="5c7f6b388e5787c366587985301ea05ab16e4cc0de3be2b3d6a559ce81a2f102"
         ;;
     esac
     local URL="https://ams3.dl.elementary.io/download"
@@ -1325,7 +1362,7 @@ function get_garuda() {
   local EDITION="${1:-}"
   local HASH=""
   local ISO=""
-  local URL="https://mirrors.fossho.st/garuda/iso/latest/garuda/"
+  local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
 
   ISO=${EDITION}/latest.iso
 
@@ -1339,7 +1376,7 @@ function get_gentoo() {
     local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds/"
 
     ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1)
-    HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep iso | grep -v CONTENTS | cut -d' ' -f1)
+    HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1366,6 +1403,15 @@ function get_haiku() {
     # local URL="https://mirror.aarnet.edu.au/pub/haiku/${RELEASE}" # Aus
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_holoiso() {
+    local HASH=""
+    local ISO="HoloISO_${RELEASE}_ux_changes-20230626_66f7c74061_bootchoice_fixes-1-x86_64.iso"
+    local URL="http://holoiso.itsvixano.me"
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1455,7 +1501,8 @@ function get_macos() {
         monterey)       #12
             BOARD_ID="Mac-E43C1C25D4880AD6";;
         ventura)        #13
-            BOARD_ID="Mac-7BA5B2D9E42DDD94";;
+            BOARD_ID="Mac-7BA5B2D9E42DDD94"
+            OS_TYPE="latest";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
@@ -1511,18 +1558,30 @@ function get_mageia() {
 }
 
 function get_manjaro() {
+    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local MANIFESTURL=""
+    local MANIFEST=""
     local URL=""
+    local TYPE=""
 
     case ${RELEASE} in
-      gnome|kde|xfce) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/official/${RELEASE}.md";;
-      budgie|cinnamon|deepin|i3|mate) MANIFESTURL="https://gitlab.manjaro.org/webpage/manjaro-homepage/-/raw/master/site/content/downloads/community/${RELEASE}.md";;
+      sway) MANIFEST="$( wget -qO- https://mirror.manjaro-sway.download/manjaro-sway/release.json )";;
+      gnome|xfce|plasma) TYPE="official";;
+      *) TYPE="community";;
     esac
 
-    URL="$(wget -qO- "${MANIFESTURL}" | grep "Download_x64 =" | cut -d'"' -f2)"
-    HASH=$(wget -qO- "${MANIFESTURL}" | grep "Download_x64_Checksum =" | cut -d'"' -f2)
+    [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+
+    [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
+    
+    if [[ ${RELEASE} != "sway" ]]; then 
+        URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
+    else
+        URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
+    fi
+    
+    HASH=$(wget -qO- "${URL}.sha512" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
@@ -1620,6 +1679,31 @@ function get_oraclelinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_peppermint() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/peppermintos/files/isos"
+
+    case ${EDITION} in
+      devuan-xfce) ISO="PeppermintOS-devuan_64_xfce.iso"
+      URL="${URL}/XFCE"
+      ;;
+      debian-xfce) ISO="PeppermintOS-Debian-64.iso"
+      URL="${URL}/XFCE"
+      ;;
+      devuan-gnome) ISO="PeppermintOS-devuan_64_gfb.iso"
+      URL="${URL}/Gnome_FlashBack"
+      ;;
+      debian-gnome) ISO="PeppermintOS-Debian_64_gfb.iso"
+      URL="${URL}/Gnome_FlashBack"
+      ;;
+    esac
+
+    HASH=$(wget -q -O- "${URL}/${ISO}-sha512.checksum" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_popos() {
     local EDITION="${1:-}"
     local HASH=""
@@ -1663,10 +1747,10 @@ function get_siduction() {
     local HASH=""
     local DATE=""
     local ISO=""
-    local URL="https://mirrors.dotsrc.org/siduction/iso/Masters_of_War/${EDITION}"
+    local URL="https://mirrors.dotsrc.org/siduction/iso/Standing_on_the_Shoulders_of_Giants/${EDITION}"
     DATE=$(wget -q -O- "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" | cut -d' ' -f1)
-    ISO="siduction-22.1.1-Masters_of_War-${EDITION}-amd64-${DATE}.iso"
+    ISO="siduction-2023.1.1-Standing_on_the_Shoulders_of_Giants-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1688,16 +1772,6 @@ function get_solus() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_holoiso() {
-    local HASH=""
-    local DATE="20221211"
-    local ISO="HoloISO_${RELEASE}_OfflineInstaller-${DATE}_1636-x86_64.iso"
-    local URL="http://holoiso.itsvixano.me"
-
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
 function get_tails() {
     local ISO=""
     local JSON=""
@@ -1708,6 +1782,22 @@ function get_tails() {
     URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
     HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
     echo "${URL} ${HASH}"
+}
+
+function get_trisquel() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
+
+    case ${EDITION} in
+        mate)  ISO="trisquel_${RELEASE}_amd64.iso";;
+        lxde)  ISO="trisquel-mini_${RELEASE}_amd64.iso";;
+        kde)   ISO="triskel_${RELEASE}_amd64.iso";;
+        sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
+    esac
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_truenas-scale() {
@@ -1794,11 +1884,11 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso |cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2 | sed '1q;d')
+        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1 | sed '1q;d')
     else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f3)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | cut -d' ' -f1)
+        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2)
+        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1)
     fi
 
     if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -1829,6 +1919,14 @@ function get_void() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_vxlinux() {
+    local HASH=""
+    local ISO="vx-${RELEASE}.iso"
+    local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/vx-${RELEASE}.md5" | cut  -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 
 function get_xerolinux() {
     local HASH=""
@@ -1849,19 +1947,6 @@ function get_zorin() {
     # Parse out the iso URL from the redirector
     URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}${EDITION}" 2>&1 | grep Location | cut -d' ' -f4)
     echo "${URL} ${HASH}"
-}
-
-function get_vxlinux() {
-    local HASH=""
-    local ISO=""
-    local URL="https://github.com/dessington/vx-linux/releases/download/${RELEASE}"
-
-    if [ "$RELEASE" == "4.0" ]; then
-        ISO="vx-linux-4.0-qt.iso"
-    else
-        ISO="vx-linux-${RELEASE}.iso"
-    fi
-    echo "${URL}/${ISO} ${HASH}"
 }
 
 function unattended_windows() {
@@ -2309,6 +2394,15 @@ if [ -n "${2}" ]; then
             if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
                 echo "ERROR! Unsupported combination"
                 echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                exit 1;
+            fi
+        fi
+
+        # Handle missing Mangaro Sway minimal
+        if [[ $OS == manjaro ]] ; then
+            if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
+                echo "ERROR! Unsupported combination"
+                echo "       Manjaro Sway does not have a minimal edition"
                 exit 1;
             fi
         fi

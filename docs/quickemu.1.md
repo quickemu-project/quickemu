@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: June 14, 2023
+date: June 27, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -349,8 +349,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur` and `monterey` are
-supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
+`ventura` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
@@ -360,8 +360,8 @@ supported.
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
-            Sur, and Monterey), choose any of the APFS options as the
-            filesystem. MacOS Extended may not work.
+            Sur, Monterey and Ventura), choose any of the APFS options
+            as the filesystem. MacOS Extended may not work.
     -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
@@ -443,6 +443,7 @@ There are some considerations when running macOS via Quickemu.
     -   Catalina **(Recommended)**
     -   Big Sur
     -   Monterey
+    -   Ventura
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
@@ -506,7 +507,7 @@ quickemu --vm windows-11-22H2.conf
 
 -   Complete the installation as you normally would.
 -   All relevant drivers and services should be installed automatically.
--   A local adminstrator user account is automatically created, with
+-   A local administrator user account is automatically created, with
     these credentials:
     -   Username: `Quickemu`
     -   Password: `quickemu`
@@ -623,7 +624,7 @@ which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
 
-The '--screenpct' is an optional interger value between 25 \<= pct \<
+The '--screenpct' is an optional integer value between 25 \<= pct \<
 100 which will override system default screen sizes. The VM size will be
 'pct' of the chosen screen. **If --fullscreen is chosen screen will be
 fullsize instead of being scaled down by --screenpct value.**
