@@ -243,6 +243,7 @@ with your preferred flavour.
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
 -   `blendos` (BlendOS)
+-   `bunsenlabs` (Bunsenlabs)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `debian` (Debian)
@@ -255,6 +256,7 @@ with your preferred flavour.
 -   `fedora` (Fedora)
 -   `freebsd` (FreeBSD)
 -   `freedos` (FreeDOS)
+-   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
@@ -274,6 +276,7 @@ with your preferred flavour.
 -   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
+-   `peppermint` (PeppermintOS)
 -   `popos` (Pop!\_OS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
@@ -282,6 +285,7 @@ with your preferred flavour.
 -   `slackware` (Slackware)
 -   `solus` (Solus)
 -   `tails` (Tails)
+-   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
 -   `vanillaos` (Vanilla OS)
@@ -766,7 +770,7 @@ You can also pass optional parameters
   --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
   --ssh-port <port>                 : Set ssh-port manually
   --spice-port <port>               : Set spice-port manually
-  --public-dir <path>               : expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'
+  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'
   --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'
   --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')
   --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')
@@ -778,6 +782,7 @@ You can also pass optional parameters
   --keyboard_layout <layout>        : Set keyboard layout.
   --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
   --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
+  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'
   --extra_args <arguments>          : Pass additional arguments to qemu
   --version                         : Print version
 
@@ -839,8 +844,8 @@ which Quickemu sizes to 2048x1152. Without the `--screen` option,
 Quickemu would have used the 1920x1080 monitor which results in a window
 size of 1664x936.
 
-The '--screenpct' is an optional integer value between 25 \<= pct \<
-100 which will override system default screen sizes. The VM size will be
+The '--screenpct' is an optional integer value between 25 \<= pct \< 100
+which will override system default screen sizes. The VM size will be
 'pct' of the chosen screen. **If --fullscreen is chosen screen will be
 fullsize instead of being scaled down by --screenpct value.**
 
