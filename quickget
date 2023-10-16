@@ -606,6 +606,9 @@ function releases_ubuntu() {
     local INTERIM_SUPPORT="23.04"
 
     case "${OS}" in
+        edubuntu)
+        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        ;;
         kubuntu|lubuntu|ubuntukylin|\
         ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
@@ -624,12 +627,11 @@ function releases_ubuntu() {
     esac
 
 
-    if [ "${OS}" == "ubuntu-unity" ]  ||  [ "${OS}" == "ubuntucinnamon" ]; then
+    if [ "${OS}" == "edubuntu" ] || [ "${OS}" == "ubuntu-unity" ] || [ "${OS}" == "ubuntucinnamon" ]; then
         echo ${INTERIM_SUPPORT} \
             daily-live \
             daily-canary \
              ;
-
     else
         echo ${LTS_SUPPORT} \
             ${INTERIM_SUPPORT} \
