@@ -596,7 +596,7 @@ function releases_truenas-scale() {
 
 function releases_ubuntu() {
     local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="22.10 23.04"
+    local INTERIM_SUPPORT="23.04 23.10"
 
     case "${OS}" in
         kubuntu|lubuntu|ubuntukylin|\
@@ -665,13 +665,14 @@ function releases_ubuntu() {
             eol-20.10 \
             eol-21.04 \
             eol-21.10 \
+            eol-22.10 \
             ;
     fi
 }
 
 function releases_ubuntu-server() {
    local LTS_SUPPORT="18.04 20.04 22.04"
-   local INTERIM_SUPPORT="22.10 23.04"
+   local INTERIM_SUPPORT="23.04 23.10"
     echo ${LTS_SUPPORT} \
          ${INTERIM_SUPPORT} \
          daily-live
