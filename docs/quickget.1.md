@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: October 17, 2023
+date: October 18, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -99,6 +99,7 @@ with your preferred flavour.
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
 -   `blendos` (BlendOS)
+-   `bodhi` (Bodhi)
 -   `bunsenlabs` (Bunsenlabs)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
@@ -120,6 +121,7 @@ with your preferred flavour.
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
+-   `linuxlite` (Linux Lite)
 -   `linuxmint` (Linux Mint)
 -   `lmde` (Linux Mint Debian Edition)
 -   `mageia` (Mageia)
