@@ -146,11 +146,11 @@ sudo apt install quickgui
 
 ## Arch
 
-Quickemu is available from the AUR (Arch user repository), and can be installed via any AUR helper.
-Assuming your AUR helper is yay,
-Run the following command:
+Quickemu is available from the AUR (Arch user repository), and can be
+installed via any AUR helper. Assuming your AUR helper is yay, Run the
+following command:
 
-```bash
+``` bash
 yay -Sy quickemu
 ```
 
@@ -253,6 +253,7 @@ with your preferred flavour.
 -   `arcolinux` (Arco Linux)
 -   `batocera` (Batocera)
 -   `blendos` (BlendOS)
+-   `bodhi` (Bodhi)
 -   `bunsenlabs` (Bunsenlabs)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
@@ -274,6 +275,7 @@ with your preferred flavour.
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
+-   `linuxlite` (Linux Lite)
 -   `linuxmint` (Linux Mint)
 -   `lmde` (Linux Mint Debian Edition)
 -   `mageia` (Mageia)
