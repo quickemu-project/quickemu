@@ -231,6 +231,7 @@ function os_support() {
     archcraft \
     arcolinux \
     batocera \
+    bazzite \
     blendos \
     bodhi \
     bunsenlabs \
@@ -320,6 +321,7 @@ function os_homepage(){
         archcraft)         HOMEPAGE="https://archcraft.io/";;
         arcolinux)         HOMEPAGE="https://arcolinux.com/";;
         batocera)          HOMEPAGE="https://batocera.org/";;
+        bazzite)           HOMEPAGE="https://bazzite.gg/";;
         blendos)           HOMEPAGE="https://blendos.co/";;
         bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
         bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
@@ -442,6 +444,10 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+
+function releases_bazzite() {
+    echo $(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | tr '\n' ' ')
 }
 
 function releases_blendos() {
@@ -1406,6 +1412,16 @@ function get_batocera() {
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
     local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
      echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_bazzite() {
+    local HASH=""
+    local ISO=""
+    local URL="https://github.com/ublue-os/bazzite/releases/download/v${RELEASE}"
+
+    ISO=$(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '"' -f4 | cut -d'.' -f1-5 | grep "${RELEASE}" | cut -d'/' -f9)
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | grep 'SHA256' | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bodhi() {
