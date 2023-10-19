@@ -115,6 +115,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
     tinycore)           PRETTY_NAME="Tiny Core Linux";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
@@ -287,6 +288,7 @@ function os_support() {
     siduction \
     slackware \
     slax \
+    slitaz \
     solus \
     spiral \
     tails \
@@ -380,6 +382,7 @@ function os_homepage(){
         siduction)         HOMEPAGE="https://siduction.org/";;
         slackware)         HOMEPAGE="http://www.slackware.com/";;
         slax)              HOMEPAGE="https://www.slax.org/";;
+        slitaz)            HOMEPAGE="https://www.slitaz.org/";;
         solus)             HOMEPAGE="https://getsol.us/";;
         spiral)            HOMEPAGE="https://spirallinux.github.io/";;
         tails)             HOMEPAGE="https://tails.net/";;
@@ -850,6 +853,10 @@ function editions_slax() {
     echo debian slackware
 }
 
+function releases_slitaz() {
+    echo preferred core core64 loram core-5in1 preinit
+}
+
 function releases_solus() {
     echo 4.3
 }
@@ -1248,6 +1255,11 @@ EOF
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
+          slitaz)
+            echo "boot=\"legacy\"" >> "${CONF_FILE}"
+            echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+            echo "ram=\"512M\"" >> "${CONF_FILE}"
             ;;
           truenas-scale|truenas-core)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -2257,6 +2269,20 @@ function get_slax() {
       ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_slitaz() {
+    local HASH=""
+    local ISO="slitaz-rolling-${RELEASE}"
+    local URL="http://mirror.slitaz.org/iso/rolling"
+
+    case ${RELEASE} in
+      preferred) ISO="slitaz-rolling";;
+      *)   ISO="slitaz-rolling-${RELEASE}";;
+    esac
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
+    echo "${URL}/${ISO}.iso ${HASH}"
 }
 
 function get_solus() {
