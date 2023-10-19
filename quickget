@@ -61,6 +61,7 @@ function pretty_name() {
     archlinux)          PRETTY_NAME="Arch Linux";;
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
+    artixlinux)         PRETTY_NAME="Artix Linux";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -210,6 +211,7 @@ function os_support() {
     archlinux \
     archcraft \
     arcolinux \
+    artixlinux \
     batocera \
     blendos \
     bodhi \
@@ -296,6 +298,7 @@ function os_homepages(){
         archlinux)         HOMEPAGE="https://archlinux.org/";;
         archcraft)         HOMEPAGE="https://archcraft.io/";;
         arcolinux)         HOMEPAGE="https://arcolinux.com/";;
+        artixlinux)        HOMEPAGE="https://artixlinux.org/";;
         batocera)          HOMEPAGE="https://batocera.org/";;
         blendos)           HOMEPAGE="https://blendos.co/";;
         bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
@@ -416,6 +419,43 @@ function releases_arcolinux() {
 
 function editions_arcolinux() {
     echo large small
+}
+
+function releases_artixlinux() {
+    echo stable
+}
+
+function editions_artixlinux() {
+    echo base-dinit \
+    base-openrc \
+    base-runit \
+    base-s6 \
+    cinnamon-dinit \
+    cinnamon-openrc \
+    cinnamon-runit \
+    cinnamon-s6 \
+    lxde-dinit \
+    lxde-openrc \
+    lxde-runit \
+    lxde-s6 \
+    lxqt-dinit \
+    lxqt-openrc \
+    lxqt-runit \
+    lxqt-s6 \
+    mate-dinit \
+    mate-openrc \
+    mate-runit \
+    mate-s6 \
+    plasma-dinit \
+    plasma-openrc \
+    plasma-runit \
+    plasma-s6 \
+    xfce-dinit \
+    xfce-openrc \
+    xfce-runit \
+    xfce-s6 \
+    community-gtk-openrc \
+    community-qt-openrc
 }
 
 function releases_blendos() {
@@ -1259,6 +1299,17 @@ function get_arcolinux() {
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_artixlinux() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.artixlinux.org/iso"
+    DATE=$(wget -q -O- ${URL}/sha256sums | cut -d'-' -f4 | head -1)
+    ISO="artix-${EDITION}-${DATE}-x86_64.iso"
+    HASH=$(wget -q -O- ${URL}/sha256sums | grep "${ISO}")
     echo "${URL}/${ISO} ${HASH}"
 }
 
