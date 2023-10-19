@@ -62,6 +62,7 @@ function pretty_name() {
     archcraft)          PRETTY_NAME="Archcraft";;
     arcolinux)          PRETTY_NAME="Arco Linux";;
     artixlinux)         PRETTY_NAME="Artix Linux";;
+    atheanos)           PRETTY_NAME="Athena OS";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -212,6 +213,7 @@ function os_support() {
     archcraft \
     arcolinux \
     artixlinux \
+    athenaos \
     batocera \
     blendos \
     bodhi \
@@ -299,6 +301,7 @@ function os_homepages(){
         archcraft)         HOMEPAGE="https://archcraft.io/";;
         arcolinux)         HOMEPAGE="https://arcolinux.com/";;
         artixlinux)        HOMEPAGE="https://artixlinux.org/";;
+        athenaos)          HOMEPAGE="https://athenaos.org/";;
         batocera)          HOMEPAGE="https://batocera.org/";;
         blendos)           HOMEPAGE="https://blendos.co/";;
         bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
@@ -456,6 +459,10 @@ function editions_artixlinux() {
     xfce-s6 \
     community-gtk-openrc \
     community-qt-openrc
+}
+
+function releases_athenaos() {
+    wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
 }
 
 function releases_blendos() {
@@ -1113,7 +1120,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|centos-stream|endless|garuda|nixos|oraclelinux|popos|rockylinux)
+          alma|athenaos|centos-stream|endless|garuda|nixos|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           openindiana)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -1310,6 +1317,25 @@ function get_artixlinux() {
     DATE=$(wget -q -O- ${URL}/sha256sums | cut -d'-' -f4 | head -1)
     ISO="artix-${EDITION}-${DATE}-x86_64.iso"
     HASH=$(wget -q -O- ${URL}/sha256sums | grep "${ISO}")
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_athenaos() {
+    local HASH=""
+    local URL=""
+    local ISO=""
+    case ${RELEASE} in
+        rolling)
+            ISO="athena-rolling-x86_64.iso"
+            URL="https://sourceforge.net/projects/athena-iso/files/rolling"
+            HASH=$(wget -q -O- "${URL}/${ISO}.md5" | cut -d' ' -f1)
+            ;;
+        *)
+            ISO="athena-20${RELEASE}-x86_64.iso"
+            URL="https://sourceforge.net/projects/athena-iso/files/v${RELEASE}"
+            HASH=$(wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | grep "${RELEASE}" | cut -d '=' -f7 | cut -d'>' -f2 | cut -d'<' -f1)
+            ;;
+    esac
     echo "${URL}/${ISO} ${HASH}"
 }
 
