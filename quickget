@@ -279,6 +279,7 @@ function os_support() {
     rockylinux \
     siduction \
     slackware \
+    slax \
     solus \
     spiral \
     tails \
@@ -367,6 +368,7 @@ function os_homepage(){
         rockylinux)        HOMEPAGE="https://rockylinux.org/";;
         siduction)         HOMEPAGE="https://siduction.org/";;
         slackware)         HOMEPAGE="http://www.slackware.com/";;
+        slax)              HOMEPAGE="https://www.slax.org/";;
         solus)             HOMEPAGE="https://getsol.us/";;
         spiral)            HOMEPAGE="https://spirallinux.github.io/";;
         tails)             HOMEPAGE="https://tails.net/";;
@@ -776,6 +778,14 @@ function releases_slackware() {
     echo 14.2 15.0
 }
 
+function releases_slax() {
+    echo latest
+}
+
+function editions_slax() {
+    echo debian slackware
+}
+
 function releases_solus() {
     echo 4.3
 }
@@ -1159,7 +1169,7 @@ EOF
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           batocera)
             echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
-          dragonflybsd|haiku|openbsd|netbsd|slackware|tails|tinycore)
+          dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
             echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           deepin)
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
@@ -2113,6 +2123,24 @@ function get_slackware() {
     local ISO="slackware64-${RELEASE}-install-dvd.iso"
     local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_slax() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    case ${EDITION} in
+      debian) URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
+          ISO=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
+          HASH=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
+      ;;
+      slackware) URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x"
+          ISO=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
+          HASH=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
+      ;;
+    esac
     echo "${URL}/${ISO} ${HASH}"
 }
 
