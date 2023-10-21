@@ -405,7 +405,7 @@ function releases_fedora() {
 }
 
 function releases_batocera() {
-  echo 32 33 34
+  echo latest
 }
 
 function editions_fedora() {
