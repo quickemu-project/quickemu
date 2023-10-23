@@ -229,6 +229,7 @@ series.
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
 
+-   `edubuntu` (Edubuntu)
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
