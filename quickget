@@ -25,15 +25,27 @@ function cleanup() {
   fi
 }
 
-if [ "${1}" == '-t' ]; then
-  testmode="on"
-  if [ -n "$4" ]; then
-    set -- "$2" "$3" "$4"
-  elif [ -n "$3" ]; then
-    set -- "$2" "$3"
-  else
+if [ "${1}" == '--test-iso-url' ]; then
+    test_iso_url="on"
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
+elif [ "${1}" == '--show-iso-url' ]; then
+    show_iso_url="on"
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
+elif [ "${1}" == '--open-distro-homepage' ]; then
+    open_distro_homepage="on"
     set -- "$2"
-  fi
 fi
 
 function pretty_name() {
@@ -860,10 +872,14 @@ function web_get() {
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
 # Test mode for ISO (yet wget only)
-    elif [ "${testmode}" == 'on' ]; then
+    elif [ "${show_iso_url}" == 'on' ]; then
           echo "${URL}"
-          #wget --spider "${URL}"
-          exit 1
+          exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+          wget --spider "${URL}"
+          exit 0
+    elif [ "${open_distro_homepage}" == 'on' ]; then
+          xdgopen "${distro_homepage}" && exit 0
     else
         if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
