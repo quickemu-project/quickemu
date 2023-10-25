@@ -282,6 +282,87 @@ function os_support() {
     zorin
 }
 
+function os_homepages(){
+    echo alma/https://almalinux.org/ \
+        alpine/https://alpinelinux.org/ \
+        android/https://www.android-x86.org/ \
+        antix/https://antixlinux.com/ \
+        archlinux/https://archlinux.org/ \
+        archcraft/https://archcraft.io/ \
+        arcolinux/https://arcolinux.com/ \
+        batocera/https://batocera.org/ \
+        blendos/https://blendos.co/ \
+        bodhi/https://www.bodhilinux.com/ \
+        bunsenlabs/https://www.bunsenlabs.org/ \
+        cachyos/https://cachyos.org/ \
+        centos-stream/https://www.centos.org/centos-stream/ \
+        debian/https://www.debian.org/ \
+        deepin/https://www.deepin.org/ \
+        devuan/https://www.devuan.org/ \
+        dragonflybsd/https://www.dragonflybsd.org/ \
+        edubuntu/https://www.edubuntu.org/ \
+        elementary/https://elementary.io/ \
+        endeavouros/https://endeavouros.com/ \
+        endless/https://www.endlessos.org/os \
+        fedora/https://www.fedoraproject.org/ \
+        freebsd/https://www.freebsd.org/ \
+        freedos/https://freedos.org/ \
+        garuda/https://garudalinux.org/ \
+        gentoo/https://www.gentoo.org/ \
+        ghostbsd/https://www.ghostbsd.org/ \
+        haiku/https://www.haiku-os.org/ \
+        holoiso/https://github.com/HoloISO/holoiso \
+        kali/https://www.kali.org/ \
+        kdeneon/https://neon.kde.org/ \
+        kolibrios/http://kolibrios.org/en/ \
+        kubuntu/https://kubuntu.org/ \
+        linuxlite/https://www.linuxliteos.com/ \
+        linuxmint/https://linuxmint.com/ \
+        lmde/https://www.linuxmint.com/download_lmde.php \
+        mageia/https://www.mageia.org/ \
+        manjaro/https://manjaro.org/ \
+        mxlinux/https://mxlinux.org/ \
+        netboot/https://netboot.xyz/ \
+        netbsd/https://www.netbsd.org/ \
+        nixos/https://nixos.org/ \
+        lubuntu/https://lubuntu.me/ \
+        macos/https://www.apple.com/macos/ \
+        openbsd/https://www.openbsd.org/ \
+        openindiana/https://www.openindiana.org/ \
+        opensuse/https://www.opensuse.org/ \
+        oraclelinux/https://www.oracle.com/linux/ \
+        peppermint/https://peppermintos.com/ \
+        popos/https://pop.system76.com/ \
+        porteus/http://www.porteus.org/ \
+        reactos/https://reactos.org/ \
+        rebornos/https://rebornos.org/ \
+        rockylinux/https://rockylinux.org/ \
+        siduction/https://siduction.org/ \
+        slackware/http://www.slackware.com/ \
+        solus/https://getsol.us/ \
+        spiral/https://spirallinux.github.io/ \
+        tails/https://tails.net/ \
+        tinycore/http://www.tinycorelinux.net/ \
+        trisquel/https://trisquel.info/ \
+        truenas-core/https://www.truenas.com/truenas-core/ \
+        truenas-scale/https://www.truenas.com/truenas-scale/ \
+        ubuntu/https://ubuntu.com/ \
+        ubuntu-budgie/https://ubuntubudgie.org/ \
+        ubuntucinnamon/https://ubuntucinnamon.org/ \
+        ubuntukylin/https://ubuntukylin.com/ \
+        ubuntu-mate/https://ubuntu-mate.org/ \
+        ubuntu-server/https://ubuntu.com/server \
+        ubuntustudio/https://ubuntustudio.org/ \
+        ubuntu-unity/https://ubuntuunity.org/ \
+        vanillaos/https://vanillaos.org/ \
+        void/https://voidlinux.org/ \
+        vxlinux/https://vxlinux.org/ \
+        windows/https://www.microsoft.com/en-us/windows/ \
+        xerolinux/https://xerolinux.xyz/ \
+        xubuntu/https://xubuntu.org/ \
+        zorin/https://zorin.com/os/
+}
+
 function releases_alma() {
     echo 8 9
 }
@@ -820,9 +901,6 @@ function editions_zorin() {
 }
 
 function check_hash() {
-    if  [ "${testmode}" == 'on' ]; then
-      exit 0
-    fi
     local iso=""
     local hash=""
     local hash_algo=""
@@ -872,15 +950,13 @@ function web_get() {
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
-# Test mode for ISO (yet wget only)
+    # Test mode for ISO (yet wget only)
     elif [ "${show_iso_url}" == 'on' ]; then
           echo "${URL}"
           exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
           wget --spider "${URL}"
           exit 0
-    elif [ "${open_distro_homepage}" == 'on' ]; then
-          xdgopen "${distro_homepage}" && exit 0
     else
         if ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
@@ -2596,6 +2672,11 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 else
+    if [ "${open_distro_homepage}" == 'on' ]; then
+        homepage=$(os_homepages | sed 's/\s\+/\n/g' |  grep ${OS} | cut -d'/' -f2-9)
+        echo "${homepage}"
+        xdg-open "${homepage}" && exit 0
+    fi
     echo "ERROR! You must specify a release."
     case ${OS} in
       *ubuntu-server*)
