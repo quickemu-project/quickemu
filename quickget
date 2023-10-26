@@ -25,7 +25,7 @@ function cleanup() {
   fi
 }
 
-if [ "${1}" == '--test-iso-url' ]; then
+if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
     test_iso_url="on"
     if [ -n "$4" ]; then
         set -- "$2" "$3" "$4"
@@ -34,7 +34,7 @@ if [ "${1}" == '--test-iso-url' ]; then
     else
         set -- "$2"
     fi
-elif [ "${1}" == '--show-iso-url' ]; then
+elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
     show_iso_url="on"
     if [ -n "$4" ]; then
         set -- "$2" "$3" "$4"
@@ -43,7 +43,7 @@ elif [ "${1}" == '--show-iso-url' ]; then
     else
         set -- "$2"
     fi
-elif [ "${1}" == '--open-distro-homepage' ]; then
+elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
     open_distro_homepage="on"
     set -- "$2"
 fi
