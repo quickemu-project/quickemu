@@ -212,6 +212,42 @@ quickget_test_download_ISOs() {
 	done < supported
 	printf "\nDone"
 }
+
+quickget_show_ISOs_urls(){
+	rm -r "${TMP}"
+	mkdir -p "$TMP" && cd "$TMP"
+	touch "${TMP}/test"
+	"$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' > supported
+	while read -r get_name; do
+		echo "Trying $get_name..."
+		mkdir -p "${TMP}/_distros/$get_name" && cd "${TMP}/_distros/$get_name"
+		releases=$("$QUICKGET" "$get_name" | grep 'Releases' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+		echo "$releases" > releases
+		editions=$("$QUICKGET" "$get_name" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+		echo "$editions" > editions
+		if [ -z "$editions" ]; then
+			for release in $releases; do
+				echo "$get_name" >> "${TMP}/test"
+				timeout 3 "$QUICKGET" -s "$get_name" "${release}" >> "${TMP}/test" && $(killall zsync >> /dev/null)
+			done
+		else
+			while read -r release; do
+				for edition in $editions; do
+					echo "$get_name" >> "${TMP}/test"
+					timeout 3 "$QUICKGET" -s "$get_name" "${release}" "${edition}" >> "${TMP}/test" && $(killall zsync >> /dev/null)
+				done
+			done < releases
+		fi
+		cd "$TMP"
+	done < supported
+	printf "\nDone"
+}
+
+quickget_open_distro_homepage(){
+    os=$("$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose distro homepage to open')
+    "$QUICKGET" -o "${os}"
+}
+
 tui_advanced_menu() {
 	advance=$(printf "Do you want to...
 default VMs config
@@ -227,7 +263,7 @@ open distro homepage" | fzf --height 10% --layout=reverse --info=inline --header
 		'quickemu custom command' ) tui_custom_quickemu_command;;
 		'quickget add distro' ) quickget_add_distro;;
 		'quickget test ISOs URLs' ) quickget_test_download_ISOs;;
-		'quickget show ISOs URLs' ) quickget_show_isos_urls;;
+		'quickget show ISOs URLs' ) quickget_show_ISOs_urls;;
 		'open distro homepage' ) quickget_open_distro_homepage;;
 	esac
 }
