@@ -47,7 +47,7 @@ function pretty_name() {
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
-    holoiso)            PRETTY_NAME="HoloISO";;
+    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxlite)          PRETTY_NAME="Linux Lite";;
@@ -461,7 +461,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    echo 4.5
+    wget -q https://github.com/HoloISO/holoiso/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_kali() {
@@ -1486,9 +1486,9 @@ function get_haiku() {
 
 function get_holoiso() {
     local HASH=""
-    local ISO="HoloISO_${RELEASE}_ux_changes-20230626_66f7c74061_bootchoice_fixes-1-x86_64.iso"
-    local URL="http://holoiso.itsvixano.me"
-
+    local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
+    local URL="https://cd2.holoiso.ru.eu.org"
+    # Can't find hash
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
