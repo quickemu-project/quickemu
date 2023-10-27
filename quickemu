@@ -687,41 +687,41 @@ function vm_boot() {
     *) AUDIO_DEV="pa,id=audio0";;
   esac
 
-  # Determine a sane resolution for Linux guests.
-  if [ "${guest_os}" == "linux" ]; then
-    local X_RES=1152
-    local Y_RES=648
-    if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-      if [ -z "${SCREEN}" ]; then
-        X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-        Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-      else
-        X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-        Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
-      fi
+    # Determine a sane resolution for Linux guests.
+    if [ "${guest_os}" == "linux" ]; then
+        local X_RES=1152
+        local Y_RES=648
+        if [ "${XDG_SESSION_TYPE}" == "x11" ] || [ "${XDG_SESSION_TYPE}" == "wayland" ]; then
+            if [ -z "${SCREEN}" ]; then
+                X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+                Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
+            else
+                X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+                Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
+            fi
 
-      if [ "${FULLSCREEN}" ]; then
-        :
-      elif [ "${SCREENPCT}" ] ; then
-        X_RES=$(( X_RES*SCREENPCT/100 ))
-        Y_RES=$(( Y_RES*SCREENPCT/100 ))
-      elif [ "${X_RES}" -ge 3840 ]; then
-        X_RES=3200
-        Y_RES=1800
-      elif [ "${X_RES}" -ge 2560 ]; then
-        X_RES=2048
-        Y_RES=1152
-      elif [ "${X_RES}" -ge 1920 ]; then
-        X_RES=1664
-        Y_RES=936
-      elif [ "${X_RES}" -ge 1280 ]; then
-        X_RES=1152
-        Y_RES=648
-      else
-        :
-      fi
+            if [ "${FULLSCREEN}" ]; then
+                :
+            elif [ "${SCREENPCT}" ] ; then
+                X_RES=$(( X_RES*SCREENPCT/100 ))
+                Y_RES=$(( Y_RES*SCREENPCT/100 ))
+            elif [ "${X_RES}" -ge 3840 ]; then
+                X_RES=3200
+                Y_RES=1800
+            elif [ "${X_RES}" -ge 2560 ]; then
+                X_RES=2048
+                Y_RES=1152
+            elif [ "${X_RES}" -ge 1920 ]; then
+                X_RES=1664
+                Y_RES=936
+            elif [ "${X_RES}" -ge 1280 ]; then
+                X_RES=1152
+                Y_RES=648
+            else
+                :
+            fi
+        fi
     fi
-  fi
 
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
