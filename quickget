@@ -2532,6 +2532,11 @@ function get_windows() {
     esac
 }
 
+open_url() {
+    local URL="$1";
+    xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
+}
+
 create_vm() {
     # shellcheck disable=SC2206
     local URL_HASH=(${1// / })
@@ -2682,8 +2687,7 @@ if [ -n "${2}" ]; then
 else
     if [ "${open_distro_homepage}" == 'on' ]; then
         homepage=$(os_homepages | sed 's/\s\+/\n/g' |  grep ${OS} | cut -d'/' -f2-9)
-        echo "${homepage}"
-        xdg-open "${homepage}" && exit 0
+        open_url "${homepage}" && exit 0
     fi
     echo "ERROR! You must specify a release."
     case ${OS} in
