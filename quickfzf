@@ -24,6 +24,7 @@ tui_define_variables() {
 	fi
 	qcommand="quickemu < ${configdir}/command -vm"
 }
+
 tui_display_header() {
 	printf 'Simple TUI for quickemu\n%s: v.%s\nquickemu: v.%s\n' "$progname" "$version" "$(quickemu --version)"
 	if [ -z "$EDITOR" ]; then
@@ -40,6 +41,7 @@ tui_display_header() {
 	fi
 	printf '\nPrepared VMs:\n-------------\n'
 }
+
 tui_print_available_VMs() {
 	if [ ${#vms[@]} -eq 0 ]; then
 		echo 'No VMs found.'
@@ -50,6 +52,7 @@ tui_print_available_VMs() {
 		printf 'Press CTRL+c anytime to kill %s' "$progname"
 	fi
 }
+
 tui_action_prompt_fzf() {
 	start=$(printf "Do you want to...
 run VM
@@ -61,12 +64,15 @@ advance settings" | fzf --height 10% --layout=reverse --info=inline --header-lin
 		r|'run VM' ) todo='run';;
 	esac
 }
+
 fzf_get_releases() {
 	release=$(echo "$choices" | grep 'Releases' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Release')
 }
+
 fzf_get_editions() {
 	edition=$(echo "$choices" | grep 'Editions' | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose Edition')
 }
+
 tui_create_VM() {
 	os=$("$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
 	choices=$("$QUICKGET" "$os" | sed 1d)
@@ -85,13 +91,16 @@ tui_create_VM() {
 		echo "${configdir}/vm" >> ./"$(ls -t | head -n1)"
 	fi
 }
+
 tui_edit_default_VMs_config() {
 	printf 'For example:\ncpu_cores="2"\nram="4G"\n'
 	${EDITOR} ${configdir}/vm
 }
+
 tui_edit_VM_config() {
 	find *.conf | fzf --cycle --header='Choose config to edit' --height 10% --layout=reverse --info=inline --preview 'cat {}' --bind 'enter:become($EDITOR {})' || exit 104
 }
+
 tui_custom_quickemu_command() {
 	custom=$(echo "edit delete"| grep -o '[^ ]*' | fzf --cycle --header='Edit or delete custom command?')
 	if [ "$custom" = "edit" ]; then
@@ -104,9 +113,11 @@ tui_custom_quickemu_command() {
 		rm "${configdir}/command"
 	fi
 }
+
 tui_choose_VM_to_run() {
 	chosen=$(printf '%s\n' "${vms[@]%.*}" | fzf --cycle --header='Choose VM to run' --height 50% --layout=reverse --info=inline --preview 'cat {}.conf')
 }
+
 tui_run_VM() {
 	printf '\n Starting %s...\n\n' "$chosen"
 	if [ -f "${configdir}/command" ]; then
@@ -115,6 +126,7 @@ tui_run_VM() {
 		quickemu -vm "$chosen".conf
 	fi
 }
+
 quickget_add_distro() {
 	echo "for now with yad only" #TODO
 	yad --form --field="Pretty name" "" --field="Name" "" --field="Releases" "" --field="Editions" "" --field="URL" "" --field="ISO" "" --field="Checksum file" "" > "${TMP}/template"
@@ -158,11 +170,13 @@ echo "\${URL}/\${ISO}" "\${HASH}"
 EOF
 	diff "${TMP}/template" "quickget"
 }
+
 function quickget_get_releases_and_editions() {
 	result=$(quickget "$os" | sed 1d | cut -d':' -f2)
 	releases=$(echo "$result" | head -1)
 	editions=$(echo "$result" | tail -1)
 }
+
 function desktop_entry_create() {
 	cat <<EOF > "${DESKTOP_FILE}"
 [Desktop Entry]
@@ -183,6 +197,7 @@ Keywords=$keyword
 
 EOF
 }
+
 quickget_test_download_ISOs() {
 	rm -r "${TMP}"
 	mkdir -p "$TMP" && cd "$TMP"
@@ -267,6 +282,7 @@ open distro homepage" | fzf --height 10% --layout=reverse --info=inline --header
 		'open distro homepage' ) quickget_open_distro_homepage;;
 	esac
 }
+
 tui_what_to_do() {
 	if [ "$#" -eq  "1" ]; then
 		todo="$1"
@@ -282,6 +298,7 @@ tui_what_to_do() {
 			;;
 	esac
 }
+
 tui_run() {
 	tui_define_variables || exit 4
 	tui_display_header || exit 5
@@ -289,6 +306,7 @@ tui_run() {
 	tui_action_prompt_fzf || exit 7
 	tui_what_to_do || exit 8
 }
+
 while true
 do
 	tui_run
