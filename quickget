@@ -2650,6 +2650,14 @@ else
     echo "ERROR! You must specify an operating system."
     echo -n " - Operating Systems: "
     os_support
+    echo "
+        You can also use this arguments:
+        Only show ISO download URL
+            --show-iso-url / -s {distro} {release} [edition]
+        Test if ISO is available
+            --test-iso-url / -t {distro} {release} [edition]
+        Open distro homepage
+            --open-distro-homepage / -o {distro}"
     exit 1
 fi
 
