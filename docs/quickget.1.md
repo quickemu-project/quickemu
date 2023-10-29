@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: October 19, 2023
+date: October 29, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -75,6 +75,7 @@ series.
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
 
+-   `edubuntu` (Edubuntu)
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)

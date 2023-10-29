@@ -229,6 +229,7 @@ series.
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
 
+-   `edubuntu` (Edubuntu)
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
@@ -804,7 +805,7 @@ You can also pass optional parameters
 
 ```
 <!-- [[[end]]] -->
-
+```
 ## Desktop shortcuts
 
 Desktop shortcuts can be created for a VM, the shortcuts are saved in
