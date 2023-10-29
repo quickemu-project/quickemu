@@ -76,7 +76,7 @@ fzf_get_editions() {
 }
 
 tui_create_VM() {
-	os=$("$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
+	os=$("$QUICKGET" -o | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' | fzf --cycle --header='Choose OS to download')
 	choices=$("$QUICKGET" "$os" | sed 1d)
 	# Get the release and edition to download, if necessary
 	if [ -z "$os" ]; then exit 100
