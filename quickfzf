@@ -57,11 +57,13 @@ tui_action_prompt_fzf() {
 	start=$(printf "Do you want to...
 run VM
 create new VM
-advance settings" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
+open distro homepage
+advanced & settings" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
 	case $start in
 		c|'create new VM' ) todo='create';;
-		a|'advance settings' ) todo='advanced';;
+		a|'advanced & settings' ) todo='advanced';;
 		r|'run VM' ) todo='run';;
+		h|'open distro homepage' ) todo='homepage';;
 	esac
 }
 
@@ -270,8 +272,7 @@ edit VM config
 quickemu custom command
 quickget add distro
 quickget test ISOs URLs
-quickget show ISOs URLs
-open distro homepage" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
+quickget show ISOs URLs" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
 	case $advance in
 		'default VMs config' ) tui_edit_default_VMs_config;;
 		'edit VM config' ) tui_edit_VM_config;;
@@ -279,7 +280,6 @@ open distro homepage" | fzf --height 10% --layout=reverse --info=inline --header
 		'quickget add distro' ) quickget_add_distro;;
 		'quickget test ISOs URLs' ) quickget_test_download_ISOs;;
 		'quickget show ISOs URLs' ) quickget_show_ISOs_urls;;
-		'open distro homepage' ) quickget_open_distro_homepage;;
 	esac
 }
 
@@ -292,9 +292,10 @@ tui_what_to_do() {
 		create ) tui_create_VM || exit 200;;
 		edit ) tui_edit_VM_config || exit 201;;
 		custom ) tui_custom_quickemu_command || exit 202;;
+		homepage ) quickget_open_distro_homepage || exit 203;;
 		run )
-			tui_choose_VM_to_run || exit 203
-			tui_run_VM || exit 204
+			tui_choose_VM_to_run || exit 204
+			tui_run_VM || exit 205
 			;;
 	esac
 }
