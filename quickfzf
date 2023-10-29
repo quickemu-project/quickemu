@@ -99,12 +99,16 @@ tui_edit_default_VMs_config() {
 	${EDITOR} ${configdir}/vm
 }
 
-tui_edit_VM_config() {
+fzf_edit_VM_config() {
 	find *.conf | fzf --cycle --header='Choose config to edit' --height 10% --layout=reverse --info=inline --preview 'cat {}' --bind 'enter:become($EDITOR {})' || exit 104
 }
 
-tui_custom_quickemu_command() {
+fzf_custom_quickemu_command() {
 	custom=$(echo "edit delete"| grep -o '[^ ]*' | fzf --cycle --header='Edit or delete custom command?')
+}
+
+tui_custom_quickemu_command() {
+	fzf_custom_quickemu_command
 	if [ "$custom" = "edit" ]; then
 		quickemu
 		printf '\nEnter quickemu custom command:\n For example:--public-dir ~/Downloads\n:'
@@ -275,7 +279,7 @@ quickget test ISOs URLs
 quickget show ISOs URLs" | fzf --height 10% --layout=reverse --info=inline --header-lines=1)
 	case $advance in
 		'default VMs config' ) tui_edit_default_VMs_config;;
-		'edit VM config' ) tui_edit_VM_config;;
+		'edit VM config' ) fzf_edit_VM_config;;
 		'quickemu custom command' ) tui_custom_quickemu_command;;
 		'quickget add distro' ) quickget_add_distro;;
 		'quickget test ISOs URLs' ) quickget_test_download_ISOs;;
