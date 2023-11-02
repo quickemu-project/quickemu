@@ -1532,12 +1532,12 @@ function get_haiku() {
 }
 
 function get_holoiso() {
-    local HASH=""
+    #local HASH=""
     local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
     local URL="https://cd2.holoiso.ru.eu.org"
     # Can't find hash
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} #${HASH}"
 }
 
 function get_kali() {
