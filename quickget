@@ -868,13 +868,16 @@ function web_get() {
             exit 1
           fi
           echo #Necessary as aria2c in suppressed mode does not have new lines
-      else
-          if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-            echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
-            exit 1
-          fi
-      fi
-    # fi
+          echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
+          exit 1
+        fi
+        echo #Necessary as aria2c in suppressed mode does not have new lines
+    else
+        if ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+          echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+          exit 1
+        fi
+    fi
 }
 
 function zsync_get() {
