@@ -27,6 +27,9 @@ machines for Linux, macOS and Windows
 
 You can also pass optional parameters
 
+**--access**
+:   Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
+
 **--braille**
 :   Enable braille support. Requires SDL.
 
@@ -552,6 +555,7 @@ Here are the usage instructions:
       quickemu --vm ubuntu.conf
 
     You can also pass optional parameters
+      --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
       --braille                         : Enable braille support. Requires SDL.
       --delete-disk                     : Delete the disk image and EFI variables
       --delete-vm                       : Delete the entire VM and it's configuration
