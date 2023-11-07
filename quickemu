@@ -848,6 +848,19 @@ function vm_boot() {
       SPICE_PORT=$(get_port 5930 9)
     fi
 
+    # ALLOW REMOTE ACCESS TO SPICE OVER LAN RATHER THAN JUST LOCALHOST
+    if [ -z "${ACCESS}" ]; then
+      SPICE_ADDR="127.0.0.1"
+    else
+      if [ "${ACCESS}" == "remote" ]; then
+        SPICE_ADDR=""
+      elif [ "${ACCESS}" == "local" ]; then
+        SPICE_ADDR="127.0.0.1"
+      else
+        SPICE_ADDR="${ACCESS}"
+      fi
+    fi
+
     if [ -z "${SPICE_PORT}" ]; then
       echo " - SPICE:    All SPICE ports have been exhausted."
       if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
@@ -864,7 +877,7 @@ function vm_boot() {
           echo -n " --spice-shared-dir ${PUBLIC}"
         fi
         echo "${FULLSPICY}"
-        SPICE="${SPICE},port=${SPICE_PORT},addr=127.0.0.1"
+        SPICE="${SPICE},port=${SPICE_PORT},addr=${SPICE_ADDR}"
       fi
     fi
   fi
@@ -1237,7 +1250,6 @@ function vm_boot() {
     exit 1
   fi
 
-
   if [ -z "${EXTRA_ARGS}" ]; then
     EXTRA_ARGS="${extra_args}"
   fi
@@ -1332,6 +1344,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
+  echo "  --access                          : Select whether to enable remote spice access. 'local' (default), 'remote' 'clientipaddress'"
   echo "  --braille                         : Enable braille support. Requires SDL."
   echo "  --delete-disk                     : Delete the disk image and EFI variables"
   echo "  --delete-vm                       : Delete the entire VM and it's configuration"
@@ -1504,6 +1517,7 @@ mouse="tablet"
 # options: intel-hda, ac97, es1370, sb16, none
 sound_card="intel-hda"
 
+ACCESS=""
 BRAILLE=""
 DELETE_DISK=0
 DELETE_VM=0
@@ -1570,6 +1584,10 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
+          -access|--access)
+            ACCESS="${2}"
+            shift
+            shift;;
           -braille|--braille)
             BRAILLE="on"
             shift;;
