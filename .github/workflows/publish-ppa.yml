@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: yuezk/publish-ppa-package@v1
+    - uses: yuezk/publish-ppa-package@v1.0.0
       with:
         repository: 'ppa:flexiondotorg/quickemu'
         gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
