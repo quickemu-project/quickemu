@@ -1338,7 +1338,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
-  echo "  --access                          : Select whether to enable remote spice access. 'local' (default), 'remote' 'clientipaddress'"
+  echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
   echo "  --braille                         : Enable braille support. Requires SDL."
   echo "  --delete-disk                     : Delete the disk image and EFI variables"
   echo "  --delete-vm                       : Delete the entire VM and it's configuration"
