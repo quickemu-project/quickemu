@@ -29,7 +29,8 @@ jobs:
         sudo apt-get -y update
         sudo apt-get -y install debhelper devscripts
         REL_VER=$(grep "^readonly VERSION" quickemu | cut -d'"' -f2)
-        dch -v "${REL_VER}-1" --distribution=unstable "New upstream release."
+        rm debian/changelog
+        dch --package quickemu --newversion="${REL_VER}-1" --distribution=unstable "New upstream release." --create
         dpkg-buildpackage --build=binary --no-check-builddeps --compression=gzip
         gh release upload "${{ github.ref }}" "../quickemu_${REL_VER}-1_all.deb" --clobber
 
