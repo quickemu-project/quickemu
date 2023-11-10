@@ -1,3 +1,9 @@
+quickemu (4.9.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 10 Nov 2023 14:49:08 +0000
+
 quickemu (4.8-1~mantic1.0) mantic; urgency=medium
 
   * New upstream release.
