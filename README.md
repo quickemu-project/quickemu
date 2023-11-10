@@ -482,7 +482,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 10 & 11 Guests
+## Windows 8, 10 & 11 Guests
 
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
@@ -491,9 +491,12 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
+Windows 8.1 is also supported but doesn't feature any automated installation or
+driver optimisation.
+
 ``` bash
 quickget windows 11
-quickemu --vm windows-11-22H2.conf
+quickemu --vm windows-11.conf
 ```
 
 -   Complete the installation as you normally would.
@@ -511,7 +514,7 @@ disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
-secureboot="on"
+secureboot="off"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
