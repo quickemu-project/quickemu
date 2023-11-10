@@ -507,7 +507,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37 38
+    echo 33 34 35 36 37 38 39
 }
 
 function releases_batocera() {
@@ -528,7 +528,8 @@ function editions_fedora() {
   Sericea \
   Kinoite \
   Sway \
-  Server
+  Server \
+  Onyx
 }
 
 function releases_freebsd(){
@@ -1510,7 +1511,7 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Kinoite|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+      Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
 
@@ -1773,13 +1774,13 @@ function get_manjaro() {
     [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
 
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
-    
-    if [[ ${RELEASE} != "sway" ]]; then 
+
+    if [[ ${RELEASE} != "sway" ]]; then
         URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
     else
         URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
     fi
-    
+
     HASH=$(wget -qO- "${URL}.sha512" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
@@ -2785,9 +2786,9 @@ if [ -n "${2}" ]; then
 
         # Handle odd missing fedora cominations
         if [[ $OS == fedora ]] ; then
-            if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
+            if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
                 echo "ERROR! Unsupported combination"
-                echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1;
             fi
         fi
