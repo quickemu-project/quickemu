@@ -273,7 +273,7 @@ with your preferred flavour.
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
--   `holoiso` (HoloISO)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -491,8 +491,8 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-Windows 8.1 is also supported but doesn't feature any automated installation or
-driver optimisation.
+Windows 8.1 is also supported but doesn't feature any automated
+installation or driver optimisation.
 
 ``` bash
 quickget windows 11
