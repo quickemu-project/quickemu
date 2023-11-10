@@ -1,0 +1,19 @@
+name: Publish PPA 📦️
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-ppa:
+    name: Publish PPA
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: yuezk/publish-ppa-package@v1
+      with:
+        repository: 'ppa:flexiondotorg/quickemu'
+        gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+        gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+        pkgdir: '${{ github.workspace }}/quickemu/'
