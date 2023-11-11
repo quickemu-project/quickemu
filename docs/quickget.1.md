@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 10, 2023
+date: November 11, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -28,6 +28,15 @@ configuration for `quickemu` to use to build and run
 **list \| list_csv \| list_json**
 :   provide a csv list of all supported guest OSes, versions and
     variants.
+
+**`--show-iso-url` \| -s** {**os**} {**release**} \[**edition**\]
+:   show ISO download URL
+
+**`--test-iso-url` \| -t** {**os**} {**release**} \[**edition**\]
+:   test if ISO is available
+
+**`--open-distro-homepage` \| -o** {**os**}
+:   open OS homepage in browser
 
 **\[OS\] \[Release\] \[Edition\]**
 :   specify the OS and release (and optional edition) if insufficient
@@ -87,6 +96,21 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
+
+You can also use `quickget` with options to:
+
+``` shell
+    # show an OS ISO download URL for {os} {release} [edition] 
+    quickget --show-iso-url fedora 38 Silverblue   
+    # test if and OS ISO is available for {os} {release} [edition]
+    quickget --test-iso-url nixos 23.05 plasma5
+    # open an OS distribution homepage in a browser
+    quickget --open-distro-homepage  ubuntu-mate
+```
+
+The `--show-iso-url` and `--test-iso-url` options **do not** work for
+`Windows` (`quickget` will begin downloading the requested release and
+edition of windows)
 
 ## Other Operating Systems
 
