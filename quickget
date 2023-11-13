@@ -298,6 +298,7 @@ function os_homepages(){
         archcraft)         HOMEPAGE="https://archcraft.io/";;
         arcolinux)         HOMEPAGE="https://arcolinux.com/";;
         batocera)          HOMEPAGE="https://batocera.org/";;
+        bazzite)           HOMEPAGE="https://bazzite.gg/";;
         blendos)           HOMEPAGE="https://blendos.co/";;
         bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
         bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
