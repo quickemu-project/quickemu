@@ -2129,7 +2129,7 @@ function get_void() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local URL="https://alpha.de.repo.voidlinux.org/live/current"
+    local URL="https://repo-default.voidlinux.org/live/current"
 
     DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
