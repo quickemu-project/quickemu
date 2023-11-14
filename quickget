@@ -691,34 +691,23 @@ function releases_ubuntu() {
             INTERIM_SUPPORT+=($i)
         fi
     done
-
+    
     case "${OS}" in
-        edubuntu)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        edubuntu|ubuntu-unity|ubuntucinnamon)
+        echo ${INTERIM_SUPPORT[@]} daily-live
         ;;
         kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live daily-legacy jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
         ubuntu-budgie)
         #after 16.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live daily-legacy jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
-        ubuntu-unity)
-            INTERIM_SUPPORT="${INTERIM_SUPPORT}"
-            ;;
-        ubuntucinnamon)
-            INTERIM_SUPPORT="${INTERIM_SUPPORT}"
-            ;;
-    esac
-
-    if [ "${OS}" == "edubuntu" ] || [ "${OS}" == "ubuntu-unity" ] || [ "${OS}" == "ubuntucinnamon" ]; then
-        echo ${INTERIM_SUPPORT} daily-live
-    elif [ "${OS}" == "ubuntu" ]; then
+        ubuntu)
         echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live daily-legacy ${EOL_VERSIONS[@]/#/eol-}
-    else
-        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live daily-legacy jammy-daily ${EOL_VERSIONS[@]/#/eol-}
-    fi
+        ;;
+    esac
 }
 
 function releases_ubuntu-server() {
