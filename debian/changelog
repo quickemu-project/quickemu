@@ -1,0 +1,204 @@
+quickemu (4.9.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 10 Nov 2023 14:49:08 +0000
+
+quickemu (4.8-1~mantic1.0) mantic; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.8
+
+ -- Martin Wimpress <code@wimpress.io>  Wed, 14 Jun 2023 12:40:56 +0100
+
+quickemu (4.7-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.7
+
+ -- Martin Wimpress <code@wimpress.io>  Wed, 26 Apr 2023 12:00:35 +0100
+
+quickemu (4.6-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.6
+
+ -- Martin Wimpress <code@wimpress.io>  Sat, 04 Feb 2023 00:32:47 +0000
+
+quickemu (4.5-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.5
+
+ -- Martin Wimpress <code@wimpress.io>  Sun, 11 Dec 2022 20:54:52 +0000
+
+quickemu (4.4-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.4
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 21 Oct 2022 08:52:12 +0100
+
+quickemu (4.3-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.3
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 22 Sep 2022 09:22:00 +0100
+
+quickemu (4.2-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+    + https://github.com/quickemu-project/quickemu/releases/tag/4.2
+
+ -- Martin Wimpress <code@wimpress.io>  Wed, 21 Sep 2022 23:34:24 +0100
+
+quickemu (4.1-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Sat, 20 Aug 2022 00:03:33 +0100
+
+quickemu (4.0-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Mon, 01 Aug 2022 11:24:48 +0100
+
+quickemu (3.16-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 29 Jul 2022 11:50:32 +0100
+
+quickemu (3.15-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 22 Apr 2022 09:55:13 +0100
+
+quickemu (3.14-1~focal1.0) focal; urgency=medium
+
+  * New Upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 11 Mar 2022 16:20:05 +0000
+
+quickemu (3.13-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 24 Feb 2022 23:00:05 +0000
+
+quickemu (3.12-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Tue, 22 Feb 2022 12:13:16 +0000
+
+quickemu (3.11-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <martin.wimpress@ubuntu.com>  Wed, 08 Dec 2021 11:01:04 +0000
+
+quickemu (2.3.4-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Mon, 06 Dec 2021 11:53:50 +0000
+
+quickemu (2.3.3-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 03 Dec 2021 11:38:10 +0000
+
+quickemu (2.3.2-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Sun, 14 Nov 2021 10:25:06 +0000
+
+quickemu (2.3.1-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Mon, 08 Nov 2021 00:54:38 +0000
+
+quickemu (2.3.0-1~focal1.0) focal; urgency=medium
+
+  * New upstream release
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 29 Oct 2021 10:03:58 +0100
+
+quickemu (2.2.9-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 28 Oct 2021 22:46:37 +0100
+
+quickemu (2.2.8-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 28 Oct 2021 16:13:20 +0100
+
+quickemu (2.2.7-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Wed, 27 Oct 2021 12:57:59 +0100
+
+quickemu (2.2.6-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 21 Oct 2021 10:57:35 +0100
+
+quickemu (2.2.5-1~jammy1.0) jammy; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Sat, 16 Oct 2021 11:35:41 +0100
+
+quickemu (2.2.4-1~impish1.0) impish; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 15 Oct 2021 12:50:05 +0100
+
+quickemu (2.2.3-1~impish1.0) impish; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 08 Oct 2021 15:06:50 +0100
+
+quickemu (2.2.2-1~impish1.0) impish; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Fri, 08 Oct 2021 02:39:00 +0100
+
+quickemu (2.2.1-1~impish1.0) impish; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Thu, 07 Oct 2021 16:23:33 +0100
+
+quickemu (2.2.0-1~impish1.0) impish; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Wed, 06 Oct 2021 11:08:33 +0100
+
+quickemu (2.1.0-1~focal1.0) focal; urgency=medium
+
+  * New upstream release.
+
+ -- Martin Wimpress <code@wimpress.io>  Tue, 05 Oct 2021 17:12:48 +0100
+
+quickemu (1.0.0-1~focal1.2) focal; urgency=medium
+
+  * Initial release.
+
+ -- Martin Wimpress <code@wimpress.io>  Mon, 06 Sep 2021 23:11:44 +0100

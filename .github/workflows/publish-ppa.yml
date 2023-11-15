@@ -1,0 +1,36 @@
+name: Publish PPA 📦️
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-ppa:
+    name: Publish PPA
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout 
+      uses: actions/checkout@v4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Import gpg key
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install debhelper-compat distro-info dput devscripts
+    - name: Publish to PPA
+      env:
+        DEBEMAIL: ${{ secrets.DEBEMAIL }}
+        DEBFULLNAME: ${{ secrets.DEBFULLNAME }}
+      run: |
+        REL_VER=$(grep "^readonly VERSION" quickemu | cut -d'"' -f2)
+        STAMP=$(date +%y%j.%H%M)
+        for CODENAME in $(distro-info --supported); do
+          rm debian/changelog
+          dch --package quickemu --newversion="${REL_VER}-1~${CODENAME}${STAMP}" --distribution=${CODENAME} "New upstream release." --create
+          dpkg-buildpackage -d -S -sa
+          dput ppa:flexiondotorg/quickemu ../quickemu_${REL_VER}-1~${CODENAME}${STAMP}_source.changes
+        done

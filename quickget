@@ -3,27 +3,52 @@ export LC_ALL=C
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
-#  1. Update os_support() - add new OS, all lowercase
-#  2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
-#  3. Create a releases_newos() generator (required) outputs the current supported release versions
-#  4. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
-#  5. Update make_vm_config() - add any *required* new OS tweaks
-#  6. Create a get_newos() function - that does something like this:
-#     function get_newos() {
-#         local EDITION="${1:-}"
-#         local HASH=""
-#         local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
-#         local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
+#    1. Update os_support() - add new OS, all lowercase
+#    2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
+#    3. Update os_homepages() - add a homepage for new OS
+#    4. Create a releases_newos() generator (required) outputs the current supported release versions
+#    5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
+#    6. Update make_vm_config() - add any *required* new OS tweaks
+#    7. Create a get_newos() function - that does something like this:
 #
-#         HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
-#         echo "${URL}/${ISO} ${HASH}"
-#     }
+#function get_newos() {
+#    local EDITION="${1:-}"
+#    local HASH=""
+#    local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
+#    local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
+#
+#    HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1)
+#    echo "${URL}/${ISO} ${HASH}"
+#}
 
 function cleanup() {
   if [ -n "$(jobs -p)" ]; then
     kill "$(jobs -p)"
   fi
 }
+
+if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
+    test_iso_url="on"
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
+elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
+    show_iso_url="on"
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
+elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
+    open_distro_homepage="on"
+    set -- "$2"
+fi
 
 function pretty_name() {
   local SIMPLE_NAME=""
@@ -47,7 +72,7 @@ function pretty_name() {
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
-    holoiso)            PRETTY_NAME="HoloISO";;
+    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxlite)          PRETTY_NAME="Linux Lite";;
@@ -259,6 +284,93 @@ function os_support() {
     zorin
 }
 
+function os_homepages(){
+    local SIMPLE_NAME=""
+    local HOMEPAGE=""
+    SIMPLE_NAME="${1}"
+    case ${SIMPLE_NAME} in
+        alma)              HOMEPAGE="https://almalinux.org/";;
+        alpine)            HOMEPAGE="https://alpinelinux.org/";;
+        android)           HOMEPAGE="https://www.android-x86.org/";;
+        antix)             HOMEPAGE="https://antixlinux.com/";;
+        archlinux)         HOMEPAGE="https://archlinux.org/";;
+        archcraft)         HOMEPAGE="https://archcraft.io/";;
+        arcolinux)         HOMEPAGE="https://arcolinux.com/";;
+        batocera)          HOMEPAGE="https://batocera.org/";;
+        blendos)           HOMEPAGE="https://blendos.co/";;
+        bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
+        bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
+        cachyos)           HOMEPAGE="https://cachyos.org/";;
+        centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
+        debian)            HOMEPAGE="https://www.debian.org/";;
+        deepin)            HOMEPAGE="https://www.deepin.org/";;
+        devuan)            HOMEPAGE="https://www.devuan.org/";;
+        dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
+        edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
+        elementary)        HOMEPAGE="https://elementary.io/";;
+        endeavouros)       HOMEPAGE="https://endeavouros.com/";;
+        endless)           HOMEPAGE="https://www.endlessos.org/os";;
+        fedora)            HOMEPAGE="https://www.fedoraproject.org/";;
+        freebsd)           HOMEPAGE="https://www.freebsd.org/";;
+        freedos)           HOMEPAGE="https://freedos.org/";;
+        garuda)            HOMEPAGE="https://garudalinux.org/";;
+        gentoo)            HOMEPAGE="https://www.gentoo.org/";;
+        ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
+        haiku)             HOMEPAGE="https://www.haiku-os.org/";;
+        holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
+        kali)              HOMEPAGE="https://www.kali.org/";;
+        kdeneon)           HOMEPAGE="https://neon.kde.org/";;
+        kolibrios)         HOMEPAGE="http://kolibrios.org/en/";;
+        kubuntu)           HOMEPAGE="https://kubuntu.org/";;
+        linuxlite)         HOMEPAGE="https://www.linuxliteos.com/";;
+        linuxmint)         HOMEPAGE="https://linuxmint.com/";;
+        lmde)              HOMEPAGE="https://www.linuxmint.com/download_lmde.php";;
+        mageia)            HOMEPAGE="https://www.mageia.org/";;
+        manjaro)           HOMEPAGE="https://manjaro.org/";;
+        mxlinux)           HOMEPAGE="https://mxlinux.org/";;
+        netboot)           HOMEPAGE="https://netboot.xyz/";;
+        netbsd)            HOMEPAGE="https://www.netbsd.org/";;
+        nixos)             HOMEPAGE="https://nixos.org/";;
+        lubuntu)           HOMEPAGE="https://lubuntu.me/";;
+        macos)             HOMEPAGE="https://www.apple.com/macos/";;
+        openbsd)           HOMEPAGE="https://www.openbsd.org/";;
+        openindiana)       HOMEPAGE="https://www.openindiana.org/";;
+        opensuse)          HOMEPAGE="https://www.opensuse.org/";;
+        oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
+        peppermint)        HOMEPAGE="https://peppermintos.com/";;
+        popos)             HOMEPAGE="https://pop.system76.com/";;
+        porteus)           HOMEPAGE="http://www.porteus.org/";;
+        reactos)           HOMEPAGE="https://reactos.org/";;
+        rebornos)          HOMEPAGE="https://rebornos.org/";;
+        rockylinux)        HOMEPAGE="https://rockylinux.org/";;
+        siduction)         HOMEPAGE="https://siduction.org/";;
+        slackware)         HOMEPAGE="http://www.slackware.com/";;
+        solus)             HOMEPAGE="https://getsol.us/";;
+        spiral)            HOMEPAGE="https://spirallinux.github.io/";;
+        tails)             HOMEPAGE="https://tails.net/";;
+        tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
+        trisquel)          HOMEPAGE="https://trisquel.info/";;
+        truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
+        truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
+        ubuntu)            HOMEPAGE="https://ubuntu.com/";;
+        ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
+        ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
+        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/";;
+        ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
+        ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
+        ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
+        ubuntu-unity)      HOMEPAGE="https://ubuntuunity.org/";;
+        vanillaos)         HOMEPAGE="https://vanillaos.org/";;
+        void)              HOMEPAGE="https://voidlinux.org/";;
+        vxlinux)           HOMEPAGE="https://vxlinux.org/";;
+        windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
+        xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
+        xubuntu)           HOMEPAGE="https://xubuntu.org/";;
+        zorin)             HOMEPAGE="https://zorin.com/os/";;
+    esac
+    echo "${HOMEPAGE}"
+}
+
 function releases_alma() {
     echo 8 9
 }
@@ -395,11 +507,11 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37 38
+    echo 33 34 35 36 37 38 39
 }
 
 function releases_batocera() {
-  echo 32 33 34
+  echo latest
 }
 
 function editions_fedora() {
@@ -416,7 +528,8 @@ function editions_fedora() {
   Sericea \
   Kinoite \
   Sway \
-  Server
+  Server \
+  Onyx
 }
 
 function releases_freebsd(){
@@ -461,7 +574,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    echo 4.5
+    wget -q https://github.com/HoloISO/holoiso/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_kali() {
@@ -745,11 +858,11 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    wget -q https://github.com/VX-Linux/main/releases/latest -O- |grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+'|head -1|cut -d/ -f3
+    wget -q https://github.com/VX-Linux/main/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_windows() {
-    echo 10 11
+    echo 8 10 11
 }
 
 function releases_xerolinux() {
@@ -814,8 +927,15 @@ function web_get() {
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
+    # Test mode for ISO (yet wget only)
+    elif [ "${show_iso_url}" == 'on' ]; then
+          echo "${URL}"
+          exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+          wget --spider "${URL}"
+          exit 0
     else
-        if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+        if ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
           echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
           exit 1
         fi
@@ -1006,13 +1126,7 @@ EOF
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
-            # Only force SecureBoot on for non-Debian/Ubuntu distros.
-            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
-              SEC_BOOT="off"
-            else
-              SEC_BOOT="on"
-            fi
-            echo "secureboot=\"${SEC_BOOT}\"" >> "${CONF_FILE}"
+            echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
     fi
     echo
@@ -1175,22 +1289,7 @@ function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
     local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
-    local CURRENT_RELEASE=$(echo "${ISO}"| cut -d\- -f3)
-
-
-    case ${RELEASE} in
-      ${CURRENT_RELEASE})  #Current release
-         URL+=""
-         ;;
-      *)
-         URL+="/archives/${RELEASE}"
-         ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
-         ;; # non-current are here
-
-    esac
-
-
-    echo "${URL}/${ISO} ${HASH}"
+     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bodhi() {
@@ -1365,7 +1464,7 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Kinoite|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+      Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
 
@@ -1453,12 +1552,12 @@ function get_haiku() {
 }
 
 function get_holoiso() {
-    local HASH=""
-    local ISO="HoloISO_${RELEASE}_ux_changes-20230626_66f7c74061_bootchoice_fixes-1-x86_64.iso"
-    local URL="http://holoiso.itsvixano.me"
-
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
+    #local HASH=""
+    local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
+    local URL="https://cd2.holoiso.ru.eu.org"
+    # Can't find hash
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} #${HASH}"
 }
 
 function get_kali() {
@@ -2333,48 +2432,191 @@ function unattended_windows() {
 EOF
 }
 
+handle_curl_error() {
+    local error_code="$1"
 
-function get_windows() {
-    # Use the iTechtics CDN to download the ISOs.
-    # - https://www.itechtics.com/windows-10-download-iso/
-    # - https://www.itechtics.com/windows-11-download-iso/
-    #  0 : Prompt for a manual ISO download
-    #  1 : Download automatically
-    local AUTO_DOWNLOAD=1
-    local DOWNLOAD_URL=""
+    local fatal_error_action=2
 
-    if [ ${AUTO_DOWNLOAD} -eq 1 ]; then
-        # Ignore the most recent Windows 10 release for now.
-        case ${RELEASE} in
-            10) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=173"
-                EDITION="22H2"
-                FILE_NAME="Win${RELEASE}_${EDITION}_EnglishInternational_x64v1.iso"
-                FILE_HASH="dc3982ad27e2d4e03b680630c28f824cb78bcd47"
-                ;;
-            11) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=168"
-                EDITION="22H2"
-                FILE_NAME="Win${RELEASE}_${EDITION}_English_x64v1.iso"
-                FILE_HASH="c5341ba26e420684468fa4d4ab434823c9d1b61f"
-                ;;
-        esac
+    case "$error_code" in
+        6)
+            echo "Failed to resolve Microsoft servers! Is there an Internet connection? Exiting..."
+            return "$fatal_error_action"
+            ;;
+        7)
+            echo "Failed to contact Microsoft servers! Is there an Internet connection or is the server down?"
+            ;;
+        23)
+            echo "Failed at writing Windows media to disk! Out of disk space or permission error? Exiting..."
+            return "$fatal_error_action"
+            ;;
+        26)
+            echo "Ran out of memory during download! Exiting..."
+            return "$fatal_error_action"
+            ;;
+        36)
+            echo "Failed to continue earlier download!"
+            ;;
+        22)
+            echo "Microsoft servers returned failing HTTP status code!"
+            ;;
+        # POSIX defines exit statuses 1-125 as usable by us
+        # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
+        $((error_code <= 125)))
+            # Must be some other server error (possibly with this specific request/file)
+            # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and HTTP(S) request, using only the curl features we're using, and a sane build
+            echo "Server returned an error status!"
+            ;;
+        126 | 127)
+            echo "Curl command not found! Please install curl and try again. Exiting..."
+            return "$fatal_error_action"
+            ;;
+        # Exit statuses are undefined by POSIX beyond this point
+        *)
+            case "$(kill -l "$error_code")" in
+                # Signals defined to exist by POSIX:
+                # https://pubs.opengroup.org/onlinepubs/009695399/basedefs/signal.h.html
+                INT)
+                    echo "Curl was interrupted!"
+                    ;;
+                # There could be other signals but these are most common
+                SEGV | ABRT)
+                    echo "Curl crashed! Failed exploitation attempt? Please report any core dumps to curl developers. Exiting..."
+                    return "$fatal_error_action"
+                    ;;
+                *)
+                    echo "Curl terminated due to a fatal signal!"
+                    ;;
+            esac
+    esac
 
-        echo "Downloading Windows ${RELEASE} ${EDITION}..."
-        web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+    return 1
+}
 
-        check_hash "${FILE_NAME}" "${FILE_HASH}"
-    else
-        case ${RELEASE} in
-            10) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows10";;
-            11) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows11";;
-        esac
-        echo "######################################################################"
-        echo "# Download a Windows ${RELEASE} .iso image from:"
-        echo "#  - ${WINDOWS_ISO_URL}"
-        echo "# Put the .iso image in the ${VM_PATH} directory and rename"
-        echo "# it to windows-${RELEASE}.iso."
-        echo "######################################################################"
+function download_windows() {
+    # Download newer consumer Windows versions from behind gated Microsoft API
+    # This function aims to precisely emulate what Fido does down to the URL requests and HTTP headers (exceptions: updated user agent and referer adapts to Windows version instead of always being "windows11") but written in POSIX sh (with coreutils) and curl instead of PowerShell (also simplified to greatly reduce attack surface)
+    # However, differences such as the order of HTTP headers and TLS stacks (could be used to do TLS fingerprinting) still exist
+    #
+    # Command translated: ./Fido -Win 10 -Lang English -Verbose
+    # "English" = "English (United States)" (as opposed to the default "English (International)")
+    # For testing Fido, replace all "https://" with "http://" and remove all instances of "-MaximumRedirection 0" (to allow redirection of HTTP traffic to HTTPS) so HTTP requests can easily be inspected in Wireshark
+    # Fido (command-line only) works under PowerShell for Linux if that makes it easier for you
+    # UPDATE: Fido v1.4.2+ no longer works without being edited on Linux due to these issues on the Fido GitHub repo (and possibly others after these): #56 and #58
+    #
+    # If this function in Mido fails to work for you then please test with the Fido script before creating an issue because we basically just copy what Fido does exactly:
+    # https://github.com/pbatard/Fido
+
+    # Either 8, 10, or 11
+    local windows_version="$1"
+
+    local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
+    case "$windows_version" in
+        8 | 10) url="${url}ISO";;
+    esac
+
+    local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
+    # uuidgen: For MacOS (installed by default) and other systems (e.g. with no /proc) that don't have a kernel interface for generating random UUIDs
+    local session_id="$(cat /proc/sys/kernel/random/uuid 2> /dev/null || uuidgen --random)"
+
+    # Get product edition ID for latest release of given Windows version
+    # Product edition ID: This specifies both the Windows release (e.g. 22H2) and edition ("multi-edition" is default, either Home/Pro/Edu/etc., we select "Pro" in the answer files) in one number
+    # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
+    # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
+    # Remove "Accept" header that curl sends by default
+    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    # Limit untrusted size for input validation
+    iso_download_page_html="$(echo "$iso_download_page_html" | head -c 102400)"
+    # tr: Filter for only numerics to prevent HTTP parameter injection
+    # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
+    local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
+    echo " - Product edition ID: $product_edition_id"
+
+    # Permit Session ID
+    # "org_id" is always the same value
+    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+        # This should only happen if there's been some change to how this API works (copy whatever fix Fido implements)
+        handle_curl_error $?
+        return $?
+    }
+
+    # Extract everything after the last slash
+    local url_segment_parameter="${url##*/}"
+
+    # Get language -> skuID association table
+    # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
+    # We must make this request so our next one will be allowed
+    # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
+    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    # Limit untrusted size for input validation
+    language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
+    # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
+    local sku_id="$(echo "$language_skuid_table_html" | grep "English (United States)" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    echo " - SKU ID: $sku_id"
+
+    # Get ISO download link
+    # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
+    # --referer: Required by Microsoft servers to allow request
+    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")" || {
+        # This should only happen if there's been some change to how this API works
+        handle_curl_error $?
+        return $?
+    }
+
+    local failed=0
+
+    # Limit untrusted size for input validation
+    iso_download_link_html="$(echo "$iso_download_link_html" | head -c 4096)"
+
+    if ! [ "$iso_download_link_html" ]; then
+        # This should only happen if there's been some change to how this API works
+        echo " - Microsoft servers gave us an empty response to our request for an automated download."
+        failed=1
     fi
 
+    if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+        echo " - Microsoft blocked the automated download request based on your IP address."
+        failed=1
+    fi
+
+    if [ ${failed} -eq 1 ]; then
+        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
+        echo " - Save the downloaded ISO to: $(realpath ${VM_PATH})"
+        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
+        echo " - Continuing with the VM creation process..."
+        return 1
+    fi
+
+    # Filter for 64-bit ISO download URL
+    # sed: HTML decode "&" character
+    # tr: Filter for only alphanumerics or punctuation
+    local iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]' | head -c 512)"
+
+    if ! [ "$iso_download_link" ]; then
+        # This should only happen if there's been some change to the download endpoint web address
+        echo " - Microsoft servers gave us no download link to our request for an automated download. Please manually download this ISO in a web browser: $url"
+        return 1
+    fi
+
+    echo " - Got latest ISO download link (valid for 24 hours): $iso_download_link"
+
+    # Download ISO
+    FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
+    web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
+}
+
+function get_windows() {
+    echo "Downloading Windows ${RELEASE}..."
+    download_windows "${RELEASE}"
+
+    echo "Downloading VirtIO drivers..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
     rm -f "${VM_PATH}/unattended.iso"
@@ -2390,10 +2632,16 @@ function get_windows() {
             ;;
     esac
 
-    case "${AUTO_DOWNLOAD}" in
-        0) make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso";;
-        1) make_vm_config "${FILE_NAME}" "virtio-win.iso";;
-    esac
+    if [ -n "${FILE_NAME}" ]; then
+        make_vm_config "${FILE_NAME}" "virtio-win.iso"
+    else
+        make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso"
+    fi
+}
+
+open_url() {
+    local URL="$1";
+    xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
 }
 
 create_vm() {
@@ -2460,6 +2708,14 @@ else
     echo "ERROR! You must specify an operating system."
     echo -n " - Operating Systems: "
     os_support
+    echo "
+        You can also use this arguments:
+        Only show ISO download URL
+            --show-iso-url / -s {distro} {release} [edition]
+        Test if ISO is available
+            --test-iso-url / -t {distro} {release} [edition]
+        Open distro homepage
+            --open-distro-homepage / -o {distro}"
     exit 1
 fi
 
@@ -2490,9 +2746,9 @@ if [ -n "${2}" ]; then
 
         # Handle odd missing fedora cominations
         if [[ $OS == fedora ]] ; then
-            if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
+            if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
                 echo "ERROR! Unsupported combination"
-                echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1;
             fi
         fi
@@ -2536,6 +2792,10 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 else
+    if [ "${open_distro_homepage}" == 'on' ]; then
+        HOMEPAGE=$(os_homepages ${OS})
+        open_url "${HOMEPAGE}" && exit 0
+    fi
     echo "ERROR! You must specify a release."
     case ${OS} in
       *ubuntu-server*)

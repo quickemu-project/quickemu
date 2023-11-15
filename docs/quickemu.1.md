@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: October 19, 2023
+date: November 11, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -248,6 +248,7 @@ series.
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
 
+-   `edubuntu` (Edubuntu)
 -   `kubuntu` (Kubuntu)
 -   `lubuntu` (Lubuntu)
 -   `ubuntu-budgie` (Ubuntu Budgie)
@@ -259,6 +260,21 @@ with your preferred flavour.
 -   `ubuntu` (Ubuntu)
 -   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
+
+You can also use `quickget` with options to:
+
+``` shell
+    # show an OS ISO download URL for {os} {release} [edition] 
+    quickget --show-iso-url fedora 38 Silverblue   
+    # test if and OS ISO is available for {os} {release} [edition]
+    quickget --test-iso-url nixos 23.05 plasma5
+    # open an OS distribution homepage in a browser
+    quickget --open-distro-homepage  ubuntu-mate
+```
+
+The `--show-iso-url` and `--test-iso-url` options **do not** work for
+`Windows` (`quickget` will begin downloading the requested release and
+edition of windows)
 
 ## Other Operating Systems
 
@@ -291,7 +307,7 @@ with your preferred flavour.
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
--   `holoiso` (HoloISO)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -506,7 +522,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 10 & 11 Guests
+## Windows 8, 10 & 11 Guests
 
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
@@ -515,9 +531,12 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
+Windows 8.1 is also supported but doesn't feature any automated
+installation or driver optimisation.
+
 ``` bash
 quickget windows 11
-quickemu --vm windows-11-22H2.conf
+quickemu --vm windows-11.conf
 ```
 
 -   Complete the installation as you normally would.
@@ -535,7 +554,7 @@ disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
-secureboot="on"
+secureboot="off"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
@@ -552,6 +571,7 @@ Here are the usage instructions:
       quickemu --vm ubuntu.conf
 
     You can also pass optional parameters
+      --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
       --braille                         : Enable braille support. Requires SDL.
       --delete-disk                     : Delete the disk image and EFI variables
       --delete-vm                       : Delete the entire VM and it's configuration
