@@ -196,6 +196,7 @@ function os_support() {
     deepin \
     devuan \
     dragonflybsd \
+    edubuntu \
     elementary \
     endeavouros \
     endless \
