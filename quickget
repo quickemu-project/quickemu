@@ -2016,6 +2016,8 @@ function get_ubuntu-server() {
     local ISO=""
     local URL="https://releases.ubuntu.com/${RELEASE}"
 
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
+
     if wget -q --spider "${URL}/SHA256SUMS"; then
         ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
         HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
@@ -2024,7 +2026,7 @@ function get_ubuntu-server() {
         HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
     fi
 
-    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
         HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
@@ -2042,6 +2044,8 @@ function get_ubuntu() {
     local HASH=""
     local URL=""
     local DATA=""
+
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
 
     if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
