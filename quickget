@@ -978,7 +978,7 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
 
-	# Test mode for IS
+	# Test mode for ISO
 	if [ "${show_iso_url}" == 'on' ]; then
 	    echo "${URL}"
 	    exit 0
