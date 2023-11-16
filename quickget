@@ -176,10 +176,6 @@ function list_csv() {
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-legacy" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
       else
@@ -792,89 +788,57 @@ function releases_truenas-scale() {
 }
 
 function releases_ubuntu() {
-    local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="23.04 23.10"
+    local VERSION_DATA="$(IFS=$'\n' wget -qO- https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
+    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    local LTS_SUPPORT=()
+    local INTERIM_SUPPORT=()
+
+    for i in "${SUPPORTED_VERSIONS[@]}"; do
+        if [[ $(expr ${i%.*} % 2) == 0 && ${i#*.} == "04" ]]; then
+            LTS_SUPPORT+=($i)
+        else
+            INTERIM_SUPPORT+=($i)
+        fi
+    done
 
     case "${OS}" in
-        edubuntu)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        edubuntu|ubuntu-unity|ubuntucinnamon)
+        echo ${INTERIM_SUPPORT[@]} daily-live
         ;;
-        kubuntu|lubuntu|ubuntukylin|\
-        ubuntu-mate|ubuntustudio|xubuntu)
+        kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
         ubuntu-budgie)
         #after 16.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
-        ubuntu-unity)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
-        ;;
-        ubuntucinnamon)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        ubuntu)
+        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live ${EOL_VERSIONS[@]/#/eol-}
         ;;
     esac
-
-
-    if [ "${OS}" == "edubuntu" ] || [ "${OS}" == "ubuntu-unity" ] || [ "${OS}" == "ubuntucinnamon" ]; then
-        echo ${INTERIM_SUPPORT} \
-            daily-live \
-            daily-canary \
-             ;
-    else
-        echo ${LTS_SUPPORT} \
-            ${INTERIM_SUPPORT} \
-            jammy-daily \
-            daily-live \
-            daily-canary \
-            daily-legacy \
-            eol-4.10 \
-            eol-5.04 \
-            eol-5.10 \
-            eol-6.06.0 eol-6.06.1 eol-6.06.2 \
-            eol-6.10 \
-            eol-7.04 \
-            eol-7.10 \
-            eol-8.04.0 eol-8.04.1 eol-8.04.2 eol-8.04.3 eol-8.04.4 \
-            eol-8.10 \
-            eol-9.04 \
-            eol-9.10 \
-            eol-10.04.0 eol-10.04.1 eol-10.04.2 eol-10.04.3 eol-10.04.4 \
-            eol-10.10 \
-            eol-11.04 \
-            eol-11.10 \
-            eol-12.04 eol-12.04.0 eol-12.04.1 eol-12.04.2 eol-12.04.3 eol-12.04.4 eol-12.04.5 \
-            eol-12.10 \
-            eol-13.04 \
-            eol-13.10 \
-            eol-14.04.0 eol-14.04.1 eol-14.04.2 eol-14.04.3 eol-14.04.4 eol-14.04.5 \
-            eol-14.10 \
-            eol-15.04 \
-            eol-15.10 \
-            eol-16.04.0 eol-16.04.1 eol-16.04.2 eol-16.04.3 eol-16.04.4 eol-16.04.5 eol-16.04.6 \
-            eol-16.10 \
-            eol-17.04 \
-            eol-17.10 \
-            eol-18.04 eol-18.04.0 eol-18.04.1 eol-18.04.2 eol-18.04.3 eol-18.04.4 eol-18.04.5 \
-            eol-18.10 \
-            eol-19.04 \
-            eol-19.10 \
-            eol-20.04 eol-20.04.0 eol-20.04.1 eol-20.04.2 \
-            eol-20.10 \
-            eol-21.04 \
-            eol-21.10 \
-            eol-22.10 \
-            ;
-    fi
 }
 
 function releases_ubuntu-server() {
-   local LTS_SUPPORT="18.04 20.04 22.04"
-   local INTERIM_SUPPORT="23.04 23.10"
-    echo ${LTS_SUPPORT} \
-         ${INTERIM_SUPPORT} \
-         daily-live
+    local ALL_VERSIONS=($(IFS=$'\n' wget -qO- http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version'))
+
+    local LTS_SUPPORT=()
+    local INTERIM_SUPPORT=()
+
+    for i in "${!ALL_VERSIONS[@]}"; do
+        if [[ $i == 0 || ${ALL_VERSIONS[$i]} > ${ALL_VERSIONS[$(expr $i - 1)]} ]]; then
+            if [[ $(expr ${ALL_VERSIONS[${i}]%.*} % 2) == 0 && ${ALL_VERSIONS[${i}]#*.} == "04" ]]; then
+                LTS_SUPPORT+=(${ALL_VERSIONS[$i]})
+            else
+                INTERIM_SUPPORT+=(${ALL_VERSIONS[$i]})
+            fi
+        else
+            break
+        fi
+    done
+
+    echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live
 }
 
 function releases_vanillaos() {
@@ -2048,56 +2012,66 @@ function get_truenas-core() {
 
 function get_ubuntu-server() {
 
-      local HASH=""
-      local ISO=""
-      local URL="https://releases.ubuntu.com/${RELEASE}"
+    local HASH=""
+    local ISO=""
+    local URL=""
 
-      if wget -q --spider "${URL}/SHA256SUMS"; then
-          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
-          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
-      else
-          ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f3)
-          HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
-      fi
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
 
-      if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
-          URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
-          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
-          zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
-          make_vm_config "${OS}-devel.iso"
-      else
-          web_get "${URL}/${ISO}" "${VM_PATH}"
-          check_hash "${ISO}" "${HASH}"
-          make_vm_config "${ISO}"
-      fi
+    if [[ "${RELEASE}" == "daily"* ]]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    else
+        URL="https://releases.ubuntu.com/${RELEASE}"
+    fi
+
+    if wget -q --spider "${URL}/SHA256SUMS"; then
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        ISO=$(cut -d'*' -f2 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
+    else
+        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        ISO=$(cut -d' ' -f3 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
+    fi
+
+    if [ -z $ISO ] || [ -z $HASH ]; then
+        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        exit 1
+    fi
+
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
 }
 
 function get_ubuntu() {
     local ISO=""
     local HASH=""
     local URL=""
+    local DATA=""
 
-    if [[ "${RELEASE}" == *"daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
+
+    if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
         RELEASE="dvd"
-    elif [ "${RELEASE}" == "daily-canary" ] && [ "${OS}" != "ubuntu" ]; then
-        # daily-canary is only available for Ubuntu, switch flavours to daily-live
-        RELEASE="daily-live"
-    elif [ "${RELEASE}" == "daily-legacy" ] && [ "${OS}" != "ubuntu" ]; then
-        # daily-legacy is only available for Ubuntu, switch flavours to daily-live
-        RELEASE="daily-live"
     fi
 
     if [[ "${RELEASE}" == "eol-"* ]]; then
         URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
     elif [[ "${RELEASE}" == "jammy-daily" ]]; then
-        URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        if [[ "${OS}" == "ubuntustudio" ]]; then
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/dvd/current"
+        else
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        fi
         VM_PATH="${OS}-jammy-live"
-    elif [[ "${RELEASE}" == "daily-legacy" ]]; then
-        URL="https://cdimage.ubuntu.com/${RELEASE}/current"
-        VM_PATH="${OS}-${RELEASE}"
-    elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+    elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-${RELEASE}"
     elif [ "${OS}" == "ubuntu" ]; then
@@ -2107,16 +2081,26 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2 | sed '1q;d')
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1 | sed '1q;d')
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
+        HASH=$(cut -d' ' -f1 <<<${DATA} | sed '1q;d')
     else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1)
+        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
     fi
 
-    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+    if [ -z $ISO ] || [ -z $HASH ]; then
+        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        exit 1
+    fi
+
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
         make_vm_config "${OS}-devel.iso"
+    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-jammy-live.iso"
+        make_vm_config "${OS}-jammy-live.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
         check_hash "${ISO}" "${HASH}"
