@@ -952,7 +952,7 @@ function web_get() {
       exit 1
     fi
 
-	# Test mode for ISO (yet wget only)
+	# Test mode for ISO
 	if [ "${show_iso_url}" == 'on' ]; then
 	    echo "${URL}"
 	    exit 0
@@ -978,7 +978,7 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
 
-	# Test mode for ISO (yet wget only)
+	# Test mode for IS
 	if [ "${show_iso_url}" == 'on' ]; then
 	    echo "${URL}"
 	    exit 0
