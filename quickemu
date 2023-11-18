@@ -683,41 +683,41 @@ function vm_boot() {
     *) AUDIO_DEV="pa,id=audio0";;
   esac
 
-  # Determine a sane resolution for Linux guests.
-  if [ "${guest_os}" == "linux" ]; then
-    local X_RES=1152
-    local Y_RES=648
-    if [ "${XDG_SESSION_TYPE}" == "x11" ]; then
-      if [ -z "${SCREEN}" ]; then
-        X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
-        Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
-      else
-        X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
-        Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
-      fi
+    # Determine a sane resolution for Linux guests.
+    if [ "${guest_os}" == "linux" ]; then
+        local X_RES=1152
+        local Y_RES=648
+        if [ "${XDG_SESSION_TYPE}" == "x11" ] || [ "${XDG_SESSION_TYPE}" == "wayland" ]; then
+            if [ -z "${SCREEN}" ]; then
+                X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
+                Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
+            else
+                X_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f1 | head -n1)
+                Y_RES=$(xrandr --listmonitors | grep -v Monitors | grep "^ ${SCREEN}:" | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | head -n1)
+            fi
 
-      if [ "${FULLSCREEN}" ]; then
-        :
-      elif [ "${SCREENPCT}" ] ; then
-        X_RES=$(( X_RES*SCREENPCT/100 ))
-        Y_RES=$(( Y_RES*SCREENPCT/100 ))
-      elif [ "${X_RES}" -ge 3840 ]; then
-        X_RES=3200
-        Y_RES=1800
-      elif [ "${X_RES}" -ge 2560 ]; then
-        X_RES=2048
-        Y_RES=1152
-      elif [ "${X_RES}" -ge 1920 ]; then
-        X_RES=1664
-        Y_RES=936
-      elif [ "${X_RES}" -ge 1280 ]; then
-        X_RES=1152
-        Y_RES=648
-      else
-        :
-      fi
+            if [ "${FULLSCREEN}" ]; then
+                :
+            elif [ "${SCREENPCT}" ] ; then
+                X_RES=$(( X_RES*SCREENPCT/100 ))
+                Y_RES=$(( Y_RES*SCREENPCT/100 ))
+            elif [ "${X_RES}" -ge 3840 ]; then
+                X_RES=3200
+                Y_RES=1800
+            elif [ "${X_RES}" -ge 2560 ]; then
+                X_RES=2048
+                Y_RES=1152
+            elif [ "${X_RES}" -ge 1920 ]; then
+                X_RES=1664
+                Y_RES=936
+            elif [ "${X_RES}" -ge 1280 ]; then
+                X_RES=1152
+                Y_RES=648
+            else
+                :
+            fi
+        fi
     fi
-  fi
 
   # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
   if [ "${guest_os}" == "linux" ]; then
@@ -848,6 +848,19 @@ function vm_boot() {
       SPICE_PORT=$(get_port 5930 9)
     fi
 
+    # ALLOW REMOTE ACCESS TO SPICE OVER LAN RATHER THAN JUST LOCALHOST
+    if [ -z "${ACCESS}" ]; then
+      SPICE_ADDR="127.0.0.1"
+    else
+      if [ "${ACCESS}" == "remote" ]; then
+        SPICE_ADDR=""
+      elif [ "${ACCESS}" == "local" ]; then
+        SPICE_ADDR="127.0.0.1"
+      else
+        SPICE_ADDR="${ACCESS}"
+      fi
+    fi
+
     if [ -z "${SPICE_PORT}" ]; then
       echo " - SPICE:    All SPICE ports have been exhausted."
       if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
@@ -864,7 +877,7 @@ function vm_boot() {
           echo -n " --spice-shared-dir ${PUBLIC}"
         fi
         echo "${FULLSPICY}"
-        SPICE="${SPICE},port=${SPICE_PORT},addr=127.0.0.1"
+        SPICE="${SPICE},port=${SPICE_PORT},addr=${SPICE_ADDR}"
       fi
     fi
   fi
@@ -1231,7 +1244,6 @@ function vm_boot() {
     exit 1
   fi
 
-
   if [ -z "${EXTRA_ARGS}" ]; then
     EXTRA_ARGS="${extra_args}"
   fi
@@ -1326,6 +1338,7 @@ function usage() {
   echo "  ${LAUNCHER} --vm ubuntu.conf"
   echo
   echo "You can also pass optional parameters"
+  echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
   echo "  --braille                         : Enable braille support. Requires SDL."
   echo "  --delete-disk                     : Delete the disk image and EFI variables"
   echo "  --delete-vm                       : Delete the entire VM and it's configuration"
@@ -1498,6 +1511,7 @@ mouse="tablet"
 # options: intel-hda, ac97, es1370, sb16, none
 sound_card="intel-hda"
 
+ACCESS=""
 BRAILLE=""
 DELETE_DISK=0
 DELETE_VM=0
@@ -1540,7 +1554,7 @@ SOUND_CARD=""
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
-readonly VERSION="4.8"
+readonly VERSION="4.9.1"
 
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
@@ -1564,6 +1578,10 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
+          -access|--access)
+            ACCESS="${2}"
+            shift
+            shift;;
           -braille|--braille)
             BRAILLE="on"
             shift;;

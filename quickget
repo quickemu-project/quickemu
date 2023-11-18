@@ -72,7 +72,7 @@ function pretty_name() {
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
-    holoiso)            PRETTY_NAME="HoloISO";;
+    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
     linuxlite)          PRETTY_NAME="Linux Lite";;
@@ -176,10 +176,6 @@ function list_csv() {
     for RELEASE in $("releases_${FUNC}"); do
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-canary" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
-      elif [ "${OS}" == "ubuntu" ] && [ "${RELEASE}" == "daily-legacy" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-        DOWNLOADER="zsync"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
       else
@@ -507,11 +503,11 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37 38
+    echo 33 34 35 36 37 38 39
 }
 
 function releases_batocera() {
-  echo 32 33 34
+  echo latest
 }
 
 function editions_fedora() {
@@ -528,7 +524,8 @@ function editions_fedora() {
   Sericea \
   Kinoite \
   Sway \
-  Server
+  Server \
+  Onyx
 }
 
 function releases_freebsd(){
@@ -573,7 +570,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    echo 4.5
+    wget -q https://github.com/HoloISO/holoiso/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_kali() {
@@ -791,89 +788,57 @@ function releases_truenas-scale() {
 }
 
 function releases_ubuntu() {
-    local LTS_SUPPORT="14.04 16.04 18.04 20.04 22.04"
-    local INTERIM_SUPPORT="23.04 23.10"
+    local VERSION_DATA="$(IFS=$'\n' wget -qO- https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
+    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    local LTS_SUPPORT=()
+    local INTERIM_SUPPORT=()
+
+    for i in "${SUPPORTED_VERSIONS[@]}"; do
+        if [[ $(expr ${i%.*} % 2) == 0 && ${i#*.} == "04" ]]; then
+            LTS_SUPPORT+=($i)
+        else
+            INTERIM_SUPPORT+=($i)
+        fi
+    done
 
     case "${OS}" in
-        edubuntu)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        edubuntu|ubuntu-unity|ubuntucinnamon)
+        echo ${INTERIM_SUPPORT[@]} daily-live
         ;;
-        kubuntu|lubuntu|ubuntukylin|\
-        ubuntu-mate|ubuntustudio|xubuntu)
+        kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 /}"
+        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
         ubuntu-budgie)
         #after 16.04
-        LTS_SUPPORT="${LTS_SUPPORT/14.04 16.04 /}"
+        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
         ;;
-        ubuntu-unity)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
-        ;;
-        ubuntucinnamon)
-        INTERIM_SUPPORT="${INTERIM_SUPPORT}"
+        ubuntu)
+        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live ${EOL_VERSIONS[@]/#/eol-}
         ;;
     esac
-
-
-    if [ "${OS}" == "edubuntu" ] || [ "${OS}" == "ubuntu-unity" ] || [ "${OS}" == "ubuntucinnamon" ]; then
-        echo ${INTERIM_SUPPORT} \
-            daily-live \
-            daily-canary \
-             ;
-    else
-        echo ${LTS_SUPPORT} \
-            ${INTERIM_SUPPORT} \
-            jammy-daily \
-            daily-live \
-            daily-canary \
-            daily-legacy \
-            eol-4.10 \
-            eol-5.04 \
-            eol-5.10 \
-            eol-6.06.0 eol-6.06.1 eol-6.06.2 \
-            eol-6.10 \
-            eol-7.04 \
-            eol-7.10 \
-            eol-8.04.0 eol-8.04.1 eol-8.04.2 eol-8.04.3 eol-8.04.4 \
-            eol-8.10 \
-            eol-9.04 \
-            eol-9.10 \
-            eol-10.04.0 eol-10.04.1 eol-10.04.2 eol-10.04.3 eol-10.04.4 \
-            eol-10.10 \
-            eol-11.04 \
-            eol-11.10 \
-            eol-12.04 eol-12.04.0 eol-12.04.1 eol-12.04.2 eol-12.04.3 eol-12.04.4 eol-12.04.5 \
-            eol-12.10 \
-            eol-13.04 \
-            eol-13.10 \
-            eol-14.04.0 eol-14.04.1 eol-14.04.2 eol-14.04.3 eol-14.04.4 eol-14.04.5 \
-            eol-14.10 \
-            eol-15.04 \
-            eol-15.10 \
-            eol-16.04.0 eol-16.04.1 eol-16.04.2 eol-16.04.3 eol-16.04.4 eol-16.04.5 eol-16.04.6 \
-            eol-16.10 \
-            eol-17.04 \
-            eol-17.10 \
-            eol-18.04 eol-18.04.0 eol-18.04.1 eol-18.04.2 eol-18.04.3 eol-18.04.4 eol-18.04.5 \
-            eol-18.10 \
-            eol-19.04 \
-            eol-19.10 \
-            eol-20.04 eol-20.04.0 eol-20.04.1 eol-20.04.2 \
-            eol-20.10 \
-            eol-21.04 \
-            eol-21.10 \
-            eol-22.10 \
-            ;
-    fi
 }
 
 function releases_ubuntu-server() {
-   local LTS_SUPPORT="18.04 20.04 22.04"
-   local INTERIM_SUPPORT="23.04 23.10"
-    echo ${LTS_SUPPORT} \
-         ${INTERIM_SUPPORT} \
-         daily-live
+    local ALL_VERSIONS=($(IFS=$'\n' wget -qO- http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version'))
+
+    local LTS_SUPPORT=()
+    local INTERIM_SUPPORT=()
+
+    for i in "${!ALL_VERSIONS[@]}"; do
+        if [[ $i == 0 || ${ALL_VERSIONS[$i]} > ${ALL_VERSIONS[$(expr $i - 1)]} ]]; then
+            if [[ $(expr ${ALL_VERSIONS[${i}]%.*} % 2) == 0 && ${ALL_VERSIONS[${i}]#*.} == "04" ]]; then
+                LTS_SUPPORT+=(${ALL_VERSIONS[$i]})
+            else
+                INTERIM_SUPPORT+=(${ALL_VERSIONS[$i]})
+            fi
+        else
+            break
+        fi
+    done
+
+    echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live
 }
 
 function releases_vanillaos() {
@@ -889,11 +854,11 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    wget -q https://github.com/VX-Linux/main/releases/latest -O- |grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+'|head -1|cut -d/ -f3
+    wget -q https://github.com/VX-Linux/main/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_windows() {
-    echo 10 11
+    echo 8 10 11
 }
 
 function releases_xerolinux() {
@@ -951,25 +916,23 @@ function web_get() {
       exit 1
     fi
 
-    if command -v aria2c &>/dev/null; then
+	# Test mode for ISO
+	if [ "${show_iso_url}" == 'on' ]; then
+	    echo "${URL}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+	    wget --spider "${URL}"
+	    exit 0
+    elif command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
-    # Test mode for ISO (yet wget only)
-    elif [ "${show_iso_url}" == 'on' ]; then
-          echo "${URL}"
-          exit 0
-    elif [ "${test_iso_url}" == 'on' ]; then
-          wget --spider "${URL}"
-          exit 0
-    else
-        if ! wget --quiet --continue --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
-          echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
-          exit 1
-        fi
+    elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+        echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+        exit 1
     fi
 }
 
@@ -979,7 +942,14 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
 
-    if command -v zsync &>/dev/null; then
+	# Test mode for ISO
+	if [ "${show_iso_url}" == 'on' ]; then
+	    echo "${URL}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+	    wget --spider "${URL}"
+	    exit 0
+    elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
         else
@@ -1157,13 +1127,7 @@ EOF
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
-            # Only force SecureBoot on for non-Debian/Ubuntu distros.
-            if [ -e "/usr/share/OVMF/OVMF_CODE_4M.fd" ] && [ -e "/usr/share/OVMF/OVMF_VARS_4M.fd" ]; then
-              SEC_BOOT="off"
-            else
-              SEC_BOOT="on"
-            fi
-            echo "secureboot=\"${SEC_BOOT}\"" >> "${CONF_FILE}"
+            echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
     fi
     echo
@@ -1326,22 +1290,7 @@ function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
     local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
-    local CURRENT_RELEASE=$(echo "${ISO}"| cut -d\- -f3)
-
-
-    case ${RELEASE} in
-      ${CURRENT_RELEASE})  #Current release
-         URL+=""
-         ;;
-      *)
-         URL+="/archives/${RELEASE}"
-         ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
-         ;; # non-current are here
-
-    esac
-
-
-    echo "${URL}/${ISO} ${HASH}"
+     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bodhi() {
@@ -1516,7 +1465,7 @@ function get_fedora() {
     local VARIANT=""
 
     case ${EDITION} in
-      Server|Kinoite|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+      Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
 
@@ -1604,12 +1553,12 @@ function get_haiku() {
 }
 
 function get_holoiso() {
-    local HASH=""
-    local ISO="HoloISO_${RELEASE}_ux_changes-20230626_66f7c74061_bootchoice_fixes-1-x86_64.iso"
-    local URL="http://holoiso.itsvixano.me"
-
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
+    #local HASH=""
+    local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
+    local URL="https://cd2.holoiso.ru.eu.org"
+    # Can't find hash
+    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} #${HASH}"
 }
 
 function get_kali() {
@@ -1707,8 +1656,7 @@ function get_macos() {
         monterey)       #12
             BOARD_ID="Mac-E43C1C25D4880AD6";;
         ventura)        #13
-            BOARD_ID="Mac-7BA5B2D9E42DDD94"
-            OS_TYPE="latest";;
+            BOARD_ID="Mac-BE088AF8C5EB4FA2";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
@@ -1780,13 +1728,13 @@ function get_manjaro() {
     [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
 
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
-    
-    if [[ ${RELEASE} != "sway" ]]; then 
+
+    if [[ ${RELEASE} != "sway" ]]; then
         URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
     else
         URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
     fi
-    
+
     HASH=$(wget -qO- "${URL}.sha512" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
@@ -2069,56 +2017,66 @@ function get_truenas-core() {
 
 function get_ubuntu-server() {
 
-      local HASH=""
-      local ISO=""
-      local URL="https://releases.ubuntu.com/${RELEASE}"
+    local HASH=""
+    local ISO=""
+    local URL=""
 
-      if wget -q --spider "${URL}/SHA256SUMS"; then
-          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
-          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
-      else
-          ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f3)
-          HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d' ' -f1)
-      fi
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
 
-      if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
-          URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-          ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso | cut -d'*' -f2)
-          HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso |cut -d' ' -f1)
-          zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
-          make_vm_config "${OS}-devel.iso"
-      else
-          web_get "${URL}/${ISO}" "${VM_PATH}"
-          check_hash "${ISO}" "${HASH}"
-          make_vm_config "${ISO}"
-      fi
+    if [[ "${RELEASE}" == "daily"* ]]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    else
+        URL="https://releases.ubuntu.com/${RELEASE}"
+    fi
+
+    if wget -q --spider "${URL}/SHA256SUMS"; then
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        ISO=$(cut -d'*' -f2 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
+    else
+        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        ISO=$(cut -d' ' -f3 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
+    fi
+
+    if [ -z $ISO ] || [ -z $HASH ]; then
+        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        exit 1
+    fi
+
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
 }
 
 function get_ubuntu() {
     local ISO=""
     local HASH=""
     local URL=""
+    local DATA=""
 
-    if [[ "${RELEASE}" == *"daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
+    [[ $RELEASE = daily ]] && RELEASE=daily-live
+
+    if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
         RELEASE="dvd"
-    elif [ "${RELEASE}" == "daily-canary" ] && [ "${OS}" != "ubuntu" ]; then
-        # daily-canary is only available for Ubuntu, switch flavours to daily-live
-        RELEASE="daily-live"
-    elif [ "${RELEASE}" == "daily-legacy" ] && [ "${OS}" != "ubuntu" ]; then
-        # daily-legacy is only available for Ubuntu, switch flavours to daily-live
-        RELEASE="daily-live"
     fi
 
     if [[ "${RELEASE}" == "eol-"* ]]; then
         URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
     elif [[ "${RELEASE}" == "jammy-daily" ]]; then
-        URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        if [[ "${OS}" == "ubuntustudio" ]]; then
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/dvd/current"
+        else
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        fi
         VM_PATH="${OS}-jammy-live"
-    elif [[ "${RELEASE}" == "daily-legacy" ]]; then
-        URL="https://cdimage.ubuntu.com/${RELEASE}/current"
-        VM_PATH="${OS}-${RELEASE}"
-    elif [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+    elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-${RELEASE}"
     elif [ "${OS}" == "ubuntu" ]; then
@@ -2128,16 +2086,26 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        ISO=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2 | sed '1q;d')
-        HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1 | sed '1q;d')
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
+        HASH=$(cut -d' ' -f1 <<<${DATA} | sed '1q;d')
     else
-        ISO=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d'*' -f2)
-        HASH=$(wget -q -O- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | cut -d' ' -f1)
+        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<${DATA})
+        HASH=$(cut -d' ' -f1 <<<${DATA})
     fi
 
-    if [[ "${RELEASE}" == *"daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+    if [ -z $ISO ] || [ -z $HASH ]; then
+        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        exit 1
+    fi
+
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
         make_vm_config "${OS}-devel.iso"
+    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-jammy-live.iso"
+        make_vm_config "${OS}-jammy-live.iso"
     else
         web_get "${URL}/${ISO}" "${VM_PATH}"
         check_hash "${ISO}" "${HASH}"
@@ -2150,7 +2118,7 @@ function get_void() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local URL="https://alpha.de.repo.voidlinux.org/live/current"
+    local URL="https://repo-default.voidlinux.org/live/current"
 
     DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
@@ -2478,48 +2446,191 @@ function unattended_windows() {
 EOF
 }
 
+handle_curl_error() {
+    local error_code="$1"
 
-function get_windows() {
-    # Use the iTechtics CDN to download the ISOs.
-    # - https://www.itechtics.com/windows-10-download-iso/
-    # - https://www.itechtics.com/windows-11-download-iso/
-    #  0 : Prompt for a manual ISO download
-    #  1 : Download automatically
-    local AUTO_DOWNLOAD=1
-    local DOWNLOAD_URL=""
+    local fatal_error_action=2
 
-    if [ ${AUTO_DOWNLOAD} -eq 1 ]; then
-        # Ignore the most recent Windows 10 release for now.
-        case ${RELEASE} in
-            10) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=173"
-                EDITION="22H2"
-                FILE_NAME="Win${RELEASE}_${EDITION}_EnglishInternational_x64v1.iso"
-                FILE_HASH="dc3982ad27e2d4e03b680630c28f824cb78bcd47"
-                ;;
-            11) DOWNLOAD_URL="https://www.itechtics.com/?dl_id=168"
-                EDITION="22H2"
-                FILE_NAME="Win${RELEASE}_${EDITION}_English_x64v1.iso"
-                FILE_HASH="c5341ba26e420684468fa4d4ab434823c9d1b61f"
-                ;;
-        esac
+    case "$error_code" in
+        6)
+            echo "Failed to resolve Microsoft servers! Is there an Internet connection? Exiting..."
+            return "$fatal_error_action"
+            ;;
+        7)
+            echo "Failed to contact Microsoft servers! Is there an Internet connection or is the server down?"
+            ;;
+        23)
+            echo "Failed at writing Windows media to disk! Out of disk space or permission error? Exiting..."
+            return "$fatal_error_action"
+            ;;
+        26)
+            echo "Ran out of memory during download! Exiting..."
+            return "$fatal_error_action"
+            ;;
+        36)
+            echo "Failed to continue earlier download!"
+            ;;
+        22)
+            echo "Microsoft servers returned failing HTTP status code!"
+            ;;
+        # POSIX defines exit statuses 1-125 as usable by us
+        # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
+        $((error_code <= 125)))
+            # Must be some other server error (possibly with this specific request/file)
+            # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and HTTP(S) request, using only the curl features we're using, and a sane build
+            echo "Server returned an error status!"
+            ;;
+        126 | 127)
+            echo "Curl command not found! Please install curl and try again. Exiting..."
+            return "$fatal_error_action"
+            ;;
+        # Exit statuses are undefined by POSIX beyond this point
+        *)
+            case "$(kill -l "$error_code")" in
+                # Signals defined to exist by POSIX:
+                # https://pubs.opengroup.org/onlinepubs/009695399/basedefs/signal.h.html
+                INT)
+                    echo "Curl was interrupted!"
+                    ;;
+                # There could be other signals but these are most common
+                SEGV | ABRT)
+                    echo "Curl crashed! Failed exploitation attempt? Please report any core dumps to curl developers. Exiting..."
+                    return "$fatal_error_action"
+                    ;;
+                *)
+                    echo "Curl terminated due to a fatal signal!"
+                    ;;
+            esac
+    esac
 
-        echo "Downloading Windows ${RELEASE} ${EDITION}..."
-        web_get "${DOWNLOAD_URL}" "${VM_PATH}" "${FILE_NAME}"
+    return 1
+}
 
-        check_hash "${FILE_NAME}" "${FILE_HASH}"
-    else
-        case ${RELEASE} in
-            10) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows10";;
-            11) WINDOWS_ISO_URL="https://www.microsoft.com/software-download/windows11";;
-        esac
-        echo "######################################################################"
-        echo "# Download a Windows ${RELEASE} .iso image from:"
-        echo "#  - ${WINDOWS_ISO_URL}"
-        echo "# Put the .iso image in the ${VM_PATH} directory and rename"
-        echo "# it to windows-${RELEASE}.iso."
-        echo "######################################################################"
+function download_windows() {
+    # Download newer consumer Windows versions from behind gated Microsoft API
+    # This function aims to precisely emulate what Fido does down to the URL requests and HTTP headers (exceptions: updated user agent and referer adapts to Windows version instead of always being "windows11") but written in POSIX sh (with coreutils) and curl instead of PowerShell (also simplified to greatly reduce attack surface)
+    # However, differences such as the order of HTTP headers and TLS stacks (could be used to do TLS fingerprinting) still exist
+    #
+    # Command translated: ./Fido -Win 10 -Lang English -Verbose
+    # "English" = "English (United States)" (as opposed to the default "English (International)")
+    # For testing Fido, replace all "https://" with "http://" and remove all instances of "-MaximumRedirection 0" (to allow redirection of HTTP traffic to HTTPS) so HTTP requests can easily be inspected in Wireshark
+    # Fido (command-line only) works under PowerShell for Linux if that makes it easier for you
+    # UPDATE: Fido v1.4.2+ no longer works without being edited on Linux due to these issues on the Fido GitHub repo (and possibly others after these): #56 and #58
+    #
+    # If this function in Mido fails to work for you then please test with the Fido script before creating an issue because we basically just copy what Fido does exactly:
+    # https://github.com/pbatard/Fido
+
+    # Either 8, 10, or 11
+    local windows_version="$1"
+
+    local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
+    case "$windows_version" in
+        8 | 10) url="${url}ISO";;
+    esac
+
+    local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
+    # uuidgen: For MacOS (installed by default) and other systems (e.g. with no /proc) that don't have a kernel interface for generating random UUIDs
+    local session_id="$(cat /proc/sys/kernel/random/uuid 2> /dev/null || uuidgen --random)"
+
+    # Get product edition ID for latest release of given Windows version
+    # Product edition ID: This specifies both the Windows release (e.g. 22H2) and edition ("multi-edition" is default, either Home/Pro/Edu/etc., we select "Pro" in the answer files) in one number
+    # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
+    # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
+    # Remove "Accept" header that curl sends by default
+    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    # Limit untrusted size for input validation
+    iso_download_page_html="$(echo "$iso_download_page_html" | head -c 102400)"
+    # tr: Filter for only numerics to prevent HTTP parameter injection
+    # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
+    local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
+    echo " - Product edition ID: $product_edition_id"
+
+    # Permit Session ID
+    # "org_id" is always the same value
+    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+        # This should only happen if there's been some change to how this API works (copy whatever fix Fido implements)
+        handle_curl_error $?
+        return $?
+    }
+
+    # Extract everything after the last slash
+    local url_segment_parameter="${url##*/}"
+
+    # Get language -> skuID association table
+    # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
+    # We must make this request so our next one will be allowed
+    # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
+    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    # Limit untrusted size for input validation
+    language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
+    # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
+    local sku_id="$(echo "$language_skuid_table_html" | grep "English (United States)" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    echo " - SKU ID: $sku_id"
+
+    # Get ISO download link
+    # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
+    # --referer: Required by Microsoft servers to allow request
+    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")" || {
+        # This should only happen if there's been some change to how this API works
+        handle_curl_error $?
+        return $?
+    }
+
+    local failed=0
+
+    # Limit untrusted size for input validation
+    iso_download_link_html="$(echo "$iso_download_link_html" | head -c 4096)"
+
+    if ! [ "$iso_download_link_html" ]; then
+        # This should only happen if there's been some change to how this API works
+        echo " - Microsoft servers gave us an empty response to our request for an automated download."
+        failed=1
     fi
 
+    if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+        echo " - Microsoft blocked the automated download request based on your IP address."
+        failed=1
+    fi
+
+    if [ ${failed} -eq 1 ]; then
+        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
+        echo " - Save the downloaded ISO to: $(realpath ${VM_PATH})"
+        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
+        echo " - Continuing with the VM creation process..."
+        return 1
+    fi
+
+    # Filter for 64-bit ISO download URL
+    # sed: HTML decode "&" character
+    # tr: Filter for only alphanumerics or punctuation
+    local iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]' | head -c 512)"
+
+    if ! [ "$iso_download_link" ]; then
+        # This should only happen if there's been some change to the download endpoint web address
+        echo " - Microsoft servers gave us no download link to our request for an automated download. Please manually download this ISO in a web browser: $url"
+        return 1
+    fi
+
+    echo " - Got latest ISO download link (valid for 24 hours): $iso_download_link"
+
+    # Download ISO
+    FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
+    web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
+}
+
+function get_windows() {
+    echo "Downloading Windows ${RELEASE}..."
+    download_windows "${RELEASE}"
+
+    echo "Downloading VirtIO drivers..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
     rm -f "${VM_PATH}/unattended.iso"
@@ -2535,10 +2646,11 @@ function get_windows() {
             ;;
     esac
 
-    case "${AUTO_DOWNLOAD}" in
-        0) make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso";;
-        1) make_vm_config "${FILE_NAME}" "virtio-win.iso";;
-    esac
+    if [ -n "${FILE_NAME}" ]; then
+        make_vm_config "${FILE_NAME}" "virtio-win.iso"
+    else
+        make_vm_config "windows-${RELEASE}.iso" "virtio-win.iso"
+    fi
 }
 
 open_url() {
@@ -2648,9 +2760,9 @@ if [ -n "${2}" ]; then
 
         # Handle odd missing fedora cominations
         if [[ $OS == fedora ]] ; then
-            if [[ ${RELEASE} = "33"  &&  ${EDITION} = "i3"  ]] || [[  ${RELEASE} = "34"  &&  ${EDITION} = "Cinnamon"   ]] ; then
+            if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
                 echo "ERROR! Unsupported combination"
-                echo "       Fedora 33 i3 and Fedora 34 Cinnamon are not available, please choose another Release or Edition"
+                echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1;
             fi
         fi
