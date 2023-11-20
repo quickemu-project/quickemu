@@ -1731,7 +1731,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     exit 1
   fi
 
-  DiskCheck="$(qemu-img check -q "${disk_img}" 2>&1)"
+  DiskCheck="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
 
   if [[ $DiskCheck ]]; then
     echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
