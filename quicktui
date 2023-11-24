@@ -1,0 +1,627 @@
+#!/usr/bin/bash
+# Author: zenobit
+# Description: Uses gum to provide a simple TUI for quickemu and quickget
+# License MIT
+
+define_variables() {
+    progname="${progname:="${0##*/}"}"
+    version='0.33'
+    configdir="$HOME/.config/$progname"
+    vms=(*.conf)
+    # Set traps to catch the signals and exit gracefully
+    trap 'exit' INT
+    trap 'exit' EXIT
+    if ! command -v quickemu >/dev/null 2>&1; then
+        echo 'You are missing quickemu...!'
+    fi
+    QUICKGET=$(command -v quickget)
+    if ! command -v gum >/dev/null 2>&1; then
+        echo 'You are missing gum...!'
+    fi
+    # use configdir
+    if [ -f "${configdir}/border" ]; then
+        BORDER="$(cat "${configdir}"/border)"
+    else
+        BORDER="double"
+    fi
+    if [ -f "${configdir}/color" ]; then
+        BORDERS_FOREGROUND="$(cat "${configdir}"/color)"
+    else
+        BORDERS_FOREGROUND="$(( RANDOM % 255 + 1 ))"
+    fi
+    if [ -f "${configdir}/spinner" ]; then
+        spinner="$(cat "${configdir}"/spinner)"
+    else
+        spinner="globe"
+    fi
+}
+
+show_editor() {
+    if [ -z "$EDITOR" ]; then
+        echo '  editor Not set!'
+    else
+        echo "  editor $EDITOR"
+    fi
+}
+
+show_vms() {
+    if [ ${#vms[@]} -eq 0 ]; then
+        echo 'No VMs found.'
+    else
+        echo ${vms[@]%.*} | tr " " "\n"
+    fi
+}
+
+show_custom() {
+    if [ -f "${configdir}/command" ]; then
+        printf '\n   command:\nquickemu %s' "$(cat "${configdir}/command")"
+    fi
+    if [ -f "${configdir}/default_vm_config" ]; then
+        printf '\n   VMs default config:\n%s' "$(cat "${configdir}/default_vm_config")"
+    fi
+    if [ -f "${configdir}/color" ]; then
+        printf '\n   color: %s' "$(cat "${configdir}/color")"
+    fi
+    if [ -f "${configdir}/border" ]; then
+        printf '\n   border: %s' "$(cat "${configdir}/border")"
+    fi
+    if [ -f "${configdir}/spinner" ]; then
+        printf '\n   spinner: %s' "$(cat "${configdir}/spinner")"
+    fi
+}
+
+show_version_quickemu() {
+    quickemu --version | grep "ERROR! QEMU not found" && echo "QEMU is missing!" || quickemu --version
+}
+
+show_version_qemu() {
+    qemu-x86_64 -version | sed 2d | cut -d' ' -f3
+}
+
+show_header() {
+    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$title"
+}
+
+show_headers_small() {
+    header1=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$progname")
+    header2=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  ready VMs:
+$(echo ${vms[@]%.*} | tr " " "\n")")
+    header3=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  workdir:
+$(pwd)$(show_custom)")
+    header1_2=$(gum join --vertical "$header1" "$header2")
+    gum join --align top "$header1_2" "$header3"
+}
+
+show_headers_full() {
+    header1=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" --height 3 "     $(gum style --bold $progname) $version
+Simple TUI for quickemu")
+    header2=$(gum style --padding "0 1" --border="$BORDER" --border-foreground $(( $RANDOM % 255 + 1 )) "    qemu $(show_version_qemu)
+quickemu $(show_version_quickemu)
+$(show_editor)")
+    header3=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  ready VMs:
+$(show_vms)")
+    header4=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  workdir:
+$(pwd)$(show_custom)")
+    header1_2=$(gum join "$header1" "$header2")
+    header3_4=$(gum join "$header3" "$header4")
+    gum join --align center --vertical "$header1_2" "$header3_4"
+}
+
+show_help() {
+    show_headers_full
+    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$title"
+
+}
+
+help_main() {
+    title="    $progname $version
+Uses gum to provide a simple TUI for quickemu and quickget 'https://github.com/quickemu-project/quickemu'
+ 'https://github.com/charmbracelet/gum'
+
+For menus you can use arrow keys or fuzzy filtering and then ENTER
+(e + ENTER for exit or b + ENTER for back to main menu)
+
+If is posible choose more options use TAB for highliting desired and then ENTER
+
+Config and temp files are stored at $configdir"
+}
+
+#template for functions
+#    title=""
+#    show_header
+
+gum_choose_os() {
+    title="Choose OS"
+    show_header
+    os=$(gum filter < "$configdir"/supported)
+    choices=$("$QUICKGET" "$os" | sed 1d)
+}
+
+gum_choose_release() {
+    title="Choose release"
+    show_header
+    height=7
+    release=$(echo "$choices" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*' | gum filter --sort --height="$height")
+}
+
+gum_choose_edition() {
+    title="Choose edition"
+    show_header
+    edition=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*' | gum filter --prompt='Choose edition' --sort)
+}
+
+gum_choose_VM() {
+    if ls | grep ".conf" ; then
+        height=$(ls -1 | grep ".conf" | wc -l)
+        title="Choose VM"
+        show_header
+        chosen=$(ls -1 | grep ".conf" | rev | cut -d'.' -f2- | rev | gum filter --height "$height")
+    else
+        echo "No VMs to run."
+    fi
+    #chosen=$(printf '%s\n' "${vms[@]%.conf}" | gum filter --height "$("${vms[@]%.conf}" | wc -l)" --header='Choose VM to run')
+}
+
+edit_default_VMs_config() {
+    title="Editing default VM's config..."
+    show_header
+    printf 'For example:\ncpu_cores="2"\nram="4G"\n'
+    title="CTRL+D to complete.  CTRL+C and esc will cancel"
+    show_header
+    gum write > "${configdir}"/default_vm_config
+}
+
+edit_VM_config() {
+    if [ -z "$EDITOR" ]; then
+        echo "Editor not set! Can't continue!"
+    else
+        height=$(ls -1 | grep ".conf" | wc -l)
+        ${EDITOR} "$(ls | grep ".conf" | gum filter --height "$height")"
+    fi
+
+}
+
+custom_quickemu_command() {
+    custom=$(echo "edit delete" | grep -o '[^ ]*' | gum choose --header='Edit or delete custom command?')
+    if [ "$custom" = "edit" ]; then
+        quickemu
+        printf '\nEnter quickemu custom command:\n For example:--public-dir ~/Downloads\n:'
+        read -r command
+        mkdir -p "$configdir"
+        echo "$command" > "${configdir}/command"
+    elif [ "$custom" = "delete" ]; then
+        rm "${configdir}/command"
+    fi
+}
+
+run_VM() {
+    title="Starting $chosen..."
+    show_header
+    if [ -f "${configdir}/command" ]; then
+        quickemu < "${configdir}/command" -vm "$chosen.conf"
+    else
+            quickemu -vm "$chosen.conf"
+    fi
+}
+
+create_VM() {
+    gum_choose_os
+    if [ -z "$os" ]; then exit 100
+    elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
+        clear
+        gum_choose_release
+        #gum spin --spinner $spinner --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
+        "$QUICKGET" "$os" "$release"
+        if [ -f "${configdir}/default_vm_config" ]; then
+            echo 'Adding default values to config...'
+            cat "${configdir}/default_vm_config" >> "$os-$release.conf"
+        fi
+    else
+        clear
+        gum_choose_release
+        gum_choose_edition
+        gum spin --spinner $spinner --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
+        if [ -f "${configdir}/default_vm_config" ]; then
+            echo 'Adding default values to config...'
+            cat "${configdir}/default_vm_config" >> "$os-$release-$edition.conf"
+        fi
+    fi
+    echo "New VM not appear in ready VMs: yet #TODO
+To start your new $os virtual machine use 'run VM' from menu"
+show_headers_small
+}
+
+gum_choose_VM_to_delete() {
+    height=$(ls -1 | grep ".conf" | wc -l)
+    GUM_FILTER_HEADER="Choose VM to delete"
+    GUM_FILTER_HEADER_FOREGROUND=""
+    if ls | grep ".conf" ; then
+        chosen=$(echo ${vms[@]%.*} | tr " " "\n" | gum filter --height "$height" --no-limit)
+        echo 'Removing config(s)...'
+        rm -r $chosen & rm $chosen.conf
+    else
+        echo "No VMs to delete"
+    fi
+}
+
+#gum_choose_VM_to_delete() {
+    #if ls | grep ".conf" ; then
+        #GUM_FILTER_HEADER="Choose VM to delete"
+        #height=$(ls -1 | grep ".conf" | wc -l)
+        #chosen=$(ls -1 | grep ".conf" | gum filter --height "$height" --no-limit)
+        #delete_VM
+    #else
+        #echo "No VMs to delete"
+    #fi
+#}
+
+delete_VM() {
+    #chosen_to_delete=$(cat $chosen | while read line; echo $line | rev | cut -d'.' -f2-5 | rev; done)
+    echo "#TODO"
+    echo $chosen | tr " " "\n" | while read line 
+    do
+        echo 'Removing dir(s)...'
+        rm -r $(echo $line | rev | cut -d'.' -f2-5 | rev)
+    done
+    echo 'Removing config(s)...'
+    rm $(echo "$chosen")
+}
+# shellcheck disable=SC2016,2034,2153
+add_new_distro() {
+    title="Adding new distro..."
+    show_header
+    mkdir -p "$configdir"
+    echo "add new OS, all lowercase"
+    NAME="$(gum input --header="NAME" --placeholder="arch")"
+    echo "add a pretty name for new OS *only if the catch all is not suitable*"
+    PRETTY_NAME="$(gum input --header="PRETTY_NAME" --placeholder="Arch Linux")"
+    echo "add a homepage for new OS"
+    HOMEPAGE="$(gum input --header="HOMEPAGE" --placeholder="https://voidlinux.org/")"
+    echo "current supported release versions"
+    RELEASES="$(gum input --header="RELEASES" --placeholder="8 9")"
+    echo "the editions if new OS has multiple flavours/editions"
+    EDITIONS="$(gum input --header="EDITIONS" --placeholder="kde gnome")"
+    echo "base URL for ISO download"
+    URL="$(gum input --header="URL" --placeholder="https://ddl.bunsenlabs.org/ddl")"
+    echo "Name of ISO"
+    ISO="$(gum input --header="ISO" --placeholder="GhostBSD-${RELEASE}-XFCE.iso")"
+    echo "name of hash file "
+    CHECKSUM="$(gum input --header="CHECKSUM" --placeholder='${ISO}.sha256sum')"
+    cat <<EOF > "$configdir/template"
+#line 58+
+
+$NAME)           PRETTY_NAME="$PRETTY_NAME";;
+
+#line 207+
+
+$NAME \\
+
+#line 292+
+
+        $NAME)              HOMEPAGE=$HOMEPAGE;;
+
+#line 374+
+
+function releases_$NAME() {
+echo $RELEASES
+}
+
+function editions_$NAME() {
+echo $EDITIONS
+}
+
+#line 1176+
+
+function get_$NAME() {
+local EDITION="\${1:-}"
+local HASH=""
+local ISO="$ISO"
+local URL="$URL"
+HASH="\$(wget -q -O- \${URL}/\$CHECKSUM | grep (\${ISO} | cut -d' ' -f4)"
+echo "\${URL}/\${ISO}" "\${HASH}"
+}
+
+EOF
+    diff "$configdir/template" "quickget"
+}
+# shellcheck disable=SC2154
+create_desktop_entry() {
+    cat <<EOF > "${DESKTOP_FILE}"
+[Desktop Entry]
+Version=$version
+Type=$type
+Name=$name
+GenericName=$progname
+Comment=$comment
+Exec=$execmd
+Icon=$icon
+Terminal=$terminal
+X-MultipleArgs=$args
+Type=$type
+Categories=$categories
+StartupNotify=$notify
+MimeType=$mime
+Keywords=$keyword
+
+EOF
+}
+
+test_ISOs_download() {
+    rm -r "$configdir"
+    mkdir -p "$configdir" && cd "$configdir" || exit
+    touch "$configdir/test"
+    #"$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' > supported
+    os=$(gum filter < "$configdir"/supported)
+    choices=$("$QUICKGET" "$os" | sed 1d)
+    while read -r get_name; do
+        echo "Trying $get_name..."
+        mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
+        releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        echo "$releases" > releases
+        editions=$("$QUICKGET" "$get_name" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        echo "$editions" > editions
+        if [ -z "$editions" ]; then
+            for release in $releases; do
+                echo "$get_name" >> "$configdir/test"
+                timeout 10 "$QUICKGET" -t "$get_name" "${release}" >> "$configdir/test"
+            done
+        else
+            while read -r release; do
+                for edition in $editions; do
+                    echo "$get_name" >> "$configdir/test"
+                    timeout 10 "$QUICKGET" -t "$get_name" "${release}" "${edition}" >> "$configdir/test"
+                done
+            done < releases
+        fi
+        cd "$configdir" || exit
+    done < supported
+    printf "\nDone"
+}
+
+show_ISOs_urls(){
+    rm -r "$configdir"
+    mkdir -p "$configdir" && cd "$configdir" || exit
+    touch "$configdir/test"
+    while read -r get_name; do
+        echo "Trying $get_name..."
+        mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
+        releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        echo "$releases" > releases
+        editions=$("$QUICKGET" "$get_name" | grep 'Editions:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        echo "$editions" > editions
+        if [ -z "$editions" ]; then
+            for release in $releases; do
+                echo "$get_name" >> "$configdir/test"
+                timeout 5 "$QUICKGET" -s "$get_name" "${release}" >> "$configdir/test" #&& $(killall zsync >> /dev/null)
+            done
+        else
+            while read -r release; do
+                for edition in $editions; do
+                    echo "$get_name" >> "$configdir/test"
+                    timeout 5 "$QUICKGET" -s "$get_name" "${release}" "${edition}" >> "$configdir/test" #&& $(killall zsync >> /dev/null)
+                done
+            done < releases
+        fi
+        cd "$configdir" || exit
+    done < supported
+    printf "\nDone"
+}
+
+generate_if_needed() {
+    if [ ! -f "${configdir}"/supported ]; then
+        generate_supported
+    fi
+}
+
+generate_supported(){
+    echo "Extracting OS Editions and Releases..."
+    rm -r "$configdir/distros"
+    mkdir -p "$configdir/distros"
+    "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
+    while read -r get_name; do
+        supported=$(gum spin --spinner $spinner --title="$get_name" -- "$QUICKGET" "$get_name" | sed 1d)
+        echo "$supported" > "$configdir/distros/${get_name}"
+    done < "$configdir/supported"
+}
+
+open_distro_homepage(){
+    gum_choose_os
+    "$QUICKGET" -o "${os}"
+}
+
+change_borders() {
+    title="Change borders style"
+    show_header
+    BORDER=$(echo "none
+hidden
+normal
+rounded
+thick
+double" | gum filter --height $height)
+    mkdir -p ${configdir}
+    touch "${configdir}"/border
+    echo $BORDER > "${configdir}"/border
+}
+
+change_color() {
+    title="Define color number or choose random"
+    show_header
+    BORDER_FOREGROUND=$(echo 'random' | gum filter --height 1 --prompt="Enter custom" --no-strict)
+    mkdir -p ${configdir}
+    touch "${configdir}"/color
+    echo $BORDER_FOREGROUND > "${configdir}"/color
+}
+
+use_color() {
+    if [ -f "${configdir}/color" ]; then
+        BORDER_FOREGROUND=$(cat ${configdir}/color)
+    fi
+}
+
+change_spinner() {
+    spinner=$(echo "line
+dot
+minidot
+jump
+pulse
+points
+globe
+moon
+monkey
+meter
+hamburger" | gum filter --height 11)
+    mkdir -p ${configdir}
+    touch "${configdir}"/spinner
+    echo "$spinner" > "${configdir}"/spinner
+}
+# MENU
+
+show_menu_main() {
+    while true
+    do
+    height=9
+    start=$(echo "create new VM
+run VM
+open distro homepage
+delete VM
+advanced menu
+settings menu
+test menu
+show help
+EXIT $progname" | gum filter --height $height)
+    case $start in
+        'create new VM' ) create_VM;;
+        'advanced menu' ) show_menu_advanced;;
+        'settings menu' ) show_menu_settings;;
+        'run VM' ) gum_choose_VM && run_VM;;
+        'open distro homepage' ) open_distro_homepage;;
+        'delete VM' ) gum_choose_VM_to_delete;;
+        'test menu' ) show_menu_test;;
+        'show help' ) help_main; show_help;;
+        "EXIT $progname" ) exit 0;;
+    esac
+    done
+}
+
+show_menu_advanced() {
+    while true
+    do
+    title="advanced"
+    show_header
+    height=8
+    start=$(echo "test ISOs download
+show ISOs URLs
+set default config for VMs
+edit VM config
+custom quickemu command
+add new distro
+back to main menu
+EXIT $progname" | gum filter --height $height)
+    case $start in
+        'set default config for VMs' ) edit_default_VMs_config;;
+        'edit VM config' ) edit_VM_config;;
+        'custom quickemu command' ) custom_quickemu_command;;
+        'add new distro' ) add_new_distro;;
+        'test ISOs download' ) test_ISOs_download;;
+        'show ISOs URLs' ) show_ISOs_urls;;
+        'back to main menu') clear; show_headers_small; break;;
+        "EXIT $progname" ) exit 0;;
+    esac
+    done
+}
+
+show_menu_settings() {
+    while true
+    do
+    title="settings"
+    show_header
+    height=6
+    start=$(echo "update $progname
+regenerate supported
+change borders color
+change borders style
+change spinner
+back to main menu
+EXIT $progname" | gum filter --height $height)
+    case $start in
+        "update $progname" ) update_quicktui;;
+        'regenerate supported' ) generate_supported;;
+        'change borders color' ) change_color;;
+        'change borders style' ) change_borders;;
+        'change spinner' ) change_spinner;;
+        'back to main menu') clear; show_headers_small; break;;
+        "EXIT $progname" ) exit 0;;
+    esac
+    done
+}
+
+show_menu_test() {
+    while true
+    do
+    title="dev (Not for use!)"
+    show_header
+    height=27
+    start=$(echo "add new distro
+change spinner
+choose vm to delete
+create vm
+create desktop entry
+custom quickemu command
+delete vm
+edit vm config
+edit default vms config
+generate if needed
+generate supported
+gum choose vm
+gum choose editions
+gum choose os
+gum choose release
+open distro homepage
+qemu version
+quickemu version
+run vm
+show isos urls
+show custom
+show editor
+show headers
+show vms
+test isos download
+back to main menu
+EXIT $progname" | gum filter --height $height)
+    case $start in
+        'add new distro' ) add_new_distro;;
+        'change spinner' ) change_spinner;;
+        'choose vm to delete' ) gum_choose_VM_to_delete;;
+        'create vm' ) create_VM;;
+        'create desktop entry' ) create_desktop_entry;;
+        'custom quickemu command' ) custom_quickemu_command;;
+        'delete vm' ) delete_VMe;;
+        'edit vm config' ) edit_VM_config;;
+        'edit default vms config' ) edit_default_VMs_config;;
+        'generate if needed' ) generate_if_needed;;
+        'generate supported' ) generate_supported;;
+        'gum choose vm' ) gum_choose_VM;;
+        'gum choose editions' ) gum_choose_edition;;
+        'gum choose os' ) gum_choose_os;;
+        'gum choose release' ) gum_choose_release;;
+        'open distro homepage' ) open_distro_homepage;;
+        'qemu version' ) show_version_qemu;;
+        'quickemu version' ) show_version_quickemu;;
+        'run vm' ) run_VM;;
+        'show isos urls' ) show_ISOs_urls;;
+        'show custom' ) show_custom;;
+        'show editor' ) show_editor;;
+        'show headers' ) show_headers;;
+        'show vms' ) show_vms;;
+        'test isos download' ) test_ISOs_download;;
+        'back to main menu') clear; show_headers_small; break;;
+        "EXIT $progname" ) exit 0;;
+    esac
+    done
+}
+# run
+clear
+define_variables
+generate_if_needed
+show_headers_small
+show_menu_main
