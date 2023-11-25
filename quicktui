@@ -29,6 +29,16 @@ define_variables() {
     else
         BORDERS_FOREGROUND="$(( RANDOM % 255 + 1 ))"
     fi
+    if [ -f "${configdir}/indicator" ]; then
+        GUM_FILTER_INDICATOR_FOREGROUND="$(cat "${configdir}"/indicator)"
+    else
+        GUM_FILTER_INDICATOR_FOREGROUND="$(( RANDOM % 255 + 1 ))"
+    fi
+    if [ -f "${configdir}/spinner-color" ]; then
+        GUM_SPIN_SPINNER_FOREGROUND="$(cat "${configdir}"/spinner-color)"
+    else
+        GUM_SPIN_SPINNER_FOREGROUND="$(( RANDOM % 255 + 1 ))"
+    fi
     if [ -f "${configdir}/spinner" ]; then
         spinner="$(cat "${configdir}"/spinner)"
     else
@@ -59,11 +69,14 @@ show_custom() {
     if [ -f "${configdir}/default_vm_config" ]; then
         printf '\n   VMs default config:\n%s' "$(cat "${configdir}/default_vm_config")"
     fi
-    if [ -f "${configdir}/color" ]; then
-        printf '\n   color: %s' "$(cat "${configdir}/color")"
-    fi
     if [ -f "${configdir}/border" ]; then
         printf '\n   border: %s' "$(cat "${configdir}/border")"
+    fi
+    if [ -f "${configdir}/color" ]; then
+        printf '\n   borders color: %s' "$(cat "${configdir}/color")"
+    fi
+    if [ -f "${configdir}/indicator" ]; then
+        printf '\n   indicator color: %s' "$(cat "${configdir}/indicator")"
     fi
     if [ -f "${configdir}/spinner" ]; then
         printf '\n   spinner: %s' "$(cat "${configdir}/spinner")"
@@ -430,26 +443,88 @@ open_distro_homepage(){
 }
 
 change_borders() {
-    title="Change borders style"
+    header="Change borders style"
     show_header
+    height=6
     BORDER=$(echo "none
 hidden
 normal
 rounded
 thick
 double" | gum filter --height $height)
-    mkdir -p ${configdir}
-    touch "${configdir}"/border
     echo $BORDER > "${configdir}"/border
 }
 
 change_color() {
-    title="Define color number or choose random"
-    show_header
-    BORDER_FOREGROUND=$(echo 'random' | gum filter --height 1 --prompt="Enter custom" --no-strict)
-    mkdir -p ${configdir}
-    touch "${configdir}"/color
+    if command -v yad >/dev/null 2>&1; then
+        header="Define color, use color picker or choose random"
+        show_header
+        height=4
+        start=$(echo "random
+yad color picker
+custom
+EXIT $progname" | gum filter --height $height)
+        case $start in
+            'random' ) BORDER_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
+            'yad color picker' ) BORDER_FOREGROUND="$(yad --color)";;
+            'custom' ) BORDER_FOREGROUND=$(gum input  --header="Enter color value");;
+            'show help' ) help_main; show_help;;
+            "EXIT $progname" ) exit 0;;
+        esac
+    else
+        header="Define color number or choose random"
+        show_header
+        BORDER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+    fi
     echo $BORDER_FOREGROUND > "${configdir}"/color
+}
+
+change_color_indicator() {
+    if command -v yad >/dev/null 2>&1; then
+        header="Define indicator color value, use color picker or choose random"
+        show_header
+        height=5
+        start=$(echo "random
+yad color picker
+custom
+EXIT $progname" | gum filter --height $height)
+        case $start in
+            'random' ) GUM_FILTER_INDICATOR_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
+            'yad color picker' ) GUM_FILTER_INDICATOR_FOREGROUND="$(yad --color)";;
+            'custom' ) GUM_FILTER_INDICATOR_FOREGROUND=$(gum input --header="Enter color value");;
+            'show help' ) help_main; show_help;;
+            "EXIT $progname" ) exit 0;;
+        esac
+    else
+        header="Define indicator color value or choose random"
+        show_header
+        GUM_FILTER_INDICATOR_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+    fi
+    echo $GUM_FILTER_INDICATOR_FOREGROUND > "${configdir}"/indicator
+}
+
+change_color_spinner() {
+    if command -v yad >/dev/null 2>&1; then
+        header="Define color, use color picker or choose random"
+        show_header
+        height=4
+        start=$(echo "random
+yad color picker
+custom
+EXIT $progname" | gum filter --height $height)
+        case $start in
+            'random' ) GUM_SPIN_SPINNER_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
+            'yad color picker' ) GUM_SPIN_SPINNER_FOREGROUND="$(yad --color)";;
+            'custom' ) GUM_SPIN_SPINNER_FOREGROUND=$(gum input  --header="Enter color value");;
+            'show help' ) help_main; show_help;;
+            "EXIT $progname" ) exit 0;;
+        esac
+    else
+        header="Define color number or choose random"
+        show_header
+        GUM_SPIN_SPINNER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+    fi
+    echo $GUM_SPIN_SPINNER_FOREGROUND > "${configdir}"/spinner-color
 }
 
 use_color() {
@@ -459,6 +534,7 @@ use_color() {
 }
 
 change_spinner() {
+    height=11
     spinner=$(echo "line
 dot
 minidot
@@ -469,13 +545,10 @@ globe
 moon
 monkey
 meter
-hamburger" | gum filter --height 11)
-    mkdir -p ${configdir}
-    touch "${configdir}"/spinner
+hamburger" | gum filter --height $height)
     echo "$spinner" > "${configdir}"/spinner
 }
 # MENU
-
 show_menu_main() {
     while true
     do
@@ -533,14 +606,16 @@ EXIT $progname" | gum filter --height $height)
 show_menu_settings() {
     while true
     do
-    title="settings"
+    header="settings"
     show_header
-    height=6
+    height=8
     start=$(echo "update $progname
 regenerate supported
 change borders color
 change borders style
-change spinner
+change indicator color
+change spinner color
+change spinner style
 back to main menu
 EXIT $progname" | gum filter --height $height)
     case $start in
@@ -548,7 +623,9 @@ EXIT $progname" | gum filter --height $height)
         'regenerate supported' ) generate_supported;;
         'change borders color' ) change_color;;
         'change borders style' ) change_borders;;
-        'change spinner' ) change_spinner;;
+        'change indicator color' ) change_color_indicator;;
+        'change spinner style' ) change_spinner;;
+        'change spinner color' ) change_color_spinner;;
         'back to main menu') clear; show_headers_small; break;;
         "EXIT $progname" ) exit 0;;
     esac
