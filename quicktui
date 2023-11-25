@@ -22,7 +22,7 @@ define_variables() {
     if [ -f "${configdir}/border" ]; then
         BORDER="$(cat "${configdir}"/border)"
     else
-        BORDER="double"
+        BORDER="rounded"
     fi
     if [ -f "${configdir}/color" ]; then
         BORDERS_FOREGROUND="$(cat "${configdir}"/color)"
