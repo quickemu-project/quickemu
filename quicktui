@@ -92,42 +92,42 @@ show_version_qemu() {
 }
 
 show_header() {
-    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$title"
+    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$header"
 }
 
 show_headers_small() {
-    header1=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$progname")
-    header2=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  ready VMs:
-$(echo ${vms[@]%.*} | tr " " "\n")")
-    header3=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  workdir:
-$(pwd)$(show_custom)")
+    header1=$(header="$(gum style --bold $progname) $version"; show_header)
+    header2=$(header="  ready VMs:
+$(echo ${vms[@]%.*} | tr " " "\n")"; show_header)
+    header3=$(header="  workdir:
+$(pwd)$(show_custom)"; show_header)
     header1_2=$(gum join --vertical "$header1" "$header2")
     gum join --align top "$header1_2" "$header3"
 }
 
 show_headers_full() {
-    header1=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" --height 3 "     $(gum style --bold $progname) $version
-Simple TUI for quickemu")
-    header2=$(gum style --padding "0 1" --border="$BORDER" --border-foreground $(( $RANDOM % 255 + 1 )) "    qemu $(show_version_qemu)
+    header1=$(header="     $(gum style --bold $progname) $version
+Simple TUI for quickemu"; show_header)
+    header2=$(header="    qemu $(show_version_qemu)
 quickemu $(show_version_quickemu)
-$(show_editor)")
-    header3=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  ready VMs:
-$(show_vms)")
-    header4=$(gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "  workdir:
-$(pwd)$(show_custom)")
+$(show_editor)"; show_header)
+    header3=$(header="  ready VMs:
+$(show_vms)"; show_header)
+    header4=$(header="  workdir:
+$(pwd)$(show_custom)"; show_header)
     header1_2=$(gum join "$header1" "$header2")
     header3_4=$(gum join "$header3" "$header4")
     gum join --align center --vertical "$header1_2" "$header3_4"
 }
 
 show_help() {
+    clear
     show_headers_full
-    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$title"
-
+    show_header
 }
 
 help_main() {
-    title="    $progname $version
+    header="    $progname $version
 Uses gum to provide a simple TUI for quickemu and quickget 'https://github.com/quickemu-project/quickemu'
  'https://github.com/charmbracelet/gum'
 
@@ -140,34 +140,35 @@ Config and temp files are stored at $configdir"
 }
 
 #template for functions
-#    title=""
+#    header=""
 #    show_header
 
 gum_choose_os() {
-    title="Choose OS"
+    header="Choose OS"
     show_header
     os=$(gum filter < "$configdir"/supported)
     choices=$("$QUICKGET" "$os" | sed 1d)
 }
 
 gum_choose_release() {
-    title="Choose release"
+    header="Choose release"
     show_header
-    height=7
+    height=$(echo "$choices" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*' | wc -l)
     release=$(echo "$choices" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*' | gum filter --sort --height="$height")
 }
 
 gum_choose_edition() {
-    title="Choose edition"
+    header="Choose edition"
     show_header
-    edition=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*' | gum filter --prompt='Choose edition' --sort)
+    height=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*' | wc -l)
+    edition=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*' | gum filter --sort --height="$height")
 }
 
 gum_choose_VM() {
     if ls | grep ".conf" ; then
-        height=$(ls -1 | grep ".conf" | wc -l)
-        title="Choose VM"
+        header="Choose VM"
         show_header
+        height=$(ls -1 | grep ".conf" | wc -l)
         chosen=$(ls -1 | grep ".conf" | rev | cut -d'.' -f2- | rev | gum filter --height "$height")
     else
         echo "No VMs to run."
@@ -176,10 +177,10 @@ gum_choose_VM() {
 }
 
 edit_default_VMs_config() {
-    title="Editing default VM's config..."
+    header="Editing default VM's config..."
     show_header
     printf 'For example:\ncpu_cores="2"\nram="4G"\n'
-    title="CTRL+D to complete.  CTRL+C and esc will cancel"
+    header="CTRL+D to complete.  CTRL+C and esc will cancel"
     show_header
     gum write > "${configdir}"/default_vm_config
 }
@@ -188,16 +189,20 @@ edit_VM_config() {
     if [ -z "$EDITOR" ]; then
         echo "Editor not set! Can't continue!"
     else
+        header="Editing VM config"
+        show_header
         height=$(ls -1 | grep ".conf" | wc -l)
         ${EDITOR} "$(ls | grep ".conf" | gum filter --height "$height")"
     fi
-
 }
 
 custom_quickemu_command() {
+    header="Define custom command"
+    show_header
     custom=$(echo "edit delete" | grep -o '[^ ]*' | gum choose --header='Edit or delete custom command?')
     if [ "$custom" = "edit" ]; then
-        quickemu
+        header=$(quickemu | awk 'NR==6,/version/')
+        show_header
         printf '\nEnter quickemu custom command:\n For example:--public-dir ~/Downloads\n:'
         read -r command
         mkdir -p "$configdir"
@@ -208,7 +213,7 @@ custom_quickemu_command() {
 }
 
 run_VM() {
-    title="Starting $chosen..."
+    header="Starting $chosen..."
     show_header
     if [ -f "${configdir}/command" ]; then
         quickemu < "${configdir}/command" -vm "$chosen.conf"
@@ -247,7 +252,7 @@ show_headers_small
 gum_choose_VM_to_delete() {
     height=$(ls -1 | grep ".conf" | wc -l)
     GUM_FILTER_HEADER="Choose VM to delete"
-    GUM_FILTER_HEADER_FOREGROUND=""
+    GUM_FILTER_HEADER_FOREGROUND="1"
     if ls | grep ".conf" ; then
         chosen=$(echo ${vms[@]%.*} | tr " " "\n" | gum filter --height "$height" --no-limit)
         echo 'Removing config(s)...'
@@ -281,7 +286,7 @@ delete_VM() {
 }
 # shellcheck disable=SC2016,2034,2153
 add_new_distro() {
-    title="Adding new distro..."
+    header="Adding new distro..."
     show_header
     mkdir -p "$configdir"
     echo "add new OS, all lowercase"
@@ -579,7 +584,7 @@ EXIT $progname" | gum filter --height $height)
 show_menu_advanced() {
     while true
     do
-    title="advanced"
+    header="advanced"
     show_header
     height=8
     start=$(echo "test ISOs download
@@ -635,7 +640,7 @@ EXIT $progname" | gum filter --height $height)
 show_menu_test() {
     while true
     do
-    title="dev (Not for use!)"
+    header="dev (Not for use!)"
     show_header
     height=27
     start=$(echo "add new distro
