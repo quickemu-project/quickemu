@@ -261,34 +261,10 @@ gum_choose_VM_to_delete() {
         echo "No VMs to delete"
     fi
 }
-
-#gum_choose_VM_to_delete() {
-    #if ls | grep ".conf" ; then
-        #GUM_FILTER_HEADER="Choose VM to delete"
-        #height=$(ls -1 | grep ".conf" | wc -l)
-        #chosen=$(ls -1 | grep ".conf" | gum filter --height "$height" --no-limit)
-        #delete_VM
-    #else
-        #echo "No VMs to delete"
-    #fi
-#}
-
-delete_VM() {
-    #chosen_to_delete=$(cat $chosen | while read line; echo $line | rev | cut -d'.' -f2-5 | rev; done)
-    echo "#TODO"
-    echo $chosen | tr " " "\n" | while read line 
-    do
-        echo 'Removing dir(s)...'
-        rm -r $(echo $line | rev | cut -d'.' -f2-5 | rev)
-    done
-    echo 'Removing config(s)...'
-    rm $(echo "$chosen")
-}
 # shellcheck disable=SC2016,2034,2153
 add_new_distro() {
     header="Adding new distro..."
     show_header
-    mkdir -p "$configdir"
     echo "add new OS, all lowercase"
     NAME="$(gum input --header="NAME" --placeholder="arch")"
     echo "add a pretty name for new OS *only if the catch all is not suitable*"
@@ -365,9 +341,7 @@ EOF
 }
 
 test_ISOs_download() {
-    rm -r "$configdir"
     mkdir -p "$configdir" && cd "$configdir" || exit
-    touch "$configdir/test"
     #"$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' > supported
     os=$(gum filter < "$configdir"/supported)
     choices=$("$QUICKGET" "$os" | sed 1d)
@@ -375,9 +349,7 @@ test_ISOs_download() {
         echo "Trying $get_name..."
         mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
         releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        echo "$releases" > releases
         editions=$("$QUICKGET" "$get_name" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        echo "$editions" > editions
         if [ -z "$editions" ]; then
             for release in $releases; do
                 echo "$get_name" >> "$configdir/test"
@@ -397,16 +369,12 @@ test_ISOs_download() {
 }
 
 show_ISOs_urls(){
-    rm -r "$configdir"
     mkdir -p "$configdir" && cd "$configdir" || exit
-    touch "$configdir/test"
     while read -r get_name; do
         echo "Trying $get_name..."
         mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
         releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        echo "$releases" > releases
         editions=$("$QUICKGET" "$get_name" | grep 'Editions:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        echo "$editions" > editions
         if [ -z "$editions" ]; then
             for release in $releases; do
                 echo "$get_name" >> "$configdir/test"
