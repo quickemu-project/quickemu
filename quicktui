@@ -7,6 +7,7 @@ define_variables() {
     progname="${progname:="${0##*/}"}"
     version='0.33'
     configdir="$HOME/.config/$progname"
+    path=$(pwd)
     vms=(*.conf)
     # Set traps to catch the signals and exit gracefully
     trap 'exit' INT
@@ -46,6 +47,17 @@ define_variables() {
     fi
 }
 
+check_updates() {
+    show_version_quickemu
+    https://github.com/quickemu-project/quickemu/releases/latest
+    show_version_qemu
+    https://download.qemu.org
+    show_version_gum
+    https://github.com/charmbracelet/gum/releases/latest
+    $version
+    https://github.com/oSoWoSo/quickemu/tags
+}
+
 show_editor() {
     if [ -z "$EDITOR" ]; then
         echo '  editor Not set!'
@@ -58,7 +70,7 @@ show_vms() {
     if [ ${#vms[@]} -eq 0 ]; then
         echo 'No VMs found.'
     else
-        echo ${vms[@]%.*} | tr " " "\n"
+        echo "${vms[@]%.*}" | tr " " "\n"
     fi
 }
 
@@ -96,9 +108,9 @@ show_header() {
 }
 
 show_headers_small() {
-    header1=$(header="$(gum style --bold $progname) $version"; show_header)
+    header1=$(header="$(gum style --bold "$progname") $version"; show_header)
     header2=$(header="  ready VMs:
-$(echo ${vms[@]%.*} | tr " " "\n")"; show_header)
+$(echo "${vms[@]%.*}" | tr " " "\n")"; show_header)
     header3=$(header="  workdir:
 $(pwd)$(show_custom)"; show_header)
     header1_2=$(gum join --vertical "$header1" "$header2")
@@ -106,7 +118,7 @@ $(pwd)$(show_custom)"; show_header)
 }
 
 show_headers_full() {
-    header1=$(header="     $(gum style --bold $progname) $version
+    header1=$(header="     $(gum style --bold "$progname") $version
 Simple TUI for quickemu"; show_header)
     header2=$(header="    qemu $(show_version_qemu)
 quickemu $(show_version_quickemu)
@@ -147,7 +159,7 @@ gum_choose_os() {
     header="Choose OS"
     show_header
     os=$(gum filter < "$configdir"/supported)
-    choices=$("$QUICKGET" "$os" | sed 1d)
+    choices=$(cat "$configdir/distros/$os")
 }
 
 gum_choose_release() {
@@ -228,7 +240,7 @@ create_VM() {
     elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
         clear
         gum_choose_release
-        #gum spin --spinner $spinner --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
+        gum spin --spinner "$spinner" --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
         "$QUICKGET" "$os" "$release"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
@@ -238,7 +250,7 @@ create_VM() {
         clear
         gum_choose_release
         gum_choose_edition
-        gum spin --spinner $spinner --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
+        gum spin --spinner "$spinner" --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
             cat "${configdir}/default_vm_config" >> "$os-$release-$edition.conf"
@@ -254,9 +266,9 @@ gum_choose_VM_to_delete() {
     GUM_FILTER_HEADER="Choose VM to delete"
     GUM_FILTER_HEADER_FOREGROUND="1"
     if ls | grep ".conf" ; then
-        chosen=$(echo ${vms[@]%.*} | tr " " "\n" | gum filter --height "$height" --no-limit)
+        chosen=$(echo "${vms[@]%.*}" | tr " " "\n" | gum filter --height "$height" --no-limit)
         echo 'Removing config(s)...'
-        rm -r $chosen & rm $chosen.conf
+        rm -r "$chosen" & rm "$chosen".conf
     else
         echo "No VMs to delete"
     fi
@@ -341,55 +353,49 @@ EOF
 }
 
 test_ISOs_download() {
-    mkdir -p "$configdir" && cd "$configdir" || exit
-    #"$QUICKGET" | sed 1d | cut -d':' -f2 | grep -o '[^ ]*' > supported
-    os=$(gum filter < "$configdir"/supported)
-    choices=$("$QUICKGET" "$os" | sed 1d)
+    cd "$configdir/distros" || exit
+    echo "New run $(date)" > "$configdir/test_download"
     while read -r get_name; do
         echo "Trying $get_name..."
-        mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
-        releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        editions=$("$QUICKGET" "$get_name" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        releases=$(echo "$get_name" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
+        editions=$(echo "$get_name" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
         if [ -z "$editions" ]; then
             for release in $releases; do
-                echo "$get_name" >> "$configdir/test"
-                timeout 10 "$QUICKGET" -t "$get_name" "${release}" >> "$configdir/test"
+                echo "$get_name" >> "$configdir/test_download"
+                timeout 10 "$QUICKGET" -t "$get_name" "${release}"
             done
         else
             while read -r release; do
                 for edition in $editions; do
-                    echo "$get_name" >> "$configdir/test"
-                    timeout 10 "$QUICKGET" -t "$get_name" "${release}" "${edition}" >> "$configdir/test"
+                    echo "$get_name" >> "$configdir/test_download"
+                    timeout 10 "$QUICKGET" -t "$get_name" "${release}" "${edition}"
                 done
             done < releases
         fi
         cd "$configdir" || exit
-    done < supported
+    done < "$configdir/supported"
     printf "\nDone"
 }
 
 show_ISOs_urls(){
-    mkdir -p "$configdir" && cd "$configdir" || exit
+    cd "$configdir/distros" || exit
+    choices=$(echo "$configdir/distros/$os")
     while read -r get_name; do
-        echo "Trying $get_name..."
-        mkdir -p "$configdir/distros/$get_name" && cd "$configdir/distros/$get_name" || exit
-        releases=$("$QUICKGET" "$get_name" | grep 'Releases:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
-        editions=$("$QUICKGET" "$get_name" | grep 'Editions:' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        releases=$(echo "$choices" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
+        editions=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
         if [ -z "$editions" ]; then
             for release in $releases; do
-                echo "$get_name" >> "$configdir/test"
-                timeout 5 "$QUICKGET" -s "$get_name" "${release}" >> "$configdir/test" #&& $(killall zsync >> /dev/null)
+                "$QUICKGET" -s "$get_name" "${release}"
             done
         else
             while read -r release; do
                 for edition in $editions; do
-                    echo "$get_name" >> "$configdir/test"
-                    timeout 5 "$QUICKGET" -s "$get_name" "${release}" "${edition}" >> "$configdir/test" #&& $(killall zsync >> /dev/null)
+                    "$QUICKGET" -s "$get_name" "${release}" "${edition}"
                 done
             done < releases
         fi
-        cd "$configdir" || exit
-    done < supported
+        cd "$path" || exit
+    done < "$configdir/supported"
     printf "\nDone"
 }
 
@@ -405,7 +411,7 @@ generate_supported(){
     mkdir -p "$configdir/distros"
     "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
     while read -r get_name; do
-        supported=$(gum spin --spinner $spinner --title="$get_name" -- "$QUICKGET" "$get_name" | sed 1d)
+        supported=$(gum spin --spinner "$spinner" --title="$get_name" --show-output -- "$QUICKGET" "$get_name" | sed 1d)
         echo "$supported" > "$configdir/distros/${get_name}"
     done < "$configdir/supported"
 }
@@ -425,7 +431,7 @@ normal
 rounded
 thick
 double" | gum filter --height $height)
-    echo $BORDER > "${configdir}"/border
+    echo "$BORDER" > "${configdir}"/border
 }
 
 change_color() {
@@ -449,7 +455,7 @@ EXIT $progname" | gum filter --height $height)
         show_header
         BORDER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo $BORDER_FOREGROUND > "${configdir}"/color
+    echo "$BORDER_FOREGROUND" > "${configdir}"/color
 }
 
 change_color_indicator() {
@@ -473,7 +479,7 @@ EXIT $progname" | gum filter --height $height)
         show_header
         GUM_FILTER_INDICATOR_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo $GUM_FILTER_INDICATOR_FOREGROUND > "${configdir}"/indicator
+    echo "$GUM_FILTER_INDICATOR_FOREGROUND" > "${configdir}"/indicator
 }
 
 change_color_spinner() {
@@ -497,12 +503,12 @@ EXIT $progname" | gum filter --height $height)
         show_header
         GUM_SPIN_SPINNER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo $GUM_SPIN_SPINNER_FOREGROUND > "${configdir}"/spinner-color
+    echo "$GUM_SPIN_SPINNER_FOREGROUND" > "${configdir}"/spinner-color
 }
 
 use_color() {
     if [ -f "${configdir}/color" ]; then
-        BORDER_FOREGROUND=$(cat ${configdir}/color)
+        BORDER_FOREGROUND=$(cat "${configdir}"/color)
     fi
 }
 
