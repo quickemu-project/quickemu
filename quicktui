@@ -7,6 +7,7 @@ define_variables() {
     progname="${progname:="${0##*/}"}"
     version='0.33'
     configdir="$HOME/.config/$progname"
+    config="$HOME/.config/$progname/config"
     path=$(pwd)
     vms=(*.conf)
     # Set traps to catch the signals and exit gracefully
@@ -45,6 +46,7 @@ define_variables() {
     else
         spinner="globe"
     fi
+    source "$config"
 }
 
 check_updates() {
@@ -415,6 +417,7 @@ generate_if_needed() {
 generate_supported(){
     echo "Extracting OS Editions and Releases..."
     rm -r "$configdir/distros"
+    touch "$configdir/config"
     mkdir -p "$configdir/distros"
     "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
     while read -r get_name; do
@@ -426,6 +429,22 @@ generate_supported(){
 open_distro_homepage(){
     gum_choose_os
     "$QUICKGET" -o "${os}"
+}
+
+change_config_item() {
+    if [ -f "$config" ]; then
+        sed -i "s/^$item_name=.*$/$item_name=\"$new_value\"/" "$config"
+    else
+         echo "$item_name=\"$new_value\"" > "$config"
+    fi
+}
+
+change_config() {
+item_name=$(cat $config | grep '=' | cut -d'=' -f1 | gum filter --no-limit)
+echo "Changing $item_name"
+new_value=$(gum input)
+echo "into $new_value"
+gum confirm && change_config_item
 }
 
 change_borders() {
@@ -597,6 +616,7 @@ show_menu_settings() {
     height=8
     start=$(echo "update $progname
 regenerate supported
+change config
 change borders color
 change borders style
 change indicator color
@@ -607,6 +627,7 @@ EXIT $progname" | gum filter --height $height)
     case $start in
         "update $progname" ) update_quicktui;;
         'regenerate supported' ) generate_supported;;
+        'change config' ) change_config;;
         'change borders color' ) change_color;;
         'change borders style' ) change_borders;;
         'change indicator color' ) change_color_indicator;;
