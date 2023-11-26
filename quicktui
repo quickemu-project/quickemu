@@ -356,47 +356,54 @@ test_ISOs_download() {
     cd "$configdir/distros" || exit
     echo "New run $(date)" > "$configdir/test_download"
     while read -r get_name; do
-        echo "Trying $get_name..."
-        releases=$(echo "$get_name" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
-        editions=$(echo "$get_name" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
+        printf '\n%s\n\n' "$get_name"
+        releases=$(cat "$configdir/distros/$get_name" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
+        echo "$releases" > ../releases
+        editions=$(cat "$configdir/distros/$get_name" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
+        echo "$editions" > ../editions
         if [ -z "$editions" ]; then
             for release in $releases; do
-                echo "$get_name" >> "$configdir/test_download"
-                timeout 10 "$QUICKGET" -t "$get_name" "${release}"
+                echo "$get_name ${release}"
+                timeout 10 "$QUICKGET" -t "$get_name" "${release}" >> "$configdir/test_download" || echo "ERROR testing of $get_name ${release} ${edition}"
             done
         else
             while read -r release; do
                 for edition in $editions; do
-                    echo "$get_name" >> "$configdir/test_download"
-                    timeout 10 "$QUICKGET" -t "$get_name" "${release}" "${edition}"
+                    echo "$get_name ${release} ${edition}"
+                    timeout 10 "$QUICKGET" -t "$get_name" "${release}" "${edition}" >> "$configdir/test_download" || echo "ERROR testing of $get_name ${release} ${edition}"
                 done
-            done < releases
+            done < ../releases
         fi
-        cd "$configdir" || exit
     done < "$configdir/supported"
-    printf "\nDone"
+    printf "\nDone\n"
+    cd "$path"
 }
 
 show_ISOs_urls(){
     cd "$configdir/distros" || exit
-    choices=$(echo "$configdir/distros/$os")
+    mkdir -p "$configdir/distros/tmp"
     while read -r get_name; do
-        releases=$(echo "$choices" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
-        editions=$(echo "$choices" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
+        printf '\n%s\n\n' "$get_name"
+        releases=$(cat "$configdir/distros/$get_name" | grep 'Releases:' | cut -d':' -f2 | grep -o '[^ ]*')
+        echo "$releases" > ../releases
+        editions=$(cat "$configdir/distros/$get_name" | grep 'Editions:' | cut -d':' -f2 | grep -o '[^ ]*')
+        echo "$editions" > ../editions
         if [ -z "$editions" ]; then
             for release in $releases; do
-                "$QUICKGET" -s "$get_name" "${release}"
+                echo "$get_name ${release}"
+                timeout 10 "$QUICKGET" -s "$get_name" "${release}" || echo "ERROR showing ISO url of $get_name ${release}"
             done
         else
             while read -r release; do
                 for edition in $editions; do
-                    "$QUICKGET" -s "$get_name" "${release}" "${edition}"
+                    echo "$get_name ${release} ${edition}"
+                    timeout 10 "$QUICKGET" -s "$get_name" "${release}" "${edition}" || echo "ERROR showing ISO url of $get_name ${release} ${edition}"
                 done
-            done < releases
+            done < ../releases
         fi
-        cd "$path" || exit
     done < "$configdir/supported"
-    printf "\nDone"
+    printf "\nDone\n"
+    cd "$path"
 }
 
 generate_if_needed() {
