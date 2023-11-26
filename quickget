@@ -1691,12 +1691,12 @@ function get_macos() {
 
 	if [ "${show_iso_url}" == 'on' ]; then
         RECOVERY_URL=$(${MACRECOVERY} --board-id "${BOARD_ID}" --mlb "${MLB}" --os-type "${OS_TYPE}" --basename RecoveryImage --outdir /dev/null \download 2>/dev/null | grep 'Saving' | cut -d' ' -f2)
-	    echo -e 'Recovery URL (inaccessible through normal browser):\n'"${RECOVERY_URL}"'\nFirmware URLs:\n'"${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+	    echo -e "Recovery URL (inaccessible through normal browser):\n${RECOVERY_URL}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
 	    exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
         RECOVERY_URL=$(${MACRECOVERY} --board-id "${BOARD_ID}" --mlb "${MLB}" --os-type "${OS_TYPE}" --basename RecoveryImage --outdir /dev/null \download 2>/dev/null | grep 'Saving' | cut -d' ' -f2)
 	    wget --spider "${OpenCore_qcow2}" "${OVMF_CODE}" "${OVMF_VARS}"
-        echo Unable to test recovery image.
+        echo "Unable to test recovery image."
 	    exit 0
     fi
 
