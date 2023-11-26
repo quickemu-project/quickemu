@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 11, 2023
+date: November 26, 2023
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -209,6 +209,18 @@ sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
 ```
+
+### quickemu quickget X terminal project
+
+From Nov 2023, there is also a multi option desktop integrated text
+interface, with lots of unique tools and utilities to help you make
+light work of installations, snapshots and disk management
+
+-   **[qqX](https://github.com/TuxVinyards/qqX)** is independently
+    curated by [Alex Genovese](https://github.com/TuxVinyards) (see the
+    github pages)
+
+![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
 ## Ubuntu Guest
 
