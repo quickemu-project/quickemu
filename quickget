@@ -925,6 +925,10 @@ function web_get() {
       exit 1
     fi
 
+    if [[ ${OS} != windows && ${OS} != macos ]]; then
+        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
+    fi
+    
     if command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
@@ -963,6 +967,7 @@ function zsync_get() {
           exit 1
         fi
 
+        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -1680,15 +1685,33 @@ function get_macos() {
         exit 1
     fi
 
+    OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
+    OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
+    OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
+
+	if [ "${show_iso_url}" == 'on' ]; then
+        RECOVERY_URL=$(${MACRECOVERY} --board-id "${BOARD_ID}" --mlb "${MLB}" --os-type "${OS_TYPE}" --basename RecoveryImage --outdir /dev/null \download 2>/dev/null | grep 'Saving' | cut -d' ' -f2)
+	    echo -e 'Recovery URL (inaccessible through normal browser):\n'"${RECOVERY_URL}"'\nFirmware URLs:\n'"${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+        RECOVERY_URL=$(${MACRECOVERY} --board-id "${BOARD_ID}" --mlb "${MLB}" --os-type "${OS_TYPE}" --basename RecoveryImage --outdir /dev/null \download 2>/dev/null | grep 'Saving' | cut -d' ' -f2)
+	    wget --spider "${OpenCore_qcow2}" "${OVMF_CODE}" "${OVMF_VARS}"
+        echo Unable to test recovery image.
+        # This requires the "sess" variable to be populated. Would essentially require macrecovery to be completely rewritten within quickget. 
+        # wget -d --spider --header "'Host': purl.hostname" --header "'Connection': 'close'" --header "'User-Agent': 'InternetRecovery/1.0'" --header "'Cookie': '='.join(['AssetToken', ${sess}])" "${RECOVERY_URL}"
+	    exit 0
+    fi
+
+    echo Downloading macOS firmware
     # Get firmware
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+    web_get "${OpenCore_qcow2}" "${VM_PATH}"
+    web_get "${OVMF_CODE}" "${VM_PATH}"
     if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
+        web_get "${OVMF_VARS}" "${VM_PATH}"
     fi
 
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-        echo "Downloading ${RELEASE}..."
+        echo "Downloading macOS ${RELEASE}..."
         ${MACRECOVERY} \
             --board-id "${BOARD_ID}" \
             --mlb "${MLB}" \
@@ -2598,6 +2621,10 @@ function download_windows() {
     fi
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+        if [ "${show_iso_url}" == 'on' ] || [ "${test_iso_url}" == 'on' ]; then
+            echo " - Failed to get URL: Microsoft blocked the automated download request based on your IP address."
+            exit 1
+        fi
         echo " - Microsoft blocked the automated download request based on your IP address."
         failed=1
     fi
@@ -2621,7 +2648,15 @@ function download_windows() {
         return 1
     fi
 
-    echo " - Got latest ISO download link (valid for 24 hours): $iso_download_link"
+    if [ "${show_iso_url}" == 'on' ]; then
+	    echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+	    wget --spider "${iso_download_link}"
+	    exit 0
+    fi
+
+    echo Downloading Windows ${RELEASE} from "$iso_download_link"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
@@ -2629,7 +2664,6 @@ function download_windows() {
 }
 
 function get_windows() {
-    echo "Downloading Windows ${RELEASE}..."
     download_windows "${RELEASE}"
 
     echo "Downloading VirtIO drivers..."
