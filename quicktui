@@ -332,27 +332,6 @@ echo "\${URL}/\${ISO}" "\${HASH}"
 EOF
     diff "$configdir/template" "quickget"
 }
-# shellcheck disable=SC2154
-create_desktop_entry() {
-    cat <<EOF > "${DESKTOP_FILE}"
-[Desktop Entry]
-Version=$version
-Type=$type
-Name=$name
-GenericName=$progname
-Comment=$comment
-Exec=$execmd
-Icon=$icon
-Terminal=$terminal
-X-MultipleArgs=$args
-Type=$type
-Categories=$categories
-StartupNotify=$notify
-MimeType=$mime
-Keywords=$keyword
-
-EOF
-}
 
 test_ISOs_download() {
     cd "$configdir/distros" || exit
@@ -553,6 +532,64 @@ meter
 hamburger" | gum filter --height $height)
     echo "$spinner" > "${configdir}"/spinner
 }
+
+generate_desktop_files() {
+    mkdir -p "$configdir"/supported.desktop
+    rm "$configdir"/supported.desktop/*.desktop
+    echo "$MSG_INTERM"
+    run_in_terminal
+    while read -r get_name; do
+        vm_desktop=$(echo "$get_name" | tr ' ' '_')
+        releases=$("$portable_prefix"quickget "$vm_desktop" | grep 'Releases' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        editions=$("$portable_prefix"quickget "$vm_desktop" | grep 'Editions' | cut -d':' -f2 | sed 's/^ //' | sed 's/ *$//')
+        icon_name="$ICON_DIR/$get_name"
+        if [ -f "$icon_name.svg" ]; then
+            icon_file="$icon_name.svg"
+        elif [ -f "$icon_name.png" ]; then
+            icon_file="$icon_name.png"
+        else
+            icon_file="$ICON_DIR/tux.svg"
+        fi
+        echo "$MSG_CREATING $vm_desktop $MSG_DESKTOP_ENTRY"
+        echo ""
+        # Check if there are editions
+        DESKTOP_FILE="$configdir/supported.desktop/$vm_desktop.desktop"
+        type="Application"
+        name="$get_name"
+        if [ -z "$editions" ]; then
+            execmd="sh -c 'cd ${path} && yad --form --field=\"Release:CB\" \"${releases// /$replace}\" | cut -d\"|\" -f1 | xargs -I{} sh -c \"${portable_prefix}quickget ${get_name} {}\";$SHELL'"
+        elif [ "$interminal" == "yes" ]; then
+            terminal="true"
+        else
+            execmd="sh -c 'cd ${path} && yad --form --separator=\" \" --field=\"Release:CB\" \"${releases// /$replace}\" --field=\"Edition:CB\" \"${editions// /$replace}\" | xargs -I{} sh -c \"${portable_prefix}quickget ${get_name} {}\";$SHELL'"
+        fi
+        icon="$icon_file"
+        categories='System;Virtualization;'
+        create_desktop_entry
+    done < "$configdir"/supported
+}
+# shellcheck disable=SC2154
+create_desktop_entry() {
+    cat <<EOF > "${DESKTOP_FILE}"
+[Desktop Entry]
+Version=$version
+Type=$type
+Name=$name
+GenericName=$progname
+Comment=$comment
+Exec=$execmd
+Icon=$icon
+Terminal=$terminal
+X-MultipleArgs=$args
+Type=$type
+Categories=$categories
+StartupNotify=$notify
+MimeType=$mime
+Keywords=$keyword
+
+EOF
+}
+
 # MENU
 show_menu_main() {
     while true
@@ -617,6 +654,7 @@ show_menu_settings() {
     start=$(echo "update $progname
 regenerate supported
 change config
+generate desktop files
 change borders color
 change borders style
 change indicator color
@@ -628,6 +666,7 @@ EXIT $progname" | gum filter --height $height)
         "update $progname" ) update_quicktui;;
         'regenerate supported' ) generate_supported;;
         'change config' ) change_config;;
+        'generate desktop files' ) generate_desktop_files;;
         'change borders color' ) change_color;;
         'change borders style' ) change_borders;;
         'change indicator color' ) change_color_indicator;;
