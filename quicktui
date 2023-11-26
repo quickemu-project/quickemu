@@ -240,7 +240,7 @@ create_VM() {
     elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
         clear
         gum_choose_release
-        gum spin --spinner "$spinner" --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
+        #gum spin --spinner "$spinner" --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
         "$QUICKGET" "$os" "$release"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
@@ -250,7 +250,7 @@ create_VM() {
         clear
         gum_choose_release
         gum_choose_edition
-        gum spin --spinner "$spinner" --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
+        #gum spin --spinner "$spinner" --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
             cat "${configdir}/default_vm_config" >> "$os-$release-$edition.conf"
