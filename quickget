@@ -1697,8 +1697,6 @@ function get_macos() {
         RECOVERY_URL=$(${MACRECOVERY} --board-id "${BOARD_ID}" --mlb "${MLB}" --os-type "${OS_TYPE}" --basename RecoveryImage --outdir /dev/null \download 2>/dev/null | grep 'Saving' | cut -d' ' -f2)
 	    wget --spider "${OpenCore_qcow2}" "${OVMF_CODE}" "${OVMF_VARS}"
         echo Unable to test recovery image.
-        # This requires the "sess" variable to be populated. Would essentially require macrecovery to be completely rewritten within quickget. 
-        # wget -d --spider --header "'Host': purl.hostname" --header "'Connection': 'close'" --header "'User-Agent': 'InternetRecovery/1.0'" --header "'Cookie': '='.join(['AssetToken', ${sess}])" "${RECOVERY_URL}"
 	    exit 0
     fi
 
