@@ -925,11 +925,6 @@ function web_get() {
         FILE="${URL##*/}"
     fi
 
-    if ! mkdir -p "${DIR}" 2>/dev/null; then
-      echo "ERROR! Unable to create directory ${DIR}"
-      exit 1
-    fi
-
 	# Test mode for ISO
 	if [ "${show_iso_url}" == 'on' ]; then
 	    echo "${URL}"
@@ -937,7 +932,14 @@ function web_get() {
     elif [ "${test_iso_url}" == 'on' ]; then
 	    wget --spider "${URL}"
 	    exit 0
-    elif command -v aria2c &>/dev/null; then
+    fi
+
+    if ! mkdir -p "${DIR}" 2>/dev/null; then
+      echo "ERROR! Unable to create directory ${DIR}"
+      exit 1
+    fi
+
+    if command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
