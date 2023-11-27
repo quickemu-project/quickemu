@@ -1,0 +1,45 @@
+macrecovery() {
+    macRecoveryBoardID="${1}"
+    macRecoveryMLB="${2}"
+    macRecoveryOSType="${3}"
+    macRecoveryBaseName="${4}"
+    macRecoveryOutdir="${5}"
+    echo ${macRecoveryBoardID} ${macRecoveryMLB} ${macRecoveryOSType} ${macRecoveryBaseName} ${macRecoveryOutdir}
+    get_image_info
+    appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+    if [ "$6" == "download" ]; then
+        action_download
+    elif [ "$6" == "list" ]; then
+        action_list
+    fi
+}
+
+action_download() {
+    info=$(get_image_info)
+    dmgpath=$(save_image "$info{AU}" "$info{AT}" MacRecovery.dmg "${5}")
+    cnkpath=$(save_image "$info{CU}" "$info{CT}" MacRecovery.chunklist "${5}")
+    if verify_image "$dmgpath" "$cnkpath"; then
+        return 0
+    else
+        echo Invalid chunklist.
+        exit 1
+    fi
+}
+
+get_image_info() {
+    echo "${macRecoveryBoardID} ${macRecoveryMLB} ${macRecoveryOSType} ${macRecoveryBaseName} ${macRecoveryOutdir}"
+    curl -v -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "${appleSession}" -H "Content-Type: text/plain"\
+    -H "cid: $(generate_id 16)" -H "sn: ${macRecoveryMLB}" -H "bid: ${macRecoveryBoardID}" -H "k: $(generate_id 64)"\
+    -H "fg: $(generate_id 64)" -H "os: ${macRecoveryOSType}" http://osrecovery.apple.com/InstallationPayload/RecoveryImage
+    
+}
+
+generate_id() {
+    local macRecoveryID=""
+    type="${1}"
+    local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
+    for ((i=0; i<$type; i++)); do
+        macRecoveryID+=$(echo -n ${valid_chars[$((RANDOM % 16))]})
+    done
+    echo "${macRecoveryID}"
+}
