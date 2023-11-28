@@ -4,7 +4,6 @@ macrecovery() {
     macRecoveryOSType="${3}"
     macRecoveryBaseName="${4}"
     macRecoveryOutdir="${5}"
-    echo ${macRecoveryBoardID} ${macRecoveryMLB} ${macRecoveryOSType} ${macRecoveryBaseName} ${macRecoveryOutdir}
     get_image_info
     appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
     if [ "$6" == "download" ]; then
@@ -15,7 +14,11 @@ macrecovery() {
 }
 
 action_download() {
-    info=$(get_image_info)
+    local info=$(get_image_info)
+    local downloadLink=$(echo "$info" | grep oscdn | grep dmg)
+    local downloadSession=$(echo "$info" | grep expires | grep dmg)
+    local chunkListLink=$(echo "$info" | grep oscdn | grep chunklist)
+    local chunkListSession=$(echo "$info" | grep expires | grep chunklist)
     dmgpath=$(save_image "$info{AU}" "$info{AT}" MacRecovery.dmg "${5}")
     cnkpath=$(save_image "$info{CU}" "$info{CT}" MacRecovery.chunklist "${5}")
     if verify_image "$dmgpath" "$cnkpath"; then
@@ -27,11 +30,9 @@ action_download() {
 }
 
 get_image_info() {
-    echo "${macRecoveryBoardID} ${macRecoveryMLB} ${macRecoveryOSType} ${macRecoveryBaseName} ${macRecoveryOutdir}"
-    curl -v -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "${appleSession}" -H "Content-Type: text/plain"\
-    -H "cid: $(generate_id 16)" -H "sn: ${macRecoveryMLB}" -H "bid: ${macRecoveryBoardID}" -H "k: $(generate_id 64)"\
-    -H "fg: $(generate_id 64)" -H "os: ${macRecoveryOSType}" http://osrecovery.apple.com/InstallationPayload/RecoveryImage
-    
+    curl -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
+    -d $'cid='$(generate_id 16)$'\nsn='${macRecoveryMLB}$'\nbid='${macRecoveryBoardID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${macRecoveryOSType} \
+    http://osrecovery.apple.com/InstallationPayload/RecoveryImage
 }
 
 generate_id() {
