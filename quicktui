@@ -385,7 +385,9 @@ generate_supported(){
     mkdir -p "$configdir/distros"
     "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
     while read -r get_name; do
-        supported=$(gum spin --spinner "$spinner_style" --title="$get_name" --show-output -- "$QUICKGET" "$get_name" | sed 1d)
+        supported=$($QUICKGET $get_name | sed 1d)
+        echo ${get_name}
+        echo "$supported"
         echo "$supported" > "$configdir/distros/${get_name}"
     done < "$configdir/supported"
 }
