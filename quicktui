@@ -21,16 +21,6 @@ define_variables() {
         echo 'You are missing gum...!'
     fi
     # use configdir
-    if [ -f "${configdir}/border" ]; then
-        BORDER="$(cat "${configdir}"/border)"
-    else
-        BORDER="rounded"
-    fi
-    if [ -f "${configdir}/color" ]; then
-        BORDERS_FOREGROUND="$(cat "${configdir}"/color)"
-    else
-        BORDERS_FOREGROUND="$(( RANDOM % 255 + 1 ))"
-    fi
     if [ -f "${configdir}/indicator" ]; then
         GUM_FILTER_INDICATOR_FOREGROUND="$(cat "${configdir}"/indicator)"
     else
@@ -40,11 +30,6 @@ define_variables() {
         GUM_SPIN_SPINNER_FOREGROUND="$(cat "${configdir}"/spinner-color)"
     else
         GUM_SPIN_SPINNER_FOREGROUND="$(( RANDOM % 255 + 1 ))"
-    fi
-    if [ -f "${configdir}/spinner" ]; then
-        spinner="$(cat "${configdir}"/spinner)"
-    else
-        spinner="globe"
     fi
     source "$config"
 }
@@ -106,7 +91,7 @@ show_version_qemu() {
 }
 
 show_header() {
-    gum style --padding "0 1"  --border="$BORDER" --border-foreground="$BORDERS_FOREGROUND" "$header"
+    gum style --padding "0 1"  --border="$borders_style" --border-foreground="$borders_color" "$header"
 }
 
 show_headers_small() {
@@ -242,7 +227,7 @@ create_VM() {
     elif [ "$(echo "$choices" | wc -l)" = 1 ]; then
         clear
         gum_choose_release
-        #gum spin --spinner "$spinner" --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
+        #gum spin --spinner "$spinner_style" --show-output --title="Downloading $os $release" -- "$QUICKGET" "$os" "$release"
         "$QUICKGET" "$os" "$release"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
@@ -252,7 +237,7 @@ create_VM() {
         clear
         gum_choose_release
         gum_choose_edition
-        #gum spin --spinner "$spinner" --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
+        #gum spin --spinner "$spinner_style" --show-output --title="Downloading $os $release $edition" -- "$QUICKGET" "$os" "$release" "$edition"
         if [ -f "${configdir}/default_vm_config" ]; then
             echo 'Adding default values to config...'
             cat "${configdir}/default_vm_config" >> "$os-$release-$edition.conf"
@@ -400,7 +385,7 @@ generate_supported(){
     mkdir -p "$configdir/distros"
     "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
     while read -r get_name; do
-        supported=$(gum spin --spinner "$spinner" --title="$get_name" --show-output -- "$QUICKGET" "$get_name" | sed 1d)
+        supported=$(gum spin --spinner "$spinner_style" --title="$get_name" --show-output -- "$QUICKGET" "$get_name" | sed 1d)
         echo "$supported" > "$configdir/distros/${get_name}"
     done < "$configdir/supported"
 }
@@ -419,48 +404,49 @@ change_config_item() {
 }
 
 change_config() {
-item_name=$(cat $config | grep '=' | cut -d'=' -f1 | gum filter --no-limit)
-echo "Changing $item_name"
-new_value=$(gum input)
-echo "into $new_value"
-gum confirm && change_config_item
+old_value=$(cat $config | grep '=' | grep "$item_name" | cut -d'=' -f2)
+printf 'Change %s\n' "$old_value"
+printf 'to %s' "$new_value"
+gum confirm && change_config_item; . "$config" 
 }
 
-change_borders() {
-    header="Change borders style"
+change_style_borders() {
+    header="Changing borders style"
     show_header
     height=6
-    BORDER=$(echo "none
+    item_name=borders_style
+    new_value=$(echo "none
 hidden
 normal
 rounded
 thick
 double" | gum filter --height $height)
-    echo "$BORDER" > "${configdir}"/border
+    change_config
 }
 
-change_color() {
+change_color_borders() {
     if command -v yad >/dev/null 2>&1; then
         header="Define color, use color picker or choose random"
         show_header
         height=4
+        item_name=borders_color
         start=$(echo "random
-yad color picker
+color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $start in
-            'random' ) BORDER_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
-            'yad color picker' ) BORDER_FOREGROUND="$(yad --color)";;
-            'custom' ) BORDER_FOREGROUND=$(gum input  --header="Enter color value");;
+            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
+            'custom' ) new_value=$(gum input  --header="Enter color value");;
             'show help' ) help_main; show_help;;
             "EXIT $progname" ) exit 0;;
         esac
     else
         header="Define color number or choose random"
         show_header
-        BORDER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+        new_value=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo "$BORDER_FOREGROUND" > "${configdir}"/color
+    change_config
 }
 
 change_color_indicator() {
@@ -468,23 +454,24 @@ change_color_indicator() {
         header="Define indicator color value, use color picker or choose random"
         show_header
         height=5
+        item_name=indicators_color
         start=$(echo "random
 yad color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $start in
-            'random' ) GUM_FILTER_INDICATOR_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
-            'yad color picker' ) GUM_FILTER_INDICATOR_FOREGROUND="$(yad --color)";;
-            'custom' ) GUM_FILTER_INDICATOR_FOREGROUND=$(gum input --header="Enter color value");;
+            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'yad color picker' ) new_value="$(yad --color)";;
+            'custom' ) new_value=$(gum input --header="Enter color value");;
             'show help' ) help_main; show_help;;
             "EXIT $progname" ) exit 0;;
         esac
     else
         header="Define indicator color value or choose random"
         show_header
-        GUM_FILTER_INDICATOR_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+        new_value=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo "$GUM_FILTER_INDICATOR_FOREGROUND" > "${configdir}"/indicator
+    change_config
 }
 
 change_color_spinner() {
@@ -492,34 +479,30 @@ change_color_spinner() {
         header="Define color, use color picker or choose random"
         show_header
         height=4
+        item_name=spinner_color
         start=$(echo "random
 yad color picker
 custom
 EXIT $progname" | gum filter --height $height)
-        case $start in
-            'random' ) GUM_SPIN_SPINNER_FOREGROUND="$(( RANDOM % 255 + 1 ))";;
-            'yad color picker' ) GUM_SPIN_SPINNER_FOREGROUND="$(yad --color)";;
-            'custom' ) GUM_SPIN_SPINNER_FOREGROUND=$(gum input  --header="Enter color value");;
+        case $new_value in
+            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'yad color picker' ) new_value="$(yad --color)";;
+            'custom' ) new_value=$(gum input  --header="Enter color value");;
             'show help' ) help_main; show_help;;
             "EXIT $progname" ) exit 0;;
         esac
     else
         header="Define color number or choose random"
         show_header
-        GUM_SPIN_SPINNER_FOREGROUND=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+        new_value=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    echo "$GUM_SPIN_SPINNER_FOREGROUND" > "${configdir}"/spinner-color
+    change_config
 }
 
-use_color() {
-    if [ -f "${configdir}/color" ]; then
-        BORDER_FOREGROUND=$(cat "${configdir}"/color)
-    fi
-}
-
-change_spinner() {
+change_style_spinner() {
     height=11
-    spinner=$(echo "line
+    item_name=spinner_style
+    new_value=$(echo "line
 dot
 minidot
 jump
@@ -530,7 +513,7 @@ moon
 monkey
 meter
 hamburger" | gum filter --height $height)
-    echo "$spinner" > "${configdir}"/spinner
+    change_config
 }
 
 generate_desktop_files() {
@@ -595,8 +578,8 @@ show_menu_main() {
     while true
     do
     height=9
-    start=$(echo "create new VM
-run VM
+    start=$(echo "run VM
+create new VM
 open distro homepage
 delete VM
 advanced menu
@@ -650,10 +633,9 @@ show_menu_settings() {
     do
     header="settings"
     show_header
-    height=8
+    height=10
     start=$(echo "update $progname
 regenerate supported
-change config
 generate desktop files
 change borders color
 change borders style
@@ -667,10 +649,10 @@ EXIT $progname" | gum filter --height $height)
         'regenerate supported' ) generate_supported;;
         'change config' ) change_config;;
         'generate desktop files' ) generate_desktop_files;;
-        'change borders color' ) change_color;;
-        'change borders style' ) change_borders;;
+        'change borders color' ) change_color_borders;;
+        'change borders style' ) change_style_borders;;
         'change indicator color' ) change_color_indicator;;
-        'change spinner style' ) change_spinner;;
+        'change spinner style' ) change_style_spinner;;
         'change spinner color' ) change_color_spinner;;
         'back to main menu') clear; show_headers_small; break;;
         "EXIT $progname" ) exit 0;;
@@ -743,7 +725,7 @@ EXIT $progname" | gum filter --height $height)
     done
 }
 # run
-clear
+#clear
 define_variables
 generate_if_needed
 show_headers_small
