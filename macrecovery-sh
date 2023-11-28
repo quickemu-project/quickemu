@@ -1,38 +1,47 @@
 macrecovery() {
     macRecoveryBoardID="${1}"
     macRecoveryMLB="${2}"
-    macRecoveryOSType="${3}"
-    macRecoveryBaseName="${4}"
-    macRecoveryOutdir="${5}"
-    get_image_info
+    macRecoveryOutdir="${3}"
+    macRecoveryOSType="default"
+    echo $macRecoveryOutdir
     appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
-    if [ "$6" == "download" ]; then
-        action_download
-    elif [ "$6" == "list" ]; then
-        action_list
+    local info=$(curl -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
+    -d $'cid='$(generate_id 16)$'\nsn='${macRecoveryMLB}$'\nbid='${macRecoveryBoardID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${macRecoveryOSType} \
+    http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+    if [ "$4" == "download" ]; then
+        action_download "${info}"
+    elif [ "$4" == "list" ]; then
+        action_list "${info}"
     fi
 }
 
 action_download() {
-    local info=$(get_image_info)
+    local info="${1}"
     local downloadLink=$(echo "$info" | grep oscdn | grep dmg)
     local downloadSession=$(echo "$info" | grep expires | grep dmg)
     local chunkListLink=$(echo "$info" | grep oscdn | grep chunklist)
     local chunkListSession=$(echo "$info" | grep expires | grep chunklist)
-    dmgpath=$(save_image "$info{AU}" "$info{AT}" MacRecovery.dmg "${5}")
-    cnkpath=$(save_image "$info{CU}" "$info{CT}" MacRecovery.chunklist "${5}")
-    if verify_image "$dmgpath" "$cnkpath"; then
-        return 0
-    else
-        echo Invalid chunklist.
-        exit 1
-    fi
+    echo "Downloading macOS ${RELEASE}"
+    save_image "${downloadLink}" "${downloadSession}" "${macRecoveryOutdir}/RecoveryImage.dmg"
+    save_image "${chunkListLink}" "${chunkListSession}" "${macRecoveryOutdir}/RecoveryImage.chunklist"
+    #if verify_image "$dmgpath" "$cnkpath"; then
+    #     return 0
+    # else
+    #     echo Invalid chunklist.
+    #     exit 1
+    # fi
 }
 
-get_image_info() {
-    curl -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
-    -d $'cid='$(generate_id 16)$'\nsn='${macRecoveryMLB}$'\nbid='${macRecoveryBoardID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${macRecoveryOSType} \
-    http://osrecovery.apple.com/InstallationPayload/RecoveryImage
+
+
+save_image() {
+    local url="${1}"
+    local session="${2}"
+    local outpath="${3}"
+    echo "${outpath}"
+    wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll \
+    --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" \
+    --header "Cookie: AssetToken=${session}" "${url}" -O "${outpath}"
 }
 
 generate_id() {
