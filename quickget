@@ -490,7 +490,7 @@ function releases_easyos() {
     #RLIST=$(wget -q -O- 'https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/' | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
     #echo ${RLIST}
     # Not dynamic for now
-    echo 5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
+    echo 5.7 5.6.7 5.6.6 5.6.5 5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
 }
 
 function releases_elementary() {
@@ -1013,6 +1013,9 @@ function make_vm_config() {
         dragonflybsd)
             GUEST="dragonflybsd"
             IMAGE_TYPE="iso";;
+        easyos)
+            GUEST="linux"
+            IMAGE_TYPE="img";;
         freebsd|ghostbsd)
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -1421,8 +1424,18 @@ function get_dragonflybsd() {
 
 function get_easyos() {
     local HASH=""
-    local URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/${RELEASE}"
-    local ISO="easy-${RELEASE}-amd64.img"
+    local URL=""
+    local ISO=""
+    local YEAR=""
+
+    ISO="easy-${RELEASE}-amd64.img"
+    case ${RELEASE} in
+      5.6.5|5.6.4|5.6.3|5.6.2|5.6.1|5.5.5|5.5.4)
+        YEAR="2023";;
+      5.7|5.6.7|5.6.6)
+        YEAR="2024";;
+    esac
+    URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/md5.sum.txt" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -2713,6 +2726,11 @@ create_vm() {
     if [[ ${OS} == "dragonflybsd" ]] && [[ ${ISO} =~ ".bz2" ]]; then
         bzip2 -d  "${VM_PATH}/${ISO}"
         ISO="${ISO/.bz2/}"
+    fi
+
+    if [[ ${OS} == "easyos" ]] && [[ ${ISO} =~ ".img" ]]; then
+        qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+        ISO="${ISO/.img/}"
     fi
 
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
