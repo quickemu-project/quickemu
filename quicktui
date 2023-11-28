@@ -20,18 +20,233 @@ define_variables() {
     if ! command -v gum >/dev/null 2>&1; then
         echo 'You are missing gum...!'
     fi
-    # use configdir
-    if [ -f "${configdir}/indicator" ]; then
-        GUM_FILTER_INDICATOR_FOREGROUND="$(cat "${configdir}"/indicator)"
-    else
-        GUM_FILTER_INDICATOR_FOREGROUND="$(( RANDOM % 255 + 1 ))"
-    fi
-    if [ -f "${configdir}/spinner-color" ]; then
-        GUM_SPIN_SPINNER_FOREGROUND="$(cat "${configdir}"/spinner-color)"
-    else
-        GUM_SPIN_SPINNER_FOREGROUND="$(( RANDOM % 255 + 1 ))"
-    fi
+    # use config file
     source "$config"
+    BORDER="$(cat "${configdir}"/border)"
+    if [ -z "$all_colors" ]; then
+        BORDERS_FOREGROUND="$borders_color"
+        GUM_FILTER_INDICATOR_FOREGROUND="$indicator_color"
+        GUM_SPIN_SPINNER_FOREGROUND="$spinner_color"
+        #GUM_CHOOSE_CURSOR_FOREGROUND=""
+        #GUM_CHOOSE_CURSOR_BORDER_FOREGROUND=""
+        #GUM_CHOOSE_HEADER_FOREGROUND=""
+        #GUM_CHOOSE_HEADER_BORDER_FOREGROUND=""
+        #GUM_CHOOSE_ITEM_FOREGROUND=""
+        #GUM_CHOOSE_ITEM_BORDER_FOREGROUND=""
+        #GUM_CHOOSE_SELECTED_FOREGROUND=""
+        #GUM_CHOOSE_SELECTED_BORDER_FOREGROUND=""
+        #GUM_CONFIRM_PROMPT_FOREGROUND=""
+        #GUM_CONFIRM_PROMPT_BORDER_FOREGROUND=""
+        #GUM_CONFIRM_SELECTED_FOREGROUND=""
+        #GUM_CONFIRM_SELECTED_BORDER_FOREGROUND=""
+        #GUM_CONFIRM_UNSELECTED_FOREGROUND=""
+        #GUM_CONFIRM_UNSELECTED_BORDER_FOREGROUND=""
+        #GUM_FILE_CURSOR_FOREGROUND=""
+        #GUM_FILE_CURSOR_BORDER_FOREGROUND=""
+        #GUM_FILE_SYMLINK_FOREGROUND=""
+        #GUM_FILE_SYMLINK_BORDER_FOREGROUND=""
+        #GUM_FILE_DIRECTORY_FOREGROUND=""
+        #GUM_FILE_DIRECTORY_BORDER_FOREGROUND=""
+        #GUM_FILE_FILE_FOREGROUND=""
+        #GUM_FILE_FILE_BORDER_FOREGROUND=""
+        #GUM_FILE_PERMISSIONS_FOREGROUND=""
+        #GUM_FILE_PERMISSIONS_BORDER_FOREGROUND=""
+        #GUM_FILE_SELECTED_FOREGROUND=""
+        #GUM_FILE_SELECTED_BORDER_FOREGROUND=""
+        #GUM_FILE_FILE_SIZE_FOREGROUND=""
+        #GUM_FILE_FILE_SIZE_BORDER_FOREGROUND=""
+        #GUM_FILTER_INDICATOR_FOREGROUND=""
+        #GUM_FILTER_INDICATOR_BORDER_FOREGROUND=""
+        #GUM_FILTER_SELECTED_PREFIX_FOREGROUND=""
+        #GUM_FILTER_SELECTED_PREFIX_BORDER_FOREGROUND=""
+        #GUM_FILTER_UNSELECTED_PREFIX_FOREGROUND=""
+        #GUM_FILTER_UNSELECTED_PREFIX_BORDER_FOREGROUND=""
+        #GUM_FILTER_HEADER_FOREGROUND=""
+        #GUM_FILTER_HEADER_BORDER_FOREGROUND=""
+        #GUM_FILTER_TEXT_FOREGROUND=""
+        #GUM_FILTER_TEXT_BORDER_FOREGROUND=""
+        #GUM_FILTER_CURSOR_TEXT_FOREGROUND=""
+        #GUM_FILTER_CURSOR_TEXT_BORDER_FOREGROUND=""
+        #GUM_FILTER_MATCH_FOREGROUND=""
+        #GUM_FILTER_MATCH_BORDER_FOREGROUND=""
+        #GUM_FILTER_PROMPT_FOREGROUND=""
+        #GUM_FILTER_PROMPT_BORDER_FOREGROUND=""
+        #GUM_INPUT_PROMPT_FOREGROUND=""
+        #GUM_INPUT_PROMPT_BORDER_FOREGROUND=""
+        #GUM_INPUT_CURSOR_FOREGROUND=""
+        #GUM_INPUT_CURSOR_BORDER_FOREGROUND=""
+        #GUM_INPUT_HEADER_FOREGROUND=""
+        #GUM_INPUT_HEADER_BORDER_FOREGROUND=""
+        #GUM_LOG_LEVEL_FOREGROUND=""
+        #GUM_LOG_LEVEL_BORDER_FOREGROUND=""
+        #GUM_LOG_TIME_FOREGROUND=""
+        #GUM_LOG_TIME_BORDER_FOREGROUND=""
+        #GUM_LOG_PREFIX_FOREGROUND=""
+        #GUM_LOG_PREFIX_BORDER_FOREGROUND=""
+        #GUM_LOG_MESSAGE_FOREGROUND=""
+        #GUM_LOG_MESSAGE_BORDER_FOREGROUND=""
+        #GUM_LOG_KEY_FOREGROUND=""
+        #GUM_LOG_KEY_BORDER_FOREGROUND=""
+        #GUM_LOG_VALUE_FOREGROUND=""
+        #GUM_LOG_VALUE_BORDER_FOREGROUND=""
+        #GUM_LOG_SEPARATOR_FOREGROUND=""
+        #GUM_LOG_SEPARATOR_BORDER_FOREGROUND=""
+        #GUM_PAGER_FOREGROUND=""
+        #GUM_PAGER_BORDER_FOREGROUND=""
+        #GUM_PAGER_HELP_FOREGROUND=""
+        #GUM_PAGER_HELP_BORDER_FOREGROUND=""
+        #GUM_PAGER_LINE_NUMBER_FOREGROUND=""
+        #GUM_PAGER_LINE_NUMBER_BORDER_FOREGROUND=""
+        #GUM_PAGER_MATCH_FOREGROUND=""
+        #GUM_PAGER_MATCH_BORDER_FOREGROUND=""
+        #GUM_PAGER_MATCH_HIGH_FOREGROUND=""
+        #GUM_PAGER_MATCH_HIGH_BORDER_FOREGROUND=""
+        #GUM_SPIN_SPINNER_FOREGROUND=""
+        #GUM_SPIN_SPINNER_BORDER_FOREGROUND=""
+        #GUM_SPIN_TITLE_FOREGROUND=""
+        #GUM_SPIN_TITLE_BORDER_FOREGROUND=""
+        #FOREGROUND=""
+        #BORDER_FOREGROUND=""
+        #GUM_TABLE_CELL_FOREGROUND=""
+        #GUM_TABLE_CELL_BORDER_FOREGROUND=""
+        #GUM_TABLE_HEADER_FOREGROUND=""
+        #GUM_TABLE_HEADER_BORDER_FOREGROUND=""
+        #GUM_TABLE_SELECTED_FOREGROUND=""
+        #GUM_TABLE_SELECTED_BORDER_FOREGROUND=""
+        #GUM_WRITE_BASE_FOREGROUND=""
+        #GUM_WRITE_BASE_BORDER_FOREGROUND=""
+        #GUM_WRITE_CURSOR_LINE_NUMBER_FOREGROUND=""
+        #GUM_WRITE_CURSOR_LINE_NUMBER_BORDER_FOREGROUND=""
+        #GUM_WRITE_CURSOR_LINE_FOREGROUND=""
+        #GUM_WRITE_CURSOR_LINE_BORDER_FOREGROUND=""
+        #GUM_WRITE_CURSOR_FOREGROUND=""
+        #GUM_WRITE_CURSOR_BORDER_FOREGROUND=""
+        #GUM_WRITE_END_OF_BUFFER_FOREGROUND=""
+        #GUM_WRITE_END_OF_BUFFER_BORDER_FOREGROUND=""
+        #GUM_WRITE_LINE_NUMBER_FOREGROUND=""
+        #GUM_WRITE_LINE_NUMBER_BORDER_FOREGROUND=""
+        #GUM_WRITE_HEADER_FOREGROUND=""
+        #GUM_WRITE_HEADER_BORDER_FOREGROUND=""
+        #GUM_WRITE_PLACEHOLDER_FOREGROUND=""
+        #GUM_WRITE_PLACEHOLDER_BORDER_FOREGROUND=""
+        #GUM_WRITE_PROMPT_FOREGROUND=""
+        #GUM_WRITE_PROMPT_BORDER_FOREGROUND=""
+    else
+        all_colors="$(cat $config | grep '=' | grep "$all_colors" | cut -d'=' -f2)"
+        BORDERS_FOREGROUND="$all_colors"
+        GUM_FILTER_INDICATOR_FOREGROUND="$all_colors"
+        GUM_SPIN_SPINNER_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_CURSOR_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_CURSOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_HEADER_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_HEADER_BORDER_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_ITEM_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_ITEM_BORDER_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_SELECTED_FOREGROUND="$all_colors"
+        #GUM_CHOOSE_SELECTED_BORDER_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_PROMPT_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_PROMPT_BORDER_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_SELECTED_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_SELECTED_BORDER_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_UNSELECTED_FOREGROUND="$all_colors"
+        #GUM_CONFIRM_UNSELECTED_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_CURSOR_FOREGROUND="$all_colors"
+        #GUM_FILE_CURSOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_SYMLINK_FOREGROUND="$all_colors"
+        #GUM_FILE_SYMLINK_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_DIRECTORY_FOREGROUND="$all_colors"
+        #GUM_FILE_DIRECTORY_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_FILE_FOREGROUND="$all_colors"
+        #GUM_FILE_FILE_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_PERMISSIONS_FOREGROUND="$all_colors"
+        #GUM_FILE_PERMISSIONS_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_SELECTED_FOREGROUND="$all_colors"
+        #GUM_FILE_SELECTED_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILE_FILE_SIZE_FOREGROUND="$all_colors"
+        #GUM_FILE_FILE_SIZE_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_INDICATOR_FOREGROUND="$all_colors"
+        #GUM_FILTER_INDICATOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_SELECTED_PREFIX_FOREGROUND="$all_colors"
+        #GUM_FILTER_SELECTED_PREFIX_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_UNSELECTED_PREFIX_FOREGROUND="$all_colors"
+        #GUM_FILTER_UNSELECTED_PREFIX_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_HEADER_FOREGROUND="$all_colors"
+        #GUM_FILTER_HEADER_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_TEXT_FOREGROUND="$all_colors"
+        #GUM_FILTER_TEXT_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_CURSOR_TEXT_FOREGROUND="$all_colors"
+        #GUM_FILTER_CURSOR_TEXT_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_MATCH_FOREGROUND="$all_colors"
+        #GUM_FILTER_MATCH_BORDER_FOREGROUND="$all_colors"
+        #GUM_FILTER_PROMPT_FOREGROUND="$all_colors"
+        #GUM_FILTER_PROMPT_BORDER_FOREGROUND="$all_colors"
+        #GUM_INPUT_PROMPT_FOREGROUND="$all_colors"
+        #GUM_INPUT_PROMPT_BORDER_FOREGROUND="$all_colors"
+        #GUM_INPUT_CURSOR_FOREGROUND="$all_colors"
+        #GUM_INPUT_CURSOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_INPUT_HEADER_FOREGROUND="$all_colors"
+        #GUM_INPUT_HEADER_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_LEVEL_FOREGROUND="$all_colors"
+        #GUM_LOG_LEVEL_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_TIME_FOREGROUND="$all_colors"
+        #GUM_LOG_TIME_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_PREFIX_FOREGROUND="$all_colors"
+        #GUM_LOG_PREFIX_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_MESSAGE_FOREGROUND="$all_colors"
+        #GUM_LOG_MESSAGE_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_KEY_FOREGROUND="$all_colors"
+        #GUM_LOG_KEY_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_VALUE_FOREGROUND="$all_colors"
+        #GUM_LOG_VALUE_BORDER_FOREGROUND="$all_colors"
+        #GUM_LOG_SEPARATOR_FOREGROUND="$all_colors"
+        #GUM_LOG_SEPARATOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_PAGER_FOREGROUND="$all_colors"
+        #GUM_PAGER_BORDER_FOREGROUND="$all_colors"
+        #GUM_PAGER_HELP_FOREGROUND="$all_colors"
+        #GUM_PAGER_HELP_BORDER_FOREGROUND="$all_colors"
+        #GUM_PAGER_LINE_NUMBER_FOREGROUND="$all_colors"
+        #GUM_PAGER_LINE_NUMBER_BORDER_FOREGROUND="$all_colors"
+        #GUM_PAGER_MATCH_FOREGROUND="$all_colors"
+        #GUM_PAGER_MATCH_BORDER_FOREGROUND="$all_colors"
+        #GUM_PAGER_MATCH_HIGH_FOREGROUND="$all_colors"
+        #GUM_PAGER_MATCH_HIGH_BORDER_FOREGROUND="$all_colors"
+        #GUM_SPIN_SPINNER_FOREGROUND="$all_colors"
+        #GUM_SPIN_SPINNER_BORDER_FOREGROUND="$all_colors"
+        #GUM_SPIN_TITLE_FOREGROUND="$all_colors"
+        #GUM_SPIN_TITLE_BORDER_FOREGROUND="$all_colors"
+        #FOREGROUND="$all_colors"
+        #BORDER_FOREGROUND="$all_colors"
+        #GUM_TABLE_CELL_FOREGROUND="$all_colors"
+        #GUM_TABLE_CELL_BORDER_FOREGROUND="$all_colors"
+        #GUM_TABLE_HEADER_FOREGROUND="$all_colors"
+        #GUM_TABLE_HEADER_BORDER_FOREGROUND="$all_colors"
+        #GUM_TABLE_SELECTED_FOREGROUND="$all_colors"
+        #GUM_TABLE_SELECTED_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_BASE_FOREGROUND="$all_colors"
+        #GUM_WRITE_BASE_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_LINE_NUMBER_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_LINE_NUMBER_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_LINE_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_LINE_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_FOREGROUND="$all_colors"
+        #GUM_WRITE_CURSOR_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_END_OF_BUFFER_FOREGROUND="$all_colors"
+        #GUM_WRITE_END_OF_BUFFER_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_LINE_NUMBER_FOREGROUND="$all_colors"
+        #GUM_WRITE_LINE_NUMBER_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_HEADER_FOREGROUND="$all_colors"
+        #GUM_WRITE_HEADER_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_PLACEHOLDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_PLACEHOLDER_BORDER_FOREGROUND="$all_colors"
+        #GUM_WRITE_PROMPT_FOREGROUND="$all_colors"
+        #GUM_WRITE_PROMPT_BORDER_FOREGROUND="$all_colors"
+    fi
+    command="$command"
+    border_style="$border_style"
+    spinner_style="$spinner_style"
+    if [ -f "${configdir}/default_vm_config" ]; then
+        printf '\n   VMs default config:\n%s' "$(cat "${configdir}/default_vm_config")"
+    fi
 }
 
 check_updates() {
@@ -62,24 +277,7 @@ show_vms() {
 }
 
 show_custom() {
-    if [ -f "${configdir}/command" ]; then
-        printf '\n   command:\nquickemu %s' "$(cat "${configdir}/command")"
-    fi
-    if [ -f "${configdir}/default_vm_config" ]; then
-        printf '\n   VMs default config:\n%s' "$(cat "${configdir}/default_vm_config")"
-    fi
-    if [ -f "${configdir}/border" ]; then
-        printf '\n   border: %s' "$(cat "${configdir}/border")"
-    fi
-    if [ -f "${configdir}/color" ]; then
-        printf '\n   borders color: %s' "$(cat "${configdir}/color")"
-    fi
-    if [ -f "${configdir}/indicator" ]; then
-        printf '\n   indicator color: %s' "$(cat "${configdir}/indicator")"
-    fi
-    if [ -f "${configdir}/spinner" ]; then
-        printf '\n   spinner: %s' "$(cat "${configdir}/spinner")"
-    fi
+    cat ${config}
 }
 
 show_version_quickemu() {
@@ -99,7 +297,8 @@ show_headers_small() {
     header2=$(header="  ready VMs:
 $(echo "${vms[@]%.*}" | tr " " "\n")"; show_header)
     header3=$(header="  workdir:
-$(pwd)$(show_custom)"; show_header)
+$(pwd)
+$(show_custom)"; show_header)
     header1_2=$(gum join --vertical "$header1" "$header2")
     gum join --align top "$header1_2" "$header3"
 }
@@ -380,7 +579,7 @@ generate_if_needed() {
 
 generate_supported(){
     echo "Extracting OS Editions and Releases..."
-    rm -r "$configdir/distros"
+    rm -rf "$configdir/distros"
     touch "$configdir/config"
     mkdir -p "$configdir/distros"
     "$QUICKGET" | awk 'NR==2,/zorin/' | cut -d':' -f2 | grep -o '[^ ]*' > "$configdir/supported"
@@ -426,6 +625,50 @@ double" | gum filter --height $height)
     change_config
 }
 
+change_style_spinner() {
+    height=11
+    item_name=spinner_style
+    new_value=$(echo "line
+dot
+minidot
+jump
+pulse
+points
+globe
+moon
+monkey
+meter
+hamburger" | gum filter --height $height)
+    change_config
+}
+
+change_all_colors() {
+    if command -v yad >/dev/null 2>&1; then
+        header="Define all colors value, use color picker or choose random"
+        show_header
+        height=5
+        item_name=all_colors
+        start=$(echo "random
+color picker
+custom
+don't use
+EXIT $progname" | gum filter --height $height)
+        case $start in
+            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'color picker' ) new_value="$(yad --color)";;
+            'custom' ) new_value=$(gum input --header="Enter color value");;
+            "don't use" ) new_value="";;
+            'show help' ) help_main; show_help;;
+            "EXIT $progname" ) exit 0;;
+        esac
+    else
+        header="Define all colors value or choose random"
+        show_header
+        new_value=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
+    fi
+    change_config
+}
+
 change_color_borders() {
     if command -v yad >/dev/null 2>&1; then
         header="Define color, use color picker or choose random"
@@ -458,12 +701,12 @@ change_color_indicator() {
         height=5
         item_name=indicators_color
         start=$(echo "random
-yad color picker
+color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $start in
             'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
-            'yad color picker' ) new_value="$(yad --color)";;
+            'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input --header="Enter color value");;
             'show help' ) help_main; show_help;;
             "EXIT $progname" ) exit 0;;
@@ -483,12 +726,12 @@ change_color_spinner() {
         height=4
         item_name=spinner_color
         start=$(echo "random
-yad color picker
+color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $new_value in
             'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
-            'yad color picker' ) new_value="$(yad --color)";;
+            'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input  --header="Enter color value");;
             'show help' ) help_main; show_help;;
             "EXIT $progname" ) exit 0;;
@@ -498,23 +741,6 @@ EXIT $progname" | gum filter --height $height)
         show_header
         new_value=$(echo 'random' | gum filter --no-strict GUM_FILTER_PLACEHOLDER="custom" --height 1)
     fi
-    change_config
-}
-
-change_style_spinner() {
-    height=11
-    item_name=spinner_style
-    new_value=$(echo "line
-dot
-minidot
-jump
-pulse
-points
-globe
-moon
-monkey
-meter
-hamburger" | gum filter --height $height)
     change_config
 }
 
@@ -639,6 +865,7 @@ show_menu_settings() {
     start=$(echo "update $progname
 regenerate supported
 generate desktop files
+change all colors
 change borders color
 change borders style
 change indicator color
@@ -651,6 +878,7 @@ EXIT $progname" | gum filter --height $height)
         'regenerate supported' ) generate_supported;;
         'change config' ) change_config;;
         'generate desktop files' ) generate_desktop_files;;
+        'change all colors' ) change_all_colors;;
         'change borders color' ) change_color_borders;;
         'change borders style' ) change_style_borders;;
         'change indicator color' ) change_color_indicator;;
