@@ -65,6 +65,7 @@ function pretty_name() {
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
+    easyos)             PRETTY_NAME="EasyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     endeavouros)        PRETTY_NAME="EndeavourOS";;
     endless)            PRETTY_NAME="Endless OS";;
@@ -217,6 +218,7 @@ function os_support() {
     deepin \
     devuan \
     dragonflybsd \
+    easyos \
     edubuntu \
     elementary \
     endeavouros \
@@ -302,6 +304,7 @@ function os_homepages(){
         deepin)            HOMEPAGE="https://www.deepin.org/";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
         dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
+        easyos)            HOMEPAGE="https://easyos.org/";;
         edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
         elementary)        HOMEPAGE="https://elementary.io/";;
         endeavouros)       HOMEPAGE="https://endeavouros.com/";;
@@ -477,6 +480,15 @@ function releases_dragonflybsd() {
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
     echo $DBSD_RELEASES
+}
+
+function releases_easyos() {
+    #local RLIST
+    #RLIST=$(curl -s https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #RLIST=$(wget -q -O- 'https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/' | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #echo ${RLIST}
+    # Not dynamic for now
+    echo 5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
 }
 
 function releases_elementary() {
@@ -1400,6 +1412,15 @@ function get_dragonflybsd() {
     local URL="http://mirror-master.dragonflybsd.org/iso-images"
 
     HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_easyos() {
+    local HASH=""
+    local URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/${RELEASE}"
+    local ISO="easy-${RELEASE}-amd64.img"
+
+    HASH=$(wget -q -O- "${URL}/md5.sum.txt" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
