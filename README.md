@@ -76,6 +76,7 @@ QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/wat
 -   [jq](https://stedolan.github.io/jq/)
 -   [LSB](https://wiki.linuxfoundation.org/lsb/start)
 -   [procps](https://gitlab.com/procps-ng/procps)
+-   [python3](https://www.python.org/)
 -   [chunkcheck](https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7)
 -   [mkisofs](http://cdrtools.sourceforge.net/private/cdrecord.html)
 -   [usbutils](https://github.com/gregkh/usbutils)
@@ -104,11 +105,11 @@ These examples may save a little typing
 
 Debian (and direct derivatives such as MX Linux):
 
-    sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+    sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 
 Fedora:
 
-    sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+    sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 
 MacOS:
 
@@ -116,7 +117,7 @@ This is a work in progress (see [issue
 248](https://github.com/quickemu-project/quickemu/issues/248) for other
 steps and changes that may enable running on MacOS)
 
-    brew install qemu bash coreutils grep jq cdrtools gnu-sed spice-gtk wget zsync
+    brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 
 # Usage
 
@@ -906,7 +907,6 @@ Useful reference that assisted the development of Quickemu.
     -   <https://github.com/kholia/OSX-KVM>
     -   <https://github.com/thenickdude/KVM-Opencore>
     -   <https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7>
-    -   <https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery>
     -   <https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/>
     -   <https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/>
     -   <http://philjordan.eu/osx-virt/>

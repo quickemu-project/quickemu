@@ -1688,7 +1688,6 @@ function get_macos() {
            exit 1;;
     esac
 
-    # Use a bundled chunkcheck if possible
     CWD="$(dirname "${0}")"
     if [ -x "${CWD}/chunkcheck" ]; then
         CHUNKCHECK="${CWD}/chunkcheck"
@@ -1742,13 +1741,14 @@ function get_macos() {
         save_macos_image "${chunkListLink}" "${chunkListSession}" "${VM_PATH}/RecoveryImage.chunklist"
     fi
 
-    echo "Verifying downloaded macOS ${RELEASE} image using chunklist."
     if [ skipVerification != true ]; then
-        ${CHUNKCHECK} check "${VM_PATH}/RecoveryImage.chunklist" "${VM_PATH}/RecoveryImage.dmg"
-        if [ $? -ne 0 ]; then
-            echo "ERROR! Verification failed."
+        if ! python3 "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+            echo Verification failed.
             exit 1
         fi
+        echo Verified macOS ${RELEASE} image using chunklist.
+    else
+        echo Skipping verification of image.
     fi
 
     if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
