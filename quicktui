@@ -14,11 +14,11 @@ define_variables() {
     trap 'exit' INT
     trap 'exit' EXIT
     if ! command -v quickemu >/dev/null 2>&1; then
-        echo 'You are missing quickemu...!'
+        echo 'You are missing quickemu!'
     fi
     QUICKGET=$(command -v quickget)
     if ! command -v gum >/dev/null 2>&1; then
-        echo 'You are missing gum...!'
+        echo 'You are missing gum! Exiting...' && exit 1
     fi
     # use config file
     source "$config"
@@ -247,6 +247,7 @@ define_variables() {
     if [ -f "${configdir}/default_vm_config" ]; then
         printf '\n   VMs default config:\n%s' "$(cat "${configdir}/default_vm_config")"
     fi
+    gum_filter_cmd="gum filter --indicator.foreground $(( RANDOM % 255 + 1 )) --cursor-text.foreground $(( RANDOM % 255 + 1 ))"
 }
 
 check_updates() {
@@ -414,9 +415,9 @@ run_VM() {
     header="Starting $chosen..."
     show_header
     if [ -f "${configdir}/command" ]; then
-        quickemu < "${configdir}/command" -vm "$chosen.conf"
+        quickemu < "${configdir}/command" -vm "$chosen.conf" 2>&1 | tee running.log
     else
-            quickemu -vm "$chosen.conf"
+            quickemu -vm "$chosen.conf" 2>&1 | gum log
     fi
 }
 
@@ -608,7 +609,7 @@ change_config() {
 old_value=$(cat $config | grep '=' | grep "$item_name" | cut -d'=' -f2)
 printf 'Change %s\n' "$old_value"
 printf 'to %s' "$new_value"
-gum confirm && change_config_item; . "$config" 
+gum confirm && change_config_item; . "$config"
 }
 
 change_style_borders() {
@@ -654,7 +655,7 @@ custom
 don't use
 EXIT $progname" | gum filter --height $height)
         case $start in
-            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'random' ) new_value='$(( RANDOM % 255 + 1 ))';;
             'color picker' ) new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input --header="Enter color value");;
             "don't use" ) new_value="";;
@@ -680,7 +681,7 @@ color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $start in
-            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'random' ) new_value='$(( RANDOM % 255 + 1 ))';;
             'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input  --header="Enter color value");;
             'show help' ) help_main; show_help;;
@@ -705,7 +706,7 @@ color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $start in
-            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'random' ) new_value='$(( RANDOM % 255 + 1 ))';;
             'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input --header="Enter color value");;
             'show help' ) help_main; show_help;;
@@ -730,7 +731,7 @@ color picker
 custom
 EXIT $progname" | gum filter --height $height)
         case $new_value in
-            'random' ) new_value="$(( RANDOM % 255 + 1 ))";;
+            'random' ) new_value='$(( RANDOM % 255 + 1 ))';;
             'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input  --header="Enter color value");;
             'show help' ) help_main; show_help;;
@@ -808,15 +809,17 @@ show_menu_main() {
     height=9
     start=$(echo "run VM
 create new VM
+ssh into $running
 open distro homepage
 delete VM
 advanced menu
 settings menu
 test menu
 show help
-EXIT $progname" | gum filter --height $height)
+EXIT $progname" | $gum_filter_cmd --height $height)
     case $start in
         'create new VM' ) create_VM;;
+        "ssh into $running" ) ssh_into;;
         'advanced menu' ) show_menu_advanced;;
         'settings menu' ) show_menu_settings;;
         'run VM' ) gum_choose_VM && run_VM;;
