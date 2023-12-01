@@ -274,6 +274,7 @@ function os_support() {
     vanillaos \
     void \
     vxlinux \
+    whonix \
     windows \
     xerolinux \
     xubuntu \
@@ -360,6 +361,7 @@ function os_homepages(){
         void)              HOMEPAGE="https://voidlinux.org/";;
         vxlinux)           HOMEPAGE="https://vxlinux.org/";;
         windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
+        whonix)            HOMEPAGE="https://www.whonix.org/";;
         xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
         xubuntu)           HOMEPAGE="https://xubuntu.org/";;
         zorin)             HOMEPAGE="https://zorin.com/os/";;
@@ -865,6 +867,14 @@ function releases_xerolinux() {
     echo kde
 }
 
+function releases_whonix() {
+    echo 17.0.3.0
+}
+
+function editions_whonix() {
+    echo gateway workstation
+}
+
 function releases_zorin() {
     echo 16
 }
@@ -1100,6 +1110,8 @@ EOF
           ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
            ;;
+          whonix)
+              echo "boot=\"legacy\"" >> "${CONF_FILE}";;
           zorin)
             case  ${EDITION} in
               education64|edulite64)
@@ -2140,6 +2152,17 @@ function get_vxlinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_whonix() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local URL=""
+    local ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+    local URL="https://download.whonix.org/libvirt/${RELEASE}/"
+
+    HASH=$(wget -q -O- "${URL}/Whonix-Xfce-${RELEASE}.sha512sums" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_xerolinux() {
     local HASH=""
     local URL=""
@@ -2693,6 +2716,22 @@ create_vm() {
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+    fi
+
+    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]]; then
+        # https://www.whonix.org/wiki/KVM#signify
+        cd ${VM_PATH}
+        tar -xvf Whonix*.libvirt.xz
+        more WHONIX_BINARY_LICENSE_AGREEMENT
+        read -p "Are you agree? Press y/Y" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted
+        else
+            touch WHONIX_BINARY_LICENSE_AGREEMENT_denied
+            exit 0
+        fi
+        mv Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2 "whonix-${RELEASE}-workstation/disk.qcow2"
+        mv Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2 "whonix-${RELEASE}-gateway/disk.qcow2"
     fi
 
     make_vm_config "${ISO}"
