@@ -261,6 +261,46 @@ check_updates() {
     https://github.com/oSoWoSo/quickemu/tags
 }
 
+dependencies_install() {
+	# Find the current distribution and install dependecies
+		if [ -f /etc/os-release ]; then
+			if [ -f "$PATH_PREFIX/pacman" ]; then
+				install_needed_pacman
+			elif [ -f "$PATH_PREFIX/apt" ]; then
+				install_needed_apt
+			elif [ -f "$PATH_PREFIX/xbps-install" ]; then
+				install_needed_xbps
+			elif [ -f "$PATH_PREFIX/dnf" ]; then
+				install_needed_dnf
+			else
+				echo "$MSG_ERROR: $MSG_NO_DISTRO"
+				exit 1
+			fi
+		fi
+}
+
+install_needed_atp() {
+	sudo apt install qemu bash coreutils ovmf grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-client-gtk swtpm wget xdg-user-dirs zsync unzip yad fzf
+}
+
+install_needed_pacman() {
+	sudo pacman -S cdrtools coreutils edk2-ovmf grep jq procps python3 qemu-full sed socat spice-gtk swtpm usbutils util-linux wget xdg-user-dirs xorg-xrandr zsync getext yad fzf
+}
+
+install_needed_xbps() {
+	sudo xbps-install -S qemu bash coreutils grep jq procps-ng python3 util-linux sed spice-gtk swtpm usbutils wget xdg-user-dirs xrandr unzip zsync socat yad fzf
+}
+
+install_needed_dnf() {
+	sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip yad fzf
+}
+
+quickemu_install() {
+	wget https://github.com/quickemu-project/quickemu/archive/refs/tags/4.9.1.tar.gz /tmp/quickemu/
+	
+	cp quickget quickemu macrecovery windowskey /usr/bin/ >/dev/null 2>&1 || sudo cp quickget quickemu macrecovery windowskey /usr/bin/
+}
+
 show_editor() {
     if [ -z "$EDITOR" ]; then
         echo '  editor Not set!'
