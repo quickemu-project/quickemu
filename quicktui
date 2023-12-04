@@ -455,9 +455,9 @@ run_VM() {
     header="Starting $chosen..."
     show_header
     if [ -f "${configdir}/command" ]; then
-        quickemu < "${configdir}/command" -vm "$chosen.conf" 2>&1 | tee running.log
+        quickemu < "${configdir}/command" -vm "$chosen.conf"
     else
-            quickemu -vm "$chosen.conf" 2>&1 | gum log
+            quickemu -vm "$chosen.conf"
     fi
 }
 
