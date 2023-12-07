@@ -334,19 +334,29 @@ show_header() {
 }
 
 show_headers_small() {
-    header1=$(header="$(gum style --bold "$progname") $version"; show_header)
+    header1=$(header="  simple TUI for quickemu
+▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ █ ▄ ▄ ▄  ▄▄ ▄  ▄ █ ▄ ▄ ▄
+█ █ █ █ █ █   █▄▀  █ █ █ █
+█▄█ ▀▄█ █ █▄▄ █ ▀▄ █ █▄▀ █
+   ▀ $version     by zenobit"; show_header)
+    #header1=$(header="$(gum style --bold "$progname") $version"; show_header)
     header2=$(header="  ready VMs:
 $(echo "${vms[@]%.*}" | tr " " "\n")"; show_header)
     header3=$(header="  workdir:
 $(pwd)
 $(show_custom)"; show_header)
-    header1_2=$(gum join --vertical "$header1" "$header2")
+    header1_2=$(gum join --vertical --align right "$header1" "$header2")
     gum join --align top "$header1_2" "$header3"
 }
 
 show_headers_full() {
-    header1=$(header="     $(gum style --bold "$progname") $version
-Simple TUI for quickemu"; show_header)
+    header1=$(header="  simple TUI for quickemu
+▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ █ ▄ ▄ ▄  ▄▄ ▄  ▄ █ ▄ ▄ ▄
+█ █ █ █ █ █   █▄▀  █ █ █ █
+█▄█ ▀▄█ █ █▄▄ █ ▀▄ █ █▄▀ █
+   ▀ $version     by zenobit"; show_header)
     header2=$(header="    qemu $(show_version_qemu)
 quickemu $(show_version_quickemu)
 $(show_editor)"; show_header)
@@ -354,7 +364,7 @@ $(show_editor)"; show_header)
 $(show_vms)"; show_header)
     header4=$(header="  workdir:
 $(pwd)$(show_custom)"; show_header)
-    header1_2=$(gum join "$header1" "$header2")
+    header1_2=$(gum join --align bottom "$header1" "$header2")
     header3_4=$(gum join "$header3" "$header4")
     gum join --align center --vertical "$header1_2" "$header3_4"
 }
