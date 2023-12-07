@@ -493,9 +493,9 @@ create_VM() {
             cat "${configdir}/default_vm_config" >> "$os-$release-$edition.conf"
         fi
     fi
-    echo "New VM not appear in ready VMs: yet #TODO
-To start your new $os virtual machine use 'run VM' from menu"
-show_headers_small
+    echo "New VM not appear in ready VMs: yet #TODO"
+    echo "To start your new $os virtual machine use 'run VM' from menu"
+    show_headers_small
 }
 
 gum_choose_VM_to_delete() {
