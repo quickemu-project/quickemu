@@ -780,7 +780,7 @@ change_color_spinner() {
 color picker
 custom
 EXIT $progname" | gum filter --height $height)
-        case $new_value in
+        case $start in
             'random' ) new_value='$(( RANDOM % 255 + 1 ))';;
             'color picker' ) new_value="$(xcolor)" || new_value="$(yad --color)";;
             'custom' ) new_value=$(gum input  --header="Enter color value");;
