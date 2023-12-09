@@ -330,43 +330,69 @@ show_version_qemu() {
 }
 
 show_header() {
-    gum style --padding "0 1"  --border="$borders_style" --border-foreground="$borders_color" "$header"
+    gum style --padding "0 1" --border="$borders_style" --border-foreground="$borders_color" "$header"
+}
+
+show_header_center() {
+    gum style --padding "0 1" --align=center --border="$borders_style" --border-foreground="$borders_color" "$header"
 }
 
 show_headers_small() {
+    distro=$(shuf -n 1 "$configdir"/supported)
+    homepage=$("$QUICKGET" -h "${distro}")
+
     header1=$(header="  simple TUI for quickemu
 ▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 █ █ ▄ ▄ ▄  ▄▄ ▄  ▄ █ ▄ ▄ ▄
 █ █ █ █ █ █   █▄▀  █ █ █ █
 █▄█ ▀▄█ █ █▄▄ █ ▀▄ █ █▄▀ █
    ▀ $version     by zenobit"; show_header)
-    #header1=$(header="$(gum style --bold "$progname") $version"; show_header)
-    header2=$(header="  ready VMs:
+
+    header2=$(header="Are you tried?
+$distro
+$homepage"; show_header_center)
+
+    header3=$(header="  ready VMs:
 $(echo "${vms[@]%.*}" | tr " " "\n")"; show_header)
-    header3=$(header="  workdir:
+
+    header4=$(header="  workdir:
 $(pwd)
 $(show_custom)"; show_header)
-    header1_2=$(gum join --vertical --align right "$header1" "$header2")
-    gum join --align top "$header1_2" "$header3"
+
+    header1_2=$(gum join --align bottom "$header1" "$header2")
+    header3_4=$(gum join --align top "$header3" "$header4")
+    gum join --vertical --align top "$header1_2" "$header3_4"
 }
 
 show_headers_full() {
+    distro=$(shuf -n 1 "$configdir"/supported)
+    homepage=$("$QUICKGET" -h "${distro}")
+
     header1=$(header="  simple TUI for quickemu
 ▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 █ █ ▄ ▄ ▄  ▄▄ ▄  ▄ █ ▄ ▄ ▄
 █ █ █ █ █ █   █▄▀  █ █ █ █
 █▄█ ▀▄█ █ █▄▄ █ ▀▄ █ █▄▀ █
    ▀ $version     by zenobit"; show_header)
+
     header2=$(header="    qemu $(show_version_qemu)
 quickemu $(show_version_quickemu)
 $(show_editor)"; show_header)
-    header3=$(header="  ready VMs:
+
+    header3=$(header="Are you tried?
+$distro
+$homepage"; show_header_center)
+
+    header4=$(header="  ready VMs:
 $(show_vms)"; show_header)
-    header4=$(header="  workdir:
+
+    header5=$(header="  workdir:
 $(pwd)$(show_custom)"; show_header)
-    header1_2=$(gum join --align bottom "$header1" "$header2")
-    header3_4=$(gum join "$header3" "$header4")
-    gum join --align center --vertical "$header1_2" "$header3_4"
+
+    header1_2_3=$(gum join --align bottom "$header1" "$header2" "$header3")
+    header4_5=$(gum join "$header4" "$header5")
+
+    gum join --align center --vertical "$header1_2_3" "$header4_5"
 }
 
 show_help() {
