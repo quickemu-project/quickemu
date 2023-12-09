@@ -48,6 +48,9 @@ elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
 elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
     open_distro_homepage="on"
     set -- "$2"
+elif [ "${1}" == '--show-distro-homepage' ] || [ "${1}" == '-h' ]; then
+    show_distro_homepage="on"
+    set -- "$2"
 fi
 
 function pretty_name() {
@@ -2754,7 +2757,9 @@ else
         Test if ISO is available
             --test-iso-url / -t {distro} {release} [edition]
         Open distro homepage
-            --open-distro-homepage / -o {distro}"
+            --open-distro-homepage / -o {distro}
+        Show distro homepage
+            --show-distro-homepage / -h {distro}"
     exit 1
 fi
 
@@ -2834,6 +2839,10 @@ else
     if [ "${open_distro_homepage}" == 'on' ]; then
         HOMEPAGE=$(os_homepages ${OS})
         open_url "${HOMEPAGE}" && exit 0
+    fi
+    if [ "${show_distro_homepage}" == 'on' ]; then
+        HOMEPAGE=$(os_homepages ${OS})
+        echo "${HOMEPAGE}" && exit 0
     fi
     echo "ERROR! You must specify a release."
     case ${OS} in
