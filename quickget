@@ -626,7 +626,7 @@ function editions_manjaro(){
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura
+    echo high-sierra mojave catalina big-sur monterey ventura (RECOMMENDED) sonoma
 }
 
 function releases_manjaro() {
@@ -1683,6 +1683,8 @@ function get_macos() {
             BOARD_ID="Mac-E43C1C25D4880AD6";;
         ventura)        #13
             BOARD_ID="Mac-BE088AF8C5EB4FA2";;
+        sonoma)
+            BOARD_ID="Mac-A61BADE1FDAD7B05";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
@@ -1734,7 +1736,7 @@ function get_macos() {
     fi
 
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-        echo "Downloading macOS ${RELEASE}..."
+        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
         local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
         save_macos_image "${downloadLink}" "${downloadSession}" "${VM_PATH}/RecoveryImage.dmg"
