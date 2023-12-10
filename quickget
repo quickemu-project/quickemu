@@ -664,7 +664,7 @@ function releases_netbsd() {
 }
 
 function releases_nixos(){
-    echo 21.05 21.11 22.05 22.11 23.05
+    echo 21.05 21.11 22.05 22.11 23.05 23.11
 }
 
 function editions_nixos(){
