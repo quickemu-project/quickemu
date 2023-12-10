@@ -166,7 +166,7 @@ function list_csv() {
   echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
-    
+
     case ${OS} in
       *ubuntu-server*) FUNC="ubuntu-server";;
       *ubuntu*) FUNC="ubuntu";;
