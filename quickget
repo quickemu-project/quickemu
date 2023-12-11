@@ -36,7 +36,7 @@ if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
     else
         set -- "$2"
     fi
-elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
+elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-u' ]; then
     show_iso_url="on"
     if [ -n "$4" ]; then
         set -- "$2" "$3" "$4"
@@ -48,7 +48,7 @@ elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
 elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
     open_distro_homepage="on"
     set -- "$2"
-elif [ "${1}" == '--show-distro-homepage' ] || [ "${1}" == '-h' ]; then
+elif [ "${1}" == '--show-distro-homepage' ] || [ "${1}" == '-s' ]; then
     show_distro_homepage="on"
     set -- "$2"
 fi
@@ -2753,13 +2753,13 @@ else
     echo "
         You can also use this arguments:
         Only show ISO download URL
-            --show-iso-url / -s {distro} {release} [edition]
+            --show-iso-url / -u {distro} {release} [edition]
         Test if ISO is available
             --test-iso-url / -t {distro} {release} [edition]
         Open distro homepage
             --open-distro-homepage / -o {distro}
-        Show distro homepage
-            --show-distro-homepage / -h {distro}"
+        Only show distro homepage link
+            --show-distro-homepage / -s {distro}"
     exit 1
 fi
 
