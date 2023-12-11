@@ -142,6 +142,18 @@ sudo apt update
 sudo apt install quickgui
 ```
 
+### quickemu quickget X terminal project
+
+From Nov 2023, there is also a multi option desktop integrated text
+interface, with lots of unique tools and utilities to help you make
+light work of installations, snapshots and disk management
+
+-   **[qqX](https://github.com/TuxVinyards/qqX)** is independently
+    curated by [Alex Genovese](https://github.com/TuxVinyards) (see the
+    github pages)
+
+![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
+
 # Install Quickemu
 
 ## Arch
@@ -242,6 +254,21 @@ with your preferred flavour.
 -   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
+You can also use `quickget` with options to:
+
+``` shell
+    # show an OS ISO download URL for {os} {release} [edition] 
+    quickget --show-iso-url fedora 38 Silverblue   
+    # test if and OS ISO is available for {os} {release} [edition]
+    quickget --test-iso-url nixos 23.05 plasma5
+    # open an OS distribution homepage in a browser
+    quickget --open-distro-homepage  ubuntu-mate
+```
+
+The `--show-iso-url` and `--test-iso-url` options **do not** work for
+`Windows` (`quickget` will begin downloading the requested release and
+edition of windows)
+
 ## Other Operating Systems
 
 `quickget` also supports:
@@ -273,7 +300,7 @@ with your preferred flavour.
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
--   `holoiso` (HoloISO)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -482,7 +509,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 10 & 11 Guests
+## Windows 8, 10 & 11 Guests
 
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
@@ -491,9 +518,12 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
+Windows 8.1 is also supported but doesn't feature any automated
+installation or driver optimisation.
+
 ``` bash
 quickget windows 11
-quickemu --vm windows-11-22H2.conf
+quickemu --vm windows-11.conf
 ```
 
 -   Complete the installation as you normally would.
@@ -511,7 +541,7 @@ disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"
 fixed_iso="windows-11/virtio-win.iso"
 tpm="on"
-secureboot="on"
+secureboot="off"
 ```
 
 -   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
@@ -770,6 +800,7 @@ Usage
   quickemu --vm ubuntu.conf
 
 You can also pass optional parameters
+  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
   --braille                         : Enable braille support. Requires SDL.
   --delete-disk                     : Delete the disk image and EFI variables
   --delete-vm                       : Delete the entire VM and it's configuration

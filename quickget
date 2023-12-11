@@ -65,6 +65,7 @@ function pretty_name() {
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
+    easyos)             PRETTY_NAME="EasyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     endeavouros)        PRETTY_NAME="EndeavourOS";;
     endless)            PRETTY_NAME="Endless OS";;
@@ -165,15 +166,17 @@ function list_csv() {
   echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
   for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
-    if [[ "${OS}" == *"ubuntu"* ]]; then
-      FUNC="ubuntu"
-    else
-      FUNC="${OS}"
-    fi
+
+    case ${OS} in
+      *ubuntu-server*) FUNC="ubuntu-server";;
+      *ubuntu*) FUNC="ubuntu";;
+      *) FUNC="${OS}";;
+    esac
+
     PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
     SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
-    for RELEASE in $("releases_${FUNC}"); do
+    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
       if [ "${OS}" == "macos" ]; then
         DOWNLOADER="macrecovery"
       elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
@@ -217,6 +220,7 @@ function os_support() {
     deepin \
     devuan \
     dragonflybsd \
+    easyos \
     edubuntu \
     elementary \
     endeavouros \
@@ -302,6 +306,7 @@ function os_homepages(){
         deepin)            HOMEPAGE="https://www.deepin.org/";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
         dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
+        easyos)            HOMEPAGE="https://easyos.org/";;
         edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
         elementary)        HOMEPAGE="https://elementary.io/";;
         endeavouros)       HOMEPAGE="https://endeavouros.com/";;
@@ -479,6 +484,15 @@ function releases_dragonflybsd() {
     echo $DBSD_RELEASES
 }
 
+function releases_easyos() {
+    #local RLIST
+    #RLIST=$(curl -s https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #RLIST=$(wget -q -O- 'https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/' | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #echo ${RLIST}
+    # Not dynamic for now
+    echo 5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
+}
+
 function releases_elementary() {
     echo 7.0 7.1
 }
@@ -503,7 +517,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 33 34 35 36 37 38 39
+    echo 38 39
 }
 
 function releases_batocera() {
@@ -650,7 +664,7 @@ function releases_netbsd() {
 }
 
 function releases_nixos(){
-    echo 21.05 21.11 22.05 22.11 23.05
+    echo 21.05 21.11 22.05 22.11 23.05 23.11
 }
 
 function editions_nixos(){
@@ -909,6 +923,15 @@ function web_get() {
         FILE="${3}"
     else
         FILE="${URL##*/}"
+    fi
+
+	# Test mode for ISO
+	if [ "${show_iso_url}" == 'on' ]; then
+	    echo "${URL}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+	    wget --spider "${URL}"
+	    exit 0
     fi
 
     if ! mkdir -p "${DIR}" 2>/dev/null; then
@@ -1400,6 +1423,15 @@ function get_dragonflybsd() {
     local URL="http://mirror-master.dragonflybsd.org/iso-images"
 
     HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_easyos() {
+    local HASH=""
+    local URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/${RELEASE}"
+    local ISO="easy-${RELEASE}-amd64.img"
+
+    HASH=$(wget -q -O- "${URL}/md5.sum.txt" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 

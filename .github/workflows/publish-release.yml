@@ -1,0 +1,50 @@
+name: Build 🏗️ and Publish 📦️
+
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create release ${{ github.ref }} as a draft
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ github.ref }}" --draft --generate-notes
+
+  build-release:
+    needs: [create-release]
+    name: Build Release
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and Upload .deb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install debhelper devscripts
+        REL_VER=$(grep "^readonly VERSION" quickemu | cut -d'"' -f2)
+        rm debian/changelog
+        dch --package quickemu --newversion="${REL_VER}-1" --distribution=unstable "New upstream release." --create
+        dpkg-buildpackage --build=binary --no-check-builddeps --compression=gzip
+        gh release upload "${{ github.ref }}" "../quickemu_${REL_VER}-1_all.deb" --clobber
+
+  publish-release:
+    needs: [build-release]
+    name: Publish Release
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Publish release ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [ "$(gh release view "${{ github.ref }}" --json assets --template '{{len .assets}}')" -lt 0 ]; then
+          exit 1
+        fi
+        gh release edit "${{ github.ref }}" --draft=false
