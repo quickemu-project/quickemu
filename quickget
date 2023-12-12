@@ -640,7 +640,7 @@ function editions_manjaro(){
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura (RECOMMENDED) sonoma
+    echo high-sierra mojave catalina big-sur monterey ventura sonoma
 }
 
 function releases_manjaro() {
@@ -1707,7 +1707,7 @@ function get_macos() {
         ventura)        #13
             BOARD_ID="Mac-BE088AF8C5EB4FA2";;
         sonoma)
-            BOARD_ID="Mac-A61BADE1FDAD7B05";;
+            BOARD_ID="Mac-53FDB3D8DB8CA971";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;

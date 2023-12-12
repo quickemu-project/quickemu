@@ -373,8 +373,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
-`ventura` are supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and
+`sonoma` are supported. Sonoma may fail to boot.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
@@ -384,7 +384,7 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
-            Sur, Monterey and Ventura), choose any of the APFS options
+            Sur, Monterey, Ventura and Sonoma), choose any of the APFS options
             as the filesystem. MacOS Extended may not work.
     -   Click **Erase**.
     -   Click **Done**.
@@ -462,6 +462,7 @@ There are some considerations when running macOS via Quickemu.
     -   Big Sur
     -   Monterey
     -   Ventura
+    -   Sonoma (Not recommended)
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
