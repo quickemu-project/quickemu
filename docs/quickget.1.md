@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 26, 2023
+date: December 13, 2023
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -133,6 +133,7 @@ edition of windows)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
