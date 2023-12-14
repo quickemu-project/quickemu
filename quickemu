@@ -288,7 +288,7 @@ function vm_boot() {
         GUEST_CPU_CORES="${cpu_cores}"
     fi
 
-    if [ "${guest_os}" == "macos" ] && [ "${GUEST_CPU_CORES}" > 10 ] || [ "${GUEST_CPU_CORES}" == 6 ] || [ "${GUEST_CPU_CORES}" == 7 ]; then
+    if [ "${guest_os}" == "macos" ] && [ "${GUEST_CPU_CORES}" -gt 10 ] || [ "${GUEST_CPU_CORES}" -eq 6 ] || [ "${GUEST_CPU_CORES}" -eq 7 ]; then
         # macOS guests cannot boot with most core counts not powers of 2. This will fix the issue by rounding the core count down to a power of 2. Uses wc and factor from coreutils.
         factorCPUCores=$(factor "${GUEST_CPU_CORES}")
         GUEST_CPU_CORES=$(( 2 ** $(echo "${factorCPUCores#*:}" | grep -o '[0-9]' | wc -l) ))
