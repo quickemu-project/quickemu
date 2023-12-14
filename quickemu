@@ -527,7 +527,7 @@ function vm_boot() {
         # A CPU with SSE4.1 support is required for >= macOS Sierra
         # A CPU with AVX2 support is required for >= macOS Ventura
         case ${macos_release} in
-        ventura)
+        ventura|sonoma)
             if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
                 CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc,+avx2"
             else
@@ -564,7 +564,7 @@ function vm_boot() {
             NET_DEVICE="vmxnet3"
             USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
             ;;
-        big-sur|monterey|ventura)
+        big-sur|monterey|ventura|sonoma)
             BALLOON="-device virtio-balloon"
             MAC_DISK_DEV="virtio-blk-pci"
             NET_DEVICE="virtio-net"
