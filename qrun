@@ -56,7 +56,7 @@ show_vms() {
 
 show_headers() {
 	distro=$(shuf -n 1 /tmp/supported)
-	homepage=$("$QUICKGET" -h "${distro}")
+	homepage=$("$QUICKGET" -s "${distro}")
 
 	header_logo=$(gum style --padding "0 1" --border=rounded --border-foreground $color " Simple VMs runner
 ▄▄▄▄ ▄▄▄  ▄  ▄ ▄   ▄
@@ -66,9 +66,9 @@ show_headers() {
 v$version▀  for quickemu")
 
 	tip_header=$(gum style --bold "Tip: ")
-	tip_distro=$(gum style $distro)
+	tip_distro=$(gum style --align left "$distro")
 	tip_temp=$(gum join --align top "$tip_header" "$tip_distro")
-	tip_homepage=$(gum style $homepage)
+	tip_homepage=$(gum style --align left "$homepage")
 	tip=$(gum join --vertical --align top "$tip_temp" "$tip_homepage")
 	tip_border=$(gum style --padding "0 1" --border=rounded --border-foreground $color "$tip")
 
@@ -97,7 +97,6 @@ gum_choose_VM() {
 	else
 		echo "No VMs to run."
 	fi
-	#chosen=$(printf '%s\n' "${vms[@]%.conf}" | gum filter --height "$("${vms[@]%.conf}" | wc -l)" --header='Choose VM to run')
 }
 
 create_VM() {
@@ -120,7 +119,7 @@ create_VM() {
 }
 
 run_VM() {
-			quickemu -vm "$chosen.conf"
+	quickemu -vm "$chosen.conf"
 }
 
 open_distro_homepage(){
