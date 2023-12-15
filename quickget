@@ -88,6 +88,7 @@ function pretty_name() {
     mxlinux)            PRETTY_NAME="MX Linux";;
     netboot)            PRETTY_NAME="netboot.xyz";;
     netbsd)             PRETTY_NAME="NetBSD";;
+    nitrux)             PRETTY_NAME="Nitrux";;
     nixos)              PRETTY_NAME="NixOS";;
     macos)              PRETTY_NAME="macOS";;
     openbsd)            PRETTY_NAME="OpenBSD";;
@@ -257,6 +258,7 @@ function os_support() {
     mxlinux \
     netboot \
     netbsd \
+    nitrux \
     nixos \
     lubuntu \
     macos \
@@ -350,6 +352,7 @@ function os_homepages(){
         mxlinux)           HOMEPAGE="https://mxlinux.org/";;
         netboot)           HOMEPAGE="https://netboot.xyz/";;
         netbsd)            HOMEPAGE="https://www.netbsd.org/";;
+        nitrux)            HOMEPAGE="https://nxos.org/";;
         nixos)             HOMEPAGE="https://nixos.org/";;
         lubuntu)           HOMEPAGE="https://lubuntu.me/";;
         macos)             HOMEPAGE="https://www.apple.com/macos/";;
@@ -745,6 +748,10 @@ function releases_netboot() {
 function releases_netbsd() {
     local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' |tr -d '"/' |sort -nr )
     echo ${NBSD_RELEASES}
+}
+
+function releases_nitrux() {
+    echo latest
 }
 
 function releases_nixos(){
@@ -1983,6 +1990,19 @@ function get_netbsd() {
     local ISO="NetBSD-${RELEASE}-amd64.iso"
     local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images/"
     HASH=$(wget -q -O- "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_nitrux() {
+    local HASH=""
+    local URLBASE=""
+    local URL=""
+    local ISO=""
+
+    URLBASE="https://sourceforge.net/projects/nitruxos/files/Release"
+    URL="${URLBASE}/ISO"
+    ISO=$(wget -qO- 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -1 | cut -d']' -f1 | cut -d '/' -f4)
+    HASH=$(wget -q -O- "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
