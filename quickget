@@ -939,7 +939,7 @@ function web_get() {
       exit 1
     fi
 
-    if command -v wget2 &>/dev/null; then
+    if wget --help | grep -q Wget2; then
         local WGET_PROGRESS="--force-progress"
     else   
         local WGET_PROGRESS="--show-progress"
