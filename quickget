@@ -939,6 +939,12 @@ function web_get() {
       exit 1
     fi
 
+    if command -v wget2 &>/dev/null; then
+        local WGET_PROGRESS="--force-progress"
+    else   
+        local WGET_PROGRESS="--show-progress"
+    fi
+
     if command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
@@ -946,7 +952,7 @@ function web_get() {
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
-    elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+    elif ! wget --quiet --continue --tries=3 --read-timeout=10 "${WGET_PROGRESS}" --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
         echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
         exit 1
     fi
