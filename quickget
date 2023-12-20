@@ -48,6 +48,9 @@ elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
 elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
     open_distro_homepage="on"
     set -- "$2"
+elif [ "${1}" == '--show-distro-login' ] || [ "${1}" == '-l' ]; then
+    show_distro_login="on"
+    set -- "$2"
 fi
 
 function pretty_name() {
@@ -370,6 +373,94 @@ function os_homepages(){
         zorin)             HOMEPAGE="https://zorin.com/os/";;
     esac
     echo "${HOMEPAGE}"
+}
+
+function os_login() {
+    local SIMPLE_NAME=""
+    local LOGIN=""
+    SIMPLE_NAME="${1}"
+    case ${SIMPLE_NAME} in
+            alma)             LOGIN="";;
+            alpine)           LOGIN="";;
+            android)          LOGIN="";;
+            antix)            LOGIN="";;
+            archlinux)        LOGIN="";;
+            archcraft)        LOGIN="";;
+            arcolinux)        LOGIN="";;
+            batocera)         LOGIN="";;
+            blendos)          LOGIN="";;
+            bodhi)            LOGIN="";;
+            bunsenlabs)       LOGIN="";;
+            cachyos)          LOGIN="";;
+            centos-stream)    LOGIN="";;
+            debian)           LOGIN="";;
+            deepin)           LOGIN="";;
+            devuan)           LOGIN="";;
+            dragonflybsd)     LOGIN="";;
+            easyos)           LOGIN="";;
+            edubuntu)         LOGIN="";;
+            elementary)       LOGIN="";;
+            endeavouros)      LOGIN="";;
+            endless)          LOGIN="";;
+            fedora)           LOGIN="";;
+            freebsd)          LOGIN="";;
+            freedos)          LOGIN="";;
+            garuda)           LOGIN="";;
+            gentoo)           LOGIN="";;
+            ghostbsd)         LOGIN="";;
+            haiku)            LOGIN="";;
+            holoiso)          LOGIN="";;
+            kali)             LOGIN="";;
+            kdeneon)          LOGIN="";;
+            kolibrios)        LOGIN="";;
+            kubuntu)          LOGIN="";;
+            linuxlite)        LOGIN="";;
+            linuxmint)        LOGIN="";;
+            lmde)             LOGIN="";;
+            mageia)           LOGIN="";;
+            manjaro)          LOGIN="";;
+            mxlinux)          LOGIN="";;
+            netboot)          LOGIN="";;
+            netbsd)           LOGIN="";;
+            nixos)            LOGIN="";;
+            lubuntu)          LOGIN="";;
+            macos)            LOGIN="";;
+            openbsd)          LOGIN="";;
+            openindiana)      LOGIN="";;
+            opensuse)         LOGIN="";;
+            oraclelinux)      LOGIN="";;
+            peppermint)       LOGIN="";;
+            popos)            LOGIN="";;
+            porteus)          LOGIN="";;
+            reactos)          LOGIN="";;
+            rebornos)         LOGIN="";;
+            rockylinux)       LOGIN="";;
+            siduction)        LOGIN="";;
+            slackware)        LOGIN="";;
+            solus)            LOGIN="";;
+            spiral)           LOGIN="";;
+            tails)            LOGIN="";;
+            tinycore)         LOGIN="";;
+            trisquel)         LOGIN="";;
+            truenas-core)     LOGIN="";;
+            truenas-scale)    LOGIN="";;
+            ubuntu)           LOGIN="";;
+            ubuntu-budgie)    LOGIN="";;
+            ubuntucinnamon)   LOGIN="";;
+            ubuntukylin)      LOGIN="";;
+            ubuntu-mate)      LOGIN="";;
+            ubuntu-server)    LOGIN="";;
+            ubuntustudio)     LOGIN="";;
+            ubuntu-unity)     LOGIN="";;
+            vanillaos)        LOGIN="";;
+            void)             LOGIN="anon:voidlinux";;
+            vxlinux)          LOGIN="";;
+            windows)          LOGIN="";;
+            xerolinux)        LOGIN="";;
+            xubuntu)          LOGIN="";;
+            zorin)            LOGIN="";;
+    esac
+    echo "${LOGIN}"
 }
 
 function releases_alma() {
@@ -2754,7 +2845,9 @@ else
         Test if ISO is available
             --test-iso-url / -t {distro} {release} [edition]
         Open distro homepage
-            --open-distro-homepage / -o {distro}"
+            --open-distro-homepage / -o {distro}
+        Show distro default login and password
+            --show-distro-login / -l {distro}"
     exit 1
 fi
 
@@ -2834,6 +2927,9 @@ else
     if [ "${open_distro_homepage}" == 'on' ]; then
         HOMEPAGE=$(os_homepages ${OS})
         open_url "${HOMEPAGE}" && exit 0
+    elif [ "${show_distro_login}" == 'on' ]; then
+        LOGIN=$(os_login ${OS})
+        echo "${LOGIN}" && exit 0
     fi
     echo "ERROR! You must specify a release."
     case ${OS} in
