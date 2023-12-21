@@ -83,6 +83,7 @@ function pretty_name() {
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
+    crunchbang++)       PRETTY_NAME="Crunchbang++";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
     easyos)             PRETTY_NAME="EasyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
@@ -235,6 +236,7 @@ function os_support() {
     bunsenlabs \
     cachyos \
     centos-stream \
+    crunchbang++ \
     debian \
     deepin \
     devuan \
@@ -322,6 +324,7 @@ function os_homepage(){
         bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
         cachyos)           HOMEPAGE="https://cachyos.org/";;
         centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
+        crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
         debian)            HOMEPAGE="https://www.debian.org/";;
         deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
@@ -477,6 +480,10 @@ function releases_centos-stream() {
 
 function editions_centos-stream() {
     echo dvd1 boot
+}
+
+function releases_crunchbang++() {
+    echo 8 9 10 11 12
 }
 
 function releases_debian() {
@@ -1429,6 +1436,42 @@ function get_centos-stream() {
         ;;
     esac
 
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_crunchbang++() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local URLPART=""
+    local URLPART2=""
+
+    URLPART="https://github.com/CBPP/cbpp"
+
+    case ${RELEASE} in
+        8)
+            URLPART2="releases/download/v1.0-amd64"
+            ISO="cbpp-1.0-amd64-20150428.iso"
+            ;;
+        9)
+            URLPART2="9-amd64/releases/download/v9.0"
+            ISO="cbpp-9.0-amd64-20170621.iso"
+            ;;
+        10)
+            URLPART2="releases/download/v10"
+            ISO="cbpp-10.1-amd64-20190713.iso"
+            ;;
+        11)
+            URLPART2="releases/download/v11.2"
+            ISO="cbpp-11.2-amd64-20230514.iso"
+            ;;
+        12)
+            URLPART2="releases/download/v12.0"
+            ISO="cbpp-12.0-amd64-20230611.iso"
+            ;;
+    esac
+
+    URL="${URLPART}/${URLPART2}"
     echo "${URL}/${ISO} ${HASH}"
 }
 
