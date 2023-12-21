@@ -380,13 +380,13 @@ function os_login() {
     local LOGIN=""
     SIMPLE_NAME="${1}"
     case ${SIMPLE_NAME} in
-            alma)             LOGIN="";;
-            alpine)           LOGIN="";;
+            alma)             LOGIN="-";;
+            alpine)           LOGIN="ssh must by enabled! root:[empty password]";;
             android)          LOGIN="";;
-            antix)            LOGIN="";;
-            archlinux)        LOGIN="";;
-            archcraft)        LOGIN="";;
-            arcolinux)        LOGIN="";;
+            antix)            LOGIN="demo:demo root:root";;
+            archlinux)        LOGIN="Set yourself";;
+            archcraft)        LOGIN="liveuser:liveuser root:liveuser";;
+            arcolinux)        LOGIN="liveuser: ";;
             batocera)         LOGIN="";;
             blendos)          LOGIN="";;
             bodhi)            LOGIN="";;
@@ -453,7 +453,7 @@ function os_login() {
             ubuntustudio)     LOGIN="";;
             ubuntu-unity)     LOGIN="";;
             vanillaos)        LOGIN="";;
-            void)             LOGIN="anon:voidlinux";;
+            void)             LOGIN="anon:voidlinux root:voidlinux";;
             vxlinux)          LOGIN="";;
             windows)          LOGIN="";;
             xerolinux)        LOGIN="";;
@@ -2846,7 +2846,7 @@ else
             --test-iso-url / -t {distro} {release} [edition]
         Open distro homepage
             --open-distro-homepage / -o {distro}
-        Show distro default login and password
+        Show login and password for Live distro
             --show-distro-login / -l {distro}"
     exit 1
 fi
