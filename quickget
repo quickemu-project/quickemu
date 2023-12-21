@@ -2770,17 +2770,12 @@ else
     echo -n " - Operating Systems: "
     os_support
     echo "
-        You can also use this arguments:
-        Only show ISO download URL
-            --show-iso-url / -u {distro} {release} [edition]
-        Test if ISO is available
-            --test-iso-url / -t {distro} {release} [edition]
-        Open distro homepage
-            --open-distro-homepage / -o {distro}
-        Show distro homepage link
-            --show-distro-homepage / -s {distro}
-        Download ISO
-            --download-iso / -d {distro} {release} [edition]"
+You can also use these arguments
+--show-iso-url / -u <distro> <release> <edition> : Show ISO download URL
+--test-iso-url / -t <distro> <release> <edition> : Test if ISO is available
+--download-iso / -d <distro> <release> <edition> : Download ISO
+--open-distro-homepage / -o <distro>             : Open distro homepage
+--show-distro-homepage / -s <distro>             : Show distro homepage link"
     exit 1
 fi
 
