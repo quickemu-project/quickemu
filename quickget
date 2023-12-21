@@ -48,6 +48,15 @@ elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
 elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
     open_distro_homepage="on"
     set -- "$2"
+elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
+    download_iso="on"
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
 fi
 
 function pretty_name() {
@@ -924,7 +933,11 @@ function check_hash() {
     local iso=""
     local hash=""
     local hash_algo=""
-    iso="${VM_PATH}/${1}"
+    if [ "${download_iso}" == "on" ]; then
+        iso="${1}"
+    else
+        iso="${VM_PATH}/${1}"
+    fi
     hash="${2}"
 
     # Guess the hash algorithm by the hash length
@@ -974,9 +987,11 @@ function web_get() {
     elif [ "${test_iso_url}" == 'on' ]; then
 	    wget --spider "${URL}"
 	    exit 0
+    elif [ "${download_iso}" == 'on' ]; then
+        DIR="$(pwd)"
     fi
 
-    if ! mkdir -p "${DIR}" 2>/dev/null; then
+    if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
     fi
@@ -1055,6 +1070,10 @@ function make_vm_config() {
     local IMAGE_TYPE=""
     local GUEST=""
     local SEC_BOOT=""
+
+    if [ "${download_iso}" == "on" ]; then
+        exit 0
+    fi
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
@@ -2979,7 +2998,9 @@ else
         Test if ISO is available
             --test-iso-url / -t {distro} {release} [edition]
         Open distro homepage
-            --open-distro-homepage / -o {distro}"
+            --open-distro-homepage / -o {distro}
+        Only download ISO
+            --download-iso / -d {distro} {release} [edition]"
     exit 1
 fi
 
