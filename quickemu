@@ -1749,6 +1749,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         exit 1
     fi
 
+     DiskChkMsg="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
+
+    if [[ $DiskChkMsg ]]; then
+        echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
+        echo; echo "$DiskChkMsg" ; echo
+        exit 1
+    fi
+
     VMDIR=$(dirname "${disk_img}")
     VMNAME=$(basename "${VM}" .conf)
     VMPATH=$(realpath "$(dirname "${VM}")")
