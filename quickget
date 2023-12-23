@@ -950,8 +950,7 @@ function web_get() {
         echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
     fi
     
-    # Aria2c is unable to download the macOS chunklist file, for whatever reason. Use wget instead for that file. 
-    if command -v aria2c &>/dev/null && [ "${FILE}" != "RecoveryImage.chunklist" ]; then
+    if command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}" "${HEADERS[@]}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
@@ -1762,7 +1761,7 @@ function get_macos() {
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-        web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        curl --progress-bar "${chunkListLink}" -o "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
     fi
 
     if [ skipVerification != true ]; then
