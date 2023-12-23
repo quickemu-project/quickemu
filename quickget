@@ -5,7 +5,7 @@ export LC_ALL=C
 #
 #    1. Update os_support() - add new OS, all lowercase
 #    2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
-#    3. Update os_homepages() - add a homepage for new OS
+#    3. Update os_homepage() - add a homepage for new OS
 #    4. Create a releases_newos() generator (required) outputs the current supported release versions
 #    5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
 #    6. Update make_vm_config() - add any *required* new OS tweaks
@@ -323,7 +323,7 @@ function os_support() {
     zorin
 }
 
-function os_homepages(){
+function os_homepage(){
     local SIMPLE_NAME=""
     local HOMEPAGE=""
     SIMPLE_NAME="${1}"
@@ -348,7 +348,7 @@ function os_homepages(){
         chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
         crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
         debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/";;
+        deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
         dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
         easyos)            HOMEPAGE="https://easyos.org/";;
@@ -411,7 +411,7 @@ function os_homepages(){
         ubuntu)            HOMEPAGE="https://ubuntu.com/";;
         ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
         ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/";;
+        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/index-en.html";;
         ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
         ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
         ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
@@ -3538,8 +3538,15 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 elif [ "${open_distro_homepage}" == 'on' ]; then
-    HOMEPAGE=$(os_homepages ${OS})
+    HOMEPAGE=$(os_homepage ${OS})
     open_url "${HOMEPAGE}" && exit 0
+elif [ "${show_distro_homepage}" == 'on' ]; then
+        HOMEPAGE=$(os_homepage ${OS})
+        echo "${HOMEPAGE}" && exit 0
+elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
+    RELEASE=$(releases_${OS})
+    VM_PATH="${OS}"
+    create_vm "$("get_${OS}")"
 else
     echo "ERROR! You must specify a release."
     case ${OS} in
@@ -3570,3 +3577,4 @@ else
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
+
