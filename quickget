@@ -405,11 +405,11 @@ function editions_android() {
 }
 
 function releases_antix() {
-	echo 21 22 23
+    echo 21 22 23
 }
 
 function editions_antix() {
-	echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+    echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
 }
 
 function releases_archlinux() {
@@ -612,7 +612,7 @@ function releases_kolibrios() {
 }
 
 function releases_linuxlite() {
-	echo 6.0 6.2 6.4 6.6
+    echo 6.0 6.2 6.4 6.6
 }
 
 function releases_linuxmint(){
@@ -771,11 +771,11 @@ function editions_solus() {
 }
 
 function releases_spiral() {
-	echo latest
+    echo latest
 }
 
 function editions_spiral() {
-	echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+    echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
 }
 
 function releases_tails() {
@@ -941,13 +941,13 @@ function web_get() {
         FILE="${URL##*/}"
     fi
 
-	# Test mode for ISO
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo "${URL}"
-	    exit 0
+    # Test mode for ISO
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo "${URL}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${URL}"
-	    exit 0
+        wget --spider "${URL}"
+        exit 0
     elif [ "${download_iso}" == 'on' ]; then
         DIR="$(pwd)"
     fi
@@ -976,13 +976,13 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
 
-	# Test mode for ISO
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo "${URL}"
-	    exit 0
+    # Test mode for ISO
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo "${URL}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${URL}"
-	    exit 0
+        wget --spider "${URL}"
+        exit 0
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
@@ -1987,13 +1987,13 @@ function get_solus() {
 }
 
 function get_spiral() {
-	local EDITION="${1:-}"
-	local HASH=""
-	local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
-	local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
 
-	HASH=$(wget -q -O- 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
-	echo "${URL}/${ISO}" "${HASH}"
+    HASH=$(wget -q -O- 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
+    echo "${URL}/${ISO}" "${HASH}"
 }
 
 function get_tails() {
