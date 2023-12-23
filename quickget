@@ -5,7 +5,7 @@ export LC_ALL=C
 #
 #    1. Update os_support() - add new OS, all lowercase
 #    2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
-#    3. Update os_homepages() - add a homepage for new OS
+#    3. Update os_homepage() - add a homepage for new OS
 #    4. Create a releases_newos() generator (required) outputs the current supported release versions
 #    5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
 #    6. Update make_vm_config() - add any *required* new OS tweaks
@@ -296,7 +296,7 @@ function os_support() {
     zorin
 }
 
-function os_homepages(){
+function os_homepage(){
     local SIMPLE_NAME=""
     local HOMEPAGE=""
     SIMPLE_NAME="${1}"
@@ -315,7 +315,7 @@ function os_homepages(){
         cachyos)           HOMEPAGE="https://cachyos.org/";;
         centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
         debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/";;
+        deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
         dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
         easyos)            HOMEPAGE="https://easyos.org/";;
@@ -368,7 +368,7 @@ function os_homepages(){
         ubuntu)            HOMEPAGE="https://ubuntu.com/";;
         ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
         ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/";;
+        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/index-en.html";;
         ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
         ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
         ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
@@ -2771,11 +2771,11 @@ else
     os_support
     echo "
 You can also use these arguments
---show-iso-url / -u <distro> <release> <edition> : Show ISO download URL
---test-iso-url / -t <distro> <release> <edition> : Test if ISO is available
---download-iso / -d <distro> <release> <edition> : Download ISO
---open-distro-homepage / -o <distro>             : Open distro homepage
---show-distro-homepage / -s <distro>             : Show distro homepage link"
+  --show-iso-url / -u <distro> <release> <edition> : Show ISO download URL
+  --test-iso-url / -t <distro> <release> <edition> : Test if ISO is available
+  --download-iso / -d <distro> <release> <edition> : Download ISO
+  --open-distro-homepage / -o <distro>             : Open distro homepage
+  --show-distro-homepage / -s <distro>             : Show distro homepage link"
     exit 1
 fi
 
@@ -2853,11 +2853,11 @@ if [ -n "${2}" ]; then
     fi
 else
     if [ "${open_distro_homepage}" == 'on' ]; then
-        HOMEPAGE=$(os_homepages ${OS})
+        HOMEPAGE=$(os_homepage ${OS})
         open_url "${HOMEPAGE}" && exit 0
     fi
     if [ "${show_distro_homepage}" == 'on' ]; then
-        HOMEPAGE=$(os_homepages ${OS})
+        HOMEPAGE=$(os_homepage ${OS})
         echo "${HOMEPAGE}" && exit 0
     fi
     echo "ERROR! You must specify a release."
@@ -2884,3 +2884,4 @@ else
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
+
