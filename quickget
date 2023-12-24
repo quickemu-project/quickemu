@@ -1916,7 +1916,7 @@ function get_reactos() {
     local URL=""
     local TMPURL=""
 
-    TMPURL=$(curl -Lfs "https://sourceforge.net/projects/reactos/files/latest/download"-w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    TMPURL=$(curl -Lfs "https://sourceforge.net/projects/reactos/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     URL=${TMPURL%\?*}
     echo "${URL} ${HASH}"
 }
