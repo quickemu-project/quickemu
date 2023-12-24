@@ -975,6 +975,11 @@ function web_get() {
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
+    elif command -v wget2 &>/dev/null; then
+        if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
+            echo "ERROR! Failed to download ${URL} with wget2. Try running 'quickget' again."
+            exit 1
+        fi
     elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
         echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
         exit 1
@@ -1282,8 +1287,8 @@ function get_archcraft() {
     local URL=""
     local TMPURL=""
 
-    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/archcraft/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-    URL=${TMPURL%\?*}
+    # Check where the URL redirects using curl. Output to a nonexistent directory so it's not possible to successfully download the image
+    URL=$(curl -Lfs "https://sourceforge.net/projects/archcraft/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     echo "${URL} ${HASH}"
 }
 
@@ -1993,8 +1998,7 @@ function get_reactos() {
     local URL=""
     local TMPURL=""
 
-    TMPURL=$(wget -q -S -O- --max-redirect=0 "https://sourceforge.net/projects/reactos/files/latest/download" 2>&1 | grep -i Location | cut -d' ' -f4)
-    URL=${TMPURL%\?*}
+    URL=$(curl -Lfs "https://sourceforge.net/projects/reactos/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     echo "${URL} ${HASH}"
 }
 
@@ -2263,8 +2267,7 @@ function get_zorin() {
     local ISO=""
     local URL=""
 
-    # Parse out the iso URL from the redirector
-    URL=$(wget -q -S -O- --max-redirect=0 "https://zrn.co/${RELEASE}${EDITION}" 2>&1 | grep Location | cut -d' ' -f4)
+    URL=$(curl -Lfs "https://zrn.co/${RELEASE}${EDITION}" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     echo "${URL} ${HASH}"
 }
 
