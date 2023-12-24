@@ -884,7 +884,7 @@ function releases_xerolinux() {
 }
 
 function releases_zorin() {
-    echo 16
+    echo 17 16
 }
 
 function editions_zorin() {
