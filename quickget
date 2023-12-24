@@ -3347,6 +3347,10 @@ function get_windows() {
         exit 0
     fi
 
+    if [ "${download_iso}" == 'on' ]; then
+        exit 0
+    fi
+
     echo "Downloading VirtIO drivers..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
 
