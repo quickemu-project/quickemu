@@ -1127,6 +1127,15 @@ function web_get() {
     else
         FILE="${URL##*/}"
     fi
+    
+    while (( "$#" )); do
+        if [[ $1 == --header ]]; then
+            HEADERS+=("$1" "$2")
+            shift 2
+        else
+            shift
+        fi
+    done
 
     while (( "$#" )); do
         if [[ $1 == --header ]]; then
