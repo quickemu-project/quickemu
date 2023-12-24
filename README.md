@@ -259,15 +259,16 @@ You can also use `quickget` with options to:
 ``` shell
     # show an OS ISO download URL for {os} {release} [edition] 
     quickget --show-iso-url fedora 38 Silverblue   
-    # test if and OS ISO is available for {os} {release} [edition]
+    # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
     quickget --open-distro-homepage  ubuntu-mate
+    # Only download image file into current directory, without creating VM
+    quickget --download-iso elementary 7.1
 ```
 
-The `--show-iso-url` and `--test-iso-url` options **do not** work for
-`Windows` (`quickget` will begin downloading the requested release and
-edition of windows)
+The `--show-iso-url`, `--test-iso-url`, and `--download-iso` options are fully
+functional for all operating systems, including Windows and macOS.
 
 ## Other Operating Systems
 
@@ -462,7 +463,7 @@ There are some considerations when running macOS via Quickemu.
     -   Big Sur
     -   Monterey
     -   Ventura
-    -   Sonoma (Not recommended)
+    -   Sonoma
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
