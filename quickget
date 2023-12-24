@@ -189,9 +189,7 @@ function list_csv() {
     SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-      if [ "${OS}" == "macos" ]; then
-        DOWNLOADER="macrecovery"
-      elif [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+      if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
       else
         DOWNLOADER="${DL}"
@@ -652,7 +650,7 @@ function editions_manjaro(){
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura
+    echo high-sierra mojave catalina big-sur monterey ventura sonoma
 }
 
 function releases_manjaro() {
@@ -940,6 +938,15 @@ function web_get() {
     else
         FILE="${URL##*/}"
     fi
+    
+    while (( "$#" )); do
+        if [[ $1 == --header ]]; then
+            HEADERS+=("$1" "$2")
+            shift 2
+        else
+            shift
+        fi
+    done
 
     # Test mode for ISO
     if [ "${show_iso_url}" == 'on' ]; then
@@ -957,14 +964,18 @@ function web_get() {
       exit 1
     fi
 
+    if [[ ${OS} != windows && ${OS} != macos ]]; then
+        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
+    fi
+    
     if command -v aria2c &>/dev/null; then
-        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
+        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}" "${HEADERS[@]}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
           echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
           exit 1
         fi
         echo #Necessary as aria2c in suppressed mode does not have new lines
-    elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}"; then
+    elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
         echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
         exit 1
     fi
@@ -995,6 +1006,7 @@ function zsync_get() {
           exit 1
         fi
 
+        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -1664,10 +1676,20 @@ function get_lmde() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function generate_id() {
+    local macRecoveryID=""
+    local TYPE="${1}"
+    local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
+    for ((i=0; i<$TYPE; i++)); do
+        macRecoveryID+="${valid_chars[$((RANDOM % 16))]}"
+    done
+    echo "${macRecoveryID}"
+}
+
 function get_macos() {
     local BOARD_ID=""
     local CWD=""
-    local MACRECOVERY=""
+    local CHUNKCHECK=""
     local MLB="00000000000000000"
     local OS_TYPE="default"
 
@@ -1704,43 +1726,74 @@ function get_macos() {
             BOARD_ID="Mac-E43C1C25D4880AD6";;
         ventura)        #13
             BOARD_ID="Mac-BE088AF8C5EB4FA2";;
+        sonoma)
+            BOARD_ID="Mac-53FDB3D8DB8CA971";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
     esac
 
-    # Use a bundled macrecovery if possible
     CWD="$(dirname "${0}")"
-    if [ -x "${CWD}/macrecovery" ]; then
-        MACRECOVERY="${CWD}/macrecovery"
-    elif [ -x /usr/bin/macrecovery ]; then
-        MACRECOVERY="/usr/bin/macrecovery"
+    if [ -x "${CWD}/chunkcheck" ]; then
+        CHUNKCHECK="${CWD}/chunkcheck"
+    elif [ -x /usr/bin/chunkcheck ]; then
+        CHUNKCHECK="/usr/bin/chunkcheck"
     else
-        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/macrecovery" "${HOME}/.quickemu"
-        MACRECOVERY="python3 ${HOME}/.quickemu/macrecovery"
+        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/chunkcheck" "${HOME}/.quickemu"
+        CHUNKCHECK="${HOME}/.quickemu/chunkcheck"
     fi
 
-    if [ -z "${MACRECOVERY}" ]; then
-        echo "ERROR! Can not find a usable macrecovery."
-        exit 1
+    if [ -z "${CHUNKCHECK}" ]; then
+        read -p "ERROR! Can not find chunkcheck. Will not be able to verify image. Proceed anyways?" skipVerification 
+        if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
+            exit 1
+        fi
+        echo 'Skipping verification' && skipVerification=true
     fi
 
-    # Get firmware
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
-    web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+    OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
+    OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
+    OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
+
+    local appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+    local info=$(curl -s -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
+    -d $'cid='$(generate_id 16)$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${OS_TYPE} \
+    http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+    local downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
+    local downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
+    local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
+    local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
+
+	if [ "${show_iso_url}" == 'on' ]; then
+	    echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+        wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
+        wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
+	    exit 0
+    fi
+
+    echo Downloading macOS firmware
+    web_get "${OpenCore_qcow2}" "${VM_PATH}"
+    web_get "${OVMF_CODE}" "${VM_PATH}"
     if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
+        web_get "${OVMF_VARS}" "${VM_PATH}"
     fi
 
     if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-        echo "Downloading ${RELEASE}..."
-        ${MACRECOVERY} \
-            --board-id "${BOARD_ID}" \
-            --mlb "${MLB}" \
-            --os-type "${OS_TYPE}" \
-            --basename RecoveryImage \
-            --outdir "${VM_PATH}" \
-            download
+        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+        web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+        curl --progress-bar "${chunkListLink}" -o "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+    fi
+
+    if [ skipVerification != true ]; then
+        if ! python3 "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+            echo Verification failed.
+            exit 1
+        fi
+        echo Verified macOS ${RELEASE} image using chunklist.
+    else
+        echo Skipping verification of image.
     fi
 
     if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
@@ -2643,6 +2696,10 @@ function download_windows() {
     fi
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+        if [ "${show_iso_url}" == 'on' ] || [ "${test_iso_url}" == 'on' ]; then
+            echo " - Failed to get URL: Microsoft blocked the automated download request based on your IP address."
+            exit 1
+        fi
         echo " - Microsoft blocked the automated download request based on your IP address."
         failed=1
     fi
@@ -2666,7 +2723,15 @@ function download_windows() {
         return 1
     fi
 
-    echo " - Got latest ISO download link (valid for 24 hours): $iso_download_link"
+    if [ "${show_iso_url}" == 'on' ]; then
+	    echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
+	    exit 0
+    elif [ "${test_iso_url}" == 'on' ]; then
+	    wget --spider "${iso_download_link}"
+	    exit 0
+    fi
+
+    echo Downloading Windows ${RELEASE} from "$iso_download_link"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
@@ -2674,7 +2739,6 @@ function download_windows() {
 }
 
 function get_windows() {
-    echo "Downloading Windows ${RELEASE}..."
     download_windows "${RELEASE}"
 
     echo "Downloading VirtIO drivers..."
