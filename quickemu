@@ -288,6 +288,13 @@ function vm_boot() {
         GUEST_CPU_CORES="${cpu_cores}"
     fi
 
+    if [ "${guest_os}" == "macos" ] && [ "${GUEST_CPU_CORES}" -gt 10 ] || [ "${GUEST_CPU_CORES}" -eq 6 ] || [ "${GUEST_CPU_CORES}" -eq 7 ]; then
+        # macOS guests cannot boot with most core counts not powers of 2. This will fix the issue by rounding the core count down to a power of 2. Uses wc and factor from coreutils.
+        factorCPUCores=$(factor "${GUEST_CPU_CORES}")
+        GUEST_CPU_CORES=$(( 2 ** $(echo "${factorCPUCores#*:}" | grep -o '[0-9]' | wc -l) ))
+    fi
+        
+
     # Account for Hyperthreading/SMT.
     if [ -e /sys/devices/system/cpu/smt/control ] && [ "${GUEST_CPU_CORES}" -ge 2 ]; then
         HOST_CPU_SMT=$(cat /sys/devices/system/cpu/smt/control)
@@ -520,7 +527,7 @@ function vm_boot() {
         # A CPU with SSE4.1 support is required for >= macOS Sierra
         # A CPU with AVX2 support is required for >= macOS Ventura
         case ${macos_release} in
-        ventura)
+        ventura|sonoma)
             if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
                 CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc,+avx2"
             else
@@ -557,7 +564,7 @@ function vm_boot() {
             NET_DEVICE="vmxnet3"
             USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
             ;;
-        big-sur|monterey|ventura)
+        big-sur|monterey|ventura|sonoma)
             BALLOON="-device virtio-balloon"
             MAC_DISK_DEV="virtio-blk-pci"
             NET_DEVICE="virtio-net"
