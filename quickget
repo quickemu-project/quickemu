@@ -1771,19 +1771,25 @@ function get_macos() {
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
 	    exit 0
-    fi
-
-    echo Downloading macOS firmware
-    web_get "${OpenCore_qcow2}" "${VM_PATH}"
-    web_get "${OVMF_CODE}" "${VM_PATH}"
-    if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-        web_get "${OVMF_VARS}" "${VM_PATH}"
-    fi
-
-    if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+    elif [ "${download_iso}" == 'on' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-        curl --progress-bar "${chunkListLink}" -o "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        VM_PATH="$(pwd)"
+
+    else
+        echo Downloading macOS firmware
+        web_get "${OpenCore_qcow2}" "${VM_PATH}"
+        web_get "${OVMF_CODE}" "${VM_PATH}"
+        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
+            web_get "${OVMF_VARS}" "${VM_PATH}"
+        fi
+
+        if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+            echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+            web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+            curl --progress-bar "${chunkListLink}" -o "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        fi
     fi
 
     if [ skipVerification != true ]; then
@@ -1801,6 +1807,7 @@ function get_macos() {
         qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
     fi
 
+    rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
     make_vm_config RecoveryImage.img
 }
 
@@ -2740,6 +2747,10 @@ function download_windows() {
 
 function get_windows() {
     download_windows "${RELEASE}"
+
+    if [ "${download_iso}" == 'on' ]; then
+        exit 0
+    fi
 
     echo "Downloading VirtIO drivers..."
     web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
