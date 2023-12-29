@@ -57,6 +57,14 @@ elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
     else
         set -- "$2"
     fi
+elif [ "${1}" == '--download-iso-to' ] || [ "${1}" == '-dt' ]; then
+    download_iso_to="on"
+    DOWNLOAD_PATH="${2}"
+    if [ -n "$5" ]; then
+        set -- "$3" "$4" "$5"
+    elif [ -n "$4" ]; then
+        set -- "$3" "$4"
+    fi
 fi
 
 function pretty_name() {
@@ -1092,6 +1100,8 @@ function check_hash() {
     local hash_algo=""
     if [ "${download_iso}" == "on" ]; then
         iso="${1}"
+    elif [ "${download_iso_to}" == "on" ]; then
+        iso="${DOWNLOAD_PATH}/${1}"
     else
         iso="${VM_PATH}/${1}"
     fi
@@ -1155,7 +1165,10 @@ function web_get() {
         exit 0
     elif [ "${download_iso}" == 'on' ]; then
         DIR="$(pwd)"
+    elif [ "${download_iso_to}" == 'on' ]; then
+        DIR="${DOWNLOAD_PATH}"
     fi
+
 
     if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
       echo "ERROR! Unable to create directory ${DIR}"
@@ -1239,7 +1252,10 @@ function make_vm_config() {
 
     if [ "${download_iso}" == "on" ]; then
         exit 0
+    elif [ "${download_iso_to}" == "on" ]; then
+        exit 0
     fi
+
 
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
@@ -2153,7 +2169,11 @@ function get_macos() {
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
-
+    elif [ "${download_iso_to}" == 'on' ]; then
+        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+        web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+        curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        VM_PATH="${DOWNLOAD_PATH}"
     else
         echo "Downloading macOS firmware"
         web_get "${OpenCore_qcow2}" "${VM_PATH}"
@@ -3344,6 +3364,8 @@ function get_windows() {
     fi
 
     if [ "${download_iso}" == 'on' ]; then
+        exit 0
+    elif [ "${download_iso_to}" == 'on' ]; then
         exit 0
     fi
 
