@@ -116,6 +116,7 @@ function pretty_name() {
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
+    slint)              PRETTY_NAME="Slint";;
     slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
     sparkylinux)        PRETTY_NAME="SparkyLinux";;
     tinycore)           PRETTY_NAME="Tiny Core Linux";;
@@ -291,6 +292,7 @@ function os_support() {
     siduction \
     slackware \
     slax \
+    slint \
     slitaz \
     solus \
     sparkylinux \
@@ -387,6 +389,7 @@ function os_homepage(){
         siduction)         HOMEPAGE="https://siduction.org/";;
         slackware)         HOMEPAGE="http://www.slackware.com/";;
         slax)              HOMEPAGE="https://www.slax.org/";;
+        slint)             HOMEPAGE="https://slint.fr/";;
         slitaz)            HOMEPAGE="https://www.slitaz.org/";;
         solus)             HOMEPAGE="https://getsol.us/";;
         sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
@@ -867,6 +870,10 @@ function editions_slax() {
     echo debian slackware
 }
 
+function releases_slint() {
+    echo 14.2.1 15.0
+}
+
 function releases_slitaz() {
     echo preferred core core64 loram core-5in1 preinit
 }
@@ -1278,6 +1285,9 @@ EOF
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
             echo "disk_size=\"2G\"" >> "${CONF_FILE}"
             echo "ram=\"128M\"" >> "${CONF_FILE}"
+            ;;
+          slint)
+            echo "disk_size=\"50G\"" >> "${CONF_FILE}"
             ;;
           slitaz)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -2292,6 +2302,7 @@ function get_slax() {
     local ISO=""
     local URL=""
 
+
     case ${EDITION} in
       debian) URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
           ISO=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
@@ -2303,6 +2314,16 @@ function get_slax() {
       ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_slint() {
+    case ${RELEASE} in
+        14.2.1) ISO="slint64-14.2.1.4.iso";;
+        15.0) ISO="slint64-15.0-5.iso";;
+    esac
+    URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
+    HASH=$(wget -q -O- ${URL}/${ISO}.sha256 | cut -d' ' -f4)
+    echo "${URL}/${ISO}" "${HASH}"
 }
 
 function get_slitaz() {
