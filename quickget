@@ -372,6 +372,95 @@ function os_homepages(){
     echo "${HOMEPAGE}"
 }
 
+function os_about(){
+    local SIMPLE_NAME=""
+    local ABOUT=""
+    SIMPLE_NAME="${1}"
+    case ${SIMPLE_NAME} in
+        alma)              ABOUT="Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
+        alpine)            ABOUT="Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
+        android)           ABOUT="Port Android Open Source Project to x86 platform";;
+        antix)             ABOUT="Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
+        archlinux)         ABOUT="Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
+        archcraft)         ABOUT="Yet another minimal Linux distribution, based on Arch Linux.";;
+        arcolinux)         ABOUT="Is all about becoming an expert in linux.";;
+        batocera)          ABOUT="Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
+        blendos)           ABOUT="Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
+        bodhi)             ABOUT="Lightweight distribution featuring the fast & fully customizable Moksha Desktop.";;
+        bunsenlabs)        ABOUT="Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.";;
+        cachyos)           ABOUT="Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
+        centos-stream)     ABOUT="Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
+        debian)            ABOUT="Complete Free Operating System with perfect level of ease of use and stability.";;
+        deepin)            ABOUT="Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
+        devuan)            ABOUT="Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.";;
+        dragonflybsd)      ABOUT="Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series.";;
+        easyos)            ABOUT="Experimental distribution designed from scratch to support containers.";;
+        edubuntu)          ABOUT="Stable, secure and privacy concious option for schools.";;
+        elementary)        ABOUT="Thoughtful, capable, and ethical replacement for Windows and macOS.";;
+        endeavouros)       ABOUT="Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems.";;
+        endless)           ABOUT="Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More.";;
+        fedora)            ABOUT="Innovative platform for hardware, clouds, and containers, built with love by you.";;
+        freebsd)           ABOUT="Operating system used to power modern servers, desktops, and embedded platforms.";;
+        freedos)           ABOUT="DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems.";;
+        garuda)            ABOUT="Feature rich and easy to use Linux distribution.";;
+        gentoo)            ABOUT="Highly flexible, source-based Linux distribution.";;
+        ghostbsd)          ABOUT="Simple, elegant desktop BSD Operating System";;
+        haiku)             ABOUT="Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
+        holoiso)           ABOUT="Bring the Steam Deck's SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
+        kali)              ABOUT="The most advanced Penetration Testing Distribution";;
+        kdeneon)           ABOUT="Latest and greatest of KDE community software packaged on a rock-solid base.";;
+        kolibrios)         ABOUT="Tiny yet incredibly powerful and fast operating system.";;
+        kubuntu)           ABOUT="Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
+        linuxlite)         ABOUT="Your first simple, fast and free stop in the world of Linux.";;
+        linuxmint)         ABOUT="Designed to work 'out of the box' and comes fully equipped with the apps most people need.";;
+        lmde)              ABOUT="Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
+        mageia)            ABOUT="Stable, secure operating system for desktop & server";;
+        manjaro)           ABOUT="Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
+        mxlinux)           ABOUT="Designed to combine elegant and efficient desktops with high stability and solid performance.";;
+        netboot)           ABOUT="Your favorite operating systems in one place";;
+        netbsd)            ABOUT="Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
+        nixos)             ABOUT="Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
+        lubuntu)           ABOUT="Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc.";;
+        macos)             ABOUT="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
+        openbsd)           ABOUT="FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
+        openindiana)       ABOUT="Community supported illumos-based operating system.";;
+        opensuse)          ABOUT="The makers' choice for sysadmins, developers and desktop users.";;
+        oraclelinux)       ABOUT="Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
+        peppermint)        ABOUT="Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
+        popos)             ABOUT="Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
+        porteus)           ABOUT="Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
+        reactos)           ABOUT="Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
+        rebornos)          ABOUT="Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal";;
+        rockylinux)        ABOUT="Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
+        siduction)         ABOUT="Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.";;
+        slackware)         ABOUT="Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.";;
+        slint)             ABOUT="Slint is an easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.";;
+        solus)             ABOUT="Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
+        spiral)            ABOUT="Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
+        tails)             ABOUT="Portable operating system that protects against surveillance and censorship.";;
+        tinycore)          ABOUT="Highly modular based system with community build extensions.";;
+        trisquel)          ABOUT="Fully free operating system for home users, small enterprises and educational centers.";;
+        truenas-core)      ABOUT="World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
+        truenas-scale)     ABOUT="Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
+        ubuntu)            ABOUT="Complete desktop Linux operating system, freely available with both community and professional support.";;
+        ubuntu-budgie)     ABOUT="Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
+        ubuntucinnamon)    ABOUT="Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
+        ubuntukylin)       ABOUT="univerzální desktopový operační systém pro osobní počítače, notebooky a vestavěná zařízení. Jeho cílem je přinést uživatelům inteligentnější uživatelské prostředí.";;
+        ubuntu-mate)       ABOUT="stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor.";;
+        ubuntu-server)     ABOUT="Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
+        ubuntustudio)      ABOUT="Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
+        ubuntu-unity)      ABOUT="Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
+        vanillaos)         ABOUT="Designed to be a reliable and productive operating system for your daily work.";;
+        void)              ABOUT="general purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
+        vxlinux)           ABOUT="Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
+        windows)           ABOUT="Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
+        xerolinux)         ABOUT="Arch-Based Distro, that provides you with an easy way to install Arch and a well optimized, beautifully Customized Plasma Desktop, that you can later shape to suite your needs!";;
+        xubuntu)           ABOUT="Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
+        zorin)             ABOUT="Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
+    esac
+    echo "${ABOUT}"
+}
+
 function releases_alma() {
     echo 8 9
 }
