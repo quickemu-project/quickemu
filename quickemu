@@ -972,9 +972,12 @@ function vm_boot() {
         -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
         -device pci-ohci,id=smartpass
         -device usb-ccid
-        -chardev spicevmc,id=ccid,name=smartcard
-        -device ccid-card-passthru,chardev=ccid
     )
+
+    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then
+        args+=(-chardev spicevmc,id=ccid,name=smartcard
+               -device ccid-card-passthru,chardev=ccid)
+    fi
 
     # setup usb-controller
     [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
