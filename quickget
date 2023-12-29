@@ -107,6 +107,7 @@ function pretty_name() {
     vanillaos)          PRETTY_NAME="Vanilla OS";;
     void)               PRETTY_NAME="Void Linux";;
     vxlinux)            PRETTY_NAME="VX Linux";;
+    windows-server)     PRETTY_NAME="Windows Server";;
     xerolinux)          PRETTY_NAME="XeroLinux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
@@ -127,7 +128,7 @@ function validate_release() {
   esac
 
   RELEASES=$(${RELEASE_GENERATOR})
-  if [[ "${RELEASES}" != *"${RELEASE}"* ]]; then
+  if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
       echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
       echo -n "${RELEASES}"
       exit 1
@@ -188,7 +189,8 @@ function list_csv() {
         for OPTION in $(editions_"${OS}"); do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
-      elif [ "${OS}" == "windows" ]; then
+      elif [[ "${OS}" == "windows"* ]]; then
+        "languages_${OS}"
         for OPTION in "${LANGS[@]}"; do
           echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
         done
@@ -277,6 +279,7 @@ function os_support() {
     void \
     vxlinux \
     windows \
+    windows-server \
     xerolinux \
     xubuntu \
     zorin
@@ -363,6 +366,7 @@ function os_homepages(){
         void)              HOMEPAGE="https://voidlinux.org/";;
         vxlinux)           HOMEPAGE="https://vxlinux.org/";;
         windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
+        windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
         xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
         xubuntu)           HOMEPAGE="https://xubuntu.org/";;
         zorin)             HOMEPAGE="https://zorin.com/os/";;
@@ -870,7 +874,32 @@ function releases_vxlinux() {
 }
 
 function releases_windows() {
-    echo 8 10 11
+    echo 8 10 10-ltsc 11
+}
+
+function languages_windows() {
+    if [ "${RELEASE}" == 8 ]; then
+            LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
+            "Croatian" "Czech" "Danish" "Dutch" "English (United States)" "English International" "Estonian" "Finnish" "French" "German" "Greek" \
+            "Hebrew" "Hungarian" "Italian" "Japanese" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" \
+            "Slovak" "Slovenian" "Spanish" "Swedish" "Thai" "Turkish" "Ukrainian")
+        elif [ "${RELEASE}" == "10-ltsc" ]; then
+            LANGS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
+            "French" "German" "Italian" "Japanese" "Korean" "Portuguese (Brazil)" "Spanish")
+        else
+            LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+            "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
+            "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
+            "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
+    fi
+}
+
+function releases_windows-server() {
+    echo 2012-r2 2016 2019 2022
+}
+
+function languages_windows-server() {
+    LANGS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
 }
 
 function releases_xerolinux() {
@@ -946,7 +975,7 @@ function web_get() {
       exit 1
     fi
 
-    if [[ ${OS} != windows && ${OS} != macos ]]; then
+    if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
     fi
     
@@ -1063,16 +1092,15 @@ function make_vm_config() {
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;
+        windows-server)
+            GUEST="windows-server"
+            IMAGE_TYPE="iso";;
         *)
             GUEST="linux"
             IMAGE_TYPE="iso";;
     esac
 
-    if [ -n "${EDITION}" ]; then
-        CONF_FILE="${OS}-${RELEASE}-${EDITION}.conf"
-    else
-        CONF_FILE="${OS}-${RELEASE}.conf"
-    fi
+    CONF_FILE="${VM_PATH}.conf"
 
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
@@ -1158,7 +1186,7 @@ EOF
           echo "disk_size=\"32G\"" >> "${CONF_FILE}"
         fi
         # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ "${RELEASE}" -ge 11 ]; then
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == 11 ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
@@ -2594,6 +2622,89 @@ handle_curl_error() {
     return 1
 }
 
+function download_windows-server() {
+    # Download enterprise evaluation windows versions
+    local windows_version="$1"
+    local enterprise_type="$2"
+
+    local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
+
+    local iso_download_page_html="$(curl --silent --location --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    local CULTURE=""
+    local COUNTRY=""
+    local PRETTY_RELEASE=""
+    
+    case "$RELEASE" in
+        "10-ltsc")      PRETTY_RELEASE="10 LTSC";;
+        "2012-r2")      PRETTY_RELEASE="2012 R2";;
+        *)              PRETTY_RELEASE="$RELEASE";;
+    esac
+
+
+    case "$LANG" in
+        "English (Great Britain)")
+            CULTURE="en-gb"
+            COUNTRY="GB";;
+        "Chinese (Simplified)")
+            CULTURE="zh-cn"
+            COUNTRY="CN";;
+        "Chinese (Traditional)")
+            CULTURE="zh-tw"
+            COUNTRY="TW";;
+        "French")
+            CULTURE="fr-fr"
+            COUNTRY="FR";;
+        "German")
+            CULTURE="de-de"
+            COUNTRY="DE";;
+        "Italian")
+            CULTURE="it-it"
+            COUNTRY="IT";;
+        "Japanese")
+            CULTURE="ja-jp"
+            COUNTRY="JP";;
+        "Korean")
+            CULTURE="ko-kr"
+            COUNTRY="KR";;
+        "Portuguese (Brazil)")
+            CULTURE="pt-br"
+            COUNTRY="BR";;
+        "Spanish")
+            CULTURE="es-es"
+            COUNTRY="ES";;
+        "Russian")
+            CULTURE="ru-ru"
+            COUNTRY="RU";;
+        *)
+            CULTURE="en-us"
+            COUNTRY="US";;
+    esac
+
+    iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=$CULTURE&country=$COUNTRY" | head -c 1024)"
+
+    case "$enterprise_type" in
+        # Select x64 LTSC download link
+        "ltsc") iso_download_link=$(echo "$iso_download_links" | head -n 4 | tail -n 1) ;;
+        *) iso_download_link="$iso_download_links" ;;
+    esac
+
+    iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")"
+
+    if [ "${COUNTRY}" != "US" ]; then
+        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} in "${LANG}" from "$iso_download_link"
+    else
+        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} from "$iso_download_link"
+    fi
+
+    FILE_NAME="${iso_download_link##*/}"
+    web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
+    OS="windows-server"
+}
+
 function download_windows() {
     # Download newer consumer Windows versions from behind gated Microsoft API
     # This function aims to precisely emulate what Fido does down to the URL requests and HTTP headers (exceptions: updated user agent and referer adapts to Windows version instead of always being "windows11") but written in POSIX sh (with coreutils) and curl instead of PowerShell (also simplified to greatly reduce attack surface)
@@ -2607,7 +2718,7 @@ function download_windows() {
     #
     # If this function in Mido fails to work for you then please test with the Fido script before creating an issue because we basically just copy what Fido does exactly:
     # https://github.com/pbatard/Fido
-
+    
     # Either 8, 10, or 11
     local windows_version="$1"
 
@@ -2635,7 +2746,7 @@ function download_windows() {
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
     local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
-    echo " - Product edition ID: $product_edition_id"
+    # echo " - Product edition ID: $product_edition_id"
 
     # Permit Session ID
     # "org_id" is always the same value
@@ -2659,9 +2770,10 @@ function download_windows() {
 
     # Limit untrusted size for input validation
     language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
+
     # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
-    local sku_id="$(echo "$language_skuid_table_html" | grep "English (United States)" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
-    echo " - SKU ID: $sku_id"
+    local sku_id="$(echo "$language_skuid_table_html" | grep "${LANG}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    # echo " - SKU ID: $sku_id"
 
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
@@ -2673,6 +2785,12 @@ function download_windows() {
     }
 
     local failed=0
+
+    if [ "${LANG}" == "English (United States)" ]; then
+        LANG="English"
+    fi
+
+    local HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
 
     # Limit untrusted size for input validation
     iso_download_link_html="$(echo "$iso_download_link_html" | head -c 4096)"
@@ -2694,7 +2812,7 @@ function download_windows() {
 
     if [ ${failed} -eq 1 ]; then
         echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
-        echo " - Save the downloaded ISO to: $(realpath ${VM_PATH})"
+        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
         echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
         echo " - Continuing with the VM creation process..."
         return 1
@@ -2719,15 +2837,29 @@ function download_windows() {
 	    exit 0
     fi
 
-    echo Downloading Windows ${RELEASE} from "$iso_download_link"
+    if [ "${LANG}" != "English International" ]; then
+        echo Downloading Windows ${RELEASE} in "${LANG}" from "$iso_download_link"
+    else
+        echo Downloading Windows ${RELEASE} from "$iso_download_link"
+    fi
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
     web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
+    # Only Windows 11 hashes can be found directly from Microsoft's page.
+    if [ "${windows_version}" == 11 ]; then
+        check_hash "${FILE_NAME}" "${HASH}"
+    fi
 }
 
 function get_windows() {
-    download_windows "${RELEASE}"
+    if [ "${RELEASE}" == "10-ltsc" ]; then
+        download_windows-server windows-10-enterprise ltsc
+    elif [ "${OS}" == "windows-server" ]; then
+        download_windows-server windows-server-${RELEASE}
+    else
+        download_windows "${RELEASE}"
+    fi
 
     if [ "${download_iso}" == 'on' ]; then
         exit 0
@@ -2836,7 +2968,7 @@ else
     exit 1
 fi
 
-if [[ ! $(os_support) =~ ${OS} ]]; then
+if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support
     exit 1
@@ -2848,17 +2980,22 @@ if [ -n "${2}" ]; then
 
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
+        validate_release "releases_${OS}"
         EDITIONS=($(editions_${OS}))
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            if [[ ! ${EDITIONS[*]} =~ ${EDITION} ]]; then
+            if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
                 for EDITION in "${EDITIONS[@]}"; do
                   echo -n "${EDITION} "
                 done
                 exit 1
             fi
+        else
+            echo -en "ERROR! You must specify an edition.\n - Editions: "
+            editions_"${OS}"
+            exit 1
         fi
 
         # Handle odd missing fedora cominations
@@ -2881,7 +3018,6 @@ if [ -n "${2}" ]; then
 
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
-        validate_release "releases_${OS}"
         create_vm "$("get_${OS}" "${EDITION}")"
     elif [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
@@ -2900,19 +3036,30 @@ if [ -n "${2}" ]; then
         # deepin doesn't use create_vm()
         validate_release releases_deepin
         get_deepin
-    elif [ "${OS}" == "windows" ]; then
-        # Windows doesn't use create_vm()
-        validate_release releases_windows
+    elif [[ "${OS}" == "windows"* ]]; then
+        LANG="English International"
+        "languages_${OS}"
+        if [ -n "${3}" ]; then
+            LANG="${3}"
+            if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
+                echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
+                for LANG in "${LANGS[@]}"; do
+                  echo -n "${LANG} "
+                done
+                exit 1
+            fi
+            VM_PATH="$(echo "${OS}-${RELEASE}-${LANG// /-}" | tr -d '()')"
+        fi
+        validate_release "releases_${OS}"
         get_windows
     else
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
     fi
+elif [ "${open_distro_homepage}" == 'on' ]; then
+    HOMEPAGE=$(os_homepages ${OS})
+    open_url "${HOMEPAGE}" && exit 0
 else
-    if [ "${open_distro_homepage}" == 'on' ]; then
-        HOMEPAGE=$(os_homepages ${OS})
-        open_url "${HOMEPAGE}" && exit 0
-    fi
     echo "ERROR! You must specify a release."
     case ${OS} in
       *ubuntu-server*)
@@ -2923,7 +3070,12 @@ else
         echo -n " - Releases: "
         releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
-
+      *windows*)
+        echo -n " - Releases: "
+        "releases_${OS}"
+        echo -n " - Languages: "
+        "languages_${OS}" && echo "${LANGS[@]}"
+        ;;
       *)
         echo -n " - Releases: "
         releases_"${OS}"
