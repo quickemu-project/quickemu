@@ -27,8 +27,7 @@ function cleanup() {
   fi
 }
 
-if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
-    test_iso_url="on"
+pass_arguments() {
     if [ -n "$4" ]; then
         set -- "$2" "$3" "$4"
     elif [ -n "$3" ]; then
@@ -36,39 +35,39 @@ if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
     else
         set -- "$2"
     fi
-elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-u' ]; then
-    show_iso_url="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
+}
+
+case "$1" in
+    -t|--test-iso-url)
+        test_iso_url="on"
+        pass_arguments
+        ;;
+    -u|--show-iso-url)
+        show_iso_url="on"
+        pass_arguments
+            ;;
+        -o|--open-distro-homepage)
+        open_distro_homepage="on"
         set -- "$2"
-    fi
-elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
-    open_distro_homepage="on"
-    set -- "$2"
-elif [ "${1}" == '--show-distro-homepage' ] || [ "${1}" == '-s' ]; then
-    show_distro_homepage="on"
-    set -- "$2"
-elif [ "${1}" == '--download-iso' ] || [ "${1}" == '-d' ]; then
-    download_iso="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
+            ;;
+        -s|--show-distro-homepage)
+        show_distro_homepage="on"
         set -- "$2"
-    fi
-elif [ "${1}" == '--download-iso-to' ] || [ "${1}" == '-dt' ]; then
-    download_iso_to="on"
-    DOWNLOAD_PATH="${2}"
-    if [ -n "$5" ]; then
-        set -- "$3" "$4" "$5"
-    elif [ -n "$4" ]; then
-        set -- "$3" "$4"
-    fi
-fi
+        ;;
+    -d|--download-iso)
+        download_iso="on"
+        pass_arguments
+        ;;
+    -dt|--download-iso-to)
+        download_iso_to="on"
+        DOWNLOAD_PATH="${2}"
+        if [ -n "$5" ]; then
+            set -- "$3" "$4" "$5"
+        elif [ -n "$4" ]; then
+            set -- "$3" "$4"
+        fi
+        ;;
+esac
 
 function pretty_name() {
   local SIMPLE_NAME=""
@@ -3000,11 +2999,12 @@ else
     os_support
     echo "
 You can also use these arguments
-  --show-iso-url / -u <distro> <release> [edition] : Show ISO download URL
-  --test-iso-url / -t <distro> <release> [edition] : Test if ISO is available
-  --download-iso / -d <distro> <release> [edition] : Download ISO
-  --open-distro-homepage / -o <distro>             : Open distro homepage
-  --show-distro-homepage / -s <distro>             : Show distro homepage link"
+  -u  / --show-iso-url           <os> <release> [edition] : Show ISO download URL
+  -t  / --test-iso-url           <os> <release> [edition] : Test if ISO is available
+  -d  / --download-iso           <os> <release> [edition] : Download ISO to current dir
+  -dt / --download-iso-to <path> <os> <release> [edition] : Download ISO to specified dir
+  -o  / --open-distro-homepage   <os>                     : Open distro homepage
+  -s  / --show-distro-homepage   <os>                     : Show distro homepage link"
     exit 1
 fi
 
