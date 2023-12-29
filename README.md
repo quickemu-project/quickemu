@@ -511,7 +511,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8, 10 & 11 Guests
+## Windows Guests
 
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
@@ -522,6 +522,9 @@ Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
 Windows 8.1 is also supported but doesn't feature any automated
 installation or driver optimisation.
+
+`quickget` can also download [Windows 10 LTSC](https://www.microsoft.com/en-us/evalcenter/download-windows-10-enterprise) and Windows Server [2012-r2](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2012-r2), [2016](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2016), [2019](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2019), and [2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022). No automated installation is supported for these releases.
+
 
 ``` bash
 quickget windows 11
@@ -534,6 +537,15 @@ quickemu --vm windows-11.conf
     these credentials:
     -   Username: `Quickemu`
     -   Password: `quickemu`
+
+### Regional versions
+
+By default `quickget` will download the *"English International"* release (*"English (United States)"* for server releases),
+but you can optionally specify one of the supported languages: For example:
+
+``` bash
+quickget windows 11 "Chinese (Traditional)"
+```
 
 The default Windows 11 configuration looks like this:
 
