@@ -837,7 +837,7 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-    echo 6.0 5.0 4.11.3
+    echo 6.0 5.3 4.11.3
 }
 
 function editions_parrotsec() {
