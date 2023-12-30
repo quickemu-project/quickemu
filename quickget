@@ -420,7 +420,7 @@ function os_about(){
         netboot)           ABOUT="Your favorite operating systems in one place";;
         netbsd)            ABOUT="Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
         nixos)             ABOUT="Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
-        lubuntu)           ABOUT="Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc.";;
+        lubuntu)           ABOUT="Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
         macos)             ABOUT="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
         openbsd)           ABOUT="FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
         openindiana)       ABOUT="Community supported illumos-based operating system.";;
@@ -445,13 +445,13 @@ function os_about(){
         ubuntu)            ABOUT="Complete desktop Linux operating system, freely available with both community and professional support.";;
         ubuntu-budgie)     ABOUT="Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
         ubuntucinnamon)    ABOUT="Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
-        ubuntukylin)       ABOUT="univerzální desktopový operační systém pro osobní počítače, notebooky a vestavěná zařízení. Jeho cílem je přinést uživatelům inteligentnější uživatelské prostředí.";;
-        ubuntu-mate)       ABOUT="stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor.";;
+        ubuntukylin)       ABOUT="Univerzální desktopový operační systém pro osobní počítače, notebooky a vestavěná zařízení. Jeho cílem je přinést uživatelům inteligentnější uživatelské prostředí.";;
+        ubuntu-mate)       ABOUT="Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.";;
         ubuntu-server)     ABOUT="Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
         ubuntustudio)      ABOUT="Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
         ubuntu-unity)      ABOUT="Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
         vanillaos)         ABOUT="Designed to be a reliable and productive operating system for your daily work.";;
-        void)              ABOUT="general purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
+        void)              ABOUT="General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
         vxlinux)           ABOUT="Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
         windows)           ABOUT="Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
         xerolinux)         ABOUT="Arch-Based Distro, that provides you with an easy way to install Arch and a well optimized, beautifully Customized Plasma Desktop, that you can later shape to suite your needs!";;
