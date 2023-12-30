@@ -110,6 +110,7 @@ function pretty_name() {
     openindiana)        PRETTY_NAME="OpenIndiana";;
     opensuse)           PRETTY_NAME="openSUSE";;
     oraclelinux)        PRETTY_NAME="Oracle Linux";;
+    parrotsec)          PRETTY_NAME="Parrot Security";;
     peppermint)         PRETTY_NAME="PeppermintOS";;
     popos)              PRETTY_NAME="Pop!_OS";;
     primtux)            PRETTY_NAME="Primtux";;
@@ -283,6 +284,7 @@ function os_support() {
     opensuse \
     oraclelinux \
     peppermint \
+    parrotsec \
     popos \
     porteus \
     primtux \
@@ -379,6 +381,7 @@ function os_homepage(){
         openindiana)       HOMEPAGE="https://www.openindiana.org/";;
         opensuse)          HOMEPAGE="https://www.opensuse.org/";;
         oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
+        parrotsec)         HOMEPAGE="https://www.parrotsec.org/";;
         peppermint)        HOMEPAGE="https://peppermintos.com/";;
         popos)             HOMEPAGE="https://pop.system76.com/";;
         porteus)           HOMEPAGE="http://www.porteus.org/";;
@@ -794,6 +797,14 @@ function releases_opensuse(){
 
 function releases_oraclelinux() {
     echo 7.7 7.8 7.9 8.4 8.5 8.6 9.0
+}
+
+function releases_parrotsec() {
+    echo 4.11.3 5.3 6.0
+}
+
+function editions_parrotsec() {
+    echo architect home htb security
 }
 
 function releases_peppermint() {
@@ -2189,6 +2200,18 @@ function get_oraclelinux() {
     esac
     HASH=$(wget -q -O- "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_parrotsec() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
+    URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
+    HASH="$(wget -q -O- ${URL}/signed-hashes.txt | grep ${ISO} | cut -d' ' -f1)"
+    echo "${URL}/${ISO}" "${HASH}"
 }
 
 function get_peppermint() {
