@@ -1117,7 +1117,6 @@ function web_get() {
         DIR="${DOWNLOAD_PATH}"
     fi
 
-
     if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
       echo "ERROR! Unable to create directory ${DIR}"
       exit 1
