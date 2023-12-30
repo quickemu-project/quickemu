@@ -1797,13 +1797,13 @@ function get_macos() {
     local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
-	    exit 0
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
-	    exit 0
+        exit 0
     elif [ "${download_iso}" == 'on' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
@@ -2740,7 +2740,7 @@ function download_windows() {
     #
     # If this function in Mido fails to work for you then please test with the Fido script before creating an issue because we basically just copy what Fido does exactly:
     # https://github.com/pbatard/Fido
-    
+
     # Either 8, 10, or 11
     local windows_version="$1"
 
@@ -2852,11 +2852,11 @@ function download_windows() {
     fi
 
     if [ "${show_iso_url}" == 'on' ]; then
-	    echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
-	    exit 0
+        echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${iso_download_link}"
-	    exit 0
+        wget --spider "${iso_download_link}"
+        exit 0
     fi
 
     if [ "${LANG}" != "English International" ]; then
@@ -3114,4 +3114,3 @@ else
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
-
