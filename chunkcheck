@@ -1,0 +1,64 @@
+from pathlib import Path
+import struct
+import hashlib
+import argparse
+v1_prod_pubkey = 0xC3E748CAD9CD384329E10E25A91E43E1A762FF529ADE578C935BDDF9B13F2179D4855E6FC89E9E29CA12517D17DFA1EDCE0BEBF0EA7B461FFE61D94E2BDF72C196F89ACD3536B644064014DAE25A15DB6BB0852ECBD120916318D1CCDEA3C84C92ED743FC176D0BACA920D3FCF3158AFF731F88CE0623182A8ED67E650515F75745909F07D415F55FC15A35654D118C55A462D37A3ACDA08612F3F3F6571761EFCCBCC299AEE99B3A4FD6212CCFFF5EF37A2C334E871191F7E1C31960E010A54E86FA3F62E6D6905E1CD57732410A3EB0C6B4DEFDABE9F59BF1618758C751CD56CEF851D1C0EAA1C558E37AC108DA9089863D20E2E7E4BF475EC66FE6B3EFDCF
+# v2_prod_pubkey = 0xCB45C5E53217D4499FB80B2D96AA4F964EB551F1DA4EBFA4F5E23F87BFE82FC113590E536757F329D6EAD1F267771EE342F5A5E61514DD3D3383187E663929D577D94648F262EBA1157E152DB5273D10AE3A6A058CB9CD64D01267DAC82ED3B7BC1631D078C911414129CDAAA0FFB0A8E2A7ADD6F32FB09A7E98D259BFF6ED10808D1BDA58CAF7355DFF1A085A18B11657D2617447BF657140D599364E5AC8E626276AC03BC2417831D9E61B25154AFE9F2D8271E9CE22D2783803083A5A7A575774688721097DC5E4B32D118CF6317A7083BA15BA608430A8C8C6B7DA2D932D81F571603A9363AC0197AB670242D9C9180D97A10900F11FE3D9246CF14F0883
+# v2_dev_pubkey  = 0xB372CEC9E05E71FB3FAA08C34E3256FB312EA821638A243EF8A5DEA46FCDA33F00F88FC2933FB276D37B914F89BAD5B5D75771E342265B771995AE8F43B4DFF3F21A877FE777A8B419587C8718D36204FA1922A575AD5207D5D6B8C10F84DDCA661B731E7E7601D64D4A894F487FE1AA1DDC2A1697A3553B1DD85D5750DF2AA9D988E83C4C70BBBE4747219F9B92B199FECB16091896EBB441606DEC20F446249D5568BB51FC87BA7F85E6295FBE811B0A314408CD31921C360608A0FF7F87BD733560FE1C96E472834CAB6BE016C35727754273125089BE043FD3B26F0B2DE141E05990CE922F1702DA0A2F4E9F8760D0FA712DDB9928E0CDAC14501ED5E2C3
+
+ChunkListHeader = struct.Struct('<4sIBBBxQQQ')
+assert ChunkListHeader.size == 0x24
+
+Chunk = struct.Struct('<I32s')
+assert Chunk.size == 0x24
+
+def parse_chunklist(path):
+    with open(path, 'rb') as f:
+        hash_ctx = hashlib.sha256()
+        data = f.read(ChunkListHeader.size)
+        hash_ctx.update(data)
+        magic, header_size, file_version, chunk_method, signature_method, chunk_count, chunk_offset, signature_offset = ChunkListHeader.unpack(data)
+        assert magic == b'CNKL'
+        assert header_size == ChunkListHeader.size
+        assert file_version == 1
+        assert chunk_method == 1
+        assert signature_method in [1, 2]
+        assert chunk_count > 0
+        assert chunk_offset == 0x24
+        assert signature_offset == chunk_offset + Chunk.size * chunk_count
+        for i in range(chunk_count):
+            data = f.read(Chunk.size)
+            hash_ctx.update(data)
+            chunk_size, chunk_sha256 = Chunk.unpack(data)
+            yield chunk_size, chunk_sha256
+        digest = hash_ctx.digest()
+        if signature_method == 1:
+            data = f.read(256)
+            assert len(data) == 256
+            signature = int.from_bytes(data, 'little')
+            plaintext = 0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d0609608648016503040201050004200000000000000000000000000000000000000000000000000000000000000000 | int.from_bytes(digest, 'big')
+            assert pow(signature, 0x10001, v1_prod_pubkey) == plaintext
+        elif signature_method == 2:
+            data = f.read(32)
+            assert data == digest
+        else:
+            raise NotImplementedError
+        assert f.read(1) == b''
+
+def check_chunklist(path, chunklist_path):
+    with open(path, 'rb') as f:
+        for chunk_size, chunk_sha256 in parse_chunklist(chunklist_path):
+            chunk = f.read(chunk_size)
+            assert len(chunk) == chunk_size
+            assert hashlib.sha256(chunk).digest() == chunk_sha256
+        assert f.read(1) == b''
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('vmdir', type=Path)
+    args = parser.parse_args()
+    vmdir = args.vmdir
+    check_chunklist(vmdir / 'RecoveryImage.dmg', vmdir / 'RecoveryImage.chunklist')
+
+if __name__ == "__main__":
+    main()
