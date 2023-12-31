@@ -5,7 +5,7 @@ export LC_ALL=C
 #
 #    1. Update os_support() - add new OS, all lowercase
 #    2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
-#    3. Update os_homepage() - add a homepage for new OS
+#    3. Update os_info() - add a homepage for new OS
 #    4. Create a releases_newos() generator (required) outputs the current supported release versions
 #    5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
 #    6. Update make_vm_config() - add any *required* new OS tweaks
@@ -69,81 +69,106 @@ case "$1" in
         ;;
 esac
 
-function pretty_name() {
-  local SIMPLE_NAME=""
-  local PRETTY_NAME=""
-  SIMPLE_NAME="${1}"
-  case ${SIMPLE_NAME} in
-    alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linux";;
-    android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
-    archcraft)          PRETTY_NAME="Archcraft";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
-    artixlinux)         PRETTY_NAME="Artix Linux";;
-    atheanos)           PRETTY_NAME="Athena OS";;
-    biglinux)           PRETTY_NAME="BigLinux";;
-    blendos)            PRETTY_NAME="BlendOS";;
-    cachyos)            PRETTY_NAME="CachyOS";;
-    centos-stream)      PRETTY_NAME="CentOS Stream";;
-    chimeralinux)       PRETTY_NAME="Chimera Linux";;
-    crunchbang++)       PRETTY_NAME="Crunchbang++";;
-    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
-    easyos)             PRETTY_NAME="EasyOS";;
-    elementary)         PRETTY_NAME="elementary OS";;
-    endeavouros)        PRETTY_NAME="EndeavourOS";;
-    endless)            PRETTY_NAME="Endless OS";;
-    freebsd)            PRETTY_NAME="FreeBSD";;
-    freedos)            PRETTY_NAME="FreeDOS";;
-    garuda)             PRETTY_NAME="Garuda Linux";;
-    ghostbsd)           PRETTY_NAME="GhostBSD";;
-    gnomeos)            PRETTY_NAME="GNOME OS";;
-    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
-    kdeneon)            PRETTY_NAME="KDE Neon";;
-    kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxlite)          PRETTY_NAME="Linux Lite";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
-    lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
-    mageia)             PRETTY_NAME="Mageia";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
-    netboot)            PRETTY_NAME="netboot.xyz";;
-    netbsd)             PRETTY_NAME="NetBSD";;
-    nitrux)             PRETTY_NAME="Nitrux";;
-    nixos)              PRETTY_NAME="NixOS";;
-    macos)              PRETTY_NAME="macOS";;
-    openbsd)            PRETTY_NAME="OpenBSD";;
-    openindiana)        PRETTY_NAME="OpenIndiana";;
-    opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
-    parrotsec)          PRETTY_NAME="Parrot Security";;
-    peppermint)         PRETTY_NAME="PeppermintOS";;
-    popos)              PRETTY_NAME="Pop!_OS";;
-    primtux)            PRETTY_NAME="Primtux";;
-    reactos)            PRETTY_NAME="ReactOS";;
-    rebornos)           PRETTY_NAME="RebornOS";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slint)              PRETTY_NAME="Slint";;
-    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
-    sparkylinux)        PRETTY_NAME="SparkyLinux";;
-    tinycore)           PRETTY_NAME="Tiny Core Linux";;
-    truenas-core)       PRETTY_NAME="TrueNAS Core";;
-    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
-    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
-    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
-    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
-    ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
-    vanillaos)          PRETTY_NAME="Vanilla OS";;
-    void)               PRETTY_NAME="Void Linux";;
-    vxlinux)            PRETTY_NAME="VX Linux";;
-    windows-server)     PRETTY_NAME="Windows Server";;
-    xerolinux)          PRETTY_NAME="XeroLinux";;
-    zorin)              PRETTY_NAME="Zorin OS";;
-    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
-  esac
-  echo "${PRETTY_NAME}"
+OS_DATA=(
+    "alma|Alma Linux|https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.|Fedora,RedHat|"
+    "alpine|Alpine Linux|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.|Independent|"
+    "android|Android x86|https://www.android-x86.org/|Port Android Open Source Project to x86 platform|Independent|"
+    "antix|Antix|https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.|Debian|"
+    "archlinux|Arch Linux|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.|Independent|"
+    "archcraft|Archcraft|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.|Arch|"
+    "arcolinux|Arco Linux|https://arcolinux.com/|Is all about becoming an expert in linux.|Arch|"
+    "batocera|Batocera|https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.|Independent|"
+    "blendos|BlendOS|https://blendos.co/|Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.|Arch|"
+    "bodhi|Bodhi|https://www.bodhilinux.com/|Lightweight distribution featuring the fast & fully customizable Moksha Desktop.|Debian,Ubuntu|"
+    "bunsenlabs|Bunsenlab|https://www.bunsenlabs.org/|Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.|Debian|"
+    "cachyos|CachyOS|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.|Arch|"
+    "centos-stream|CentOS Stream|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.|Fedora,RedHat|"
+    "debian|Debian|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.|Independent|"
+    "deepin|Deepin|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.|Debian|"
+    "devuan|Devuan|https://www.devuan.org/|Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.|Debian|"
+    "dragonflybsd|DragonFlyBSD|https://www.dragonflybsd.org/|Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series.|FreeBSD|"
+    "easyos|EasyOS|https://easyos.org/|Experimental distribution designed from scratch to support containers.|Independent|"
+    "edubuntu|Edubuntu|https://www.edubuntu.org/|Stable, secure and privacy concious option for schools.|Ubuntu|"
+    "elementary|elementary OS|https://elementary.io/|Thoughtful, capable, and ethical replacement for Windows and macOS.|Debian,Ubuntu|"
+    "endeavouros|EndeavourOS|https://endeavouros.com/|Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems.|arch|"
+    "endless|Endless OS|https://www.endlessos.org/os|Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More.|Debian|"
+    "fedora|Fedora|https://www.fedoraproject.org/|Innovative platform for hardware, clouds, and containers, built with love by you.|Independent|"
+    "freebsd|FreeBSD|https://www.freebsd.org/|Operating system used to power modern servers, desktops, and embedded platforms.|Independent|"
+    "freedos|FreeDOS|https://freedos.org/|DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems.|Independent|"
+    "garuda|Garuda Linux|https://garudalinux.org/|Feature rich and easy to use Linux distribution.|Arch|"
+    "gentoo|Gentoo|https://www.gentoo.org/|Highly flexible, source-based Linux distribution.|Independent|"
+    "ghostbsd|GhostBSD|https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System|FreeBSD|"
+    "haiku|Haiku|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.|Independent|"
+    "holoiso|SteamOS HoloISO|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.|arch|"
+    "kali|Kali|https://www.kali.org/|The most advanced Penetration Testing Distribution|Debian|"
+    "kdeneon|KDE Neon|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.|Debian,Ubuntu|"
+    "kolibrios|KolibriOS|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.|Independent|"
+    "kubuntu|Kubuntu|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.|ubuntu|"
+    "linuxlite|Linux Lite|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.|Debian,Ubuntu|"
+    "linuxmint|Linux Mint|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.|Debian,Ubuntu|"
+    "lmde|Linux Mint Debian Edition|https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.|Debian|"
+    "lubuntu|Lubuntu|https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.|ubuntu|"
+    "mageia|Mageia|https://www.mageia.org/|Stable, secure operating system for desktop & server|Independent|"
+    "manjaro|Manjaro|https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.|arch|"
+    "mxlinux|MX Linux|https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.|Debian,Antix|"
+    "netboot|netboot.xyz|https://netboot.xyz/|Your favorite operating systems in one place||"
+    "netbsd|NetBSD|https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.|Independent|"
+    "nixos|NixOS|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.|Independent|"
+    "macos|macOS|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.|proprietary|"
+    "openbsd|OpenBSD|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.|Independent|"
+    "openindiana|OpenIndiana|https://www.openindiana.org/|Community supported illumos-based operating system.|Solaris,OpenSolaris|"
+    "opensuse|openSUSE|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.|Independent|"
+    "oraclelinux|Oracle Linux|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.|RedHat|"
+    "parrotsec|Parrot Security|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.|Debian|parrot:parrot"
+    "peppermint|PeppermintOS|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.|Debian,Devuan|"
+    "popos|Pop!_OS|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.|ubuntu|"
+    "porteus|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.|Slackware|"
+    "reactos|ReactOS|https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.|Independent|"
+    "rebornos|RebornOS|https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal|Arch|"
+    "rockylinux|Rocky Linux|https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.|RedHat|"
+    "siduction|Siduction|https://siduction.org/|Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.|Debian|"
+    "slackware|Slackware|http://www.slackware.com/|Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.|Independent|"
+    "slint|Slint|https://slint.fr/|Slint is an easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix. Maintainer: Didier Spaier.|slackware|"
+    "solus|Solus|https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.|Independent|"
+    "spiral|Spiral|https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.|Debian|"
+    "tails|Tails|https://tails.net/|Portable operating system that protects against surveillance and censorship.|Debian|"
+    "tinycore|Tiny Core Linux|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.|Independent|"
+    "trisquel|Trisquel|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.|Debian,Ubuntu|"
+    "truenas-core|TrueNAS Core|https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.|FreeBSD|"
+    "truenas-scale|TrueNAS Scale|https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.|Debian|"
+    "ubuntu|Ubuntu|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.|debian|"
+    "ubuntu-budgie|Ubuntu Budgie|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.|ubuntu|"
+    "ubuntucinnamon|Ubuntu Cinnamon|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.|ubuntu|"
+    "ubuntukylin|Ubuntu Kylin|https://ubuntukylin.com/|Univerzální desktopový operační systém pro osobní počítače, notebooky a vestavěná zařízení. Jeho cílem je přinést uživatelům inteligentnější uživatelské prostředí.|ubuntu|"
+    "ubuntu-mate|Ubuntu MATE|https://ubuntu-mate.org/|Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.|ubuntu|"
+    "ubuntu-server|Ubuntu Server|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.|ubuntu|"
+    "ubuntustudio|Ubuntu Studio|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.|ubuntu|"
+    "ubuntu-unity|Ubuntu Unity|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).|ubuntu|"
+    "vanillaos|Vanilla OS|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.|Debian,Ubuntu|"
+    "void|Void Linux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.|Independent|anon:voidlinux"
+    "vxlinux|VX Linux|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.|Void|"
+    "windows|Windows|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.|proprietary|"
+    "xerolinux|XeroLinux|https://xerolinux.xyz/|Arch-Based Distro, that provides you with an easy way to install Arch and a well optimized, beautifully Customized Plasma Desktop, that you can later shape to suite your needs!|Arch|"
+    "xubuntu|Xubuntu|https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.|ubuntu|"
+    "zorin|Zorin OS|https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.|Ubuntu|"
+)
+
+function os_info() {
+    local os="$1"
+    local info_type="$2"
+
+    for os_data in "${OS_DATA[@]}"; do
+        IFS='|' read -ra os_info <<< "$os_data"
+        if [ "${os_info[0]}" == "$os" ]; then
+            case "$info_type" in
+                PRETTY) echo "${os_info[1]}";;
+                HOMEPAGE) echo "${os_info[2]}";;
+                ABOUT) echo "${os_info[3]}";;
+                BASED) echo "${os_info[4]}";;
+                CREDENTIAL) echo "${os_info[5]}";;
+            esac
+        fi
+    done
 }
 
 function validate_release() {
@@ -151,7 +176,7 @@ function validate_release() {
   local RELEASE_GENERATOR=""
   local RELEASES=""
 
-  DISPLAY_NAME="$(pretty_name "${OS}")"
+  DISPLAY_NAME="$(os_info "${OS}" PRETTY)"
   case ${OS} in
     *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
     *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
@@ -197,7 +222,7 @@ function list_csv() {
 
   echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
   for OS in $(os_support); do
-    DISPLAY_NAME="$(pretty_name "${OS}")"
+    DISPLAY_NAME="$(os_info "${OS}" PRETTY)"
 
     case ${OS} in
       *ubuntu-server*) FUNC="ubuntu-server";;
@@ -329,110 +354,6 @@ function os_support() {
     xerolinux \
     xubuntu \
     zorin
-}
-
-function os_homepage(){
-    local SIMPLE_NAME=""
-    local HOMEPAGE=""
-    SIMPLE_NAME="${1}"
-    case ${SIMPLE_NAME} in
-        alma)              HOMEPAGE="https://almalinux.org/";;
-        alpine)            HOMEPAGE="https://alpinelinux.org/";;
-        android)           HOMEPAGE="https://www.android-x86.org/";;
-        antix)             HOMEPAGE="https://antixlinux.com/";;
-        archlinux)         HOMEPAGE="https://archlinux.org/";;
-        archcraft)         HOMEPAGE="https://archcraft.io/";;
-        arcolinux)         HOMEPAGE="https://arcolinux.com/";;
-        artixlinux)        HOMEPAGE="https://artixlinux.org/";;
-        athenaos)          HOMEPAGE="https://athenaos.org/";;
-        batocera)          HOMEPAGE="https://batocera.org/";;
-        bazzite)           HOMEPAGE="https://bazzite.gg/";;
-        biglinux)          HOMEPAGE="https://www.biglinux.com.br/";;
-        blendos)           HOMEPAGE="https://blendos.co/";;
-        bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
-        bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
-        cachyos)           HOMEPAGE="https://cachyos.org/";;
-        centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
-        chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
-        crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
-        debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
-        devuan)            HOMEPAGE="https://www.devuan.org/";;
-        dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
-        easyos)            HOMEPAGE="https://easyos.org/";;
-        edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
-        elementary)        HOMEPAGE="https://elementary.io/";;
-        endeavouros)       HOMEPAGE="https://endeavouros.com/";;
-        endless)           HOMEPAGE="https://www.endlessos.org/os";;
-        fedora)            HOMEPAGE="https://www.fedoraproject.org/";;
-        freebsd)           HOMEPAGE="https://www.freebsd.org/";;
-        freedos)           HOMEPAGE="https://freedos.org/";;
-        garuda)            HOMEPAGE="https://garudalinux.org/";;
-        gentoo)            HOMEPAGE="https://www.gentoo.org/";;
-        ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
-        gnomeos)           HOMEPAGE="https://os.gnome.org/";;
-        guix)              HOMEPAGE="https://guix.gnu.org/";;
-        haiku)             HOMEPAGE="https://www.haiku-os.org/";;
-        holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
-        kali)              HOMEPAGE="https://www.kali.org/";;
-        kdeneon)           HOMEPAGE="https://neon.kde.org/";;
-        kolibrios)         HOMEPAGE="http://kolibrios.org/en/";;
-        kubuntu)           HOMEPAGE="https://kubuntu.org/";;
-        linuxlite)         HOMEPAGE="https://www.linuxliteos.com/";;
-        linuxmint)         HOMEPAGE="https://linuxmint.com/";;
-        lmde)              HOMEPAGE="https://www.linuxmint.com/download_lmde.php";;
-        mageia)            HOMEPAGE="https://www.mageia.org/";;
-        manjaro)           HOMEPAGE="https://manjaro.org/";;
-        mxlinux)           HOMEPAGE="https://mxlinux.org/";;
-        netboot)           HOMEPAGE="https://netboot.xyz/";;
-        netbsd)            HOMEPAGE="https://www.netbsd.org/";;
-        nitrux)            HOMEPAGE="https://nxos.org/";;
-        nixos)             HOMEPAGE="https://nixos.org/";;
-        lubuntu)           HOMEPAGE="https://lubuntu.me/";;
-        macos)             HOMEPAGE="https://www.apple.com/macos/";;
-        openbsd)           HOMEPAGE="https://www.openbsd.org/";;
-        openindiana)       HOMEPAGE="https://www.openindiana.org/";;
-        opensuse)          HOMEPAGE="https://www.opensuse.org/";;
-        oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
-        parrotsec)         HOMEPAGE="https://www.parrotsec.org/";;
-        peppermint)        HOMEPAGE="https://peppermintos.com/";;
-        popos)             HOMEPAGE="https://pop.system76.com/";;
-        porteus)           HOMEPAGE="http://www.porteus.org/";;
-        primtux)           HOMEPAGE="https://primtux.fr/";;
-        reactos)           HOMEPAGE="https://reactos.org/";;
-        rebornos)          HOMEPAGE="https://rebornos.org/";;
-        rockylinux)        HOMEPAGE="https://rockylinux.org/";;
-        siduction)         HOMEPAGE="https://siduction.org/";;
-        slackware)         HOMEPAGE="http://www.slackware.com/";;
-        slax)              HOMEPAGE="https://www.slax.org/";;
-        slint)             HOMEPAGE="https://slint.fr/";;
-        slitaz)            HOMEPAGE="https://www.slitaz.org/";;
-        solus)             HOMEPAGE="https://getsol.us/";;
-        sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
-        spirallinux)       HOMEPAGE="https://spirallinux.github.io/";;
-        tails)             HOMEPAGE="https://tails.net/";;
-        tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
-        trisquel)          HOMEPAGE="https://trisquel.info/";;
-        truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
-        truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
-        ubuntu)            HOMEPAGE="https://ubuntu.com/";;
-        ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
-        ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/index-en.html";;
-        ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
-        ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
-        ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
-        ubuntu-unity)      HOMEPAGE="https://ubuntuunity.org/";;
-        vanillaos)         HOMEPAGE="https://vanillaos.org/";;
-        void)              HOMEPAGE="https://voidlinux.org/";;
-        vxlinux)           HOMEPAGE="https://vxlinux.org/";;
-        windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
-        windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
-        xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
-        xubuntu)           HOMEPAGE="https://xubuntu.org/";;
-        zorin)             HOMEPAGE="https://zorin.com/os/";;
-    esac
-    echo "${HOMEPAGE}"
 }
 
 function releases_alma() {
@@ -1167,7 +1088,7 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
+        echo Downloading $(os_info "${OS}" PRETTY) ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
     fi
 
     if command -v aria2c &>/dev/null; then
@@ -1213,7 +1134,7 @@ function zsync_get() {
           exit 1
         fi
 
-        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
+        echo -e Downloading $(os_info "${OS}" PRETTY) ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -2294,6 +2215,7 @@ function get_openindiana(){
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
 function get_opensuse() {
     local HASH=""
     local ISO=""
@@ -2623,7 +2545,7 @@ function get_ubuntu-server() {
     fi
 
     if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        echo "$(os_info "${OS}" PRETTY) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
 
@@ -2679,7 +2601,7 @@ function get_ubuntu() {
     fi
 
     if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        echo "$(os_info $OS $PRETTY) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
 
@@ -3161,9 +3083,9 @@ function download_windows-server() {
     iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")"
 
     if [ "${COUNTRY}" != "US" ]; then
-        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} in "${LANG}" from "$iso_download_link"
+        echo Downloading $(os_info "${OS}" PRETTY) ${PRETTY_RELEASE} in "${LANG}" from "$iso_download_link"
     else
-        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} from "$iso_download_link"
+        echo Downloading $(os_info "${OS}" PRETTY) ${PRETTY_RELEASE} from "$iso_download_link"
     fi
 
     FILE_NAME="${iso_download_link##*/}"
@@ -3464,7 +3386,7 @@ if [ -n "${2}" ]; then
         if [ -n "${3}" ]; then
             EDITION="${3}"
             if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
-                echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition:\n"
+                echo -e "ERROR! ${EDITION} is not a supported $(os_info "${OS}" PRETTY) edition:\n"
                 for EDITION in "${EDITIONS[@]}"; do
                   echo -n "${EDITION} "
                 done
@@ -3535,10 +3457,10 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 elif [ "${open_distro_homepage}" == 'on' ]; then
-    HOMEPAGE=$(os_homepage ${OS})
+    HOMEPAGE=$(os_info ${OS} HOMEPAGE)
     open_url "${HOMEPAGE}" && exit 0
 elif [ "${show_distro_homepage}" == 'on' ]; then
-        HOMEPAGE=$(os_homepage ${OS})
+        HOMEPAGE=$(os_info ${OS} HOMEPAGE)
         echo "${HOMEPAGE}" && exit 0
 elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
     RELEASE=$(releases_${OS})
