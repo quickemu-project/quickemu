@@ -106,7 +106,7 @@ function os_info() {
       slitaz)           INFO="SliTaz|Independent||https://www.slitaz.org/en/|Simple, fast and low resource Linux OS for servers & desktops.";;
       solus)            INFO="Solus|Independent||https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
       sparkylinux)      INFO="SparkyLinux|Debian||https://sparkylinux.org/|Fast, lightweight and fully customizable operating system which offers several versions for different use cases.";;
-      spiral)           INFO="Spiral|Debian||https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
+      spirallinux)      INFO="Spiral Linux|Debian||https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
       tails)            INFO="Tails|Debian||https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
       tinycore)         INFO="Tiny Core Linux|Independent||http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
       trisquel)         INFO="Trisquel|Debian,Ubuntu||https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
