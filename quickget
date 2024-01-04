@@ -202,6 +202,7 @@ function list_csv() {
     local DISPLAY_NAME
     local DL=""
     local DOWNLOADER
+    local URL
     local FUNC
     local OPTION
     local OS
@@ -225,7 +226,7 @@ function list_csv() {
         DL="wget"
     fi
 
-    echo "Display Name|OS|Release|Option|Downloader|PNG|SVG|Credentials|Based of|Homepage|Info about"
+    echo "Display Name|OS|Release|URL|Option|Downloader|PNG|SVG|Credentials|Based of|Homepage|Info about"
     for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
         case ${OS} in
@@ -249,15 +250,18 @@ function list_csv() {
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                    URL=${URL}
+                    echo "${DISPLAY_NAME}|${OS}|${RELEASESEASE}|${OPTION}|${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                    URL=${URL}
+                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${URL}|${OPTION}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
                 done
             else
-                echo "${DISPLAY_NAME}|${OS}|${RELEASE}||${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                URL=${URL}
+                echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${URL}||${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
             fi
         done
     done
