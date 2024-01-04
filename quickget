@@ -3276,7 +3276,7 @@ Posible arguments:
  --iso-download     (-d) <os> <re> [ed]      : Download ISO (without create VM)
  --iso-download-to (-dt) <pa> <os> <re> [ed] : Download ISO to specified dir
 
-supported Operating Systems:\n' "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)" "$(quickemu --version)"
+supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
     os_support | fold -s -w $(tput cols)
     exit 0
 }
@@ -3290,7 +3290,7 @@ os_error() {
 }
 
 os_path_error() {
-    echo "ERROR! You must specify path and operating system"
+    echo "ERROR! You must specify path."
     os_error
     exit 1
 }
