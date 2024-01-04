@@ -39,7 +39,7 @@ function os_info() {
     case ${SIMPLE_NAME} in
       alma)             INFO="Alma Linux|Fedora,RedHat||https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
       alpine)           INFO="Alpine Linux|Independent||https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
-      android)          INFO="Android x86|Independent||https://www.android-x86.org/|Port Android Open Source Project to x86 platform";;
+      android)          INFO="Android x86|Independent||https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
       antix)            INFO="Antix|Debian||https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
       artix)            INFO="Artix Linux|Arch||https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
       archlinux)        INFO="Arch Linux|Independent||https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
@@ -47,13 +47,13 @@ function os_info() {
       arcolinux)        INFO="Arco Linux|Arch||https://arcolinux.com/|Is all about becoming an expert in linux.";;
       athenaos)         INFO="Athena OS|Arch||https://athenaos.org/|Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials.";;
       batocera)         INFO="Batocera|Independent||https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
-      bazzite)          INFO="bazzite|Fedora,SteamOS||https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like";;
+      bazzite)          INFO="bazzite|Fedora,SteamOS||https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like.";;
       blendos)          INFO="BlendOS|Arch||https://blendos.co/|Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
       bodhi)            INFO="Bodhi|Debian,Ubuntu||https://www.bodhilinux.com/|Lightweight distribution featuring the fast & fully customizable Moksha Desktop.";;
       bunsenlabs)       INFO="Bunsenlab|Debian||https://www.bunsenlabs.org/|Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.";;
       cachyos)          INFO="CachyOS|Arch||https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
       centos-stream)    INFO="CentOS Stream|Fedora,RedHat||https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
-      chimeralinux)     INFO="Chimera Linux|Independent|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution ";;
+      chimeralinux)     INFO="Chimera Linux|Independent|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
       crunchbang++)     INFO="#!++|Debian||https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
       debian)           INFO="Debian|Independent||https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
       deepin)           INFO="Deepin|Debian||https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
@@ -69,10 +69,10 @@ function os_info() {
       freedos)          INFO="FreeDOS|Independent||https://freedos.org/|DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems.";;
       garuda)           INFO="Garuda Linux|Arch||https://garudalinux.org/|Feature rich and easy to use Linux distribution.";;
       gentoo)           INFO="Gentoo|Independent||https://www.gentoo.org/|Highly flexible, source-based Linux distribution.";;
-      ghostbsd)         INFO="GhostBSD|FreeBSD||https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System";;
+      ghostbsd)         INFO="GhostBSD|FreeBSD||https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System.";;
       haiku)            INFO="Haiku|Independent||https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
       holoiso)          INFO="SteamOS HoloISO|Arch,SteamOS||https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
-      kali)             INFO="Kali|Debian||https://www.kali.org/|The most advanced Penetration Testing Distribution";;
+      kali)             INFO="Kali|Debian||https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
       kdeneon)          INFO="KDE Neon|Debian,Ubuntu||https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
       kolibrios)        INFO="KolibriOS|Independent||http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
       kubuntu)          INFO="Kubuntu|Ubuntu||https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
@@ -80,10 +80,10 @@ function os_info() {
       linuxmint)        INFO="Linux Mint|Debian,Ubuntu||https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
       lmde)             INFO="Linux Mint Debian Edition|Debian||https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
       lubuntu)          INFO="Lubuntu|Ubuntu||https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
-      mageia)           INFO="Mageia|Independent||https://www.mageia.org/|Stable, secure operating system for desktop & server";;
+      mageia)           INFO="Mageia|Independent||https://www.mageia.org/|Stable, secure operating system for desktop & server.";;
       manjaro)          INFO="Manjaro|Arch||https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
       mxlinux)          INFO="MX Linux|Debian,Antix||https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.";;
-      netboot)          INFO="netboot.xyz|iPXE||https://netboot.xyz/|Your favorite operating systems in one place";;
+      netboot)          INFO="netboot.xyz|iPXE||https://netboot.xyz/|Your favorite operating systems in one place.";;
       netbsd)           INFO="NetBSD|Independent||https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
       nixos)            INFO="NixOS|Independent||https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
       macos)            INFO="macOS|proprietary||https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
@@ -97,7 +97,7 @@ function os_info() {
       porteus)          INFO="Porteus|Slackware||http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
       primtux)          INFO="PrimTux|Ubuntu||https://primtux.fr/|Upgrade for obsolete equipment and benefiting the school or educational environment in the spirit of education.";;
       reactos)          INFO="ReactOS|Independent||https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
-      rebornos)         INFO="RebornOS|Arch||https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal";;
+      rebornos)         INFO="RebornOS|Arch||https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
       rockylinux)       INFO="Rocky Linux|RedHat||https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
       siduction)        INFO="Siduction|Debian||https://siduction.org/|Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.";;
       slackware)        INFO="Slackware|Independent||http://www.slackware.com/|Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.";;
@@ -123,6 +123,7 @@ function os_info() {
       vanillaos)        INFO="Vanilla OS|Debian,Ubuntu||https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
       void)             INFO="Void Linux|Independent|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
       vxlinux)          INFO="VX Linux|Void||https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
+      whonix)           INFO="Whonix|Debian||https://www.whonix.org/|Superior Internet Privacy with Whonix™ As handy as an app - delivering maximum anonymity and security.";;
       windows)          INFO="Windows|proprietary||https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
       windows-server)   INFO="Windows Server|proprietary||https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
       xerolinux)        INFO="XeroLinux|Arch||https://xerolinux.xyz/|Arch-Based Distro, that provides you with an easy way to install Arch and a well optimized, beautifully Customized Plasma Desktop, that you can later shape to suite your needs!";;
@@ -355,6 +356,7 @@ function os_support() {
     vanillaos \
     void \
     vxlinux \
+    whonix \
     windows \
     windows-server \
     xerolinux \
@@ -1015,6 +1017,14 @@ function releases_xerolinux() {
     echo kde
 }
 
+function releases_whonix() {
+    echo 17.0.3.0
+}
+
+function editions_whonix() {
+    echo gateway workstation
+}
+
 function releases_zorin() {
     echo 17 16
 }
@@ -1066,7 +1076,7 @@ function web_get() {
     else
         FILE="${URL##*/}"
     fi
-    
+
     while (( "$#" )); do
         if [[ $1 == --header ]]; then
             HEADERS+=("$1" "$2")
@@ -1179,6 +1189,7 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
+    local n="$n"
     #not needed anymore?
     #local SEC_BOOT=""
 
@@ -1189,54 +1200,57 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        batocera)
-            GUEST="batocera"
-            IMAGE_TYPE="img";;
-        dragonflybsd)
-            GUEST="dragonflybsd"
-            IMAGE_TYPE="iso";;
-        easyos)
-            GUEST="linux"
-            IMAGE_TYPE="img";;
-        freebsd|ghostbsd)
-            GUEST="freebsd"
-            IMAGE_TYPE="iso";;
-        haiku)
-            GUEST="haiku"
-            IMAGE_TYPE="iso";;
-        freedos)
-            GUEST="freedos"
-            IMAGE_TYPE="iso";;
-        kolibrios)
-            GUEST="kolibrios"
-            IMAGE_TYPE="iso";;
-        macos)
-            GUEST="macos"
-            IMAGE_TYPE="img";;
-        netbsd)
-            GUEST="netbsd"
-            IMAGE_TYPE="iso";;
-        openbsd)
-            GUEST="openbsd"
-            IMAGE_TYPE="iso";;
-        openindiana)
-            GUEST="solaris"
-            IMAGE_TYPE="iso";;
-        reactos)
-            GUEST="reactos"
-            IMAGE_TYPE="iso";;
-        truenas*)
-            GUEST="truenas"
-            IMAGE_TYPE="iso";;
-        windows)
-            GUEST="windows"
-            IMAGE_TYPE="iso";;
-        windows-server)
-            GUEST="windows-server"
-            IMAGE_TYPE="iso";;
-        *)
-            GUEST="linux"
-            IMAGE_TYPE="iso";;
+      batocera)
+        GUEST="batocera"
+        IMAGE_TYPE="img";;
+      dragonflybsd)
+        GUEST="dragonflybsd"
+        IMAGE_TYPE="iso";;
+      easyos)
+        GUEST="linux"
+        IMAGE_TYPE="img";;
+      freebsd|ghostbsd)
+        GUEST="freebsd"
+        IMAGE_TYPE="iso";;
+      haiku)
+        GUEST="haiku"
+        IMAGE_TYPE="iso";;
+      freedos)
+        GUEST="freedos"
+        IMAGE_TYPE="iso";;
+      kolibrios)
+        GUEST="kolibrios"
+        IMAGE_TYPE="iso";;
+      macos)
+        GUEST="macos"
+        IMAGE_TYPE="img";;
+      netbsd)
+        GUEST="netbsd"
+        IMAGE_TYPE="iso";;
+      openbsd)
+        GUEST="openbsd"
+        IMAGE_TYPE="iso";;
+      openindiana)
+        GUEST="solaris"
+        IMAGE_TYPE="iso";;
+      reactos)
+        GUEST="reactos"
+        IMAGE_TYPE="iso";;
+      truenas*)
+        GUEST="truenas"
+        IMAGE_TYPE="iso";;
+      whonix)
+        GUEST="whonix"
+        IMAGE_TYPE="iso";;
+      windows)
+        GUEST="windows"
+        IMAGE_TYPE="iso";;
+      windows-server)
+        GUEST="windows-server"
+        IMAGE_TYPE="iso";;
+      *)
+        GUEST="linux"
+        IMAGE_TYPE="iso";;
     esac
 
     CONF_FILE="${VM_PATH}.conf"
@@ -1249,7 +1263,7 @@ guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        echo "Giving user execute permissions on ${CONF_FILE},"
+        echo "Giving user execute permissions on ${CONF_FILE}"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
@@ -1306,10 +1320,21 @@ EOF
             ;;
           vanillaos)
             ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
-           echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-           ;;
+            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+            ;;
+          whonix)
+            echo 'guest_os="linux"' >> "${CONF_FILE}"
+            echo "ISO=\"whonix-${RELEASE}-gateway/${IMAGE_FILE}\"" >> "${CONF_FILE}"
+            echo 'boot="legacy"' >> "${CONF_FILE}"
+            # handle multiple workstations
+            if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
+                if [[ -e "whonix-${RELEASE}-workstation.conf" ]]; then
+                    echo "disk_img=\"whonix-${RELEASE}-workstation$n/disk.qcow2\"" >> "${CONF_FILE}"
+                fi
+            fi
+            ;;
           zorin)
-            case  ${EDITION} in
+            case ${EDITION} in
               education64|edulite64)
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             esac
@@ -1344,6 +1369,8 @@ EOF
     echo "To start your $(pretty_name "${OS}") virtual machine run:"
     if [ ${OS} == "slint" ]; then
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+    elif [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
+        echo "    quickemu --vm $(echo ${CONF_FILE} | rev | cut -d'.' -f2-9 | rev)$n.conf"
     else
         echo "    quickemu --vm ${CONF_FILE}"
     fi
@@ -2689,6 +2716,18 @@ function get_vxlinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_whonix() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local URL=""
+    local ISO=""
+
+    ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+    URL="https://download.whonix.org/libvirt/${RELEASE}"
+    HASH=$(wget -q -O- "${URL}/Whonix-Xfce-${RELEASE}.sha512sums" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_xerolinux() {
     local HASH=""
     local URL=""
@@ -3367,7 +3406,86 @@ function create_vm() {
         ISO=$(find "${VM_PATH}" -type f \( -iname '*.iso' ! -iname '*.zip' \))
     fi
 
-    make_vm_config "${ISO}"
+    # Whonix need to create and handle more then one workstation
+    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "gateway" ]; then
+            echo -e "\nhttps://www.whonix.org/wiki/KVM#signify\n"
+            cd "whonix-${RELEASE}-gateway"
+            if [ -e "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" ]; then
+                echo -e '\nAlready unpacked\n'
+            else
+                echo -e "\nUnpacking...\n"
+                tar -xvf "${ISO}"
+            fi
+            if [ ! -e WHONIX_BINARY_LICENSE_AGREEMENT_accepted ]; then
+                more WHONIX_BINARY_LICENSE_AGREEMENT
+                read -p "
+
+                Are you AGREE? Press y/Y or Anything else if DISAGREE...
+                " -n 1 -r
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo -e "\n\nAccepted..."
+                    touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted
+                    rm -f WHONIX_BINARY_LICENSE_AGREEMENT_denied
+                else
+                    echo -e "\n\nNot accepted! Exiting..."
+                    touch WHONIX_BINARY_LICENSE_AGREEMENT_denied
+                    rm -f WHONIX_BINARY_LICENSE_AGREEMENT_accepted
+                    exit 1
+                fi
+            fi
+            cp "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" "disk.qcow2"
+            mkdir -p "../whonix-${RELEASE}-workstation"
+            cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../whonix-${RELEASE}-workstation/"
+            ln -rs "Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" "../whonix-${RELEASE}-workstation/Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" &>/dev/null # Don't show error
+            cd ..
+    fi
+    ##TODO
+    #if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
+        #if [[ -e whonix-${RELEASE}-workstation.conf ]]; then
+            #echo "Creating additional Whonix workstation"
+            #workstation_dir="whonix-${RELEASE}-workstation"
+            #last_number=$(find "${workstation_dir}" | awk -F "${workstation_dir}" 'NF>1{print $NF}' | sort -n | tail -n 1 | cut -d '/' -f1)
+            #new_number=$((last_number + 1))
+            #new_dir="${workstation_dir}${new_number}"
+            ##mkdir "${new_dir}"
+            #VMPATH="${new_dir}"
+            #echo "Copying and renaming whonix-${RELEASE}-workstation.conf for new VM"
+            #cp "whonix-${RELEASE}-workstation.conf" "whonix-${RELEASE}-workstation${new_number}.conf"
+            #cd "whonix-${RELEASE}-gateway"
+            #cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../${new_dir}/disk.qcow2"
+            #cd ..
+            #ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+            #CONF_FILE="whonix-${RELEASE}-workstation${new_number}.conf"
+        #fi
+        #cd "whonix-${RELEASE}-gateway"
+        #cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "disk.qcow2"
+        #cd ..
+        #ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+    #fi
+
+    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
+        if [[ -e "whonix-${RELEASE}-workstation.conf" ]]; then
+            echo "Creating additional Whonix workstation"
+            base="whonix-${RELEASE}-workstation"
+            n=1
+            while [ -d "$base$n" ]; do ((n++)); done
+            new_dir="$base$n"
+            mkdir "$base$n"
+            VMPATH="${new_dir}"
+            echo "Copying and renaming whonix-${RELEASE}-workstation.conf for new VM"
+            cp "whonix-${RELEASE}-workstation.conf" "whonix-${RELEASE}-workstation$n.conf"
+
+            cd "whonix-${RELEASE}-gateway"
+            cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../${new_dir}/disk.qcow2"
+            cd ..
+
+            ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+            CONF_FILE="whonix-${RELEASE}-workstation$n.conf"
+            n="$n"
+        fi
+    fi
+
+    make_vm_config "${ISO}" || echo "ERROR! Creating config."
 }
 
 url_open() {
@@ -3525,12 +3643,29 @@ handle_missing() {
             exit 1;
         fi
     fi
+
+    # Handle Whonix workstations
+    if [[ $OS == whonix && ${EDITION} == workstation ]] ; then
+        if [[ ! -e whonix-${RELEASE}-gateway.conf ]]; then
+            echo "ERROR! Create Whoonix gateway VM first."
+            exit 1
+        elif [[ -e whonix-${RELEASE}-workstation.conf ]]; then
+            echo "Creating additional Whonix workstation"
+            workstation_dir="whonix-${RELEASE}-workstation"
+            last_number=$(find "${workstation_dir}" | awk -F "${workstation_dir}" 'NF>1{print $NF}' | sort -n | tail -n 1 | cut -d '/' -f1)
+            new_number=$((last_number + 1))
+            new_dir="${workstation_dir}${new_number}"
+            mkdir "${new_dir}"
+            VMPATH="${new_dir}"
+        fi
+    fi
+
 }
 
 function show_os_info() {
     local OS=""
     if [ -z "${1}" ]; then
-        
+
         os_error
         exit 1
     fi
