@@ -1189,7 +1189,7 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
-    local n="$n"
+    local new_dir="$new_dir"
     #not needed anymore?
     #local SEC_BOOT=""
 
@@ -1239,9 +1239,9 @@ function make_vm_config() {
       truenas*)
         GUEST="truenas"
         IMAGE_TYPE="iso";;
-      whonix)
-        GUEST="whonix"
-        IMAGE_TYPE="iso";;
+#      whonix)
+#        GUEST="whonix"
+#        IMAGE_TYPE="iso";;
       windows)
         GUEST="windows"
         IMAGE_TYPE="iso";;
@@ -1323,8 +1323,6 @@ EOF
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
             ;;
           whonix)
-            echo 'guest_os="linux"' >> "${CONF_FILE}"
-            echo "ISO=\"whonix-${RELEASE}-gateway/${IMAGE_FILE}\"" >> "${CONF_FILE}"
             echo 'boot="legacy"' >> "${CONF_FILE}"
             # handle multiple workstations
             if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
@@ -3413,7 +3411,7 @@ function create_vm() {
             if [ -e "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" ]; then
                 echo -e '\nAlready unpacked\n'
             else
-                echo -e "\nUnpacking...\n"
+                echo -e "\nUnpacking... (This will take long time)\n"
                 tar -xvf "${ISO}"
             fi
             if [ ! -e WHONIX_BINARY_LICENSE_AGREEMENT_accepted ]; then
@@ -3433,55 +3431,37 @@ function create_vm() {
                     exit 1
                 fi
             fi
+            # Prepare first workstation
             cp "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" "disk.qcow2"
             mkdir -p "../whonix-${RELEASE}-workstation"
             cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../whonix-${RELEASE}-workstation/"
             ln -rs "Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" "../whonix-${RELEASE}-workstation/Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" &>/dev/null # Don't show error
             cd ..
     fi
-    ##TODO
-    #if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
-        #if [[ -e whonix-${RELEASE}-workstation.conf ]]; then
-            #echo "Creating additional Whonix workstation"
-            #workstation_dir="whonix-${RELEASE}-workstation"
-            #last_number=$(find "${workstation_dir}" | awk -F "${workstation_dir}" 'NF>1{print $NF}' | sort -n | tail -n 1 | cut -d '/' -f1)
-            #new_number=$((last_number + 1))
-            #new_dir="${workstation_dir}${new_number}"
-            ##mkdir "${new_dir}"
-            #VMPATH="${new_dir}"
-            #echo "Copying and renaming whonix-${RELEASE}-workstation.conf for new VM"
-            #cp "whonix-${RELEASE}-workstation.conf" "whonix-${RELEASE}-workstation${new_number}.conf"
-            #cd "whonix-${RELEASE}-gateway"
-            #cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../${new_dir}/disk.qcow2"
-            #cd ..
-            #ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
-            #CONF_FILE="whonix-${RELEASE}-workstation${new_number}.conf"
-        #fi
-        #cd "whonix-${RELEASE}-gateway"
-        #cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "disk.qcow2"
-        #cd ..
-        #ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
-    #fi
 
     if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
         if [[ -e "whonix-${RELEASE}-workstation.conf" ]]; then
-            echo "Creating additional Whonix workstation"
+            echo "Create additional Whonix ${RELEASE} workstation?"
             base="whonix-${RELEASE}-workstation"
-            n=1
-            while [ -d "$base$n" ]; do ((n++)); done
-            new_dir="$base$n"
-            mkdir "$base$n"
-            VMPATH="${new_dir}"
-            echo "Copying and renaming whonix-${RELEASE}-workstation.conf for new VM"
-            cp "whonix-${RELEASE}-workstation.conf" "whonix-${RELEASE}-workstation$n.conf"
-
-            cd "whonix-${RELEASE}-gateway"
-            cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../${new_dir}/disk.qcow2"
-            cd ..
-
-            ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
-            CONF_FILE="whonix-${RELEASE}-workstation$n.conf"
-            n="$n"
+            echo -e "\nEnter new name\nVM will be whonix-${RELEASE}-workstation-(new name)\nLeave empty to not create VM..."
+            read -r new
+            new_dir="$base-$new"
+            if [ ! ${new} == ${new_dir} ]; then
+                mkdir "$new_dir"
+                echo "Copying and renaming to $new_dir"
+                cp "whonix-${RELEASE}-workstation.conf" "$new_dir.conf"
+                cp "whonix-${RELEASE}-gateway/Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "$new_dir/disk.qcow2"
+                VMPATH="$new_dir"
+                cat << EOF > "$new_dir.conf"
+#!$(which quickemu) --vm
+guest_os="linux"
+disk_img="${new_dir}/disk.qcow2"
+iso="whonix-${RELEASE}-gateway/Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
+boot="legacy"
+EOF
+            else
+                echo 'Exiting' && exit 0
+            fi
         fi
     fi
 
@@ -3644,22 +3624,13 @@ handle_missing() {
         fi
     fi
 
-    # Handle Whonix workstations
+    # Don't allow Whonix workstation without gateway .conf file
     if [[ $OS == whonix && ${EDITION} == workstation ]] ; then
         if [[ ! -e whonix-${RELEASE}-gateway.conf ]]; then
             echo "ERROR! Create Whoonix gateway VM first."
             exit 1
-        elif [[ -e whonix-${RELEASE}-workstation.conf ]]; then
-            echo "Creating additional Whonix workstation"
-            workstation_dir="whonix-${RELEASE}-workstation"
-            last_number=$(find "${workstation_dir}" | awk -F "${workstation_dir}" 'NF>1{print $NF}' | sort -n | tail -n 1 | cut -d '/' -f1)
-            new_number=$((last_number + 1))
-            new_dir="${workstation_dir}${new_number}"
-            mkdir "${new_dir}"
-            VMPATH="${new_dir}"
         fi
     fi
-
 }
 
 function show_os_info() {
