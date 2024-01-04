@@ -48,7 +48,7 @@ function os_info() {
       athenaos)         INFO="Athena OS|Arch||https://athenaos.org/|Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials.";;
       batocera)         INFO="Batocera|Independent||https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
       bazzite)          INFO="bazzite|Fedora,SteamOS||https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like.";;
-      blendos)          INFO="BlendOS|Arch||https://blendos.co/|Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
+      blendos)          INFO="BlendOS|Arch||https://blendos.co/|A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android.";;
       bodhi)            INFO="Bodhi|Debian,Ubuntu||https://www.bodhilinux.com/|Lightweight distribution featuring the fast & fully customizable Moksha Desktop.";;
       bunsenlabs)       INFO="Bunsenlab|Debian||https://www.bunsenlabs.org/|Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux.";;
       cachyos)          INFO="CachyOS|Arch||https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
