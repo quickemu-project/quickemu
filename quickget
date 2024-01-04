@@ -1369,6 +1369,7 @@ EOF
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     elif [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
         echo "    quickemu --vm $(echo ${CONF_FILE} | rev | cut -d'.' -f2-9 | rev)$n.conf"
+        #echo "    quickemu --vm $new_dir.conf"
     else
         echo "    quickemu --vm ${CONF_FILE}"
     fi
