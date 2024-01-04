@@ -1327,6 +1327,8 @@ EOF
     echo "To start your $(pretty_name "${OS}") virtual machine run:"
     if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
         echo "    quickemu --vm $new_dir.conf"
+    elif [ ${OS} == "slint" ]; then
+        echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braile support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
         echo "    quickemu --vm ${CONF_FILE}"
     fi
