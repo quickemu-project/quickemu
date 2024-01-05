@@ -198,9 +198,162 @@ function list_json() {
     exit 0
 }
 
+# list_csv untouched
 function list_csv() {
+  local DISPLAY_NAME
+  local DL=""
+  local DOWNLOADER
+  local FUNC
+  local OPTION
+  local OS
+  local PNG
+  local RELEASE
+  local SVG
+  local HAS_ZSYNC=0
 
-function list_supported() {
+  # Check if zsync is available
+  if command -v zsync &>/dev/null; then
+    HAS_ZSYNC=1
+  fi
+
+  if command -v aria2c &>/dev/null; then
+    DL="aria2c"
+  elif command -v wget &>/dev/null; then
+    DL="wget"
+  fi
+
+  echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
+  for OS in $(os_support); do
+    DISPLAY_NAME="$(pretty_name "${OS}")"
+
+    case ${OS} in
+      *ubuntu-server*) FUNC="ubuntu-server";;
+      *ubuntu*) FUNC="ubuntu";;
+      *) FUNC="${OS}";;
+    esac
+
+    PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
+    SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+
+    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+      if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+        DOWNLOADER="zsync"
+      else
+        DOWNLOADER="${DL}"
+      fi
+
+      # If the OS has an editions_() function, use it.
+      if [[ $(type -t "editions_${OS}") == function ]]; then
+        for OPTION in $(editions_"${OS}"); do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      elif [[ "${OS}" == "windows"* ]]; then
+        "languages_${OS}"
+        for OPTION in "${LANGS[@]}"; do
+          echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+        done
+      else
+        echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
+      fi
+    done
+  done
+  exit 0
+}
+
+#cat TEST/list_supported | parallel --progress --jobs 16 --delay 0.001 --timeout 60 --shuf --colsep ' ' --results out.csv quickget -u {1} {2} {3}
+generate_supported(){
+    # run guickget - output two lines if editions
+    for OS in $(os_support); do
+        echo "=======${OS}"
+        supported=$(./quickget ${OS} | sed 1d | cut -d' ' -f4-)
+        echo "${supported}"
+    done
+    exit 0
+}
+
+list_isos() {
+    local URL
+    local FUNC
+    local OPTION
+    local OS
+
+    echo "OS|Release|Edition|URL"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+             # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -z "${URL}" ]; then
+                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                    else
+                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                    fi
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -n "${URL}" ]; then
+                        echo "${OS}|${RELEASE}|${OPTION}|"
+                    else
+                        echo "${OS}|${RELEASE}|${OPTION}|Strange!"
+                    fi
+                done
+            elif [[ "${OS}" == "macos" ]]; then
+                echo "${OS}|${RELEASE}|${OPTION}|"
+            else
+                URL=$(./quickget -u ${OS} ${RELEASE})
+                if [ -z "${URL}" ]; then
+                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                else
+                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                fi
+            fi
+        done
+    done
+    exit 0
+}
+
+list_supported() {
+    # output OS RELEASE EDITION (usefull for straight testing...)
+    local DL=""
+    local FUNC
+    local OPTION
+    local OS
+
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            else
+                echo "${OS} ${RELEASE}"
+            fi
+        done
+    done
+    exit 0
+}
+
+list_supported_extended() {
+    # nice
     local DL=""
     local FUNC
     local OPTION
@@ -211,7 +364,7 @@ function list_supported() {
     local BASED
     local CREDE
     local HOMEP
-    echo "OS|Display Name|Based of|Homepage|Credentials|Info about|SVG"
+    echo "OS|=|Display Name|Based of|Homepage|Credentials|Info about|SVG"
     for OS in $(os_support); do
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
@@ -224,26 +377,27 @@ function list_supported() {
         BASED=$(os_basedof ${OS})
         CREDE=$(os_credentials ${OS})
         ABOUT=$(os_about ${OS})
-        echo -e "${OS}|${DISPLAY_NAME}|${BASED}|${HOMEP}|${CREDE}|${ABOUT}|${SVG}"
+        echo -e "${OS}|=|${DISPLAY_NAME}|${BASED}|${HOMEP}|${CREDE}|${ABOUT}|${SVG}"
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    echo "${RELEASE},${OPTION}"
+                    echo "${OS} ${RELEASE} ${OPTION}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    echo "${RELEASE},${OPTION}"
+                    echo "${OS} ${RELEASE} ${OPTION}"
                 done
             else
-                echo "${RELEASE},"
+                echo "${OS} ${RELEASE}"
             fi
         done
     done
     exit 0
 }
 
+list_csv_extended() {
     local DISPLAY_NAME
     local DL=""
     local DOWNLOADER
@@ -271,7 +425,7 @@ function list_supported() {
         DL="wget"
     fi
 
-    echo "Display Name|OS|Release|URL|Option|Downloader|PNG|SVG|Credentials|Based of|Homepage|Info about"
+    echo "Display Name|OS|Release|Option|URL|Downloader|PNG|SVG|Credentials|Based of|Homepage|Info about"
     for OS in $(os_support); do
     DISPLAY_NAME="$(pretty_name "${OS}")"
         case ${OS} in
@@ -295,18 +449,87 @@ function list_supported() {
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    URL=${URL}
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASESEASE}|${OPTION}|${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    URL=${URL}
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${URL}|${OPTION}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|skipped|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
                 done
             else
-                URL=${URL}
-                echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${URL}||${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT})"
+                URL=$(./quickget -u ${OS} ${RELEASE})
+                echo "${DISPLAY_NAME}|${OS}|${RELEASE}||${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
+            fi
+        done
+    done
+    exit 0
+}
+
+test_isos() {
+    local DL=""
+    local URL
+    local ISO
+    local FUNC
+    local OPTION
+    local OS
+    local RELEASE
+    local HAS_ZSYNC=0
+    local GOOD
+
+    # Check if zsync is available
+    if command -v zsync &>/dev/null; then
+        HAS_ZSYNC=1
+    fi
+    if command -v aria2c &>/dev/null; then
+        DL="aria2c"
+    elif command -v wget &>/dev/null; then
+        DL="wget"
+    fi
+    echo "Status - OS|Release|Edition|URL"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+                DOWNLOADER="zsync"
+            else
+                DOWNLOADER="${DL}"
+            fi
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                    if [[ "${GOOD}" == "OK" ]]; then
+                        echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    else
+                        echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    fi
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -z "${URL}" ]; then
+                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
+                    else
+                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
+                    fi
+                done
+            else
+                URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                GOOD=$(timeout 10 wget -q --spider  ${URL} && echo 'OK' || echo 'ERROR!')
+                if [[ "${GOOD}" == "OK" ]]; then
+                    echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                else
+                    echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                fi
             fi
         done
     done
@@ -3618,10 +3841,11 @@ os_error_release() {
         echo -n " - Languages: "
         "languages_${OS}" && echo "${LANGS[@]}"
         ;;
+      *)
+      echo -n " - Releases: "
+      "releases_${OS}" | fold -s -w $(tput cols)
+        ;;
     esac
-    echo -n " - Releases: "
-    #TODO ERROR here
-    "releases_${OS}"
     if [[ $(type -t "editions_${OS}") == function ]]; then
         echo -n " - Editions: "
         "editions_${OS}"
@@ -3716,9 +3940,29 @@ case "${1}" in
     echo "$(show_os_info "${2}")" | fold -s -w $(tput cols)
     exit 0
     ;;
+
+  'isos')
+    list_isos
+    ;;  
+  'test')
+    test_isos
+    ;;
+  'isotest')
+    isostest_run
+    ;;  
   '-ls'|'--list-supported')
     list_supported  
     ;; 
+  '-lse')
+    list_supported_extended
+    ;;
+  '-lce')
+    list_csv_extended
+    ;;
+  'gen')
+    generate_supported
+    ;;  
+
   '-lc'|'--list-csv')
     list_csv
     ;;
