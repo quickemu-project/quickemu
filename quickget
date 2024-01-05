@@ -199,6 +199,51 @@ function list_json() {
 }
 
 function list_csv() {
+
+function list_supported() {
+    local DL=""
+    local FUNC
+    local OPTION
+    local OS
+    local DISPLAY_NAME
+    local SVG
+    local ABOUT
+    local BASED
+    local CREDE
+    local HOMEP
+    echo "OS|Display Name|Based of|Homepage|Credentials|Info about|SVG"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        DISPLAY_NAME="$(pretty_name "${OS}")"
+        SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
+        HOMEP=$(os_homepage ${OS})
+        BASED=$(os_basedof ${OS})
+        CREDE=$(os_credentials ${OS})
+        ABOUT=$(os_about ${OS})
+        echo -e "${OS}|${DISPLAY_NAME}|${BASED}|${HOMEP}|${CREDE}|${ABOUT}|${SVG}"
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${RELEASE},${OPTION}"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${RELEASE},${OPTION}"
+                done
+            else
+                echo "${RELEASE},"
+            fi
+        done
+    done
+    exit 0
+}
+
     local DISPLAY_NAME
     local DL=""
     local DOWNLOADER
@@ -3517,6 +3562,7 @@ Posible arguments:
  --help             (-h)                : Show this help message and exit
  --list-json       (-lj)                : Show OS info in json format
  --list-csv        (-lc)                : Show OS info in csv format
+ --list-supported  (-ls)                : Show all supported OS,releases,etitions
  --os-info          (-i) <os>           : Show info about OS
  --os-homepage      (-o) <os>           : Open OS homepage in default browser
  --iso-url-show     (-u) <os> <re> [ed]      : Show ISO download URL
@@ -3670,6 +3716,9 @@ case "${1}" in
     echo "$(show_os_info "${2}")" | fold -s -w $(tput cols)
     exit 0
     ;;
+  '-ls'|'--list-supported')
+    list_supported  
+    ;; 
   '-lc'|'--list-csv')
     list_csv
     ;;
