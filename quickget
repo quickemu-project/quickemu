@@ -799,7 +799,7 @@ function releases_debian() {
     DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- | grep '\.[0-9]/' | cut -d\> -f9 | cut -d\/ -f1)
     local DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- | grep -e '>[1-9][0-9]\.' | grep -v 'live' | cut -d\> -f9 | cut -d\/ -f1 )
 
-    echo ${DEBOLD} ${DEBCURRENT}
+    echo ${DEBCURRENT} # ${DEBOLD}
 }
 
 function editions_debian() {
@@ -1209,14 +1209,14 @@ function releases_ubuntu() {
         ;;
       kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
-        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
+        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily #${EOL_VERSIONS[@]/#/eol-}
         ;;
       ubuntu-budgie)
         #after 16.04
-        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
+        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily #${EOL_VERSIONS[@]/#/eol-}
         ;;
       ubuntu)
-        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live ${EOL_VERSIONS[@]/#/eol-}
+        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live #${EOL_VERSIONS[@]/#/eol-}
         ;;
     esac
 }
@@ -1942,7 +1942,7 @@ function get_debian() {
     DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
     case ${RELEASE} in
       "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-      *) URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
+      *) URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid";;
     esac
 
     if [ "${EDITION}" == "netinst" ]; then
