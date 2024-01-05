@@ -1,0 +1,227 @@
+=======alma
+9 8
+boot minimal dvd
+=======alpine
+latest 3.18 3.17 3.16 3.15 3.14 3.13 3.12
+=======android
+9.0 8.1 7.1
+x86_64 x86
+=======antix
+23 22 21
+net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+=======archlinux
+latest
+=======archcraft
+latest
+=======arcolinux
+v22.01.10 v22.03.07 v22.04.02 v22.05.02 v22.06.07 v22.07.03 v22.09.04 v22.10.02 v22.11.02 v22.12.02 v23.01.03 v23.02.02 v23.03.01 v23.04.03 v23.05.04 v23.06.02 v23.07.01 v23.09.03 v23.10.01 v23.11.03 v23.12.03 v24.01.04
+large small
+=======artix
+stable
+base-dinit base-openrc base-runit base-s6 cinnamon-dinit cinnamon-openrc cinnamon-runit cinnamon-s6 lxde-dinit lxde-openrc lxde-runit lxde-s6 lxqt-dinit lxqt-openrc lxqt-runit lxqt-s6 mate-dinit mate-openrc mate-runit mate-s6 plasma-dinit plasma-openrc plasma-runit plasma-s6 xfce-dinit xfce-openrc xfce-runit xfce-s6 community-gtk-openrc 
+community-qt-openrc
+=======athenaos
+rolling 23.06.23 23.06.23 23.06.03 23.02.20 23.01.23 22.11.15 22.11.04 22.10.01 22.09.24 22.09.11 22.07.14 22.07 22.06
+=======batocera
+latest
+=======bazzite
+2.1.0 2.0.2 1.3.0 1.2.2 1.2.0 1.0.1 1.0.0 0.1.0 
+=======blendos
+latest previous
+cinnamon deepin gnome lxqt mate plasma xfce
+=======bodhi
+7.0.0
+standard hwe s76
+=======bunsenlabs
+latest
+=======cachyos
+230813
+kde gnome
+=======centos-stream
+9 8
+boot dvd1
+=======chimeralinux
+latest
+base gnome
+=======crunchbang++
+12 11 10 9 8
+=======debian
+10.0.0 10.1.0 10.2.0 10.3.0 10.4.0 10.5.0 10.6.0 10.7.0 10.8.0 10.9.0 10.10.0 10.11.0 10.12.0 10.13.0 11.0.0 11.1.0 11.2.0 11.3.0 11.4.0 11.5.0 11.6.0 11.7.0 11.8.0 12.0.0 12.1.0 12.2.0 12.3.0-NEVER-RELEASED 12.4.0
+standard cinnamon gnome kde lxde lxqt mate xfce netinst
+=======deepin
+20.7 20.6 20.5 20.4 20.3 20.2.4 20.2.3 20.2.2 20.2.1 20.2 20.1 20
+=======devuan
+beowulf chimaera daedalus
+=======dragonflybsd
+6.4.0 6.2.2 6.2.1 6.0.1 6.0.0 5.8.3 5.8.2 5.8.1 5.6.3 5.8.0 5.6.2 5.6.1 5.6.0 5.4.3 5.4.2 5.4.1 5.4.0 5.2.2 5.2.1 5.2.0 5.0.2 5.0.1 5.0.0
+=======easyos
+5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
+=======edubuntu
+23.04 23.10 daily-live
+=======elementary
+7.1 7.0
+=======endeavouros
+apollo_22_1 artemis-22_6 artemis_neo_22_7 artemis_neo_22_8 artemis_nova_22_9 atlantis-21_4 atlantis_neo-21_5 cassini_22_12
+=======endless
+5.0.0
+base en fr pt_BR es
+=======fedora
+39 38
+Workstation Budgie Cinnamon i3 KDE LXDE LXQt Mate Xfce Silverblue Sericea Kinoite Sway Server Onyx
+=======freebsd
+12.4 13.2 14.0
+disc1 dvd1
+=======freedos
+1.3 1.2
+=======garuda
+latest
+cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+=======gentoo
+latest
+=======ghostbsd
+22.01.12 21.11.24 21.10.16
+mate xfce
+=======haiku
+r1beta4 r1beta3
+x86_64 x86_gcc2h
+=======holoiso
+5.0.1
+=======kali
+current kali-weekly
+=======kdeneon
+user testing unstable developer
+=======kolibrios
+latest
+=======kubuntu
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======linuxlite
+6.6 6.4 6.2 6.0
+=======linuxmint
+21.2 21.1 21 20.3 20.2
+cinnamon mate xfce
+=======lmde
+5
+cinnamon
+=======mageia
+8
+Plasma GNOME Xfce
+=======manjaro
+xfce gnome plasma budgie cinnamon i3 mate sway
+full minimal
+=======mxlinux
+21.3
+Xfce KDE Fluxbox
+=======netboot
+latest
+=======netbsd
+9.3 9.2 9.1 9.0 8.2
+=======nixos
+23.11 23.05 22.11 22.05 21.11 21.05
+minimal plasma5 gnome
+=======lubuntu
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======macos
+high-sierra mojave catalina big-sur monterey ventura sonoma
+=======openbsd
+6.8 6.9 7.0 7.1 7.2 7.3 7.4
+=======openindiana
+20230421
+gui text minimal
+=======opensuse
+tumbleweed microos 15.4 15.3 15.2 15.1 15.0
+=======oraclelinux
+9.0 8.6 8.5 8.4 7.9 7.8 7.7
+=======peppermint
+latest
+devuan-xfce devuan-gnome debian-xfce debian-gnome
+=======parrotsec
+6.0 5.3 4.11.3
+architect home htb security
+=======popos
+22.04 21.10 20.04
+intel nvidia
+=======porteus
+5.01 5.0
+cinnamon gnome kde lxde lxqt mate openbox xfce
+=======primtux
+7
+2022-10
+=======reactos
+latest
+=======rebornos
+latest
+=======rockylinux
+9.1 9.0 8.7 8.6 8.5 8.4 8.3
+minimal dvd boot
+=======siduction
+latest
+kde lxqt nox xfce xorg
+=======slackware
+15.0 14.2
+=======slax
+latest
+debian slackware
+=======slint
+15.0 14.2.1
+=======slitaz
+preferred core core64 loram core-5in1 preinit
+=======solus
+4.3
+Budgie GNOME MATE Plasma
+=======sparkylinux
+7.2 2023.10 
+lxqt mate xfce kde minimalgui minimalcli gameover multimedia rescue
+=======spirallinux
+latest
+Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+=======tails
+stable
+=======tinycore
+14.0
+Core TinyCore CorePlus CorePure64 TinyCorePure64
+=======trisquel
+11.0 10.0.1
+mate lxde kde sugar
+=======truenas-core
+13.0 12.0
+=======truenas-scale
+22.12 22.02
+=======ubuntu
+14.04 16.04 18.04 20.04 22.04 23.04 23.10 daily-live
+=======ubuntu-budgie
+18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======ubuntucinnamon
+23.04 23.10 daily-live
+=======ubuntukylin
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======ubuntu-mate
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======ubuntu-server
+18.04 20.04 22.04 23.04 23.10 daily-live
+=======ubuntustudio
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======ubuntu-unity
+23.04 23.10 daily-live
+=======vanillaos
+22.10
+=======void
+current
+glibc musl xfce-glibc xfce-musl
+=======vxlinux
+6.1.5
+=======whonix
+17.0.3.0
+gateway workstation
+=======windows
+11 10-ltsc 10 8
+Arabic Brazilian Portuguese Bulgarian Chinese (Simplified) Chinese (Traditional) Croatian Czech Danish Dutch English (United States) English International Estonian Finnish French French Canadian German Greek Hebrew Hungarian Italian Japanese Korean Latvian Lithuanian Norwegian Polish Portuguese Romanian Russian Serbian Latin Slovak Slovenian Spanish Spanish (Mexico) Swedish Thai Turkish Ukrainian
+=======windows-server
+2022 2019 2016 2012-r2
+English (United States) Chinese (Simplified) French German Italian Japanese Russian Spanish
+=======xerolinux
+kde
+=======xubuntu
+16.04 18.04 20.04 22.04 23.04 23.10 daily-live jammy-daily
+=======zorin
+17 16
+core64 lite64 education64 edulite64
