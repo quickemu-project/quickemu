@@ -977,6 +977,8 @@ function vm_boot() {
     if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then
         args+=(-chardev spicevmc,id=ccid,name=smartcard
                -device ccid-card-passthru,chardev=ccid)
+    else
+        echo "WARNING! ${QEMU} was not compiled with support for smartcard devices"
     fi
 
     # setup usb-controller
