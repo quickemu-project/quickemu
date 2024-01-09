@@ -253,7 +253,9 @@ light work of installations, snapshots and disk management
 
 ## Creating a VM
 
-#### Ubuntu Guest
+### 🐧 Linux guests
+
+#### Ubuntu
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
@@ -272,7 +274,7 @@ quickemu --vm ubuntu-22.04.conf
         enable file sharing.
         -   `sudo apt install spice-webdavd`
 
-##### Ubuntu devel (daily-live) images
+#### Ubuntu devel (daily-live) images
 
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
@@ -286,7 +288,7 @@ You can run `quickget ubuntu devel` to refresh your daily development
 image as often as you like, it will even automatically switch to a new
 series.
 
-##### Ubuntu Flavours
+#### Ubuntu Flavours
 
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
@@ -413,7 +415,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-#### macOS Guest
+### 🍏 macOS Guests
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -501,7 +503,7 @@ macos_release="catalina"
     -   And VirtIO Block Media (disks) are supported/stable in Catalina
         and newer.
 
-##### macOS compatibility
+#### macOS compatibility
 
 There are some considerations when running macOS via Quickemu.
 
@@ -543,7 +545,7 @@ There are some considerations when running macOS via Quickemu.
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-##### macOS App Store
+#### macOS App Store
 
 If you see *"Your device or computer could not be verified"* when you
 try to login to the App Store, make sure that your wired ethernet device
@@ -559,7 +561,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-### Windows 8, 10 & 11 Guests
+### 🪟 Windows 8, 10 & 11 Guests
 
 `quickget` can download
 [Windows10](https://www.microsoft.com/software-download/windows10) and
