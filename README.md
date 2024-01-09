@@ -6,7 +6,6 @@
 
 **Quickly create and run optimised Windows, macOS and Linux desktop virtual machines, with just two commands:**
 
-
 ``` bash
 quickget ubuntu-mate 22.04
 quickemu --vm ubuntu-mate-22.04.conf
