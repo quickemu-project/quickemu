@@ -4,13 +4,20 @@
 
 # Quickemu
 
-**Quickly create and run optimised Windows, macOS and Linux desktop virtual machines.**
+**Quickly create and run optimised Windows, macOS and Linux desktop virtual machines, with just two commands:**
+
+
+``` bash
+quickget ubuntu-mate 22.04
+quickemu --vm ubuntu-mate-22.04.conf
+```
 
 <img src=".github/screenshot.png" alt="Quickemu Screenshot" />
 
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" />.**
 
-Packaging status by [Repology.org](https://repology.org/):
+Quickemu is available in the repositories of the following distros
+(packaging status by [Repology.org](https://repology.org/)):
 
 <table>
 <tbody>
@@ -31,35 +38,18 @@ status](https://repology.org/badge/vertical-allrepos/quickgui.svg?header=quickgu
 </tbody>
 </table>
 
-
 We have a Discord for this project:
 
 [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
-
-See this (old) video where I explain some of my motivations for creating
-Quickemu:
-
-[![Replace VirtualBox with Bash &
-QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
 </div>
 
 ## Introduction
 
-**Quickemu** is a wrapper for the excellent [QEMU](https://www.qemu.org/)
-that attempts to automatically *"do the right thing"*, rather than
-expose exhaustive configuration options.
-
-Quickly create and run highly optimised desktop virtual machines for
-Linux, macOS and Windows, with just two commands:
-
-``` bash
-quickget ubuntu-mate 22.04
-quickemu --vm ubuntu-mate-22.04.conf
-```
-
-You decide what operating system you want to run
-and Quickemu will figure out the best way to do it for you.
+**Quickemu** is a wrapper for the excellent [QEMU](https://www.qemu.org/) that attempts to
+automatically *"do the right thing"*, rather than expose exhaustive configuration options.
+You decide what operating system you want to run, and Quickemu will figure out the best
+way to do it for you.
 
 The original objective of the project was to enable [quick testing of
 Linux distributions](#linux-guests) where the virtual machine configurations can be
@@ -67,6 +57,16 @@ stored anywhere (such as external USB storage or your home directory)
 and no elevated permissions are required to run the virtual machines.
 **Quickemu now also includes comprehensive support for [macOS](#macos-guests)
 and [Windows](#windows-guests)**.
+
+See this (old) video where I explain some of my motivations for creating
+Quickemu:
+
+<div align="center">
+
+[![Replace VirtualBox with Bash &
+QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
+
+</div>
 
 ## Features
 
