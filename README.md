@@ -1,24 +1,65 @@
-<h1 align="center">
-  <img src=".github/logo.png" alt="Quickemu" width="256" />
-  <br />
-  Quickemu
-</h1>
+<div align="center">
 
-<p align="center"><b>Quickly create and run optimised Windows, macOS and Linux desktop virtual machines.</b></p>
-<div align="center"><img src=".github/screenshot.png" alt="Quickemu Screenshot" /></div>
-<p align="center">Made with 💝 for <img src=".github/tux.png" align="top" width="18" /></p>
+<img src=".github/logo.png" alt="Quickemu" width="256" />
+
+# Quickemu
+
+**Quickly create and run optimised Windows, macOS and Linux desktop virtual machines.**
+
+<img src=".github/screenshot.png" alt="Quickemu Screenshot" />
+
+**Made with 💝 for <img src=".github/tux.png" align="top" width="24" />.**
+
+Packaging status by [Repology.org](https://repology.org/):
+
+<table>
+<tbody>
+<tr valign="top">
+<td>
+  
+[![Packaging
+status of quickemu](https://repology.org/badge/vertical-allrepos/quickemu.svg?header=quickemu)](https://repology.org/project/quickemu/versions)
+
+</td>
+<td>
+
+[![Packaging
+status](https://repology.org/badge/vertical-allrepos/quickgui.svg?header=quickgui)](https://repology.org/project/quickgui/versions)
+  
+</td>
+</tr>
+</tbody>
+</table>
+
+
+We have a Discord for this project:
+
+[![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
+
+See this (old) video where I explain some of my motivations for creating
+Quickemu:
+
+[![Replace VirtualBox with Bash &
+QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
+
+</div>
 
 ## Introduction
 
+**Quickemu** is a wrapper for the excellent [QEMU](https://www.qemu.org/)
+that attempts to automatically *"do the right thing"*, rather than
+expose exhaustive configuration options.
+
 Quickly create and run highly optimised desktop virtual machines for
-Linux, macOS and Windows; with just two commands. You decide what
-operating system you want to run and Quickemu will figure out the best
-way to do it for you. For example:
+Linux, macOS and Windows, with just two commands:
 
 ``` bash
 quickget ubuntu-mate 22.04
 quickemu --vm ubuntu-mate-22.04.conf
 ```
+
+You decide what operating system you want to run
+and Quickemu will figure out the best way to do it for you.
 
 The original objective of the project was to enable quick testing of
 Linux distributions where the virtual machine configurations can be
@@ -51,19 +92,6 @@ Windows**.
 -   Braille support
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
 -   Graphical user interfaces available
-
-Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/)
-that attempts to automatically *"do the right thing"*, rather than
-expose exhaustive configuration options.
-
-We have a Discord for this project:
-[![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
-
-See this (old) video where I explain some of my motivations for creating
-Quickemu.
-
-[![Replace VirtualBox with Bash &
-QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
 
 ## Requirements
 
