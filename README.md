@@ -4,12 +4,16 @@
 
 # Quickemu
 
-**Quickly create and run optimised Windows, macOS and Linux desktop virtual machines, with just two commands:**
+**Quickly create and run optimised Windows, macOS and Linux desktop virtual machines:**
+
+</div>
 
 ```bash
 quickget ubuntu-mate 22.04
 quickemu --vm ubuntu-mate-22.04.conf
 ```
+
+<div align="center">
 
 <img src=".github/screenshot.png" alt="Quickemu Screenshot" />
 
@@ -155,9 +159,7 @@ git clone --filter=blob:none https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
 
-Now install all the **Requirements** documented below:
-
-#### Requirements
+When installing from source, you will need to install the following requirements manually:
 
 -   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL,
     SPICE & VirtFS support**
@@ -193,7 +195,7 @@ above requirements or their equivalents.
 
 These examples may save a little typing:
 
-##### Install requirements on Debian hosts
+#### Install requirements on Debian hosts
 
 This also applies to direct derivatives, such as MX Linux:
 
@@ -201,13 +203,13 @@ This also applies to direct derivatives, such as MX Linux:
 sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
-##### Install requirements on Fedora hosts
+#### Install requirements on Fedora hosts
 
 ```sh
 sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
-##### Installing dependencies on macOS hosts
+#### Install requirements on macOS hosts
 
 This is a work in progress (see [issue 248](https://github.com/quickemu-project/quickemu/issues/248)
 for other steps and changes that may enable running on MacOS)
@@ -216,7 +218,7 @@ for other steps and changes that may enable running on MacOS)
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 ```
 
-## Usage
+## Additional UIs
 
 ### GUI
 
@@ -249,7 +251,7 @@ light work of installations, snapshots and disk management
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-### CLI
+## Creating a VM
 
 #### Ubuntu Guest
 
@@ -597,7 +599,7 @@ secureboot="off"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-## Configuration
+## Usage
 
 ### SPICE
 
@@ -848,7 +850,7 @@ guest virtual machines. Just add `tpm="on"` to your VM configuration.
 `quickget` will automatically add this line to Windows 11 virtual
 machines.
 
-## All the options
+## Configuration
 
 Here are the usage instructions:
 
