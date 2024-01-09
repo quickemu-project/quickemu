@@ -179,6 +179,37 @@ sudo apt update
 sudo apt install quickemu
 ```
 
+## NixOS
+
+To quickly try quickemu:
+
+```sh
+nix-shell -p quickemu
+```
+
+To install via Nix profile:
+
+```sh
+nix-env -iA pkgs.quickemu
+```
+
+To install via NixOS config:
+
+```nix
+# /etc/nixos/configuration.nix
+{pkgs, ...}: {
+   environment.systemPackages = with pkgs; 
+     quickemu 
+   };
+}
+```
+
+To install via Flakes:
+
+```sh
+# TODO (flake users, please add an example!)
+```
+
 ## Other Linux
 
 ``` bash
@@ -742,11 +773,27 @@ pass-through.
 ## SPICE redirection (recommended)
 
 Using SPICE for USB pass-through is easiest as it doesn't require any
-elevated permission, start Quickemu with `--display spice` and then
-select `Input` -\> `Select USB Device for redirection` from the menu to
+elevated permission:
+
+* Start Quickemu with `--display spice` and then
+* select `Input` -\> `Select USB Device for redirection` from the menu to
 choose which device(s) you want to attach to the guest.
 
-## Host redirection **NOT Recommended**
+### Enabling SPICE redirection on NixOS
+
+On NixOS, if you encounter this error:
+
+```
+Error setting facl: Operation not permitted
+```
+
+Try setting [the following option](https://search.nixos.org/options?channel=23.11&show=virtualisation.spiceUSBRedirection.enable&from=0&size=50&sort=relevance&type=packages&query=spiceusbredirec):
+
+```nix
+virtualisation.spiceUSBRedirection.enable = true;
+```
+
+## Host redirection (**NOT Recommended**)
 
 **USB host redirection is not recommended**, it is provided purely for
 backwards compatibility to older versions of Quickemu. Using SPICE is
