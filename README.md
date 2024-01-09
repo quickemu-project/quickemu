@@ -218,9 +218,7 @@ for other steps and changes that may enable running on MacOS)
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 ```
 
-## Additional UIs
-
-### GUI
+## GUI (quickgui)
 
 While `quickemu` and `quickget` are designed for the terminal, a
 graphical user interface is also available:
@@ -239,7 +237,7 @@ Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 [Philipp Kiemle](https://github.com/daPhipz) for creating the
 **[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
 
-### TUI
+## TUI (qqx)
 
 From Nov 2023, there is also a multi option desktop integrated text
 interface, the **quickemu quickget X terminal project**, a.k.a. **qqX**,
@@ -251,11 +249,9 @@ light work of installations, snapshots and disk management
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-## Creating a VM
+## Creating Linux guests 🐧
 
-### 🐧 Linux guests
-
-#### Ubuntu
+### Ubuntu
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
@@ -274,7 +270,7 @@ quickemu --vm ubuntu-22.04.conf
         enable file sharing.
         -   `sudo apt install spice-webdavd`
 
-#### Ubuntu devel (daily-live) images
+### Ubuntu devel (daily-live) images
 
 `quickget` can also download/refresh devel images via `zsync` for Ubuntu
 developers and testers.
@@ -288,7 +284,7 @@ You can run `quickget ubuntu devel` to refresh your daily development
 image as often as you like, it will even automatically switch to a new
 series.
 
-#### Ubuntu Flavours
+### Ubuntu Flavours
 
 All the official Ubuntu flavours are supported, just replace `ubuntu`
 with your preferred flavour.
@@ -321,7 +317,7 @@ The `--show-iso-url` and `--test-iso-url` options **do not** work for
 `Windows` (`quickget` will begin downloading the requested release and
 edition of windows)
 
-#### Other Operating Systems
+### Other Operating Systems
 
 `quickget` also supports:
 
@@ -390,6 +386,8 @@ edition of windows)
 -   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
 
+### Custom Linux guests
+
 Or you can download a Linux image and manually create a VM
 configuration.
 
@@ -415,7 +413,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-### 🍏 macOS Guests
+## Creating macOS Guests 🍏 
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -503,7 +501,7 @@ macos_release="catalina"
     -   And VirtIO Block Media (disks) are supported/stable in Catalina
         and newer.
 
-#### macOS compatibility
+### macOS compatibility
 
 There are some considerations when running macOS via Quickemu.
 
@@ -545,7 +543,7 @@ There are some considerations when running macOS via Quickemu.
     webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
 -   Copy/paste via SPICE agent is **not available on macOS**.
 
-#### macOS App Store
+### macOS App Store
 
 If you see *"Your device or computer could not be verified"* when you
 try to login to the App Store, make sure that your wired ethernet device
@@ -561,16 +559,16 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-### 🪟 Windows 8, 10 & 11 Guests
+## Creating Windows guests 🪟
 
 `quickget` can download
-[Windows10](https://www.microsoft.com/software-download/windows10) and
-[Windows 11](https://www.microsoft.com/software-download/windows11)
+[**Windows 10**](https://www.microsoft.com/software-download/windows10) and
+[**Windows 11**](https://www.microsoft.com/software-download/windows11)
 automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-Windows 8.1 is also supported but doesn't feature any automated
+**Windows 8.1** is also supported but doesn't feature any automated
 installation or driver optimisation.
 
 ``` bash
@@ -601,7 +599,7 @@ secureboot="off"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-## Usage
+## Connecting to your VM
 
 ### SPICE
 
