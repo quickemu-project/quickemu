@@ -1335,9 +1335,9 @@ EOF
 function usage() {
     echo
     echo "Usage"
-    echo "  ${LAUNCHER} --vm ubuntu.conf"
+    echo "  ${LAUNCHER} --vm ubuntu.conf [optional params]"
     echo
-    echo "You can also pass optional parameters"
+    echo "List of optional parameters:"
     echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
     echo "  --braille                         : Enable braille support. Requires SDL."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"
