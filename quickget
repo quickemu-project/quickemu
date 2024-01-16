@@ -289,6 +289,55 @@ list_supported() {
     exit 0
 }
 
+list_isos() {
+    local URL
+    local FUNC
+    local OPTION
+    local OS
+
+    echo "OS|Release|Edition|URL"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+             # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -z "${URL}" ]; then
+                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                    else
+                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                    fi
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -n "${URL}" ]; then
+                        echo "${OS}|${RELEASE}|${OPTION}|"
+                    else
+                        echo "${OS}|${RELEASE}|${OPTION}|Strange!"
+                    fi
+                done
+            elif [[ "${OS}" == "macos" ]]; then
+                echo "${OS}|${RELEASE}|${OPTION}|"
+            else
+                URL=$(./quickget -u ${OS} ${RELEASE})
+                if [ -z "${URL}" ]; then
+                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                else
+                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
+                fi
+            fi
+        done
+    done
+    exit 0
+}
+
 function os_support() {
     echo alma \
     alpine \
