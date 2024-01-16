@@ -667,6 +667,10 @@ function releases_gentoo() {
     echo latest
 }
 
+function editions_gentoo() {
+    echo minimal livegui
+}
+
 function releases_ghostbsd() {
     echo 21.10.16 21.11.24 22.01.12
 }
@@ -1804,8 +1808,12 @@ function get_gentoo() {
     local ISO=""
     local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds/"
 
-    ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1)
-    HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1)
+    case ${EDITION} in
+      minimal) ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1)
+        HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1);;
+      livegui) ISO=$(wget -q -O- "${URL}/${RELEASE}-iso.txt" | grep livegui | cut -d' ' -f1)
+        HASH=$( wget -q -O- "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1);;
+    esac
     echo "${URL}/${ISO} ${HASH}"
 }
 
