@@ -3331,8 +3331,8 @@ function get_windows() {
 }
 
 open_url() {
-    local URL="$1";
-    xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
+    local URL="${1}";
+    xdg-open "$URL" || sensible-browser "$URL" || x-www-browser "$URL" || gnome-open "$URL";
 }
 
 create_vm() {
@@ -3454,7 +3454,7 @@ case "${1}" in
     if [ -z "$(os_homepage ${OS})" ]; then
         os_error
     else
-        url_open "$(os_homepage ${OS})"
+        open_url "$(os_homepage ${OS})"
         exit 0
     fi
     ;;
