@@ -1446,7 +1446,11 @@ EOF
 
     echo
     echo "To start your $(pretty_name "${OS}") virtual machine run:"
-    echo "    quickemu --vm ${CONF_FILE}"
+    if [ ${OS} == "slint" ]; then
+        echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+    else
+        echo "    quickemu --vm ${CONF_FILE}"
+    fi
     echo
     exit 0
 }
@@ -2438,12 +2442,16 @@ function get_slax() {
 }
 
 function get_slint() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
     case ${RELEASE} in
       14.2.1) ISO="slint64-14.2.1.4.iso";;
       15.0) ISO="slint64-15.0-5.iso";;
     esac
     URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
-    HASH=$(wget -q -O- ${URL}/${ISO}.sha256 | cut -d' ' -f4)
+    HASH=$(wget -q -O- "${URL}"/${ISO}.sha256 | cut -d' ' -f4)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
