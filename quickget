@@ -292,6 +292,40 @@ list_supported() {
     exit 0
 }
 
+# output OS RELEASE EDITION (usefull for straight testing...)
+list_isos2() {
+    local show_iso_url="1"
+    local DL=""
+    local FUNC
+    local OPTION
+    local OS
+
+    echo "OS|Release|Edition|URL"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            else
+                echo "${OS} ${RELEASE}"
+            fi
+        done
+    done
+    exit 0
+}
+
 list_isos() {
     local URL
     local FUNC
@@ -343,6 +377,7 @@ list_isos() {
 
 test_isos() {
     local DL=""
+    local test_iso_url="1"
     local URL
     local ISO
     local FUNC
