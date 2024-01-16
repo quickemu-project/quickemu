@@ -3388,36 +3388,22 @@ fi
 
 LANGS=()
 
-if [ -n "${1}" ]; then
-    OS="${1,,}"
-    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
-        list_csv
-    elif [ "${OS}" == "list_json" ]; then
-        list_json
-    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-        WHERE=$(dirname "${BASH_SOURCE[0]}")
-        "${WHERE}/quickemu" --version
-        exit 0
-    fi
-else
+os_error() {
     echo "ERROR! You must specify an operating system."
-    echo -n " - Operating Systems: "
-    os_support
-    echo "
-You can also use these arguments
-  -u  / --show-iso-url           <os> <release> [edition] : Show ISO download URL
-  -t  / --test-iso-url           <os> <release> [edition] : Test if ISO is available
-  -d  / --download-iso           <os> <release> [edition] : Download ISO to current dir
-  -dt / --download-iso-to <path> <os> <release> [edition] : Download ISO to specified dir
-  -o  / --open-distro-homepage   <os>                     : Open distro homepage
-  -s  / --show-distro-homepage   <os>                     : Show distro homepage link"
+    echo "- Supported Operating Systems:"
+    os_support | fold -s -w $(tput cols)
+    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
-fi
+}
 
-if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support
+os_supported() {
+    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
+            echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support | fold -s -w $(tput cols)
     exit 1
+    fi
+}
+
 function show_os_info() {
     local OS=""
 
@@ -3511,7 +3497,18 @@ case "${1}" in
     ;;
  esac
 
+if [ -n "${1}" ]; then
+    OS="${1,,}"
+    case "${OS}" in
+    '-i'|'--os-info'|'-o'|'--os-homepage'|'-d'|'--iso-download')
+        os_error
+        ;;
+    esac
+else
+    os_error
 fi
+
+os_supported
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
@@ -3597,12 +3594,7 @@ if [ -n "${2}" ]; then
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
     fi
-elif [ "${open_distro_homepage}" == 'on' ]; then
-    HOMEPAGE=$(os_homepage ${OS})
-    open_url "${HOMEPAGE}" && exit 0
-elif [ "${show_distro_homepage}" == 'on' ]; then
-        HOMEPAGE=$(os_homepage ${OS})
-        echo "${HOMEPAGE}" && exit 0
+
 elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
     RELEASE=$(releases_${OS})
     VM_PATH="${OS}"
@@ -3625,14 +3617,14 @@ else
         "languages_${OS}" && echo "${LANGS[@]}"
         ;;
       *)
-        echo -n " - Releases: "
-        releases_"${OS}"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-          echo -n " - Editions: "
-          editions_"${OS}"
-        fi
+      echo -n " - Releases: "
+      "releases_${OS}" | fold -s -w $(tput cols)
         ;;
     esac
+    if [[ $(type -t "editions_${OS}") == function ]]; then
+        echo -n " - Editions: "
+        "editions_${OS}"
+    fi
     exit 1
 fi
 
