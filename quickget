@@ -292,10 +292,8 @@ list_supported() {
     exit 0
 }
 
-# output OS RELEASE EDITION (usefull for straight testing...)
 list_isos() {
-    local show_iso_url="1"
-    local DIR="/dev/null"
+    local URL
     local FUNC
     local OPTION
     local OS
@@ -319,6 +317,9 @@ list_isos() {
                     validate_release releases_${OS}
                     get_${OS} ${OPTION} | cut_1
                 done
+            #TODO NEEDED?
+            elif [[ "${OS}" == "macos" ]]; then
+                echo "${OS}|${RELEASE}|${OPTION}|"
             else
                 validate_release releases_${OS}
                 get_${OS} ${RELEASE} | cut_1
@@ -378,74 +379,6 @@ test_isos() {
     exit 0
 }
 
-test_isos2() {
-    local DL=""
-    local URL
-    local ISO
-    local FUNC
-    local OPTION
-    local OS
-    local RELEASE
-    local HAS_ZSYNC=0
-    local GOOD
-
-    # Check if zsync is available
-    if command -v zsync &>/dev/null; then
-        HAS_ZSYNC=1
-    fi
-    if command -v aria2c &>/dev/null; then
-        DL="aria2c"
-    elif command -v wget &>/dev/null; then
-        DL="wget"
-    fi
-    echo "Status - OS|Release|Edition|URL"
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-                DOWNLOADER="zsync"
-            else
-                DOWNLOADER="${DL}"
-            fi
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
-                    if [[ "${GOOD}" == "OK" ]]; then
-                        echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                    else
-                        echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                    fi
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -z "${URL}" ]; then
-                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
-                    else
-                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
-                    fi
-                done
-            else
-                URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                GOOD=$(timeout 10 wget -q --spider  ${URL} && echo 'OK' || echo 'ERROR!')
-                if [[ "${GOOD}" == "OK" ]]; then
-                    echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                else
-                    echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                fi
-            fi
-        done
-    done
-    exit 0
-}
 
 function os_support() {
     echo alma \
@@ -1223,14 +1156,7 @@ function web_get() {
     done
 
     # Test mode for ISO
-    if [ "${show_iso_url}" == 1 ]; then
-        echo "${URL}"
-        exit 0
-    elif [ "${test_iso_url}" == 1 ]; then
-        echo -n "Testing if $(echo ${URL} | rev | cut -d'/' -f1 | rev) is available... "
-        wget -q --spider "${URL}" && echo 'Sucessfull' || echo 'ERROR!'
-        exit 0
-    elif [ "${download_iso}" == 1 ]; then
+    if [ "${download_iso}" == 1 ]; then
         DIR="$(pwd)"
     fi
 
