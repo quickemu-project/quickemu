@@ -260,6 +260,38 @@ function list_csv() {
   exit 0
 }
 
+list_supported() {
+    # output OS RELEASE EDITION (usefull for straight testing...)
+    local DL=""
+    local FUNC
+    local OPTION
+    local OS
+
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            else
+                echo "${OS} ${RELEASE}"
+            fi
+        done
+    done
+    exit 0
+}
+
 list_isos() {
     local URL
     local FUNC
@@ -303,38 +335,6 @@ list_isos() {
                 else
                     echo "${OS}|${RELEASE}|${OPTION}|${URL}"
                 fi
-            fi
-        done
-    done
-    exit 0
-}
-
-list_supported() {
-    # output OS RELEASE EDITION (usefull for straight testing...)
-    local DL=""
-    local FUNC
-    local OPTION
-    local OS
-
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            else
-                echo "${OS} ${RELEASE}"
             fi
         done
     done
@@ -593,7 +593,6 @@ function editions_artix() {
 }
 
 function releases_athenaos() {
-    local PROJECT="athena-iso"
     wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
 }
 
@@ -984,9 +983,8 @@ function editions_solus() {
 }
 
 function releases_sparkylinux() {
-    local SPARKYS=""
-    SPARKYS=$(wget -qO- "https://sourceforge.net/projects/sparkylinux/rss?path=/" | grep 'link' | grep '.iso' | cut -d'-' -f2 | uniq | tr '\r\n' ' ')
-    echo "${SPARKYS}"
+    local SPARKY_RELEASES=$(wget -qO- "https://sourceforge.net/projects/sparkylinux/rss?path=/" | grep 'link' | grep '.iso' | cut -d'-' -f2 | uniq | tr '\r\n' ' ')
+    echo "${SPARKY_RELEASES}"
 }
 
 function editions_sparkylinux() {
@@ -1449,7 +1447,7 @@ EOF
     echo
     echo "To start your $(pretty_name "${OS}") virtual machine run:"
     if [ ${OS} == "slint" ]; then
-        echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braile support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+        echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
         echo "    quickemu --vm ${CONF_FILE}"
     fi
@@ -1581,7 +1579,6 @@ function get_artix() {
 }
 
 function get_athenaos() {
-    local PROJECT="athena-iso"
     local HASH=""
     local URL=""
     local ISO=""
@@ -3341,7 +3338,7 @@ function get_windows() {
     fi
 }
 
-url_open() {
+open_url() {
     local URL="${1}";
     xdg-open "$URL" || sensible-browser "$URL" || x-www-browser "$URL" || gnome-open "$URL";
 }
@@ -3396,6 +3393,22 @@ fi
 
 LANGS=()
 
+os_error() {
+    echo "ERROR! You must specify an operating system."
+    echo "- Supported Operating Systems:"
+    os_support | fold -s -w $(tput cols)
+    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
+    exit 1
+}
+
+os_supported() {
+    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
+            echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support | fold -s -w $(tput cols)
+    exit 1
+    fi
+}
+
 help_message() {
     printf '                             _              _
            __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
@@ -3434,108 +3447,6 @@ Posible arguments:
 supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
     os_support | fold -s -w $(tput cols)
     exit 0
-}
-
-os_error() {
-    echo "ERROR! You must specify an operating system."
-    echo "- Supported Operating Systems:"
-    os_support | fold -s -w $(tput cols)
-    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
-    exit 1
-}
-
-os_path_error() {
-    echo "ERROR! You must specify path."
-    os_error
-    exit 1
-}
-
-os_supported() {
-    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
-        os_not_supported
-    fi
-}
-
-os_not_supported() {
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support | fold -s -w $(tput cols)
-    exit 1
-}
-
-os_error_release() {
-    echo "ERROR! You must specify a release."
-    case ${OS} in
-      *ubuntu-server*)
-        echo -n " - Releases: "
-        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *ubuntu*)
-        echo -n " - Releases: "
-        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *windows*)
-        echo -n " - Releases: "
-        "releases_${OS}"
-        echo -n " - Languages: "
-        "languages_${OS}" && echo "${LANGS[@]}"
-        ;;
-      *)
-      echo -n " - Releases: "
-      "releases_${OS}" | fold -s -w $(tput cols)
-        ;;
-    esac
-    if [[ $(type -t "editions_${OS}") == function ]]; then
-        echo -n " - Editions: "
-        "editions_${OS}"
-    fi
-    exit 1
-}
-
-os_supported_edition() {
-    if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
-        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition."
-        echo -n ' - Editions: '
-        for EDITION in "${EDITIONS[@]}"; do
-            echo -n "${EDITION} "
-        done
-        echo ''
-        exit 1
-    fi
-}
-
-os_error_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
-}
-
-os_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language:\n"
-    for LANG in "${LANGS[@]}"; do
-        echo -n "${LANG} "
-    done
-    exit 1
-}
-
-handle_missing() {
-    # Handle odd missing Fedora combinations
-    if [[ $OS == fedora ]] ; then
-        if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
-            echo "ERROR! Unsupported combination"
-            echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
-            exit 1;
-        fi
-    fi
-
-    # Handle missing Manjaro Sway minimal
-    if [[ $OS == manjaro ]] ; then
-        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
-            echo "ERROR! Unsupported combination"
-            echo "       Manjaro Sway does not have a minimal edition"
-            exit 1;
-        fi
-    fi
 }
 
 function show_os_info() {
@@ -3620,7 +3531,7 @@ case "${1}" in
     if [ -z "$(os_homepage ${OS})" ]; then
         os_error
     else
-        url_open "$(os_homepage ${OS})"
+        open_url "$(os_homepage ${OS})"
         exit 0
     fi
     ;;
@@ -3655,16 +3566,43 @@ if [ -n "${2}" ]; then
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            os_supported_edition
-        else
-            os_error_edition
+                if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
+        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition."
+        echo -n ' - Editions: '
+        for EDITION in "${EDITIONS[@]}"; do
+            echo -n "${EDITION} "
+        done
+        echo ''
+        exit 1
         fi
+    else
+        echo -en "ERROR! You must specify an edition.\n - Editions: "
+        #TODO ERROR here
+        "editions_${OS}"
+        exit 1
+    fi
 
-        handle_missing
+    # Handle odd missing Fedora combinations
+    if [[ $OS == fedora ]] ; then
+        if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
+            echo "ERROR! Unsupported combination"
+            echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+            exit 1;
+        fi
+    fi
 
-        VM_PATH="${OS}-${RELEASE}-${EDITION}"
-        create_vm "$("get_${OS}" "${EDITION}")"
-    elif [ "${OS}" == "macos" ]; then
+    # Handle missing Manjaro Sway minimal
+    if [[ $OS == manjaro ]] ; then
+        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
+            echo "ERROR! Unsupported combination"
+            echo "       Manjaro Sway does not have a minimal edition"
+            exit 1;
+        fi
+    fi
+
+    VM_PATH="${OS}-${RELEASE}-${EDITION}"
+    create_vm "$("get_${OS}" "${EDITION}")"
+    if [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
         get_macos
@@ -3687,7 +3625,11 @@ if [ -n "${2}" ]; then
         if [ -n "${3}" ]; then
             LANG="${3}"
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
-                os_supported_lang
+                echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language:\n"
+                for LANG in "${LANGS[@]}"; do
+                    echo -n "${LANG} "
+                done
+                exit 1
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${LANG// /-}" | tr -d '()')"
         fi
@@ -3703,7 +3645,32 @@ elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == 
     VM_PATH="${OS}"
     create_vm "$("get_${OS}")"
 else
-    os_error_release
+    echo "ERROR! You must specify a release."
+    case ${OS} in
+      *ubuntu-server*)
+        echo -n " - Releases: "
+        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *ubuntu*)
+        echo -n " - Releases: "
+        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *windows*)
+        echo -n " - Releases: "
+        "releases_${OS}"
+        echo -n " - Languages: "
+        "languages_${OS}" && echo "${LANGS[@]}"
+        ;;
+      *)
+      echo -n " - Releases: "
+      "releases_${OS}" | fold -s -w $(tput cols)
+        ;;
+    esac
+    if [[ $(type -t "editions_${OS}") == function ]]; then
+        echo -n " - Editions: "
+        "editions_${OS}"
+    fi
+    exit 1
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
