@@ -90,36 +90,36 @@ arcolinux v24.01.04 large
 arcolinux v24.01.04 small
 arcolinux v24.02.01 large
 arcolinux v24.02.01 small
-artix stable base-dinit
-artix stable base-openrc
-artix stable base-runit
-artix stable base-s6
-artix stable cinnamon-dinit
-artix stable cinnamon-openrc
-artix stable cinnamon-runit
-artix stable cinnamon-s6
-artix stable lxde-dinit
-artix stable lxde-openrc
-artix stable lxde-runit
-artix stable lxde-s6
-artix stable lxqt-dinit
-artix stable lxqt-openrc
-artix stable lxqt-runit
-artix stable lxqt-s6
-artix stable mate-dinit
-artix stable mate-openrc
-artix stable mate-runit
-artix stable mate-s6
-artix stable plasma-dinit
-artix stable plasma-openrc
-artix stable plasma-runit
-artix stable plasma-s6
-artix stable xfce-dinit
-artix stable xfce-openrc
-artix stable xfce-runit
-artix stable xfce-s6
-artix stable community-gtk-openrc
-artix stable community-qt-openrc
+artixlinux stable base-dinit
+artixlinux stable base-openrc
+artixlinux stable base-runit
+artixlinux stable base-s6
+artixlinux stable cinnamon-dinit
+artixlinux stable cinnamon-openrc
+artixlinux stable cinnamon-runit
+artixlinux stable cinnamon-s6
+artixlinux stable lxde-dinit
+artixlinux stable lxde-openrc
+artixlinux stable lxde-runit
+artixlinux stable lxde-s6
+artixlinux stable lxqt-dinit
+artixlinux stable lxqt-openrc
+artixlinux stable lxqt-runit
+artixlinux stable lxqt-s6
+artixlinux stable mate-dinit
+artixlinux stable mate-openrc
+artixlinux stable mate-runit
+artixlinux stable mate-s6
+artixlinux stable plasma-dinit
+artixlinux stable plasma-openrc
+artixlinux stable plasma-runit
+artixlinux stable plasma-s6
+artixlinux stable xfce-dinit
+artixlinux stable xfce-openrc
+artixlinux stable xfce-runit
+artixlinux stable xfce-s6
+artixlinux stable community-gtk-openrc
+artixlinux stable community-qt-openrc
 athenaos rolling
 athenaos 23.06.23
 athenaos 23.06.23
@@ -143,20 +143,20 @@ bazzite 1.2.0
 bazzite 1.0.1
 bazzite 1.0.0
 bazzite 0.1.0
-blendos latest cinnamon
-blendos latest deepin
-blendos latest gnome
-blendos latest lxqt
-blendos latest mate
-blendos latest plasma
-blendos latest xfce
-blendos previous cinnamon
-blendos previous deepin
-blendos previous gnome
-blendos previous lxqt
-blendos previous mate
-blendos previous plasma
-blendos previous xfce
+blendos plasma/1688424625
+blendos gnome/1688424211
+blendos deepin/1688423865
+blendos lxqt/1688423615
+blendos mate/1688423313
+blendos xfce/1688423053
+blendos cinnamon/1688422684
+blendos plasma/1687873468
+blendos gnome/1687872336
+blendos deepin/1687871428
+blendos lxqt/1687870883
+blendos mate/1687870186
+blendos xfce/1687869663
+blendos cinnamon/1687869060
 bodhi 7.0.0 standard
 bodhi 7.0.0 hwe
 bodhi 7.0.0 s76
@@ -232,14 +232,20 @@ edubuntu 23.10
 edubuntu daily-live
 elementary 7.1
 elementary 7.0
-endeavouros apollo_22_1
-endeavouros artemis-22_6
-endeavouros artemis_neo_22_7
-endeavouros artemis_neo_22_8
-endeavouros artemis_nova_22_9
-endeavouros atlantis-21_4
-endeavouros atlantis_neo-21_5
+endeavouros galileo-11-2023
+endeavouros cassini_nova-03-2023_r3
+endeavouros cassini_nova-03-2023_r2
+endeavouros cassini_nova-03-2023_r1
+endeavouros cassini_nova-03-2023
+endeavouros cassini_neo_22_12
 endeavouros cassini_22_12
+endeavouros atlantis_neo-21_5
+endeavouros atlantis-21_4
+endeavouros artemis_nova_22_9
+endeavouros artemis_neo_22_8
+endeavouros artemis_neo_22_7
+endeavouros artemis-22_6
+endeavouros apollo_22_1
 endless 5.0.0 base
 endless 5.0.0 en
 endless 5.0.0 fr
@@ -296,7 +302,8 @@ garuda latest qtile
 garuda latest sway
 garuda latest wayfire
 garuda latest xfce
-gentoo latest
+gentoo latest minimal
+gentoo latest livegui
 ghostbsd 22.01.12 mate
 ghostbsd 22.01.12 xfce
 ghostbsd 21.11.24 mate
@@ -371,6 +378,8 @@ netbsd 9.2
 netbsd 9.1
 netbsd 9.0
 netbsd 8.2
+netbsd 8.1
+netbsd 8.0
 nixos 23.11 minimal
 nixos 23.11 plasma5
 nixos 23.11 gnome
@@ -414,13 +423,13 @@ openbsd 7.4
 openindiana 20230421 gui
 openindiana 20230421 text
 openindiana 20230421 minimal
-opensuse tumbleweed
-opensuse microos
 opensuse 15.4
 opensuse 15.3
 opensuse 15.2
 opensuse 15.1
 opensuse 15.0
+opensuse microos
+opensuse tumbleweed
 oraclelinux 9.0
 oraclelinux 8.6
 oraclelinux 8.5
@@ -612,8 +621,6 @@ void current musl
 void current xfce-glibc
 void current xfce-musl
 vxlinux 6.1.5
-whonix 17.0.3.0 gateway
-whonix 17.0.3.0 workstation
 windows 11 Arabic
 windows 11 Brazilian Portuguese
 windows 11 Bulgarian
