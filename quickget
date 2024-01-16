@@ -3480,7 +3480,7 @@ create_vm() {
 
     if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso')
+        ISO=$(find "${VM_PATH}" -type f -iname '*.iso')
     fi
 
     #if [ ${OS} == "guix" ] && [[ $ISO =~ ".qcow2" ]]; then
@@ -3506,7 +3506,7 @@ create_vm() {
 
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+        ISO=$(find "${VM_PATH}" -type f \( -iname '*.iso' ! -iname '*.zip' \))
     fi
 
     make_vm_config "${ISO}"
