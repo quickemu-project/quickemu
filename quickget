@@ -1055,14 +1055,14 @@ function releases_ubuntu() {
         ;;
       kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
         ## after 14.04
-        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
+        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily #${EOL_VERSIONS[@]/#/eol-}
         ;;
       ubuntu-budgie)
         #after 16.04
-        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
+        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily #${EOL_VERSIONS[@]/#/eol-}
         ;;
-        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live ${EOL_VERSIONS[@]/#/eol-}
       ubuntu)
+        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live #${EOL_VERSIONS[@]/#/eol-}
         ;;
     esac
 }
