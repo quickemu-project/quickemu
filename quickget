@@ -531,11 +531,11 @@ function editions_antix() {
     echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
 }
 
-function releases_archlinux() {
+function releases_archcraft() {
     echo latest
 }
 
-function releases_archcraft() {
+function releases_archlinux() {
     echo latest
 }
 
@@ -590,24 +590,21 @@ function releases_athenaos() {
     wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
 }
 
+function releases_batocera() {
+    echo latest
+}
+
 function releases_bazzite() {
     echo $(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | tr '\n' ' ')
 }
 
 function releases_blendos() {
+    local RLIST=""
 
-# Pull the rss feed
-wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
-
-    local RLIST
+    # Pull the rss feed
+    wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
     RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
-    echo ${RLIST}
-
-}
-
-
-function releases_bunsenlabs() {
-    echo latest
+    echo "${RLIST}"
 }
 
 function releases_bodhi() {
@@ -616,6 +613,10 @@ function releases_bodhi() {
 
 function editions_bodhi() {
     echo standard hwe s76
+}
+
+function releases_bunsenlabs() {
+    echo latest
 }
 
 function releases_cachyos() {
@@ -705,11 +706,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 38 39
-}
-
-function releases_batocera() {
-  echo latest
+    echo 39 38
 }
 
 function editions_fedora() {
@@ -807,6 +804,10 @@ function releases_lmde(){
     echo 5
 }
 
+function releases_macos() {
+    echo high-sierra mojave catalina big-sur monterey ventura sonoma
+}
+
 function releases_mageia(){
     echo 8
 }
@@ -815,20 +816,8 @@ function editions_mageia(){
     echo Plasma GNOME Xfce
 }
 
-function releases_mxlinux(){
-    echo 21.3
-}
-
-function editions_mxlinux(){
-    echo Xfce KDE Fluxbox
-}
-
 function editions_manjaro(){
     echo full minimal
-}
-
-function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura sonoma
 }
 
 function releases_manjaro() {
@@ -840,6 +829,14 @@ function releases_manjaro() {
     i3 \
     mate \
     sway
+}
+
+function releases_mxlinux(){
+    echo 21.3
+}
+
+function editions_mxlinux(){
+    echo Xfce KDE Fluxbox
 }
 
 function releases_netboot() {
@@ -926,12 +923,6 @@ function releases_reactos() {
 
 function releases_rebornos() {
     echo latest
-}
-
-function get_rebornos() {
-    local ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    local HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
-    echo "${ISO} ${HASH}"
 }
 
 function releases_rockylinux() {
@@ -1523,27 +1514,28 @@ function get_antix() {
       ;;
     esac
 
-    HASH=$(wget -q -O- ${URL}/README.txt | grep "${ISO}" | cut -d' ' -f1 | head -1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_archlinux() {
-    local HASH=""
-    local ISO=""
-    local URL="https://mirror.rackspace.com/archlinux"
-    ISO=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
-    HASH=$(wget -q -O- "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha1_sum')
+    HASH=$(wget -q -O- ${URL}/README.txt | grep "${ISO}" | cut_1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_archcraft() {
     local HASH=""
     local URL=""
-    local TMPURL=""
+    # no longer needed?
+    #local TMPURL=""
 
     # Check where the URL redirects using curl. Output to a nonexistent directory so it's not possible to successfully download the image
     URL=$(curl -Lfs "https://sourceforge.net/projects/archcraft/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     echo "${URL} ${HASH}"
+}
+
+function get_archlinux() {
+    local HASH=""
+    local ISO="archlinux-x86_64.iso"
+    local URL="https://mirror.rackspace.com/archlinux/iso/latest"
+
+    HASH=$(wget -q -O- "${URL}/sha256sums.txt" | grep "${ISO}" | cut_1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_arcolinux() {
@@ -1585,16 +1577,25 @@ function get_athenaos() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_bunsenlabs() {
+function get_batocera() {
     local HASH=""
-    local ISO="beryllium-1-amd64.hybrid.iso"
-    local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
+    local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_bazzite() {
+    local HASH=""
+    local ISO=""
+    local URL="https://github.com/ublue-os/bazzite/releases/download/v${RELEASE}"
+
+    ISO=$(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '"' -f4 | cut -d'.' -f1-5 | grep "${RELEASE}" | cut -d'/' -f9)
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | grep 'SHA256' | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_blendos() {
-
     local HASH=""
     local URL=""
 
@@ -1606,40 +1607,12 @@ function get_blendos() {
     URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
     HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
     # ## fix up variables for path naming
-      EDITION=${RELEASE%%/*}
-      RELEASE=${RELEASE##*/}
-      # For UX maybe show the date of the release
-      #echo ${RELEASE##*/} "(" $(date -d @${RELEASE##*/}) ")"
-      # maybe $(date -d @${RELEASE##*/} '+%Y%m%d')
-      echo "${URL} ${HASH}"
-}
-
-function get_vanillaos() {
-  # maybe use github api and dynamism for R2.0 but for 22.10 just
-  # hit their CDN
-  #
-  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.md5.txt
-  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt
-    local HASH=$(curl -s "https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt" | cut -d' ' -f1)
-    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.iso"
+    EDITION=${RELEASE%%/*}
+    RELEASE=${RELEASE##*/}
+    # For UX maybe show the date of the release
+    #echo ${RELEASE##*/} "(" $(date -d @${RELEASE##*/}) ")"
+    # maybe $(date -d @${RELEASE##*/} '+%Y%m%d')
     echo "${URL} ${HASH}"
-}
-
-function get_batocera() {
-    local HASH=""
-    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
-    local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
-     echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_bazzite() {
-    local HASH=""
-    local ISO=""
-    local URL="https://github.com/ublue-os/bazzite/releases/download/v${RELEASE}"
-
-    ISO=$(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '"' -f4 | cut -d'.' -f1-5 | grep "${RELEASE}" | cut -d'/' -f9)
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | grep 'SHA256' | cut -d' ' -f4)
-    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bodhi() {
@@ -1653,6 +1626,15 @@ function get_bodhi() {
       *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_bunsenlabs() {
+    local HASH=""
+    local ISO="beryllium-1-amd64.hybrid.iso"
+    local URL="https://ddl.bunsenlabs.org/ddl"
+
+    HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2368,6 +2350,14 @@ function get_reactos() {
     echo "${URL} ${HASH}"
 }
 
+function get_rebornos() {
+    local ISO=""
+    local HASH=""
+    ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    echo "${ISO} ${HASH}"
+}
+
 function get_rockylinux() {
     local EDITION="${1:-}"
     if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]
@@ -2650,6 +2640,18 @@ function get_ubuntu() {
         check_hash "${ISO}" "${HASH}"
         make_vm_config "${ISO}"
     fi
+}
+
+function get_vanillaos() {
+    # maybe use github api and dynamism for R2.0 but for 22.10 just
+    # hit their CDN
+    #
+    # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.md5.txt
+    # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt
+    local HASH=$(curl -s "https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt" | cut_1)
+    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.iso"
+
+    echo "${URL} ${HASH}"
 }
 
 function get_void() {
