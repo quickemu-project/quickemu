@@ -260,6 +260,38 @@ function list_csv() {
   exit 0
 }
 
+list_supported() {
+    # output OS RELEASE EDITION (usefull for straight testing...)
+    local DL=""
+    local FUNC
+    local OPTION
+    local OS
+
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "${OS} ${RELEASE} ${OPTION}"
+                done
+            else
+                echo "${OS} ${RELEASE}"
+            fi
+        done
+    done
+    exit 0
+}
+
 list_isos() {
     local URL
     local FUNC
@@ -303,38 +335,6 @@ list_isos() {
                 else
                     echo "${OS}|${RELEASE}|${OPTION}|${URL}"
                 fi
-            fi
-        done
-    done
-    exit 0
-}
-
-list_supported() {
-    # output OS RELEASE EDITION (usefull for straight testing...)
-    local DL=""
-    local FUNC
-    local OPTION
-    local OS
-
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            else
-                echo "${OS} ${RELEASE}"
             fi
         done
     done
@@ -621,11 +621,6 @@ function releases_blendos() {
     local RLIST
     RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]'| tr '\r\n' ' ')
     echo "${RLIST}"
-
-}
-
-function releases_bunsenlabs() {
-    echo latest
 }
 
 function releases_bodhi() {
@@ -1659,6 +1654,15 @@ function get_bazzite() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_biglinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.biglinux.com.br/"
+    ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- ${URL}) | sort -u | tail -n2 | head -n1)
+    HASH=$(curl -s ${URL}${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
+    echo "${URL}${ISO} ${HASH}"
+}
+
 function get_blendos() {
     local HASH=""
     local URL=""
@@ -1711,7 +1715,8 @@ function get_cachyos() {
     release=$(curl "https://mirror.cachyos.org/ISO/${EDITION}/" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | tail -n 1)
     ISO="cachyos-${EDITION}-linux-${release}.iso"
     URL="https://mirror.cachyos.org/ISO/${EDITION}/${release}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3458,7 +3463,7 @@ function get_windows() {
     fi
 }
 
-url_open() {
+open_url() {
     local URL="${1}";
     xdg-open "$URL" || sensible-browser "$URL" || x-www-browser "$URL" || gnome-open "$URL";
 }
@@ -3746,7 +3751,7 @@ case "${1}" in
     if [ -z "$(os_homepage ${OS})" ]; then
         os_error
     else
-        url_open "$(os_homepage ${OS})"
+        open_url "$(os_homepage ${OS})"
         exit 0
     fi
     ;;
@@ -3785,6 +3790,7 @@ if [ -n "${2}" ]; then
         else
             os_error_edition
         fi
+    fi
 
         handle_missing
 
