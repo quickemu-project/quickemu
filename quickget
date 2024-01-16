@@ -293,14 +293,13 @@ list_supported() {
 }
 
 # output OS RELEASE EDITION (usefull for straight testing...)
-list_isos2() {
+list_isos() {
     local show_iso_url="1"
     local DIR="/dev/null"
     local FUNC
     local OPTION
     local OS
 
-    echo "OS|Release|Edition|URL"
     for OS in $(os_support); do
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
@@ -311,65 +310,18 @@ list_isos2() {
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    quickget ${OS} ${RELEASE} ${OPTION}
+                    validate_release releases_${OS}
+                    get_${OS} ${OPTION} | cut_1
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    get_"${OS}" && web_get
+                    validate_release releases_${OS}
+                    get_${OS} ${OPTION} | cut_1
                 done
             else
-                get_"${OS}" && web_get
-            fi
-        done
-    done
-    exit 0
-}
-
-list_isos() {
-    local show_iso_url="1"
-    local URL
-    local FUNC
-    local OPTION
-    local OS
-
-    echo "OS|Release|Edition|URL"
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-             # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -z "${URL}" ]; then
-                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                    else
-                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                    fi
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -n "${URL}" ]; then
-                        echo "${OS}|${RELEASE}|${OPTION}|"
-                    else
-                        echo "${OS}|${RELEASE}|${OPTION}|Strange!"
-                    fi
-                done
-            elif [[ "${OS}" == "macos" ]]; then
-                echo "${OS}|${RELEASE}|${OPTION}|"
-            else
-                URL=$(./quickget -u ${OS} ${RELEASE})
-                if [ -z "${URL}" ]; then
-                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                else
-                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                fi
+                validate_release releases_${OS}
+                get_${OS} ${RELEASE} | cut_1
             fi
         done
     done
@@ -377,6 +329,56 @@ list_isos() {
 }
 
 test_isos() {
+    local test_iso_url="1"
+    local DIR="/dev/null"
+    local FUNC
+    local OPTION
+    local OS
+
+    check_it() {
+        validate_release releases_${OS}
+        URL=$(get_${OS} ${OPTION} | cut_1)
+        GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+        if [[ "${GOOD}" == "OK" ]]; then
+            echo "OK - ${OS},${RELEASE},${OPTION},${URL}"
+        else
+            echo "ERROR - ${OS},${RELEASE},${OPTION},${URL}"
+        fi
+    }
+
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    check_it
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    check_it
+                done
+            else
+                validate_release releases_${OS}
+                URL=$(get_${OS} ${RELEASE} | cut_1)
+                GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                if [[ "${GOOD}" == "OK" ]]; then
+                    echo "OK - ${OS},${RELEASE},,${URL}"
+                else
+                    echo "ERROR - ${OS},${RELEASE},,${URL}"
+                fi
+            fi
+        done
+    done
+    exit 0
+}
+
+test_isos2() {
     local DL=""
     local URL
     local ISO
@@ -3529,9 +3531,9 @@ case "${1}" in
     list_supported  
     ;;
   '-li'|'--list-isos')
-    list_isos2
+    list_isos
     ;;  
-  '-ti|--test-isos')
+  '-ti'|'--test-isos')
     test_isos
     ;;
   '-d'|'--iso-download')
