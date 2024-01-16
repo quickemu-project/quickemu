@@ -295,7 +295,7 @@ list_supported() {
 # output OS RELEASE EDITION (usefull for straight testing...)
 list_isos2() {
     local show_iso_url="1"
-    local DL=""
+    local DIR="/dev/null"
     local FUNC
     local OPTION
     local OS
@@ -311,15 +311,15 @@ list_isos2() {
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${OPTION}"
+                    quickget ${OS} ${RELEASE} ${OPTION}
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${OPTION}"
+                    get_"${OS}" && web_get
                 done
             else
-                echo "${OS} ${RELEASE}"
+                get_"${OS}" && web_get
             fi
         done
     done
@@ -327,6 +327,7 @@ list_isos2() {
 }
 
 list_isos() {
+    local show_iso_url="1"
     local URL
     local FUNC
     local OPTION
@@ -377,7 +378,6 @@ list_isos() {
 
 test_isos() {
     local DL=""
-    local test_iso_url="1"
     local URL
     local ISO
     local FUNC
@@ -3431,7 +3431,7 @@ os_supported() {
     fi
 }
 
-help_message() {
+function help_message() {
     printf '                             _              _
            __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
           / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
@@ -3529,9 +3529,9 @@ case "${1}" in
     list_supported  
     ;;
   '-li'|'--list-isos')
-    list_isos
+    list_isos2
     ;;  
-  '-ti'|'--test-isos')
+  '-ti|--test-isos')
     test_isos
     ;;
   '-d'|'--iso-download')
@@ -3562,7 +3562,7 @@ case "${1}" in
     "${WHERE}/quickemu" --version
     exit 0
     ;;
- esac
+esac
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
