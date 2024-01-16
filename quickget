@@ -41,7 +41,7 @@ function os_info() {
       alpine)           INFO="Alpine Linux|Independent||https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
       android)          INFO="Android x86|Independent||https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
       antix)            INFO="Antix|Debian||https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
-      artix)            INFO="Artix Linux|Arch||https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
+      artixlinux)       INFO="Artix Linux|Arch||https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
       archlinux)        INFO="Arch Linux|Independent||https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
       archcraft)        INFO="Archcraft|Arch||https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
       arcolinux)        INFO="Arco Linux|Arch||https://arcolinux.com/|Is all about becoming an expert in linux.";;
