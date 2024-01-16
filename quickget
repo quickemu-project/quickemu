@@ -598,14 +598,8 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    echo apollo_22_1 \
-    artemis-22_6 \
-    artemis_neo_22_7 \
-    artemis_neo_22_8 \
-    artemis_nova_22_9 \
-    atlantis-21_4 \
-    atlantis_neo-21_5 \
-    cassini_22_12
+    local ENDEAVOUR_RELEASES="$(curl -s https://mirror.alpix.eu/endeavouros/iso/ | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13-)"
+    echo ${ENDEAVOUR_RELEASES,,}
 }
 
 function releases_endless() {
@@ -1707,9 +1701,10 @@ function get_elementary() {
 
 function get_endeavouros() {
     local HASH=""
-    # Endeavour release names are Capitalized and our $RELEASE is forced to lowercase so we have to revert it
-    local ISO="EndeavourOS_${RELEASE@u}.iso"
-    local URL="https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive"
+    local URL="https://mirror.alpix.eu/endeavouros/iso"
+    # Find EndeavourOS releases from mirror, pick one matching release
+    local ENDEAVOUR_RELEASES="$(curl -s "${URL}"/ | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
+    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i ${RELEASE}).iso"
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
