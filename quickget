@@ -298,7 +298,6 @@ list_isos() {
     local OPTION
     local OS
 
-    echo "OS|Release|Edition|URL"
     for OS in $(os_support); do
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
@@ -306,35 +305,24 @@ list_isos() {
           *) FUNC="${OS}";;
         esac
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-             # If the OS has an editions_() function, use it.
+            # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -z "${URL}" ]; then
-                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                    else
-                        echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                    fi
+                    validate_release releases_${OS}
+                    get_${OS} ${OPTION} | cut_1
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -n "${URL}" ]; then
-                        echo "${OS}|${RELEASE}|${OPTION}|"
-                    else
-                        echo "${OS}|${RELEASE}|${OPTION}|Strange!"
-                    fi
+                    validate_release releases_${OS}
+                    get_${OS} ${OPTION} | cut_1
                 done
+            #TODO NEEDED?
             elif [[ "${OS}" == "macos" ]]; then
                 echo "${OS}|${RELEASE}|${OPTION}|"
             else
-                URL=$(./quickget -u ${OS} ${RELEASE})
-                if [ -z "${URL}" ]; then
-                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                else
-                    echo "${OS}|${RELEASE}|${OPTION}|${URL}"
-                fi
+                validate_release releases_${OS}
+                get_${OS} ${RELEASE} | cut_1
             fi
         done
     done
@@ -342,26 +330,23 @@ list_isos() {
 }
 
 test_isos() {
-    local DL=""
-    local URL
-    local ISO
+    local test_iso_url="1"
+    local DIR="/dev/null"
     local FUNC
     local OPTION
     local OS
-    local RELEASE
-    local HAS_ZSYNC=0
-    local GOOD
 
-    # Check if zsync is available
-    if command -v zsync &>/dev/null; then
-        HAS_ZSYNC=1
-    fi
-    if command -v aria2c &>/dev/null; then
-        DL="aria2c"
-    elif command -v wget &>/dev/null; then
-        DL="wget"
-    fi
-    echo "Status - OS|Release|Edition|URL"
+    check_it() {
+        validate_release releases_${OS}
+        URL=$(get_${OS} ${OPTION} | cut_1)
+        GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+        if [[ "${GOOD}" == "OK" ]]; then
+            echo "OK - ${OS},${RELEASE},${OPTION},${URL}"
+        else
+            echo "ERROR - ${OS},${RELEASE},${OPTION},${URL}"
+        fi
+    }
+
     for OS in $(os_support); do
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
@@ -369,46 +354,31 @@ test_isos() {
           *) FUNC="${OS}";;
         esac
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-                DOWNLOADER="zsync"
-            else
-                DOWNLOADER="${DL}"
-            fi
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
-                    if [[ "${GOOD}" == "OK" ]]; then
-                        echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                    else
-                        echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
-                    fi
+                    check_it
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    if [ -z "${URL}" ]; then
-                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
-                    else
-                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
-                    fi
+                    check_it
                 done
             else
-                URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                GOOD=$(timeout 10 wget -q --spider  ${URL} && echo 'OK' || echo 'ERROR!')
+                validate_release releases_${OS}
+                URL=$(get_${OS} ${RELEASE} | cut_1)
+                GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
                 if [[ "${GOOD}" == "OK" ]]; then
-                    echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    echo "OK - ${OS},${RELEASE},,${URL}"
                 else
-                    echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    echo "ERROR - ${OS},${RELEASE},,${URL}"
                 fi
             fi
         done
     done
     exit 0
 }
+
 
 function os_support() {
     echo alma \
@@ -3760,7 +3730,7 @@ case "${1}" in
     "${WHERE}/quickemu" --version
     exit 0
     ;;
- esac
+esac
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
