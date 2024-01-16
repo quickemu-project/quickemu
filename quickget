@@ -338,6 +338,75 @@ list_isos() {
     exit 0
 }
 
+test_isos() {
+    local DL=""
+    local URL
+    local ISO
+    local FUNC
+    local OPTION
+    local OS
+    local RELEASE
+    local HAS_ZSYNC=0
+    local GOOD
+
+    # Check if zsync is available
+    if command -v zsync &>/dev/null; then
+        HAS_ZSYNC=1
+    fi
+    if command -v aria2c &>/dev/null; then
+        DL="aria2c"
+    elif command -v wget &>/dev/null; then
+        DL="wget"
+    fi
+    echo "Status - OS|Release|Edition|URL"
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+                DOWNLOADER="zsync"
+            else
+                DOWNLOADER="${DL}"
+            fi
+            # If the OS has an editions_() function, use it.
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    GOOD=$(wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                    if [[ "${GOOD}" == "OK" ]]; then
+                        echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    else
+                        echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                    fi
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    #URL=$(timeout 10 ./quickget -u ${OS} ${RELEASE} ${OPTION})
+                    if [ -z "${URL}" ]; then
+                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
+                    else
+                        echo "N - ${OS}|${RELEASE}|${OPTION}|"
+                    fi
+                done
+            else
+                URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
+                GOOD=$(timeout 10 wget -q --spider  ${URL} && echo 'OK' || echo 'ERROR!')
+                if [[ "${GOOD}" == "OK" ]]; then
+                    echo "OK - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                else
+                    echo "ERROR - ${OS}|${RELEASE}|${OPTION}|${URL}"
+                fi
+            fi
+        done
+    done
+    exit 0
+}
+
 function os_support() {
     echo alma \
     alpine \
