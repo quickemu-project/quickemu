@@ -1827,9 +1827,14 @@ function get_elementary() {
 
 function get_endeavouros() {
     local HASH=""
+    local ISO=""
+    local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Endeavour release names are Capitalized and our $RELEASE is forced to lowercase so we have to revert it
-    local ISO="EndeavourOS_${RELEASE@u}.iso"
-    local URL="https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive"
+    case ${RELEASE} in
+      galileo-11-2023) ISO="Endeavouros-${RELEASE@u}.iso";;
+      cassini_nova-03-2023_r3) ISO="Endeavouros_Cassini_Nova-03-2023_R3.iso";;
+      *) ISO="EndeavourOS_${RELEASE@u}.iso";;
+    esac
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
