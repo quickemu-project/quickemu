@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#shellcheck disable=SC1001,1083,2016,2046,2086,2155,2206,2207,2068,2071,2076,2162
+#shellcheck disable=SC1001,1003,1083,2016,2046,2086,2155,2206,2207,2068,2071,2076,2162
 export LC_ALL=C
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
