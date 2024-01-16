@@ -2126,7 +2126,7 @@ function get_macos() {
         curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
     else
-        echo Downloading macOS firmware
+        echo "Downloading macOS firmware"
         web_get "${OpenCore_qcow2}" "${VM_PATH}"
         web_get "${OVMF_CODE}" "${VM_PATH}"
         if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
@@ -2140,14 +2140,14 @@ function get_macos() {
         fi
     fi
 
-    if [ skipVerification != true ]; then
+    if [ $skipVerification != true ]; then
         if ! python3 "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
-            echo Verification failed.
+            echo "Verification failed."
             exit 1
         fi
-        echo Verified macOS ${RELEASE} image using chunklist.
+        echo "Verified macOS ${RELEASE} image using chunklist."
     else
-        echo Skipping verification of image.
+        echo "Skipping verification of image."
     fi
 
     if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
@@ -3291,7 +3291,10 @@ function download_windows() {
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
     web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
-    check_hash "${FILE_NAME}" "${HASH}"
+    # Only Windows 11 hashes can be found directly from Microsoft's page.
+    if [ "${windows_version}" == 11 ]; then
+        check_hash "${FILE_NAME}" "${HASH}"
+    fi
 }
 
 function get_windows() {
