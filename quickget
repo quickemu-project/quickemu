@@ -178,6 +178,7 @@ function validate_release() {
     local RELEASE_GENERATOR=""
     local RELEASES=""
 
+    DISPLAY_NAME="$(pretty_name "${OS}")"
     case ${OS} in
       *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
       *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
@@ -194,11 +195,10 @@ function validate_release() {
 
 function list_json() {
     # Reference: https://stackoverflow.com/a/67359273
-    list_csv | jq -R 'split("|") as $h|reduce inputs as $in ([]; . += [$in|split("|")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+    list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
     exit 0
 }
 
-# list_csv untouched
 function list_csv() {
   local DISPLAY_NAME
   local DL=""
@@ -258,17 +258,6 @@ function list_csv() {
     done
   done
   exit 0
-}
-
-#cat TEST/list_supported | parallel --progress --jobs 16 --delay 0.001 --timeout 60 --shuf --colsep ' ' --results out.csv quickget -u {1} {2} {3}
-generate_supported(){
-    # run guickget - output two lines if editions
-    for OS in $(os_support); do
-        echo "=======${OS}"
-        supported=$(./quickget ${OS} | sed 1d | cut -d' ' -f4-)
-        echo "${supported}"
-    done
-    exit 0
 }
 
 list_isos() {
@@ -346,121 +335,6 @@ list_supported() {
                 done
             else
                 echo "${OS} ${RELEASE}"
-            fi
-        done
-    done
-    exit 0
-}
-
-list_supported_extended() {
-    # nice
-    local DL=""
-    local FUNC
-    local OPTION
-    local OS
-    local DISPLAY_NAME
-    local SVG
-    local ABOUT
-    local BASED
-    local CREDE
-    local HOMEP
-    echo "OS|=|Display Name|Based of|Homepage|Credentials|Info about|SVG"
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        DISPLAY_NAME="$(pretty_name "${OS}")"
-        SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
-        HOMEP=$(os_homepage ${OS})
-        BASED=$(os_basedof ${OS})
-        CREDE=$(os_credentials ${OS})
-        ABOUT=$(os_about ${OS})
-        echo -e "${OS}|=|${DISPLAY_NAME}|${BASED}|${HOMEP}|${CREDE}|${ABOUT}|${SVG}"
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${OPTION}"
-                done
-            else
-                echo "${OS} ${RELEASE}"
-            fi
-        done
-    done
-    exit 0
-}
-
-list_csv_extended() {
-    local DISPLAY_NAME
-    local DL=""
-    local DOWNLOADER
-    local URL
-    local FUNC
-    local OPTION
-    local OS
-    local PNG
-    local RELEASE
-    local SVG
-    local HAS_ZSYNC=0
-    local ABOUT
-    local BASED
-    local CREDE
-    local HOMEP
-
-    # Check if zsync is available
-    if command -v zsync &>/dev/null; then
-        HAS_ZSYNC=1
-    fi
-
-    if command -v aria2c &>/dev/null; then
-        DL="aria2c"
-    elif command -v wget &>/dev/null; then
-        DL="wget"
-    fi
-
-    echo "Display Name|OS|Release|Option|URL|Downloader|PNG|SVG|Credentials|Based of|Homepage|Info about"
-    for OS in $(os_support); do
-    DISPLAY_NAME="$(pretty_name "${OS}")"
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
-        PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
-        SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
-        HOMEP=$(os_homepage ${OS})
-        BASED=$(os_basedof ${OS})
-        CREDE=$(os_credentials ${OS})
-        ABOUT=$(os_about ${OS})
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
-                DOWNLOADER="zsync"
-            else
-                DOWNLOADER="${DL}"
-            fi
-
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    #URL=$(./quickget -u ${OS} ${RELEASE} ${OPTION})
-                    echo "${DISPLAY_NAME}|${OS}|${RELEASE}|${OPTION}|skipped|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
-                done
-            else
-                URL=$(./quickget -u ${OS} ${RELEASE})
-                echo "${DISPLAY_NAME}|${OS}|${RELEASE}||${URL}|${DOWNLOADER}|${PNG}|${SVG}|${CREDE}|${BASED}|${HOMEP}|${ABOUT}"
             fi
         done
     done
@@ -628,7 +502,6 @@ function os_support() {
     vanillaos \
     void \
     vxlinux \
-    whonix \
     windows \
     windows-server \
     xerolinux \
@@ -679,7 +552,6 @@ function releases_archlinux() {
 
 function releases_arcolinux() {
     local RLIST
-
     RLIST=$(curl -s https://ant.seedhost.eu/arcolinux/iso/ | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | tr '\r\n' ' ')
     echo ${RLIST}
 }
@@ -726,6 +598,7 @@ function editions_artixlinux() {
 }
 
 function releases_athenaos() {
+    local PROJECT="athena-iso"
     wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
 }
 
@@ -1029,7 +902,7 @@ function editions_openindiana(){
 }
 
 function releases_opensuse(){
-    echo tumbleweed microos 15.4 15.3 15.2 15.1 15.0
+    echo 15.4 15.3 15.2 15.1 15.0 microos tumbleweed
 }
 
 function releases_oraclelinux() {
@@ -1289,14 +1162,6 @@ function releases_xerolinux() {
     echo kde
 }
 
-function releases_whonix() {
-    echo 17.0.3.0
-}
-
-function editions_whonix() {
-    echo gateway workstation
-}
-
 function releases_zorin() {
     echo 17 16
 }
@@ -1311,8 +1176,6 @@ function check_hash() {
     local hash_algo=""
     if [ "${download_iso}" == 1 ]; then
         iso="${1}"
-    elif [ "${download_iso_to}" == 1 ]; then
-        iso="${DOWNLOAD_PATH}/${1}"
     else
         iso="${VM_PATH}/${1}"
     fi
@@ -1377,8 +1240,6 @@ function web_get() {
         exit 0
     elif [ "${download_iso}" == on ]; then
         DIR="$(pwd)"
-    elif [ "${download_iso_to}" == on ]; then
-        DIR="${DOWNLOAD_PATH}"
     fi
 
     if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
@@ -1461,11 +1322,10 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
-    local new_dir="$new_dir"
     #not needed anymore?
     #local SEC_BOOT=""
 
-    if [ "${download_iso}" == 1 ] || [ "${download_iso_to}" == 1 ]; then
+    if [ "${download_iso}" == 1 ]; then
         exit 0
     fi
 
@@ -1511,9 +1371,6 @@ function make_vm_config() {
       truenas*)
         GUEST="truenas"
         IMAGE_TYPE="iso";;
-#      whonix)
-#        GUEST="whonix"
-#        IMAGE_TYPE="iso";;
       windows)
         GUEST="windows"
         IMAGE_TYPE="iso";;
@@ -1594,15 +1451,6 @@ EOF
             ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
             echo "disk_size=\"64G\"" >> "${CONF_FILE}"
             ;;
-          whonix)
-            echo 'boot="legacy"' >> "${CONF_FILE}"
-            # handle multiple workstations
-            if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
-                if [[ -e "whonix-${RELEASE}-workstation.conf" ]]; then
-                    echo "disk_img=\"whonix-${RELEASE}-workstation$n/disk.qcow2\"" >> "${CONF_FILE}"
-                fi
-            fi
-            ;;
           zorin)
             case ${EDITION} in
               education64|edulite64)
@@ -1654,7 +1502,6 @@ function get_alma() {
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
     local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
-
     HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1708,6 +1555,7 @@ function get_antix() {
       21) URL_runit="${URL}/runit-bullseye";;
       *) URL_runit="${URL}/runit-antiX-${RELEASE}";;
     esac
+
     case ${EDITION} in
       net-sysv)  ISO="antiX-${RELEASE}-net_x64-net.iso";;
       core-sysv) ISO="antiX-${RELEASE}_x64-core.iso";;
@@ -1756,7 +1604,6 @@ function get_arcolinux() {
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
-
     HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1774,6 +1621,7 @@ function get_artixlinux() {
 }
 
 function get_athenaos() {
+    local PROJECT="athena-iso"
     local HASH=""
     local URL=""
     local ISO=""
@@ -2208,7 +2056,6 @@ function get_holoiso() {
     #local HASH=""
     local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
     local URL="https://cd2.holoiso.ru.eu.org"
-
     # Can't find hash
     #HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut_1)
     echo "${URL}/${ISO} #${HASH}"
@@ -2238,7 +2085,6 @@ function get_kolibrios() {
     local HASH=""
     local ISO="kolibri.iso"
     local URL="https://builds.kolibrios.org/eng"
-
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2372,12 +2218,6 @@ function get_macos() {
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
-    #TODO
-    elif [ "${download_iso_to}" == 1 ]; then
-        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
-        web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-        curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
-        VM_PATH="${DOWNLOAD_PATH}"
     else
         echo "Downloading macOS firmware"
         web_get "${OpenCore_qcow2}" "${VM_PATH}"
@@ -2416,7 +2256,6 @@ function get_mageia() {
     local EDITION="${1:-}"
     local ISO=$(wget -q https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" -O- | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
     local HASH=$(wget -q -O- "${ISO}.sha512" | cut_1)
-
     echo "${ISO} ${HASH}"
 }
 
@@ -2433,6 +2272,7 @@ function get_manjaro() {
       gnome|xfce|plasma) TYPE="official";;
       *) TYPE="community";;
     esac
+
     [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
     if [[ ${RELEASE} != "sway" ]]; then
@@ -2673,8 +2513,6 @@ function get_rockylinux() {
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
 
-
-
     case ${RELEASE} in
       9.1) URL="https://download.rockylinux.org/pub/rocky/9/isos/x86_64";;
       8.7) URL="https://download.rockylinux.org/pub/rocky/8/isos/x86_64";;
@@ -2809,6 +2647,7 @@ function get_tinycore() {
     elif [ "${EDITION}" == "CorePure64" ] || [ "${EDITION}" == "TinyCorePure64" ]; then
         URL="http://www.tinycorelinux.net/14.x/x86_64/release"
     fi
+
     HASH=$(wget -q -O- "${URL}/${ISO}.md5.txt" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2844,8 +2683,8 @@ function get_truenas-core() {
     local HASH=""
     local ISO=""
     local URL=""
-
     local DLINFO="https://www.truenas.com/download-truenas-core/"
+
     URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
     HASH=$(wget -q ${URL}.sha256 -O- | cut_1)
     echo "${URL} ${HASH}"
@@ -2984,18 +2823,6 @@ function get_vxlinux() {
     local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
 
     HASH=$(wget -q -O- "${URL}/vx-${RELEASE}.md5" | cut  -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_whonix() {
-    local EDITION="${1:-}"
-    local HASH=""
-    local URL=""
-    local ISO=""
-
-    ISO="Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
-    URL="https://download.whonix.org/libvirt/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/Whonix-Xfce-${RELEASE}.sha512sums" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3432,6 +3259,7 @@ function download_windows-server() {
     esac
 
     iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")"
+
     if [ "${COUNTRY}" != "US" ]; then
         echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} in "${LANG}" from "$iso_download_link"
     else
@@ -3599,7 +3427,7 @@ function get_windows() {
         download_windows "${RELEASE}"
     fi
 
-    if [ "${download_iso}" == 1 ] || [ "${download_iso_to}" == 1 ]; then
+    if [ "${download_iso}" == 1 ]; then
         exit 0
     fi
 
@@ -3630,7 +3458,12 @@ function get_windows() {
     fi
 }
 
-function create_vm() {
+url_open() {
+    local URL="${1}";
+    xdg-open "$URL" || sensible-browser "$URL" || x-www-browser "$URL" || gnome-open "$URL";
+}
+
+create_vm() {
     # shellcheck disable=SC2206
     local URL_HASH=(${1// / })
     local URL="${URL_HASH[0]}"
@@ -3677,73 +3510,7 @@ function create_vm() {
         ISO=$(find "${VM_PATH}" -type f \( -iname '*.iso' ! -iname '*.zip' \))
     fi
 
-    # Whonix need to create and handle more then one workstation
-    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "gateway" ]; then
-            echo -e "\nhttps://www.whonix.org/wiki/KVM#signify\n"
-            cd "whonix-${RELEASE}-gateway"
-            if [ -e "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" ]; then
-                echo -e '\nAlready unpacked\n'
-            else
-                echo -e "\nUnpacking... (This will take long time)\n"
-                tar -xvf "${ISO}"
-            fi
-            if [ ! -e WHONIX_BINARY_LICENSE_AGREEMENT_accepted ]; then
-                more WHONIX_BINARY_LICENSE_AGREEMENT
-                read -p "
-
-                Are you AGREE? Press y/Y or Anything else if DISAGREE...
-                " -n 1 -r
-                if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    echo -e "\n\nAccepted..."
-                    touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted
-                    rm -f WHONIX_BINARY_LICENSE_AGREEMENT_denied
-                else
-                    echo -e "\n\nNot accepted! Exiting..."
-                    touch WHONIX_BINARY_LICENSE_AGREEMENT_denied
-                    rm -f WHONIX_BINARY_LICENSE_AGREEMENT_accepted
-                    exit 1
-                fi
-            fi
-            # Prepare first workstation
-            cp "Whonix-Gateway-Xfce-${RELEASE}.Intel_AMD64.qcow2" "disk.qcow2"
-            mkdir -p "../whonix-${RELEASE}-workstation"
-            cp "Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "../whonix-${RELEASE}-workstation/"
-            ln -rs "Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" "../whonix-${RELEASE}-workstation/Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz" &>/dev/null # Don't show error
-            cd ..
-    fi
-
-    if [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
-        if [[ -e "whonix-${RELEASE}-workstation.conf" ]]; then
-            echo "Create additional Whonix ${RELEASE} workstation?"
-            base="whonix-${RELEASE}-workstation"
-            echo -e "\nEnter new name\nVM will be whonix-${RELEASE}-workstation-(new name)\nLeave empty to not create VM..."
-            read -r new
-            new_dir="$base-$new"
-            if [ ! ${new} == ${new_dir} ]; then
-                mkdir "$new_dir"
-                echo "Copying and renaming to $new_dir"
-                cp "whonix-${RELEASE}-workstation.conf" "$new_dir.conf"
-                cp "whonix-${RELEASE}-gateway/Whonix-Workstation-Xfce-${RELEASE}.Intel_AMD64.qcow2" "$new_dir/disk.qcow2"
-                VMPATH="$new_dir"
-                cat << EOF > "$new_dir.conf"
-#!$(which quickemu) --vm
-guest_os="linux"
-disk_img="${new_dir}/disk.qcow2"
-iso="whonix-${RELEASE}-gateway/Whonix-Xfce-${RELEASE}.Intel_AMD64.qcow2.libvirt.xz"
-boot="legacy"
-EOF
-            else
-                echo 'Exiting' && exit 0
-            fi
-        fi
-    fi
-
-    make_vm_config "${ISO}" || echo "ERROR! Creating config."
-}
-
-url_open() {
-    local URL="${1}";
-    xdg-open "$URL" || sensible-browser "$URL" || x-www-browser "$URL" || gnome-open "$URL";
+    make_vm_config "${ISO}"
 }
 
 trap cleanup EXIT
@@ -3778,20 +3545,17 @@ Basic Usage:
 
 Advanced Usage:
  quickget <arg> [path] <os> [re] [ed]
- quickget -dt $HOME/Downloads peppermint latest devuan-xfce
+ quickget -d peppermint latest devuan-xfce
 
 Posible arguments:
- --version          (-v)                : Show version and exit
  --help             (-h)                : Show this help message and exit
- --list-json       (-lj)                : Show OS info in json format
- --list-csv        (-lc)                : Show OS info in csv format
- --list-supported  (-ls)                : Show all supported OS,releases,etitions
  --os-info          (-i) <os>           : Show info about OS
  --os-homepage      (-o) <os>           : Open OS homepage in default browser
- --iso-url-show     (-u) <os> <re> [ed]      : Show ISO download URL
- --iso-url-test     (-t) <os> <re> [ed]      : Test if ISO is available
- --iso-download     (-d) <os> <re> [ed]      : Download ISO (without create VM)
- --iso-download-to (-dt) <pa> <os> <re> [ed] : Download ISO to specified dir
+ --iso-download     (-d) <os> <re> [ed] : Just download ISO
+ --list-supported  (-ls)                : List all supported OS,releases,editions
+ --list-isos       (-ls)                : List all supported ISOs
+ --test-isos       (-ts)                : Test if ISOs are available
+ --version          (-v)                : Show version and exit
 
 supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
     os_support | fold -s -w $(tput cols)
@@ -3898,84 +3662,84 @@ handle_missing() {
             exit 1;
         fi
     fi
-
-    # Don't allow Whonix workstation without gateway .conf file
-    if [[ $OS == whonix && ${EDITION} == workstation ]] ; then
-        if [[ ! -e whonix-${RELEASE}-gateway.conf ]]; then
-            echo "ERROR! Create Whoonix gateway VM first."
-            exit 1
-        fi
-    fi
 }
 
 function show_os_info() {
     local OS=""
-    if [ -z "${1}" ]; then
 
+    if [ -z "${1}" ]; then
         os_error
         exit 1
     fi
+
     OS="${1}"
     os_supported
+    if command -v neofetch > /dev/null; then
+        neofetch -l --ascii_distro ${OS}
+    fi
     echo ${OS}
     echo -n 'Pretty name: '
     pretty_name ${OS}
     echo -n 'Based of: '
     os_basedof ${OS}
+
     if [ -z "$(os_credentials ${OS})" ]; then
         echo 'Credentials: Unknown'
     else
         echo -n 'Credentials: '
         os_credentials ${OS}
     fi
+
     echo -n 'Homepage: '
     os_homepage ${OS}
     echo -n 'Info: '
     os_about ${OS}
+
+    if [[ ! $(type -t "editions_${OS}") == function ]]; then
+        echo -n 'Releases: '
+        "releases_${OS}"
+    else
+        echo -n 'Releases: '
+        "releases_${OS}"
+        echo -n 'Editions: '
+        "editions_${OS}"
+    fi
+
     exit 0
 }
 
 case "${1}" in
+  '-h'|'--help')
+    help_message
+    ;;
+  'list'|'list_csv')
+    list_csv
+    ;;
+  'list_json')
+    list_json
+    ;;
+  '-ls'|'--list-supported')
+    list_supported  
+    ;;
+  '-li|--list-isos')
+    list_isos
+    ;;  
+  '-ti|--test-isos')
+    test_isos
+    ;;
+  '-d'|'--iso-download')
+    download_iso=1
+    if [ -n "$4" ]; then
+        set -- "$2" "$3" "$4"
+    elif [ -n "$3" ]; then
+        set -- "$2" "$3"
+    else
+        set -- "$2"
+    fi
+    ;;
   '-i'|'--os-info')
     echo "$(show_os_info "${2}")" | fold -s -w $(tput cols)
     exit 0
-    ;;
-
-  'isos')
-    list_isos
-    ;;  
-  'test')
-    test_isos
-    ;;
-  'isotest')
-    isostest_run
-    ;;  
-  '-ls'|'--list-supported')
-    list_supported  
-    ;; 
-  '-lse')
-    list_supported_extended
-    ;;
-  '-lce')
-    list_csv_extended
-    ;;
-  'gen')
-    generate_supported
-    ;;  
-
-  '-lc'|'--list-csv')
-    list_csv
-    ;;
-  '-lj'|'--list-json')
-    list_json
-    ;;
-  '-v'|'--version')
-    WHERE=$(dirname "${BASH_SOURCE[0]}")
-    "${WHERE}/quickemu" --version
-    exit 0
-    ;;
-  '-h'|'--help')
-    help_message
     ;;
   '-o'|'--os-homepage')
     OS="${2}"
@@ -3986,43 +3750,17 @@ case "${1}" in
         exit 0
     fi
     ;;
-  '-dt'|'--iso-download-to')
-    download_iso_to=1
-    if [ -z "${2}" ]; then
-        os_path_error
-    fi
-    DOWNLOAD_PATH="${2}"
-    if [ -n "$5" ]; then
-        set -- "$3" "$4" "$5"
-    elif [ -n "$4" ]; then
-        set -- "$3" "$4"
-    else
-        set -- "$3"
-    fi
+  '-v'|'--version')
+    WHERE=$(dirname "${BASH_SOURCE[0]}")
+    "${WHERE}/quickemu" --version
+    exit 0
+    ;;
  esac
-
-if [ "${1}" == "-u" ] || [ "${1}" == "--iso-url-show" ] ||[ "${1}" == "-t" ] ||[ "${1}" == "--iso-url-test" ] || [ "${1}" == "-d" ] || [ "${1}" == "--iso-download" ]; then
-    case "${1}" in
-      '-u'|'--iso-url-show')
-        show_iso_url=1;;
-      '-t'|'--iso-url-test')
-        test_iso_url=1;;
-      '-d'|'--iso-download')
-        download_iso=1;;
-    esac
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-fi
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
     case "${OS}" in
-    '-i'|'--os-info'|'-o'|'--os-homepage'|'-u'|'--iso-url-show'|'-t'|'--iso-url-test'|'-d'|'--iso-download'|'-dt'|'--iso-download-to')
+    '-i'|'--os-info'|'-o'|'--os-homepage'|'-d'|'--iso-download')
         os_error
         ;;
     esac
