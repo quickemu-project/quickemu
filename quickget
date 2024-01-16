@@ -477,7 +477,7 @@ function os_support() {
     slitaz \
     solus \
     sparkylinux \
-    spiral \
+    spirallinux \
     tails \
     tinycore \
     trisquel \
@@ -987,11 +987,11 @@ function editions_sparkylinux() {
     echo lxqt mate xfce kde minimalgui minimalcli gameover multimedia rescue
 }
 
-function releases_spiral() {
+function releases_spirallinux() {
     echo latest
 }
 
-function editions_spiral() {
+function editions_spirallinux() {
     echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
 }
 
@@ -2476,7 +2476,7 @@ function get_sparkylinux() {
     echo "${URL}/${ISO}" "${HASH}"
 }
 
-function get_spiral() {
+function get_spirallinux() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
