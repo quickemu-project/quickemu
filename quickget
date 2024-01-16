@@ -297,7 +297,7 @@ function os_support() {
     slitaz \
     solus \
     sparkylinux \
-    spiral \
+    spirallinux \
     tails \
     tinycore \
     trisquel \
@@ -399,7 +399,7 @@ function os_homepages(){
         slitaz)            HOMEPAGE="https://www.slitaz.org/";;
         solus)             HOMEPAGE="https://getsol.us/";;
         sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
-        spiral)            HOMEPAGE="https://spirallinux.github.io/";;
+        spirallinux)       HOMEPAGE="https://spirallinux.github.io/";;
         tails)             HOMEPAGE="https://tails.net/";;
         tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
         trisquel)          HOMEPAGE="https://trisquel.info/";;
@@ -923,12 +923,12 @@ function editions_sparkylinux() {
     echo lxqt mate xfce kde minimalgui minimalcli gameover multimedia rescue
 }
 
-function releases_spiral() {
-	echo latest
+function releases_spirallinux() {
+    echo latest
 }
 
-function editions_spiral() {
-	echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+function editions_spirallinux() {
+    echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
 }
 
 function releases_tails() {
@@ -2480,14 +2480,14 @@ function get_sparkylinux() {
     echo "${URL}/${ISO}" "${HASH}"
 }
 
-function get_spiral() {
-	local EDITION="${1:-}"
-	local HASH=""
-	local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
-	local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
+function get_spirallinux() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
 
-	HASH=$(wget -q -O- 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
-	echo "${URL}/${ISO}" "${HASH}"
+    HASH=$(wget -q -O- 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
+    echo "${URL}/${ISO}" "${HASH}"
 }
 
 function get_tails() {
