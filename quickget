@@ -4,13 +4,14 @@ export LC_ALL=C
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
-#    1. Update os_support() - add new OS, all lowercase
-#    2. Update pretty_name() - add a pretty name for new OS *only if the catch all is not suitable*
-#    3. Update os_homepage() - add a homepage for new OS
-#    4. Create a releases_newos() generator (required) outputs the current supported release versions
-#    5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
-#    6. Update make_vm_config() - add any *required* new OS tweaks
-#    7. Create a get_newos() function - that does something like this:
+# 1. Update os_support() - add new OS, all lowercase
+# 2. Update os_info() - Fill all posible fields for new OS (leave empty if no login, but | must stay same)
+#    Here is whats should be there...
+#    <OS name>)     INFO="<OS nice name>|<OS based on>|<OS default login:pass if any>|<OS homepage>|<ABOUT>";;
+# 4. Create a releases_newos() generator (required) outputs the current supported release versions (from newest)
+# 5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
+# 6. Update make_vm_config() - add any *required* new OS tweaks
+# 7. Create a get_newos() function - that does something like this: (Look at other OS)
 #
 #function get_newos() {
 #    local EDITION="${1:-}"
@@ -69,77 +70,43 @@ elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
 fi
 
 function pretty_name() {
-  local SIMPLE_NAME=""
-  local PRETTY_NAME=""
-  SIMPLE_NAME="${1}"
-  case ${SIMPLE_NAME} in
-    alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linux";;
-    android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
-    archcraft)          PRETTY_NAME="Archcraft";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
-    artix)              PRETTY_NAME="Artix Linux";;
-    atheanos)           PRETTY_NAME="Athena OS";;
-    blendos)            PRETTY_NAME="BlendOS";;
-    cachyos)            PRETTY_NAME="CachyOS";;
-    centos-stream)      PRETTY_NAME="CentOS Stream";;
-    chimeralinux)       PRETTY_NAME="Chimera Linux";;
-    crunchbang++)       PRETTY_NAME="Crunchbang++";;
-    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
-    easyos)             PRETTY_NAME="EasyOS";;
-    elementary)         PRETTY_NAME="elementary OS";;
-    endeavouros)        PRETTY_NAME="EndeavourOS";;
-    endless)            PRETTY_NAME="Endless OS";;
-    freebsd)            PRETTY_NAME="FreeBSD";;
-    freedos)            PRETTY_NAME="FreeDOS";;
-    garuda)             PRETTY_NAME="Garuda Linux";;
-    ghostbsd)           PRETTY_NAME="GhostBSD";;
-    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
-    kdeneon)            PRETTY_NAME="KDE Neon";;
-    kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxlite)          PRETTY_NAME="Linux Lite";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
-    lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
-    mageia)             PRETTY_NAME="Mageia";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
-    netboot)            PRETTY_NAME="netboot.xyz";;
-    netbsd)             PRETTY_NAME="NetBSD";;
-    nixos)              PRETTY_NAME="NixOS";;
-    macos)              PRETTY_NAME="macOS";;
-    openbsd)            PRETTY_NAME="OpenBSD";;
-    openindiana)        PRETTY_NAME="OpenIndiana";;
-    opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
-    parrotsec)          PRETTY_NAME="Parrot Security";;
-    peppermint)         PRETTY_NAME="PeppermintOS";;
-    popos)              PRETTY_NAME="Pop!_OS";;
-    primtux)            PRETTY_NAME="Primtux";;
-    reactos)            PRETTY_NAME="ReactOS";;
-    rebornos)           PRETTY_NAME="RebornOS";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slint)              PRETTY_NAME="Slint";;
-    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
-    sparkylinux)        PRETTY_NAME="SparkyLinux";;
-    tinycore)           PRETTY_NAME="Tiny Core Linux";;
-    truenas-core)       PRETTY_NAME="TrueNAS Core";;
-    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
-    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
-    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
-    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
-    ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
-    vanillaos)          PRETTY_NAME="Vanilla OS";;
-    void)               PRETTY_NAME="Void Linux";;
-    vxlinux)            PRETTY_NAME="VX Linux";;
-    windows-server)     PRETTY_NAME="Windows Server";;
-    xerolinux)          PRETTY_NAME="XeroLinux";;
-    zorin)              PRETTY_NAME="Zorin OS";;
-    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
-  esac
-  echo "${PRETTY_NAME}"
+    local SIMPLE_NAME=""
+    local PRETTY_NAME=""
+    SIMPLE_NAME="${1}"
+    PRETTY_NAME=$(os_info ${SIMPLE_NAME} | cut -d'|' -f1)
+    echo "${PRETTY_NAME}"
+}
+
+function os_basedof() {
+    local SIMPLE_NAME=""
+    local BASED=""
+    SIMPLE_NAME="${1}"
+    BASED=$(os_info ${SIMPLE_NAME} | cut -d'|' -f2)
+    echo "${BASED}"
+}
+
+function os_credentials() {
+    local SIMPLE_NAME=""
+    local CREDE=""
+    SIMPLE_NAME="${1}"
+    CREDE=$(os_info ${SIMPLE_NAME} | cut -d'|' -f3)
+    echo "${CREDE}"
+}
+
+function os_homepage(){
+    local SIMPLE_NAME=""
+    local HOMEP=""
+    SIMPLE_NAME="${1}"
+    HOMEP=$(os_info ${SIMPLE_NAME} | cut -d'|' -f4)
+    echo "$HOMEP"
+}
+
+function os_about() {
+    local SIMPLE_NAME=""
+    local ABOUT=""
+    SIMPLE_NAME="${1}"
+    ABOUT=$(os_info ${SIMPLE_NAME} | cut -d'|' -f5)
+    echo "${ABOUT}"
 }
 
 function validate_release() {
@@ -323,104 +290,6 @@ function os_support() {
     zorin
 }
 
-function os_homepage(){
-    local SIMPLE_NAME=""
-    local HOMEPAGE=""
-    SIMPLE_NAME="${1}"
-    case ${SIMPLE_NAME} in
-        alma)              HOMEPAGE="https://almalinux.org/";;
-        alpine)            HOMEPAGE="https://alpinelinux.org/";;
-        android)           HOMEPAGE="https://www.android-x86.org/";;
-        antix)             HOMEPAGE="https://antixlinux.com/";;
-        archlinux)         HOMEPAGE="https://archlinux.org/";;
-        archcraft)         HOMEPAGE="https://archcraft.io/";;
-        arcolinux)         HOMEPAGE="https://arcolinux.com/";;
-        artix)             HOMEPAGE="https://artixlinux.org/";;
-        athenaos)          HOMEPAGE="https://athenaos.org/";;
-        batocera)          HOMEPAGE="https://batocera.org/";;
-        bazzite)           HOMEPAGE="https://bazzite.gg/";;
-        blendos)           HOMEPAGE="https://blendos.co/";;
-        bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
-        bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
-        cachyos)           HOMEPAGE="https://cachyos.org/";;
-        centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
-        chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
-        crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
-        debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/index/en";;
-        devuan)            HOMEPAGE="https://www.devuan.org/";;
-        dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
-        easyos)            HOMEPAGE="https://easyos.org/";;
-        edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
-        elementary)        HOMEPAGE="https://elementary.io/";;
-        endeavouros)       HOMEPAGE="https://endeavouros.com/";;
-        endless)           HOMEPAGE="https://www.endlessos.org/os";;
-        fedora)            HOMEPAGE="https://www.fedoraproject.org/";;
-        freebsd)           HOMEPAGE="https://www.freebsd.org/";;
-        freedos)           HOMEPAGE="https://freedos.org/";;
-        garuda)            HOMEPAGE="https://garudalinux.org/";;
-        gentoo)            HOMEPAGE="https://www.gentoo.org/";;
-        ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
-        haiku)             HOMEPAGE="https://www.haiku-os.org/";;
-        holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
-        kali)              HOMEPAGE="https://www.kali.org/";;
-        kdeneon)           HOMEPAGE="https://neon.kde.org/";;
-        kolibrios)         HOMEPAGE="http://kolibrios.org/en/";;
-        kubuntu)           HOMEPAGE="https://kubuntu.org/";;
-        linuxlite)         HOMEPAGE="https://www.linuxliteos.com/";;
-        linuxmint)         HOMEPAGE="https://linuxmint.com/";;
-        lmde)              HOMEPAGE="https://www.linuxmint.com/download_lmde.php";;
-        mageia)            HOMEPAGE="https://www.mageia.org/";;
-        manjaro)           HOMEPAGE="https://manjaro.org/";;
-        mxlinux)           HOMEPAGE="https://mxlinux.org/";;
-        netboot)           HOMEPAGE="https://netboot.xyz/";;
-        netbsd)            HOMEPAGE="https://www.netbsd.org/";;
-        nixos)             HOMEPAGE="https://nixos.org/";;
-        lubuntu)           HOMEPAGE="https://lubuntu.me/";;
-        macos)             HOMEPAGE="https://www.apple.com/macos/";;
-        openbsd)           HOMEPAGE="https://www.openbsd.org/";;
-        openindiana)       HOMEPAGE="https://www.openindiana.org/";;
-        opensuse)          HOMEPAGE="https://www.opensuse.org/";;
-        oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
-        parrotsec)         HOMEPAGE="https://www.parrotsec.org/";;
-        peppermint)        HOMEPAGE="https://peppermintos.com/";;
-        popos)             HOMEPAGE="https://pop.system76.com/";;
-        porteus)           HOMEPAGE="http://www.porteus.org/";;
-        primtux)           HOMEPAGE="https://primtux.fr/";;
-        reactos)           HOMEPAGE="https://reactos.org/";;
-        rebornos)          HOMEPAGE="https://rebornos.org/";;
-        rockylinux)        HOMEPAGE="https://rockylinux.org/";;
-        siduction)         HOMEPAGE="https://siduction.org/";;
-        slackware)         HOMEPAGE="http://www.slackware.com/";;
-        slax)              HOMEPAGE="https://www.slax.org/";;
-        slint)             HOMEPAGE="https://slint.fr/";;
-        slitaz)            HOMEPAGE="https://www.slitaz.org/";;
-        solus)             HOMEPAGE="https://getsol.us/";;
-        sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
-        spiral)            HOMEPAGE="https://spirallinux.github.io/";;
-        tails)             HOMEPAGE="https://tails.net/";;
-        tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
-        trisquel)          HOMEPAGE="https://trisquel.info/";;
-        truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
-        truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
-        ubuntu)            HOMEPAGE="https://ubuntu.com/";;
-        ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
-        ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/index-en.html";;
-        ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
-        ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
-        ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
-        ubuntu-unity)      HOMEPAGE="https://ubuntuunity.org/";;
-        vanillaos)         HOMEPAGE="https://vanillaos.org/";;
-        void)              HOMEPAGE="https://voidlinux.org/";;
-        vxlinux)           HOMEPAGE="https://vxlinux.org/";;
-        windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
-        windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
-        xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
-        xubuntu)           HOMEPAGE="https://xubuntu.org/";;
-        zorin)             HOMEPAGE="https://zorin.com/os/";;
-    esac
-    echo "${HOMEPAGE}"
 }
 
 function releases_alma() {
