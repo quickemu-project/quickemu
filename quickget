@@ -3440,8 +3440,8 @@ Posible arguments:
  --os-homepage      (-o) <os>           : Open OS homepage in default browser
  --iso-download     (-d) <os> <re> [ed] : Just download ISO
  --list-supported  (-ls)                : List all supported OS,releases,editions
- --list-isos       (-ls)                : List all supported ISOs
- --test-isos       (-ts)                : Test if ISOs are available
+ --list-isos       (-li)                : List all supported ISOs
+ --test-isos       (-ti)                : Test if ISOs are available
  --version          (-v)                : Show version and exit
 
 supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
@@ -3497,19 +3497,19 @@ case "${1}" in
   '-h'|'--help')
     help_message
     ;;
-  'list'|'list_csv')
+  '-lc'|'list'|'list_csv')
     list_csv
     ;;
-  'list_json')
+  '-lj'|'list_json')
     list_json
     ;;
   '-ls'|'--list-supported')
     list_supported  
     ;;
-  '-li|--list-isos')
+  '-li'|'--list-isos')
     list_isos
     ;;  
-  '-ti|--test-isos')
+  '-ti'|'--test-isos')
     test_isos
     ;;
   '-d'|'--iso-download')
