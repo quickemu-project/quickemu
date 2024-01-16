@@ -3790,7 +3790,6 @@ if [ -n "${2}" ]; then
         else
             os_error_edition
         fi
-    fi
 
         handle_missing
 
