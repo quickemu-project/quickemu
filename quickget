@@ -1419,7 +1419,8 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
-    local SEC_BOOT=""
+    #not needed anymore?
+    #local SEC_BOOT=""
 
     if [ "${download_iso}" == 1 ]; then
         exit 0
@@ -1639,6 +1640,7 @@ function get_antix() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO=""
+    local URL_runit=""
     local URL="https://sourceforge.net/projects/antix-linux/files/Final/antiX-${RELEASE}"
 
     case ${RELEASE} in
@@ -2562,6 +2564,7 @@ function get_popos() {
 
 function get_porteus() {
     local EDITION="${1:-}"
+    local edition=""
     local HASH=""
     local ISO=""
     local URL=""
@@ -2775,6 +2778,7 @@ function get_trisquel() {
 }
 
 function get_truenas-scale() {
+    local HASH=""
     local ISO=""
     local URL=""
 
@@ -2787,6 +2791,7 @@ function get_truenas-scale() {
 }
 
 function get_truenas-core() {
+    local HASH=""
     local ISO=""
     local URL=""
 
