@@ -3521,6 +3521,8 @@ Advanced Usage:
 
 Posible arguments:
  --help             (-h)                : Show this help message and exit
+ --list-json       (-lj)                : Show OS info in json format
+ --list-csv        (-lc)                : Show OS info in csv format
  --os-info          (-i) <os>           : Show info about OS
  --os-homepage      (-o) <os>           : Open OS homepage in default browser
  --iso-download     (-d) <os> <re> [ed] : Just download ISO
