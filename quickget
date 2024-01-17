@@ -3356,7 +3356,7 @@ os_supported() {
     fi
 }
 
-function help_message() {
+help_message() {
     printf '                             _              _
            __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
           / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
@@ -3383,6 +3383,8 @@ Advanced Usage:
 
 Posible arguments:
  --help             (-h)                : Show this help message and exit
+ --list-json       (-lj)                : Show OS info in json format
+ --list-csv        (-lc)                : Show OS info in csv format
  --os-info          (-i) <os>           : Show info about OS
  --os-homepage      (-o) <os>           : Open OS homepage in default browser
  --iso-download     (-d) <os> <re> [ed] : Just download ISO
@@ -3525,7 +3527,7 @@ if [ -n "${2}" ]; then
         else
             echo -en "ERROR! You must specify an edition.\n - Editions: "
             #TODO ERROR here
-            "editions_${OS}"
+            editions_"${OS}"
             exit 1
         fi
 
@@ -3610,12 +3612,12 @@ else
       *)
       echo -n " - Releases: "
       "releases_${OS}" | fold -s -w $(tput cols)
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+          echo -n " - Editions: "
+          editions_"${OS}" | fold -s -w $(tput cols)
+        fi
         ;;
     esac
-    if [[ $(type -t "editions_${OS}") == function ]]; then
-        echo -n " - Editions: "
-        "editions_${OS}"
-    fi
     exit 1
 fi
 
