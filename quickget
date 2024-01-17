@@ -379,7 +379,6 @@ test_isos() {
     exit 0
 }
 
-
 function os_support() {
     echo alma \
     alpine \
@@ -1829,6 +1828,7 @@ function get_fedora() {
       Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
       *) VARIANT="Spins";;
     esac
+
     JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
@@ -1983,7 +1983,6 @@ function generate_id() {
     local macRecoveryID=""
     local TYPE="${1}"
     local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
-
     for ((i=0; i<$TYPE; i++)); do
         macRecoveryID+="${valid_chars[$((RANDOM % 16))]}"
     done
@@ -2080,6 +2079,7 @@ function get_macos() {
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
+
     else
         echo "Downloading macOS firmware"
         web_get "${OpenCore_qcow2}" "${VM_PATH}"
@@ -2136,7 +2136,9 @@ function get_manjaro() {
     esac
 
     [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
+
     if [[ ${RELEASE} != "sway" ]]; then
         URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
     else
@@ -2165,7 +2167,6 @@ function get_netboot() {
     local ISO="netboot.xyz.iso"
     local HASH=""
     local URL="https://boot.netboot.xyz/ipxe"
-
     HASH=$(wget -q -O- "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2174,7 +2175,6 @@ function get_netbsd() {
     local HASH=""
     local ISO="NetBSD-${RELEASE}-amd64.iso"
     local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images/"
-
     HASH=$(wget -q -O- "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2184,7 +2184,6 @@ function get_nixos() {
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
-
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2193,7 +2192,6 @@ function get_openbsd() {
     local HASH=""
     local ISO="install${RELEASE//\./}.iso"
     local URL="https://mirror.leaseweb.com/pub/OpenBSD/${RELEASE}/amd64"
-
     HASH=$(wget -q -O- "${URL}/SHA256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2287,7 +2285,6 @@ function get_popos() {
     local HASH=""
     local ISO=""
     local URL=""
-
     URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
     HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
     echo "${URL} ${HASH}"
@@ -2371,7 +2368,6 @@ function get_slackware() {
     local HASH=""
     local ISO="slackware64-${RELEASE}-install-dvd.iso"
     local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
-
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2967,6 +2963,7 @@ EOF
 
 handle_curl_error() {
     local error_code="$1"
+
     local fatal_error_action=2
 
     case "$error_code" in
@@ -3401,8 +3398,8 @@ supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version 
 
 function show_os_info() {
     local OS=""
-
     if [ -z "${1}" ]; then
+
         os_error
         exit 1
     fi
@@ -3589,7 +3586,6 @@ if [ -n "${2}" ]; then
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
     fi
-
 elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
     RELEASE=$(releases_${OS})
     VM_PATH="${OS}"
