@@ -1,0 +1,117 @@
+--- # This is a basic workflow to help test quickget
+
+name: quickget test
+
+# Controls when the action will run.
+on:
+  # Build at 00:00 on every 12th day-of-month.
+  #schedule:
+  #  - cron: "0 0 */12 * *"
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: '**' #'!master' # excludes master
+    paths: [ quickget ]
+  pull_request:
+    branches: '**' # matches every branch
+    paths:
+      - quickget
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+
+  Supported:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: List all supported systems in plain text
+        run: |
+          echo -e "\n\n               Supported:\n\n"
+          ./quickget -l | tee supported.txt
+          echo -e "\n\n               Finished\n\n"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supported
+          path: supported.txt
+
+
+  OSinfo:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: Show info about OS
+        #env:
+          #TERM: xterm
+        run: |
+          export TERM=xterm-256color
+          #sudo apt install -y neofetch
+          #echo -e "\n\n"
+          #neofetch
+          #echo -e "\n\n"
+          echo -e "\n\n               OSinfo:\n\n"
+          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
+          for os in ${distros}; do
+            echo -e "\n\n      ${os}" && ./quickget -12345 "${os}" | tee osinfo.txt
+          done
+          echo -e "\n\n               Finished\n\n"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: osinfo
+          path: osinfo.txt
+
+  ISOlist:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: List all supported systems download URLs
+        run: |
+          echo -e "\n\n               ISOs:\n\n"
+          ./quickget -lu | tee isoslist.txt
+          echo -e "\n\n               Finished\n\n"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: isoslist
+          path: isoslist.txt
+
+
+  Test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: Check all downloads for all OSs are available
+        run: |
+          echo -e "\n\n               ISOs availability:\n\n"
+          ./quickget -tu | tee isostest.txt
+          echo -e "\n\n               Finished\n\n"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: isostest
+          path: isostest.txt
