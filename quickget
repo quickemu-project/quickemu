@@ -525,8 +525,9 @@ function releases_blendos() {
     wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
 
     local RLIST
-    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]')
-    echo ${RLIST}
+    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]'| tr '\r\n' ' ')
+    echo "${RLIST}"
+
 }
 
 function releases_bunsenlabs() {
