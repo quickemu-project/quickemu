@@ -63,6 +63,7 @@ function pretty_name() {
     arcolinux)          PRETTY_NAME="Arco Linux";;
     artixlinux)         PRETTY_NAME="Artix Linux";;
     atheanos)           PRETTY_NAME="Athena OS";;
+    biglinux)           PRETTY_NAME="Big Linux";;
     blendos)            PRETTY_NAME="BlendOS";;
     cachyos)            PRETTY_NAME="CachyOS";;
     centos-stream)      PRETTY_NAME="CentOS Stream";;
@@ -216,6 +217,7 @@ function os_support() {
     athenaos \
     batocera \
     bazzite \
+    biglinux \
     blendos \
     bodhi \
     bunsenlabs \
@@ -305,6 +307,7 @@ function os_homepages(){
         athenaos)          HOMEPAGE="https://athenaos.org/";;
         batocera)          HOMEPAGE="https://batocera.org/";;
         bazzite)           HOMEPAGE="https://bazzite.gg/";;
+        biglinux)          HOMEPAGE="https://www.biglinux.com.br/";;
         blendos)           HOMEPAGE="https://blendos.co/";;
         bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
         bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
@@ -469,6 +472,10 @@ function releases_athenaos() {
 
 function releases_bazzite() {
     echo $(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | tr '\n' ' ')
+}
+
+function releases_biglinux() {
+    echo kde
 }
 
 function releases_blendos() {
@@ -1343,6 +1350,15 @@ function get_athenaos() {
             ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_biglinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.biglinux.com.br/"
+    ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- ${URL}) | sort -u | tail -n2 | head -n1)
+    HASH=$(curl -s ${URL}${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
+    echo "${URL}${ISO} ${HASH}"
 }
 
 function get_bunsenlabs() {
