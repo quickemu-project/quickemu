@@ -30,7 +30,7 @@ env:
 
   # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
   # or posted in a PR (pull_request)
-  APPLY_FIXES_MODE: commit
+  APPLY_FIXES_MODE: pull-request
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 concurrency:
