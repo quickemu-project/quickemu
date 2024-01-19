@@ -21,3 +21,4 @@
 *.xml
 *.zs-old
 .direnv/
+megalinter-reports/
