@@ -111,6 +111,7 @@ FILEIO_REPORTER: true
 JSON_REPORTER: true
 GITHUB_STATUS_REPORTER: true
 GITHUB_COMMENT_REPORTER: true
+REPORT_OUTPUT_FOLDER: /megalinter-reports
 PLUGINS:
   - https://raw.githubusercontent.com/oxsecurity/megalinter/main/.automation/test/mega-linter-plugin-test/test.megalinter-descriptor.yml
 PRE_COMMANDS:
