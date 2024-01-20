@@ -1,29 +1,35 @@
---- # reviewdog
-name: 'Run shellcheck with reviewdog'
-
+name: reviewdog
 on:
+  pull_request:
   push:
   workflow_dispatch:
 
 jobs:
-  shellcheck:
-    permissions:
-      checks: write
-      contents: read
-      pull-requests: write
-    name: 'Run shellcheck with reviewdog'
+  quickemu-check:
+    name: runner / quickemu
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: haya14busa/action-cond@v1
-        id: reporter
+      - name: shellcheck
+        uses: reviewdog/action-shellcheck@v1
         with:
-          cond: ${{ github.event_name == 'pull_request' }}
-      - uses: reviewdog/action-shellcheck@v1
-        with:
-          reporter: ${{ steps.reporter.outputs.value }}
-          level: error
           github_token: ${{ secrets.github_token }}
-          pattern: |
-            quickget
-            quickemu
+          reporter: github-pr-review # Change reporter.
+          path: "." # Optional.
+          pattern: "quickemu" # Optional.
+          exclude: "./.git/*" # Optional.
+          check_all_files_with_shebangs: "false" # Optional.
+  quickget-check:
+    name: runner / quickget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review # Change reporter.
+          path: "." # Optional.
+          pattern: "quickget" # Optional.
+          exclude: "./.git/*" # Optional.
+          check_all_files_with_shebangs: "false" # Optional.
