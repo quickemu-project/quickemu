@@ -22,3 +22,5 @@
 *.zs-old
 .direnv/
 megalinter-reports/
+.gitsecret/keys/random_seed
+!*.secret
