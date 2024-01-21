@@ -73,6 +73,7 @@ function pretty_name() {
     freedos)            PRETTY_NAME="FreeDOS";;
     garuda)             PRETTY_NAME="Garuda Linux";;
     ghostbsd)           PRETTY_NAME="GhostBSD";;
+    gnomeos)            PRETTY_NAME="GNOME OS";;
     holoiso)            PRETTY_NAME="SteamOS HoloISO";;
     kdeneon)            PRETTY_NAME="KDE Neon";;
     kolibrios)          PRETTY_NAME="KolibriOS";;
@@ -231,6 +232,7 @@ function os_support() {
     garuda \
     gentoo \
     ghostbsd \
+    gnomeos \
     haiku \
     holoiso \
     kali \
@@ -317,6 +319,7 @@ function os_homepages(){
         garuda)            HOMEPAGE="https://garudalinux.org/";;
         gentoo)            HOMEPAGE="https://www.gentoo.org/";;
         ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
+        gnomeos)           HOMEPAGE="https://os.gnome.org/";;
         haiku)             HOMEPAGE="https://www.haiku-os.org/";;
         holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
         kali)              HOMEPAGE="https://www.kali.org/";;
@@ -573,6 +576,11 @@ function releases_ghostbsd() {
 
 function editions_ghostbsd() {
     echo mate xfce
+}
+
+function releases_gnomeos() {
+    local GNOMEOS_RELEASES=$(curl -s https://download.gnome.org/gnomeos/ | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
+    echo nightly ${GNOMEOS_RELEASES}
 }
 
 function releases_haiku() {
@@ -1562,6 +1570,30 @@ function get_ghostbsd() {
       xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
     esac
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_gnomeos() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+
+    case ${RELEASE} in
+        nightly)
+            URL="https://os.gnome.org/download/latest"
+            ISO="gnome_os_installer.iso";;
+        # The download.gnome.org mirror does not currently link to ISOs for 44.rc or 45.rc
+        44.rc|45.rc)
+            URL="https://mirror.umd.edu/gnome/gnomeos/${RELEASE}"
+            ISO="gnome_os_installer_${RELEASE}.iso";;
+        3.38*)
+            URL="https://download.gnome.org/gnomeos/${RELEASE}"
+            ISO="gnome_os_installer.iso";;
+        *)
+            URL="https://download.gnome.org/gnomeos/${RELEASE}"
+            ISO="gnome_os_installer_${RELEASE}.iso";;
+    esac
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
