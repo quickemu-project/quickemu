@@ -532,7 +532,7 @@ function editions_bodhi() {
 }
 
 function releases_cachyos() {
-    echo 230813
+    echo 240121
 }
 
 function editions_cachyos() {
