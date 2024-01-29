@@ -543,7 +543,7 @@ function editions_bodhi() {
 }
 
 function releases_cachyos() {
-    echo 230813
+    echo latest
 }
 
 function editions_cachyos() {
@@ -1612,8 +1612,13 @@ function get_bodhi() {
 
 function get_cachyos() {
     local HASH=""
-    local ISO="cachyos-${EDITION}-linux-${RELEASE}.iso"
-    local URL="https://mirror.cachyos.org/ISO/${EDITION}/${RELEASE}"
+    local ISO=""
+    local URL=""
+    local release=""
+
+    release=$(curl "https://mirror.cachyos.org/ISO/${EDITION}/" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | tail -n 1)
+    ISO="cachyos-${EDITION}-linux-${release}.iso"
+    URL="https://mirror.cachyos.org/ISO/${EDITION}/${release}"
     HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
