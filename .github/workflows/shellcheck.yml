@@ -1,0 +1,7 @@
+      - name: MegaLinter
+        uses: efrecon/mega-linter-runner@main
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          flavor: documentation
