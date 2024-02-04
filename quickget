@@ -372,6 +372,16 @@ function os_homepages(){
     echo "${HOMEPAGE}"
 }
 
+function check_arch() {
+    # Check the architecture of the host system. Format it in a more standard way (e.g. x86_64 -> amd64), and set it as a global variable
+    local OUTPUT=$(uname -m)
+    case ${OUTPUT} in
+        x86_64) ARCH="amd64";;
+        i386|i686) ARCH="i386";;
+        *) ARCH="${OUTPUT}";;
+    esac
+}
+
 function releases_alma() {
     echo 8 9
 }
@@ -939,6 +949,10 @@ function web_get() {
       exit 1
     fi
 
+    if echo ${URL} | grep -qE "aarch64|arm64"; then
+        setArch="on"
+    fi
+
     if command -v aria2c &>/dev/null; then
         if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}"; then
           echo #Necessary as aria2c in suppressed mode does not have new lines
@@ -957,6 +971,10 @@ function zsync_get() {
     local FILE="${1##*/}"
     local OUT=""
     local URL="${1}"
+
+    if echo ${URL} | grep -qE "aarch64|arm64"; then
+        setArch="on"
+    fi
 
 	# Test mode for ISO
 	if [ "${show_iso_url}" == 'on' ]; then
@@ -1135,6 +1153,10 @@ EOF
             fi
             ;;
         esac
+
+        if [[ "${setArch}" == "on" ]]; then
+            echo "arch=\"${ARCH}\"" >> "${CONF_FILE}"
+        fi
 
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
         # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
@@ -1486,6 +1508,7 @@ function get_fedora() {
     local HASH=""
     local ISO=""
     local JSON=""
+    local RAWJSON="$(wget -q -O- "https://getfedora.org/releases.json")"
     local URL=""
     local VARIANT=""
 
@@ -1494,7 +1517,15 @@ function get_fedora() {
       *) VARIANT="Spins";;
     esac
 
-    JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+    if [[ "${ARCH}" == "arm64" ]]; then
+        JSON=$(echo "${RAWJSON}" | jq '.[] | select(.subvariant=="'"${EDITION}"'" and .arch=="aarch64" and .version=="'"${RELEASE}"'" and (.link | test("iso")))')
+        if [ -z "${JSON}" ]; then
+            JSON=$(echo "${RAWJSON}" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+        fi
+    else
+        JSON=$(echo "${RAWJSON}" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+    fi
+
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -2041,7 +2072,6 @@ function get_truenas-core() {
 }
 
 function get_ubuntu-server() {
-
     local HASH=""
     local ISO=""
     local URL=""
@@ -2050,16 +2080,18 @@ function get_ubuntu-server() {
 
     if [[ "${RELEASE}" == "daily"* ]]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    elif [[ ${ARCH} == "arm64" ]]; then
+        URL="https://cdimage.ubuntu.com/releases/${RELEASE}/release"
     else
         URL="https://releases.ubuntu.com/${RELEASE}"
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'live-server' | grep "${ARCH}" | grep iso)
         ISO=$(cut -d'*' -f2 <<<${DATA})
         HASH=$(cut -d' ' -f1 <<<${DATA})
     else
-        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'live-server' | grep "${ARCH}" | grep iso)
         ISO=$(cut -d' ' -f3 <<<${DATA})
         HASH=$(cut -d' ' -f1 <<<${DATA})
     fi
@@ -2101,6 +2133,8 @@ function get_ubuntu() {
             URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
         fi
         VM_PATH="${OS}-jammy-live"
+    elif [[ "${OS}" == "ubuntu" ]] && [[ "${RELEASE}" == "22.04" ]] && [[ "${ARCH}" == "arm64" ]]; then
+        URL="https://cdimage.ubuntu.com/jammy/daily-live/current"
     elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-${RELEASE}"
@@ -2111,7 +2145,13 @@ function get_ubuntu() {
     fi
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep iso | grep -v "+mac")
+        # Check whether the host architecture (excluding amd64) is available
+        if echo "${DATA}" | grep -q $ARCH && [[ "${ARCH}" != "amd64" ]]; then
+            DATA=$(echo "${DATA}" | grep $ARCH)
+        else
+            DATA=$(echo "${DATA}" | grep amd64)
+        fi
         ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
         HASH=$(cut -d' ' -f1 <<<${DATA} | sed '1q;d')
     else
@@ -2763,6 +2803,8 @@ if [[ ! $(os_support) =~ ${OS} ]]; then
     os_support
     exit 1
 fi
+
+check_arch
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
