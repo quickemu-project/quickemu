@@ -378,6 +378,7 @@ function check_arch() {
     case ${OUTPUT} in
         x86_64) ARCH="amd64";;
         i386|i686) ARCH="i386";;
+        armv8*|aarch64*) ARCH="arm64";;
         *) ARCH="${OUTPUT}";;
     esac
 }
