@@ -1,0 +1,2 @@
+--- # only API token
+REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

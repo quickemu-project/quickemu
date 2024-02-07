@@ -16,3 +16,6 @@
 *.sock
 *.xml
 *.zs-old
+megalinter-reports/
+.gitsecret/keys/random_seed
+!*.secret
