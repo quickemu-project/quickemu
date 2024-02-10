@@ -1,0 +1,86 @@
+--- # Configuration file for MegaLinter
+# See all available variables at https://megalinter.io/configuration/ and in linters documentation
+
+APPLY_FIXES: all
+# ENABLE: # If you use ENABLE variable, all other languages/formats/tooling formats will be disabled by default
+ENABLE_LINTERS: # If you use ENABLE_LINTERS variable, all other linters will be disabled by default
+  - BASH_SHELLCHECK
+  - BASH_SHFMT
+  - GROOVY_NPM_GROOVY_LINT
+  - MAKEFILE_CHECKMAKE
+  - ENV_DOTENV_LINTER
+  - JSON_JSONLINT
+  - JSON_ESLINT_PLUGIN_JSONC
+  - JSON_V8R
+  - JSON_PRETTIER
+  - XML_XMLLINT
+  - YAML_PRETTIER
+  - YAML_YAMLLINT
+  - YAML_V8R
+  - COPYPASTE_JSCPD
+  - REPOSITORY_GIT_DIFF
+  - REPOSITORY_GITLEAKS
+  - REPOSITORY_GRYPE
+  - REPOSITORY_SECRETLINT
+  - REPOSITORY_TRIVY
+  - REPOSITORY_TRIVY_SBOM
+  - REPOSITORY_TRUFFLEHOG
+# DISABLE:
+# - CLOUDFORMATION
+# - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
+# - CSS
+# - EDITORCONFIG
+# - SPELL # Uncomment to disable checks of spelling mistakes
+# - JAVASCRIPT
+# - TEKTON
+# DISABLE_LINTERS:
+# - JSON_PRETTIER
+# - REPOSITORY_GITLEAKS
+# - REPOSITORY_KICS
+# - SPELL_PROSELINT
+# - SPELL_MISSPELL
+# - SPELL_VALE
+# DISABLE_ERRORS_LINTERS:
+# - PYTHON_BANDIT
+# - PYTHON_PYRIGHT
+# - REPOSITORY_DEVSKIM
+# - REPOSITORY_GRYPE
+# - REPOSITORY_SEMGREP
+# - REPOSITORY_TRUFFLEHOG
+PRINT_ALL_FILES: true
+FILTER_REGEX_EXCLUDE: '(\.automation/test|\.automation/generated|\.venv|\.github/workflows|docs/javascripts|docs/overrides|docs/json-schemas|flavors|clj-kondo|TEMPLATES)'
+JSON_JSONLINT_FILTER_REGEX_EXCLUDE: '(\.vscode/)'
+YAML_YAMLLINT_FILTER_REGEX_EXCLUDE: '(templates/\.mega-linter\.yml)'
+YAML_PRETTIER_FILTER_REGEX_EXCLUDE: '(templates/\.mega-linter\.yml|mkdocs\.yml)'
+YAML_V8R_FILTER_REGEX_EXCLUDE: '(descriptors|templates/\.mega-linter\.yml|\.codecov\.yml)'
+BASH_FILTER_REGEX_INCLUDE: "quickget|quickemu"
+BASH_FILTER_REGEX_EXCLUDE: "(lib)"
+BASH_SHELLCHECK_FILE_EXTENSIONS: [""]
+BASH_SHFMT_FILE_EXTENSIONS: [""]
+MARKDOWN_FILTER_REGEX_EXCLUDE: '(license\.md|docs/licenses)'
+MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
+SPELL_VALE_FILE_EXTENSIONS:
+  - .md
+SPELL_FILTER_REGEX_EXCLUDE: (valestyles|\.github|docs/licenses)
+DOCKERFILE_HADOLINT_ARGUMENTS: "--ignore DL3003 --ignore DL3007 --ignore DL3013 --ignore DL3016 --ignore DL3018 --ignore DL3028 --ignore DL3059 --ignore DL4001 --ignore DL4006 --ignore SC2015 --ignore SC2016 --ignore SC2039 --ignore SC2086 --ignore SC1091 --ignore SC3046"
+REPOSITORY_TRIVY_ARGUMENTS:
+  - "--skip-dirs"
+  - ".automation/test"
+  - "--skip-dirs"
+  - ".venv"
+CONSOLE_REPORTER: true
+OUTPUT_DETAIL: detailed
+SHOW_ELAPSED_TIME: true
+FLAVOR_SUGGESTIONS: true
+EMAIL_REPORTER: false
+FILEIO_REPORTER: true
+JSON_REPORTER: true
+GITHUB_STATUS_REPORTER: true
+PLUGINS:
+  - https://raw.githubusercontent.com/oxsecurity/megalinter/main/.automation/test/mega-linter-plugin-test/test.megalinter-descriptor.yml
+PRE_COMMANDS:
+  - command: echo "This is MegaLinter PRE_COMMAND on own MegaLinter ! :)"
+    cwd: "root"
+POST_COMMANDS:
+  - command: echo "This is MegaLinter POST_COMMAND on own MegaLinter ! :)"
+    cwd: "workspace"
