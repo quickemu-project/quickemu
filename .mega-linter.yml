@@ -1,4 +1,4 @@
-# Configuration file for MegaLinter
+--- # Configuration file for MegaLinter
 # See all available variables at https://megalinter.io/configuration/ and in linters documentation
 
 APPLY_FIXES: all
