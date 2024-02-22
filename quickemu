@@ -1748,6 +1748,11 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         disk_size="${disk}"
     fi
 
+    # Set the default disk_format if not provided by user
+    if [ -z "${disk_format}" ]; then
+        disk_format=$(${QEMU_IMG} info "${disk_img}" | gawk '/^file format: / {print $NF}')
+    fi
+
     if [ -n "${display}" ]; then
         OUTPUT="${display}"
     fi
