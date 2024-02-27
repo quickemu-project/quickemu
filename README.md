@@ -163,7 +163,7 @@ installed via any AUR helper. Assuming your AUR helper is yay, Run the
 following command:
 
 ``` bash
-yay -Sy quickemu
+yay -Syu quickemu
 ```
 
 ## Ubuntu
