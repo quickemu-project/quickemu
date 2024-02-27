@@ -184,6 +184,7 @@ sudo apt install quickemu
 ``` bash
 git clone --filter=blob:none https://github.com/wimpysworld/quickemu
 cd quickemu
+sudo make install
 ```
 
 Now install all the **Requirements** documented above.
