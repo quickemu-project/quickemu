@@ -1,16 +1,10 @@
 --- # RSS feed
-name: Monitor new OS versions
+name: Monitor new OS versions (distrowatch)
 
 on:
   schedule:
     # Run this Action every day at 7:37am UTC
-    - cron: "37 7 * * *"
-  push:
-    branches: '**' #'!master' # excludes master
-    paths-ignore: [ '**/README.md' ]
-  pull_request:
-    branches: '**' # matches every branch
-    paths-ignore: [ '**/README.md' ]
+    - cron: '0 18 * * *'
   workflow_dispatch:
 jobs:
   distrowatch:
