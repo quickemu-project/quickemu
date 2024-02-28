@@ -1,5 +1,5 @@
 --- # RSS feed
-name: Monitor new OS versions
+name: Monitor new OS versions (distrowatch)
 
 on:
   schedule:
