@@ -1750,7 +1750,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
 
     # Set the default disk_format if not provided by user
     if [ -z "${disk_format}" ]; then
-        disk_format=$(${QEMU_IMG} info "${disk_img}" | gawk '/^file format: / {print $NF}')
+        disk_format=$(${QEMU_IMG} info "${disk_img}" | grep 'file format' | cut -d ':' -f 2 | tr -cd '[:graph:]')
     fi
 
     if [ -n "${display}" ]; then
