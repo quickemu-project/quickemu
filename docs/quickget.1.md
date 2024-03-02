@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 26, 2023
+date: March 2, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -133,6 +133,7 @@ edition of windows)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
@@ -143,7 +144,6 @@ edition of windows)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
 -   `haiku` (Haiku)
--   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
