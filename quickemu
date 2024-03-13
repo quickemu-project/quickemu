@@ -288,6 +288,13 @@ function vm_boot() {
         GUEST_CPU_CORES="${cpu_cores}"
     fi
 
+    if [ "${guest_os}" == "macos" ] && [ "${GUEST_CPU_CORES}" -gt 10 ] || [ "${GUEST_CPU_CORES}" -eq 6 ] || [ "${GUEST_CPU_CORES}" -eq 7 ]; then
+        # macOS guests cannot boot with most core counts not powers of 2. This will fix the issue by rounding the core count down to a power of 2. Uses wc and factor from coreutils.
+        factorCPUCores=$(factor "${GUEST_CPU_CORES}")
+        GUEST_CPU_CORES=$(( 2 ** $(echo "${factorCPUCores#*:}" | grep -o '[0-9]' | wc -l) ))
+    fi
+        
+
     # Account for Hyperthreading/SMT.
     if [ -e /sys/devices/system/cpu/smt/control ] && [ "${GUEST_CPU_CORES}" -ge 2 ]; then
         HOST_CPU_SMT=$(cat /sys/devices/system/cpu/smt/control)
@@ -330,7 +337,7 @@ function vm_boot() {
     fi
     echo ", ${RAM_VM} RAM"
 
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         if [ "${RAM_VM//G/}" -lt 4 ]; then
             echo "ERROR! You have insufficient RAM to run ${guest_os} in a VM"
             exit 1
@@ -341,7 +348,7 @@ function vm_boot() {
     boot=${boot,,}
     guest_os=${guest_os,,}
 
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ]; then
+    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         # Display MSRs alert if the guest is macOS or windows
         ignore_msrs_alert
     fi
@@ -520,7 +527,7 @@ function vm_boot() {
         # A CPU with SSE4.1 support is required for >= macOS Sierra
         # A CPU with AVX2 support is required for >= macOS Ventura
         case ${macos_release} in
-        ventura)
+        ventura|sonoma)
             if check_cpu_flag sse4_1 && check_cpu_flag avx2; then
                 CPU="-cpu Haswell,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc,+avx2"
             else
@@ -557,7 +564,7 @@ function vm_boot() {
             NET_DEVICE="vmxnet3"
             USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci"
             ;;
-        big-sur|monterey|ventura)
+        big-sur|monterey|ventura|sonoma)
             BALLOON="-device virtio-balloon"
             MAC_DISK_DEV="virtio-blk-pci"
             NET_DEVICE="virtio-net"
@@ -578,7 +585,7 @@ function vm_boot() {
             disk_size="96G"
         fi
         ;;
-    windows)
+    windows|windows-server)
         if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
             CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
         else
@@ -731,7 +738,7 @@ function vm_boot() {
         # qxl-vga supports seamless mouse and sane resolutions if only one scanout
         # is used. Which is whay '-vga none' is added to the QEMU command line.
         DISPLAY_DEVICE="qxl-vga"
-    elif [ "${guest_os}" == "windows" ]; then
+    elif [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         case ${OUTPUT} in
         # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues.
         # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
@@ -896,7 +903,7 @@ function vm_boot() {
         esac
     fi
 
-    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
+    if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
         echo -n " - 9P:       On guest: "
         if [ "${guest_os}" == "linux" ]; then
             echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
@@ -1142,6 +1149,10 @@ function vm_boot() {
         # shellcheck disable=SC2054,SC2206
         args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
 
+    elif [ "${guest_os}" == "windows-server" ]; then
+        args+=(-device ide-hd,drive=SystemDisk
+            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
     else
         # shellcheck disable=SC2054,SC2206
         args+=(-device virtio-blk-pci,drive=SystemDisk
@@ -1150,7 +1161,7 @@ function vm_boot() {
 
     # https://wiki.qemu.org/Documentation/9psetup
     # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
-    if [ "${guest_os}" != "windows" ] && [ -n "${PUBLIC}" ]; then
+    if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
         # shellcheck disable=SC2054
         args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
             -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
@@ -1736,7 +1747,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VMPATH=$(realpath "$(dirname "${VM}")")
     VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
     VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
-
+    if [ ! -f "${disk_img}" ]; then
+        cd "${VMPATH}"
+    fi
+    
     # Backwards compatibility for ${driver_iso}
     if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
         fixed_iso="${driver_iso}"
@@ -1885,6 +1899,10 @@ if [ ${VM_UP} -eq 0 ]; then
     # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
     if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
         sleep 3.5
+        monitor_send_cmd "sendkey ret"
+    fi
+    if [ -n "${iso}" ] && [ "${guest_os}" == "windows-server" ]; then
+        sleep 7
         monitor_send_cmd "sendkey ret"
     fi
     start_viewer
