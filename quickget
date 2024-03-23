@@ -2758,7 +2758,7 @@ else
     exit 1
 fi
 
-if [[ ! $(os_support) =~ ${OS} ]]; then
+if [[ ! "$(os_support)" =~ (^| )"${OS}"($| ) ]]; then
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support
     exit 1
