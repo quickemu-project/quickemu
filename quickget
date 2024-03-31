@@ -93,7 +93,7 @@ function os_info() {
       netbsd)           INFO="NetBSD|Independent|-|https://www.netbsd.org/|Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices.";;
       nitrux)           INFO="Nitrux|Debian|-|https://nxos.org/|Powered by Debian, KDE Plasma and Frameworks, and AppImages.";;
       nixos)            INFO="NixOS|Independent|-|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
-      nwgiso)           INFO="nwg-shell|Arch|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
+      nwg-shell)        INFO="nwg-shell|Arch|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
       macos)            INFO="macOS|proprietary|-|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
       openbsd)          INFO="OpenBSD|Independent|-|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
       openindiana)      INFO="OpenIndiana|Solaris,OpenSolaris|-|https://www.openindiana.org/|Community supported illumos-based operating system.";;
@@ -516,6 +516,7 @@ function os_support() {
     netbsd \
     nitrux \
     nixos \
+    nwg-shell \
     lubuntu \
     macos \
     openbsd \
@@ -885,6 +886,10 @@ function releases_nixos(){
 
 function editions_nixos(){
     echo minimal plasma5 gnome
+}
+
+function releases_nwg-shell() {
+    echo $(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep 'url=' | grep '64.iso' | cut -d'/' -f12 | cut -d'-' -f3)
 }
 
 function releases_openbsd(){
@@ -2160,6 +2165,14 @@ function get_nixos() {
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_nwg-shell() {
+    local HASH=""
+    local ISO="nwg-live-${RELEASE}-x86_64.iso"
+    local URL="https://sourceforge.net/projects/nwg-iso/files"
+    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
