@@ -1,0 +1,38 @@
+name: reviewdog-suggester
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  go:
+    name: runner / suggester / gofmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: gofmt -w -s .
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: gofmt
+  shell:
+    name: runner / suggester / shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+      - run: go install mvdan.cc/sh/v3/cmd/shfmt@latest
+
+      - run: shfmt -i 2 -ci -w .
+      - name: suggester / shfmt
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: shfmt
+
+      # Need to install latest shellcheck to use diff output format as of writing (2020/08/03).
+      - name: install shellcheck
+        run: |
+          scversion="latest"
+          wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv
+          sudo cp "shellcheck-${scversion}/shellcheck" /usr/local/bin/
+          rm -rf "shellcheck-${scversion}/shellcheck"
+      - run: shellcheck -f diff $(shfmt -f .) | patch -p1
+      - name: suggester / shellcheck
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: shellcheck
