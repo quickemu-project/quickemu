@@ -504,7 +504,7 @@ function vm_boot() {
         fi
 
         if [ -z "${disk_size}" ]; then
-            disk_size="32G"
+            disk_size="16G"
         fi
         ;;
      kolibrios|reactos)
