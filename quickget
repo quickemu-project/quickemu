@@ -3057,7 +3057,7 @@ if [ -n "${2}" ]; then
         if [ -n "${3}" ]; then
             LANG="${3}"
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
-                echo -e "ERROR! ${LANG} is not a supported Windows language:\n"
+                echo -e "ERROR! ${LANG} is not a supported Windows ${RELEASE} language:\n"
                 for LANG in "${LANGS[@]}"; do
                   echo -n "${LANG} "
                 done
