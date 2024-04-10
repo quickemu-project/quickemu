@@ -1195,7 +1195,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-          alma|athenaos|centos-stream|endless|garuda|nixos|oraclelinux|popos|rockylinux)
+          alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
             echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
           openindiana)
             echo "boot=\"legacy\"" >> "${CONF_FILE}"
