@@ -62,14 +62,6 @@ your home directory) and no elevated permissions are required to run the
 virtual machines. **Quickemu now also includes comprehensive support for
 [macOS](#macos-guests) and [Windows](#windows-guests)**.
 
-See this (old) video where I explain some of my motivations for creating
-Quickemu:
-
-::: {align="center"}
-[![Replace VirtualBox with Bash &
-QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
-:::
-
 ## Features
 
 -   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
@@ -107,6 +99,17 @@ following command:
 yay -Sy quickemu
 ```
 
+### Debian and derivatives
+
+A [.deb package is available for Debian and derivatives in this
+project's GitHub releases
+page](https://github.com/quickemu-project/quickemu/releases). Download
+the .deb and install it with `apt-get`.
+
+``` bash
+sudo apt-get install ./quickemu_x.y.z-1_all.deb
+```
+
 ### Ubuntu hosts
 
 Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
@@ -139,8 +142,8 @@ To install via NixOS config:
 ``` nix
 # /etc/nixos/configuration.nix
 {pkgs, ...}: {
-   environment.systemPackages = with pkgs; 
-     quickemu 
+   environment.systemPackages = with pkgs;
+     quickemu
    };
 }
 ```
@@ -197,7 +200,7 @@ These examples may save a little typing:
 
 #### Install requirements on Debian hosts
 
-This also applies to direct derivatives, such as MX Linux:
+This also applies to derivatives:
 
 ``` sh
 sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
@@ -211,7 +214,7 @@ sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genis
 
 #### Install requirements on macOS hosts
 
-This is a work in progress (see [issue
+This is a **work in progress** (see [issue
 248](https://github.com/quickemu-project/quickemu/issues/248) for other
 steps and changes that may enable running on MacOS)
 
@@ -349,7 +352,6 @@ fully functional for all operating systems, including Windows and macOS.
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
--   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
