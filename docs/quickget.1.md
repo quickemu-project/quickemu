@@ -142,7 +142,6 @@ fully functional for all operating systems, including Windows and macOS.
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
--   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)

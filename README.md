@@ -100,10 +100,14 @@ yay -Sy quickemu
 ```
 ### Debian and derivatives
 
-A [.deb package is available for Debian and derivatives in this project's GitHub releases page](https://github.com/quickemu-project/quickemu/releases).
-Download the .deb and install it with `apt-get`.
+### Debian and derivatives
 
-```bash
+A [.deb package is available for Debian and derivatives in this
+project's GitHub releases
+page](https://github.com/quickemu-project/quickemu/releases). Download
+the .deb and install it with `apt-get`.
+
+``` bash
 sudo apt-get install ./quickemu_x.y.z-1_all.deb
 ```
 
@@ -211,8 +215,9 @@ sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genis
 
 #### Install requirements on macOS hosts
 
-This is a **work in progress** (see [issue 248](https://github.com/quickemu-project/quickemu/issues/248)
-for other steps and changes that may enable running on MacOS)
+This is a **work in progress** (see [issue
+248](https://github.com/quickemu-project/quickemu/issues/248) for other
+steps and changes that may enable running on MacOS)
 
 ``` sh
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
@@ -347,7 +352,6 @@ fully functional for all operating systems, including Windows and macOS.
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
--   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
