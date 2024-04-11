@@ -270,17 +270,16 @@ quickemu --vm ubuntu-22.04.conf
         enable file sharing.
         -   `sudo apt install spice-webdavd`
 
-### Ubuntu devel (daily-live) images
+### Ubuntu daily-live images
 
-`quickget` can also download/refresh devel images via `zsync` for Ubuntu
-developers and testers.
+`quickget` can also download/refresh daily-live images via `zsync` for Ubuntu developers and testers.
 
 ``` bash
-quickget ubuntu devel
-quickemu --vm ubuntu-devel.conf
+quickget ubuntu daily-live
+quickemu --vm ubuntu-daily-live.conf
 ```
 
-You can run `quickget ubuntu devel` to refresh your daily development
+You can run `quickget ubuntu daily-live` to refresh your daily development
 image as often as you like, it will even automatically switch to a new
 series.
 
