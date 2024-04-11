@@ -100,6 +100,13 @@ yay -Sy quickemu
 ```
 ### Debian and derivatives
 
+A [.deb package is available for Debian and derivatives in this project's GitHub releases page](https://github.com/quickemu-project/quickemu/releases).
+Download the .deb and install it with `apt-get`.
+
+```bash
+sudo apt-get install ./quickemu_x.y.z-1_all.deb
+```
+
 ### Debian and derivatives
 
 A [.deb package is available for Debian and derivatives in this
