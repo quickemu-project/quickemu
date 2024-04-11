@@ -158,18 +158,6 @@ stored anywhere (such as external USB storage or your home directory)
 and no elevated permissions are required to run the virtual machines.
 \f[B]Quickemu now also includes comprehensive support for macOS and
 Windows\f[R].
-.PP
-See this (old) video where I explain some of my motivations for creating
-Quickemu:
-.PP
-\c
-.UR https://www.youtube.com/watch?v=AOTYWEgw0hI
-[IMAGE: \c
-.UR https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg
-Replace VirtualBox with Bash & QEMU
-.UE \c
-]
-.UE \c
 .SS Features
 .IP \[bu] 2
 \f[B]macOS\f[R] Monterey, Big Sur, Catalina, Mojave & High Sierra
@@ -355,7 +343,7 @@ to install the above requirements or their equivalents.
 .PP
 These examples may save a little typing:
 .SS Install requirements on Debian hosts
-This also applies to direct derivatives, such as MX Linux:
+This also applies to derivatives:
 .IP
 .EX
 sudo apt install qemu bash coreutils ovmf grep jq lsb\-base procps python3 genisoimage usbutils util\-linux sed spice\-client\-gtk libtss2\-tcti\-swtpm0 wget xdg\-user\-dirs zsync unzip
@@ -366,7 +354,7 @@ sudo apt install qemu bash coreutils ovmf grep jq lsb\-base procps python3 genis
 sudo dnf install qemu bash coreutils edk2\-tools grep jq lsb procps python3 genisoimage usbutils util\-linux sed spice\-gtk\-tools swtpm wget xdg\-user\-dirs xrandr unzip
 .EE
 .SS Install requirements on macOS hosts
-This is a work in progress (see \c
+This is a \f[B]work in progress\f[R] (see \c
 .UR https://github.com/quickemu-project/quickemu/issues/248
 issue 248
 .UE \c
@@ -568,8 +556,6 @@ operating systems, including Windows and macOS.
 \f[CR]devuan\f[R] (Devuan)
 .IP \[bu] 2
 \f[CR]dragonflybsd\f[R] (DragonFlyBSD)
-.IP \[bu] 2
-\f[CR]easyos\f[R] (EasyOS)
 .IP \[bu] 2
 \f[CR]elementary\f[R] (elementary OS)
 .IP \[bu] 2
