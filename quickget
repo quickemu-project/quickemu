@@ -79,6 +79,7 @@ function pretty_name() {
     chimeralinux)       PRETTY_NAME="Chimera Linux";;
     crunchbang++)       PRETTY_NAME="Crunchbang++";;
     dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
+    easyos)             PRETTY_NAME="EasyOS";;
     elementary)         PRETTY_NAME="elementary OS";;
     endeavouros)        PRETTY_NAME="EndeavourOS";;
     endless)            PRETTY_NAME="Endless OS";;
@@ -246,6 +247,7 @@ function os_support() {
     deepin \
     devuan \
     dragonflybsd \
+    easyos \
     edubuntu \
     elementary \
     endeavouros \
@@ -347,6 +349,7 @@ function os_homepages(){
         deepin)            HOMEPAGE="https://www.deepin.org/";;
         devuan)            HOMEPAGE="https://www.devuan.org/";;
         dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
+        easyos)            HOMEPAGE="https://easyos.org/";;
         edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
         elementary)        HOMEPAGE="https://elementary.io/";;
         endeavouros)       HOMEPAGE="https://endeavouros.com/";;
@@ -591,6 +594,15 @@ function releases_dragonflybsd() {
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
     echo $DBSD_RELEASES
+}
+
+function releases_easyos() {
+    #local RLIST
+    #RLIST=$(curl -s https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #RLIST=$(wget -q -O- 'https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/' | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
+    #echo ${RLIST}
+    # Not dynamic for now
+    echo 5.7 5.6.7 5.6.6 5.6.5 5.6.4 5.6.3 5.6.2 5.6.1 5.5.5 5.5.4
 }
 
 function releases_elementary() {
@@ -1219,6 +1231,9 @@ function make_vm_config() {
         dragonflybsd)
             GUEST="dragonflybsd"
             IMAGE_TYPE="iso";;
+        easyos)
+            GUEST="linux"
+            IMAGE_TYPE="img";;
         freebsd|ghostbsd)
             GUEST="freebsd"
             IMAGE_TYPE="iso";;
@@ -1744,6 +1759,25 @@ function get_dragonflybsd() {
     local URL="http://mirror-master.dragonflybsd.org/iso-images"
 
     HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_easyos() {
+    local HASH=""
+    local URL=""
+    local ISO=""
+    local YEAR=""
+
+    ISO="easy-${RELEASE}-amd64.img"
+    case ${RELEASE} in
+      5.6.5|5.6.4|5.6.3|5.6.2|5.6.1|5.5.5|5.5.4)
+        YEAR="2023";;
+      5.7|5.6.7|5.6.6)
+        YEAR="2024";;
+    esac
+    URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
+
+    HASH=$(wget -q -O- "${URL}/md5.sum.txt" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3340,6 +3374,11 @@ create_vm() {
     if [[ ${OS} == "dragonflybsd" ]] && [[ ${ISO} =~ ".bz2" ]]; then
         bzip2 -d  "${VM_PATH}/${ISO}"
         ISO="${ISO/.bz2/}"
+    fi
+
+    if [[ ${OS} == "easyos" ]] && [[ ${ISO} =~ ".img" ]]; then
+        qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+        ISO="${ISO/.img/}"
     fi
 
     if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
