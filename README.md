@@ -97,6 +97,14 @@ following command:
 ``` bash
 yay -Sy quickemu
 ```
+### Debian and derivatives
+
+A [.deb package is available for Debian and derivatives in this project's GitHub releases page](https://github.com/quickemu-project/quickemu/releases).
+Download the .deb and install it with `apt-get`.
+
+```bash
+sudo apt-get install ./quickemu_x.y.z-1_all.deb
+```
 
 ### Ubuntu hosts
 
@@ -187,7 +195,7 @@ These examples may save a little typing:
 
 #### Install requirements on Debian hosts
 
-This also applies to direct derivatives, such as MX Linux:
+This also applies to derivatives:
 
 ```sh
 sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
