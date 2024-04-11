@@ -61,19 +61,9 @@ and no elevated permissions are required to run the virtual machines.
 **Quickemu now also includes comprehensive support for [macOS](#macos-guests)
 and [Windows](#windows-guests)**.
 
-See this (old) video where I explain some of my motivations for creating
-Quickemu:
-
-<div align="center">
-
-[![Replace VirtualBox with Bash &
-QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
-
-</div>
-
 ## Features
 
--   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
+-   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave & High Sierra
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
