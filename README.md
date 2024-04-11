@@ -209,7 +209,7 @@ sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genis
 
 #### Install requirements on macOS hosts
 
-This is a work in progress (see [issue 248](https://github.com/quickemu-project/quickemu/issues/248)
+This is a **work in progress** (see [issue 248](https://github.com/quickemu-project/quickemu/issues/248)
 for other steps and changes that may enable running on MacOS)
 
 ```sh
