@@ -138,6 +138,14 @@ function pretty_name() {
   echo "${PRETTY_NAME}"
 }
 
+function pretty_name_new() {
+    local SIMPLE_NAME=""
+    local PRETTY_NAME=""
+    SIMPLE_NAME="${1}"
+    PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
+    echo "${PRETTY_NAME}"
+}
+
 function validate_release() {
   local DISPLAY_NAME=""
   local RELEASE_GENERATOR=""
