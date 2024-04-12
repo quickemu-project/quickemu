@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 26, 2023
+date: April 12, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -27,19 +27,22 @@ machines for Linux, macOS and Windows
 
 You can also pass optional parameters
 
+**--access**
+:   Enable remote spice access support. 'local' (default), 'remote',
+    'clientipaddress'
+
 **--braille**
 :   Enable braille support. Requires SDL.
 
 **--delete-disk**
-:   Delete the disk image.
+:   Delete the disk image and EFI variables
+
+**--delete-vm**
+:   Delete the entire VM and it's configuration
 
 **--display**
 :   Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or
     'spice-app'
-
-**--sound-card**
-:   Select virtual audio emulation. 'intel-hda' (default), 'ac97'
-    (solaris default), 'es1370', 'sb16' (freedos default) or 'none'
 
 **--fullscreen**
 :   Starts VM in full screen mode (Ctl+Alt+f to exit)
@@ -47,19 +50,22 @@ You can also pass optional parameters
 **--ignore-msrs-always**
 :   Configure KVM to always ignore unhandled machine-specific registers
 
-**--screen \<screen\>**
+**--screen**
 :   Use specified screen to determine the window size.
+
+**--screenpct `<percent>`{=html}**
+:   Percent of fullscreen for VM if --fullscreen is not specified.
 
 **--shortcut**
 :   Create a desktop shortcut
 
-**--snapshot apply \<tag\>**
+**--snapshot apply `<tag>`{=html}**
 :   Apply/restore a snapshot.
 
-**--snapshot create \<tag\>**
+**--snapshot create `<tag>`{=html}**
 :   Create a snapshot.
 
-**--snapshot delete \<tag\>**
+**--snapshot delete `<tag>`{=html}**
 :   Delete a snapshot.
 
 **--snapshot info**
@@ -67,6 +73,68 @@ You can also pass optional parameters
 
 **--status-quo**
 :   Do not commit any changes to disk/snapshot.
+
+**--viewer `<viewer>`{=html}**
+:   Choose an alternative viewer. @Options: 'spicy' (default),
+    'remote-viewer', 'none'
+
+**--width `<width>`{=html}**
+:   Set VM screen width. Does nothing without --height
+
+**--height `<height>`{=html}**
+:   Set VM screen height. Does nothing without --width
+
+**--ssh-port `<port>`{=html}**
+:   Set ssh-port manually
+
+**--spice-port `<port>`{=html}**
+:   Set spice-port manually
+
+**--public-dir `<path>`{=html}**
+:   Expose share directory. @Options: '' (default: xdg-user-dir
+    PUBLICSHARE), '`<directory>`{=html}', 'none'
+
+**--monitor `<type>`{=html}**
+:   Set monitor connection type. @Options: 'socket' (default), 'telnet',
+    'none'
+
+**--monitor-telnet-host `<ip/host>`{=html}**
+:   Set telnet host for monitor. (default: 'localhost')
+
+**--monitor-telnet-port `<port>`{=html}**
+:   Set telnet port for monitor. (default: '4440')
+
+**--monitor-cmd `<cmd>`{=html}**
+:   Send command to monitor if available. (Example: system_powerdown)
+
+**--serial `<type>`{=html}**
+:   Set serial connection type. @Options: 'socket' (default), 'telnet',
+    'none'
+
+**--serial-telnet-host `<ip/host>`{=html}**
+:   Set telnet host for serial. (default: 'localhost')
+
+**--serial-telnet-port `<port>`{=html}**
+:   Set telnet port for serial. (default: '6660')
+
+**--keyboard `<type>`{=html}**
+:   Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'
+
+**--keyboard_layout `<layout>`{=html}**
+:   Set keyboard layout.
+
+**--mouse `<type>`{=html}**
+:   Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
+
+**--usb-controller `<type>`{=html}**
+:   Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
+
+**--sound-card `<type>`{=html}**
+:   Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370',
+    'sb16', 'none'
+
+**--extra_args `<arguments>`{=html}**
+:   Pass additional arguments to qemu
 
 **--version**
 :   Print version
@@ -78,22 +146,26 @@ You can also pass optional parameters
 
 ## Introduction
 
-Quickly create and run highly optimised desktop virtual machines for
-Linux, macOS and Windows; with just two commands. You decide what
-operating system you want to run and Quickemu will figure out the best
-way to do it for you. For example:
+**Quickemu** is a wrapper for the excellent
+[QEMU](https://www.qemu.org/) that attempts to automatically *"do the
+right thing"*, rather than expose exhaustive configuration options. You
+decide what operating system you want to run, and Quickemu will figure
+out the best way to do it for you.
 
-``` bash
-quickget ubuntu-mate 22.04
-quickemu --vm ubuntu-mate-22.04.conf
-```
+The original objective of the project was to enable [quick testing of
+Linux distributions](#linux-guests) where the virtual machine
+configurations can be stored anywhere (such as external USB storage or
+your home directory) and no elevated permissions are required to run the
+virtual machines. **Quickemu now also includes comprehensive support for
+[macOS](#macos-guests) and [Windows](#windows-guests)**.
 
-The original objective of the project was to enable quick testing of
-Linux distributions where the virtual machine configurations can be
-stored anywhere, such as external USB storage or your home directory,
-and no elevated permissions are required to run the virtual machines.
-**Quickemu now also includes comprehensive support for macOS and
-Windows**.
+See this (old) video where I explain some of my motivations for creating
+Quickemu:
+
+::: {align="center"}
+[![Replace VirtualBox with Bash &
+QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
+:::
 
 ## Features
 
@@ -120,20 +192,8 @@ Windows**.
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
 -   Graphical user interfaces available
 
-Quickemu is a wrapper for the excellent [QEMU](https://www.qemu.org/)
-that attempts to automatically *"do the right thing"*, rather than
-expose exhaustive configuration options.
-
-We have a Discord for this project:
-[![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
-
-See this (old) video where I explain some of my motivations for creating
-Quickemu.
-
-[![Replace VirtualBox with Bash &
-QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI)
-
-## Requirements
+When installing from source, you will need to install the following
+requirements manually:
 
 -   [QEMU](https://www.qemu.org/) (*6.0.0 or newer*) **with GTK, SDL,
     SPICE & VirtFS support**
@@ -145,7 +205,7 @@ QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/wat
 -   [LSB](https://wiki.linuxfoundation.org/lsb/start)
 -   [procps](https://gitlab.com/procps-ng/procps)
 -   [python3](https://www.python.org/)
--   [macrecovery](https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery)
+-   [chunkcheck](https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7)
 -   [mkisofs](http://cdrtools.sourceforge.net/private/cdrecord.html)
 -   [usbutils](https://github.com/gregkh/usbutils)
 -   [util-linux](https://github.com/karelzak/util-linux)
@@ -159,9 +219,7 @@ QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/wat
 -   [zsync](http://zsync.moria.org.uk/)
 -   [unzip](http://www.info-zip.org/UnZip.html)
 
-### Installing Requirements
-
-For Ubuntu, Arch and nixos systems the
+For Ubuntu, Arch and NixOS hosts, the
 [ppa](https://launchpad.net/~flexiondotorg/+archive/ubuntu/quickemu),
 [AUR](https://aur.archlinux.org/packages/quickemu) or
 [nix](https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/quickemu)
@@ -169,27 +227,33 @@ packaging will take care of the dependencies. For other host
 distributions or operating systems it will be necessary to install the
 above requirements or their equivalents.
 
-These examples may save a little typing
+These examples may save a little typing:
 
-Debian (and direct derivatives such as MX Linux):
+#### Install requirements on Debian hosts
 
-    sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+This also applies to direct derivatives, such as MX Linux:
 
-Fedora:
+``` sh
+sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+```
 
-    sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+#### Install requirements on Fedora hosts
 
-MacOS:
+``` sh
+sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+```
+
+#### Install requirements on macOS hosts
 
 This is a work in progress (see [issue
 248](https://github.com/quickemu-project/quickemu/issues/248) for other
 steps and changes that may enable running on MacOS)
 
-    brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
+``` sh
+brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
+```
 
-# Usage
-
-## Graphical User Interfaces
+## GUI (quickgui)
 
 While `quickemu` and `quickget` are designed for the terminal, a
 graphical user interface is also available:
@@ -198,23 +262,24 @@ graphical user interface is also available:
     Johnson](https://github.com/marxjohnson) and [Yannick
     Mauray](https://github.com/ymauray).
 
-Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
-[Philipp Kiemle](https://github.com/daPhipz) for creating the
-**[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
+To install Quickgui on Ubuntu:
 
-### Quickgui for Ubuntu
-
-``` bash
+``` sh
 sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
 ```
 
-### quickemu quickget X terminal project
+Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
+[Philipp Kiemle](https://github.com/daPhipz) for creating the
+**[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
+
+## TUI (qqx)
 
 From Nov 2023, there is also a multi option desktop integrated text
-interface, with lots of unique tools and utilities to help you make
-light work of installations, snapshots and disk management
+interface, the **quickemu quickget X terminal project**, a.k.a. **qqX**,
+with lots of unique tools and utilities to help you make light work of
+installations, snapshots and disk management
 
 -   **[qqX](https://github.com/TuxVinyards/qqX)** is independently
     curated by [Alex Genovese](https://github.com/TuxVinyards) (see the
@@ -222,7 +287,9 @@ light work of installations, snapshots and disk management
 
 ![qqX-vmm](https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf)
 
-## Ubuntu Guest
+## Creating Linux guests 🐧
+
+### Ubuntu
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
@@ -278,17 +345,18 @@ You can also use `quickget` with options to:
 ``` shell
     # show an OS ISO download URL for {os} {release} [edition] 
     quickget --show-iso-url fedora 38 Silverblue   
-    # test if and OS ISO is available for {os} {release} [edition]
+    # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
     quickget --open-distro-homepage  ubuntu-mate
+    # Only download image file into current directory, without creating VM
+    quickget --download-iso elementary 7.1
 ```
 
-The `--show-iso-url` and `--test-iso-url` options **do not** work for
-`Windows` (`quickget` will begin downloading the requested release and
-edition of windows)
+The `--show-iso-url`, `--test-iso-url`, and `--download-iso` options are
+fully functional for all operating systems, including Windows and macOS.
 
-## Other Operating Systems
+### Other Operating Systems
 
 `quickget` also supports:
 
@@ -299,16 +367,23 @@ edition of windows)
 -   `archcraft` (Archcraft)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
+-   `artixlinux` (Artix Linux)
+-   `athenaos` (Athenaos)
 -   `batocera` (Batocera)
+-   `bazzite` (Bazzite)
+-   `biglinux` (BigLinux)
 -   `blendos` (BlendOS)
 -   `bodhi` (Bodhi)
 -   `bunsenlabs` (Bunsenlabs)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
+-   `chimeralinux` (Chimera Linux)
+-   `crunchbang++` (Crunchbang++)
 -   `debian` (Debian)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
@@ -318,8 +393,9 @@ edition of windows)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
+-   `gnomeos` (GNOME OS)
+-   `guix` (Guix)
 -   `haiku` (Haiku)
--   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -331,21 +407,27 @@ edition of windows)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
 -   `netbsd` (NetBSD)
+-   `nitrux` (Nitrux)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
 -   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
+-   `parrotsec` (Parrot Security)
 -   `peppermint` (PeppermintOS)
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
+-   `primtux` (Primtux)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
 -   `siduction` (Siduction)
 -   `slackware` (Slackware)
+-   `slax` (Slax)
+-   `slint` (Slint)
+-   `slitaz` (SliTaz GNU/Linux)
 -   `solus` (Solus)
--   `spiral` (Spiral)
+-   `spirallinux` (Spirallinux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
 -   `trisquel` (Trisquel)
@@ -356,6 +438,8 @@ edition of windows)
 -   `vxlinux` (VX Linux)
 -   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
+
+### Custom Linux guests
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -382,7 +466,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-## macOS Guest
+## Creating macOS Guests 🍏
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -392,8 +476,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
-`ventura` are supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
+`ventura` and `sonoma` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
@@ -403,8 +487,8 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
-            Sur, Monterey and Ventura), choose any of the APFS options
-            as the filesystem. MacOS Extended may not work.
+            Sur, Monterey, Ventura and Sonoma), choose any of the APFS
+            options as the filesystem. MacOS Extended may not work.
     -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
@@ -426,23 +510,17 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
     macOS disk image will only ever get larger and will not shrink even
     when you delete lots of data inside macOS.
     -   To enable TRIM, open the Terminal application and type the
-        following command followed by pressing
-        `<kbd>`{=html}enter`</kbd>`{=html} to tell macos to use the TRIM
-        command on the hard disk when files are deleted:
+        following command followed by pressing command on the hard disk
+        when files are deleted:
 
 ``` bash
 sudo trimforce enable
 ```
 
 You will be prompted to enter your account's password to gain the
-privilege needed. Once you've entered your password and pressed
-`<kbd>`{=html}enter`</kbd>`{=html} the command will request confirmation
-in the form of two questions that require you to type
-`<kbd>`{=html}y`</kbd>`{=html} (for a "yes" response) followed by
-`<kbd>`{=html}enter`</kbd>`{=html} to confirm. If you press
-`<kbd>`{=html}enter`</kbd>`{=html} without first typing
-`<kbd>`{=html}y`</kbd>`{=html} the system will consider that a negative
-response as though you said "no":
+privilege needed. Once you've entered your password and pressed in the
+form of two questions that require you to type response as though you
+said "no":
 
 ``` plain
 IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
@@ -487,6 +565,7 @@ There are some considerations when running macOS via Quickemu.
     -   Big Sur
     -   Monterey
     -   Ventura
+    -   Sonoma
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
@@ -534,17 +613,27 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8, 10 & 11 Guests
+## Creating Windows guests 🪟
 
-`quickget` can download
-[Windows10](https://www.microsoft.com/software-download/windows10) and
-[Windows 11](https://www.microsoft.com/software-download/windows11)
+`quickget` can download [**Windows
+10**](https://www.microsoft.com/software-download/windows10) and
+[**Windows 11**](https://www.microsoft.com/software-download/windows11)
 automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-Windows 8.1 is also supported but doesn't feature any automated
+**Windows 8.1** is also supported but doesn't feature any automated
 installation or driver optimisation.
+
+`quickget` can also download [Windows 10
+LTSC](https://www.microsoft.com/en-us/evalcenter/download-windows-10-enterprise)
+and Windows Server
+[2012-r2](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2012-r2),
+[2016](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2016),
+[2019](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2019),
+and
+[2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022).
+No automated installation is supported for these releases.
 
 ``` bash
 quickget windows 11
@@ -557,6 +646,16 @@ quickemu --vm windows-11.conf
     these credentials:
     -   Username: `Quickemu`
     -   Password: `quickemu`
+
+### Regional versions
+
+By default `quickget` will download the *"English International"*
+release (*"English (United States)"* for server releases), but you can
+optionally specify one of the supported languages: For example:
+
+``` bash
+quickget windows 11 "Chinese (Traditional)"
+```
 
 The default Windows 11 configuration looks like this:
 
@@ -574,15 +673,15 @@ secureboot="off"
 -   `tpm="on"` instructs `quickemu` to create a software emulated TPM
     device using `swtpm`.
 
-# All the options
+## Configuration
 
 Here are the usage instructions:
 
 
     Usage
-      quickemu --vm ubuntu.conf
+      quickemu --vm ubuntu.conf [optional params]
 
-    You can also pass optional parameters
+    List of optional parameters:
       --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
       --braille                         : Enable braille support. Requires SDL.
       --delete-disk                     : Delete the disk image and EFI variables
@@ -599,6 +698,8 @@ Here are the usage instructions:
       --snapshot info                   : Show disk/snapshot info.
       --status-quo                      : Do not commit any changes to disk/snapshot.
       --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
+      --width <width>                   : Set VM screen width. Does nothing without --height
+      --height <height>                 : Set VM screen height. Does nothing without --width
       --ssh-port <port>                 : Set ssh-port manually
       --spice-port <port>               : Set spice-port manually
       --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'
@@ -677,7 +778,7 @@ which will override system default screen sizes. The VM size will be
 'pct' of the chosen screen. **If --fullscreen is chosen screen will be
 fullsize instead of being scaled down by --screenpct value.**
 
-# References
+## References
 
 Useful reference that assisted the development of Quickemu.
 
@@ -690,6 +791,7 @@ Useful reference that assisted the development of Quickemu.
     -   <https://passthroughpo.st/mac-os-adds-early-support-for-virtio-qemu/>
     -   <https://github.com/kholia/OSX-KVM>
     -   <https://github.com/thenickdude/KVM-Opencore>
+    -   <https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7>
     -   <https://github.com/acidanthera/OpenCorePkg/tree/master/Utilities/macrecovery>
     -   <https://www.kraxel.org/blog/2017/09/running-macos-as-guest-in-kvm/>
     -   <https://www.nicksherlock.com/2017/10/passthrough-of-advanced-cpu-features-for-macos-high-sierra-guests/>
