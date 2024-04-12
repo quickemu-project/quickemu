@@ -3434,7 +3434,14 @@ fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
-    VM_PATH="${OS}-${RELEASE}"
+
+    if [[ $OS == "blendos" ]]; then
+        BlendRelease=${RELEASE/'/'/'-'}
+        BlendRelease=${BlendRelease/168/}
+        VM_PATH="${OS}-${BlendRelease}"
+    else
+        VM_PATH="${OS}-${RELEASE}"
+    fi
 
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
@@ -3474,9 +3481,9 @@ if [ -n "${2}" ]; then
             fi
         fi
 
-
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         create_vm "$("get_${OS}" "${EDITION}")"
+
     elif [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
         validate_release releases_macos
