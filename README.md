@@ -67,7 +67,8 @@ virtual machines.
 
 ## Features
 
--   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
+-   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
+    High Sierra
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
@@ -282,8 +283,8 @@ quickemu --vm ubuntu-22.04.conf
 
 ### Ubuntu daily-live images
 
-`quickget` can also download/refresh devel images via `zsync` for Ubuntu
-developers and testers.
+`quickget` can also download/refresh daily-live images via `zsync` for
+Ubuntu developers and testers.
 
 ``` bash
 quickget ubuntu daily-live

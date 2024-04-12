@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 12, 2024
+date: April 13, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -69,8 +69,8 @@ quickemu --vm ubuntu-22.04.conf
 
 ### Ubuntu daily-live images
 
-`quickget` can also download/refresh devel images via `zsync` for Ubuntu
-developers and testers.
+`quickget` can also download/refresh daily-live images via `zsync` for
+Ubuntu developers and testers.
 
 ``` bash
 quickget ubuntu daily-live
