@@ -3580,11 +3580,11 @@ else
         "languages_${OS}" && echo "${LANGS[@]}"
         ;;
       *)
-        echo -n " - Releases: "
-        releases_"${OS}"
+      echo -n " - Releases: "
+      "releases_${OS}" | fold -s -w "$(tput cols)"
         if [[ $(type -t "editions_${OS}") == function ]]; then
           echo -n " - Editions: "
-          editions_"${OS}"
+          editions_"${OS}" | fold -s -w "$(tput cols)"
         fi
         ;;
     esac
