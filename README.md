@@ -26,7 +26,7 @@ Quickemu is available in the repositories of the following distros
 <tbody>
 <tr valign="top">
 <td>
-
+  
 [![Packaging
 status of quickemu](https://repology.org/badge/vertical-allrepos/quickemu.svg?header=quickemu)](https://repology.org/project/quickemu/versions)
 
@@ -35,7 +35,7 @@ status of quickemu](https://repology.org/badge/vertical-allrepos/quickemu.svg?he
 
 [![Packaging
 status](https://repology.org/badge/vertical-allrepos/quickgui.svg?header=quickgui)](https://repology.org/project/quickgui/versions)
-
+  
 </td>
 </tr>
 </tbody>
@@ -56,15 +56,17 @@ decide what operating system you want to run, and Quickemu will figure
 out the best way to do it for you.
 
 The original objective of the project was to enable [quick testing of
-Linux distributions](#linux-guests) where the virtual machine
+Linux distributions](#creating-linux-guests-) where the virtual machine
 configurations can be stored anywhere (such as external USB storage or
 your home directory) and no elevated permissions are required to run the
 virtual machines. **Quickemu now also includes comprehensive support for
-[macOS](#macos-guests) and [Windows](#windows-guests)**.
+[macOS](#creating-macos-guests-) and
+[Windows](#creating-windows-guests-)**.
 
 ## Features
 
--   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave & High Sierra
+-   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
+    High Sierra
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
@@ -97,14 +99,6 @@ following command:
 
 ``` bash
 yay -Sy quickemu
-```
-### Debian and derivatives
-
-A [.deb package is available for Debian and derivatives in this project's GitHub releases page](https://github.com/quickemu-project/quickemu/releases).
-Download the .deb and install it with `apt-get`.
-
-```bash
-sudo apt-get install ./quickemu_x.y.z-1_all.deb
 ```
 
 ### Debian and derivatives
@@ -211,19 +205,20 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` sh
-sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` sh
-sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
 
-This is a **work in progress** (see [issue 248](https://github.com/quickemu-project/quickemu/issues/248)
-for other steps and changes that may enable running on MacOS)
+This is a **work in progress** (see [issue
+248](https://github.com/quickemu-project/quickemu/issues/248) for other
+steps and changes that may enable running on MacOS)
 
 ``` sh
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
@@ -286,16 +281,17 @@ quickemu --vm ubuntu-22.04.conf
 
 ### Ubuntu daily-live images
 
-`quickget` can also download/refresh daily-live images via `zsync` for Ubuntu developers and testers.
+`quickget` can also download/refresh daily-live images via `zsync` for
+Ubuntu developers and testers.
 
 ``` bash
 quickget ubuntu daily-live
 quickemu --vm ubuntu-daily-live.conf
 ```
 
-You can run `quickget ubuntu daily-live` to refresh your daily development
-image as often as you like, it will even automatically switch to a new
-series.
+You can run `quickget ubuntu daily-live` to refresh your daily
+development image as often as you like, it will even automatically
+switch to a new series.
 
 ### Ubuntu Flavours
 
@@ -318,8 +314,8 @@ with your preferred flavour.
 You can also use `quickget` with options to:
 
 ``` shell
-    # show an OS ISO download URL for {os} {release} [edition]
-    quickget --show-iso-url fedora 38 Silverblue
+    # show an OS ISO download URL for {os} {release} [edition] 
+    quickget --show-iso-url fedora 38 Silverblue   
     # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
@@ -358,6 +354,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)

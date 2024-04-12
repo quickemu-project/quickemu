@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 12, 2024
+date: April 13, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -50,22 +50,22 @@ You can also pass optional parameters
 **--ignore-msrs-always**
 :   Configure KVM to always ignore unhandled machine-specific registers
 
-**--screen**
+**--screen \<screen\>**
 :   Use specified screen to determine the window size.
 
-**--screenpct `<percent>`{=html}**
+**--screenpct \<percent\>**
 :   Percent of fullscreen for VM if --fullscreen is not specified.
 
 **--shortcut**
 :   Create a desktop shortcut
 
-**--snapshot apply `<tag>`{=html}**
+**--snapshot apply \<tag\>**
 :   Apply/restore a snapshot.
 
-**--snapshot create `<tag>`{=html}**
+**--snapshot create \<tag\>**
 :   Create a snapshot.
 
-**--snapshot delete `<tag>`{=html}**
+**--snapshot delete \<tag\>**
 :   Delete a snapshot.
 
 **--snapshot info**
@@ -74,66 +74,66 @@ You can also pass optional parameters
 **--status-quo**
 :   Do not commit any changes to disk/snapshot.
 
-**--viewer `<viewer>`{=html}**
+**--viewer \<viewer\>**
 :   Choose an alternative viewer. @Options: 'spicy' (default),
     'remote-viewer', 'none'
 
-**--width `<width>`{=html}**
+**--width \<width\>**
 :   Set VM screen width. Does nothing without --height
 
-**--height `<height>`{=html}**
+**--height \<height\>**
 :   Set VM screen height. Does nothing without --width
 
-**--ssh-port `<port>`{=html}**
+**--ssh-port \<port\>**
 :   Set ssh-port manually
 
-**--spice-port `<port>`{=html}**
+**--spice-port \<port\>**
 :   Set spice-port manually
 
-**--public-dir `<path>`{=html}**
+**--public-dir \<path\>**
 :   Expose share directory. @Options: '' (default: xdg-user-dir
     PUBLICSHARE), '`<directory>`{=html}', 'none'
 
-**--monitor `<type>`{=html}**
+**--monitor \<type\>**
 :   Set monitor connection type. @Options: 'socket' (default), 'telnet',
     'none'
 
-**--monitor-telnet-host `<ip/host>`{=html}**
+**--monitor-telnet-host \<ip/host\>**
 :   Set telnet host for monitor. (default: 'localhost')
 
-**--monitor-telnet-port `<port>`{=html}**
+**--monitor-telnet-port \<port\>**
 :   Set telnet port for monitor. (default: '4440')
 
-**--monitor-cmd `<cmd>`{=html}**
+**--monitor-cmd \<cmd\>**
 :   Send command to monitor if available. (Example: system_powerdown)
 
-**--serial `<type>`{=html}**
+**--serial \<type\>**
 :   Set serial connection type. @Options: 'socket' (default), 'telnet',
     'none'
 
-**--serial-telnet-host `<ip/host>`{=html}**
+**--serial-telnet-host \<ip/host\>**
 :   Set telnet host for serial. (default: 'localhost')
 
-**--serial-telnet-port `<port>`{=html}**
+**--serial-telnet-port \<port\>**
 :   Set telnet port for serial. (default: '6660')
 
-**--keyboard `<type>`{=html}**
+**--keyboard \<type\>**
 :   Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'
 
-**--keyboard_layout `<layout>`{=html}**
+**--keyboard_layout \<layout\>**
 :   Set keyboard layout.
 
-**--mouse `<type>`{=html}**
+**--mouse \<type\>**
 :   Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
 
-**--usb-controller `<type>`{=html}**
+**--usb-controller \<type\>**
 :   Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
 
-**--sound-card `<type>`{=html}**
+**--sound-card \<type\>**
 :   Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370',
     'sb16', 'none'
 
-**--extra_args `<arguments>`{=html}**
+**--extra_args \<arguments\>**
 :   Pass additional arguments to qemu
 
 **--version**
@@ -153,15 +153,17 @@ decide what operating system you want to run, and Quickemu will figure
 out the best way to do it for you.
 
 The original objective of the project was to enable [quick testing of
-Linux distributions](#linux-guests) where the virtual machine
+Linux distributions](#creating-linux-guests-) where the virtual machine
 configurations can be stored anywhere (such as external USB storage or
 your home directory) and no elevated permissions are required to run the
 virtual machines. **Quickemu now also includes comprehensive support for
-[macOS](#macos-guests) and [Windows](#windows-guests)**.
+[macOS](#creating-macos-guests-) and
+[Windows](#creating-windows-guests-)**.
 
 ## Features
 
--   **macOS** Monterey, Big Sur, Catalina, Mojave & High Sierra
+-   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
+    High Sierra
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
@@ -226,13 +228,13 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` sh
-sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` sh
-sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
@@ -300,19 +302,19 @@ quickemu --vm ubuntu-22.04.conf
         enable file sharing.
         -   `sudo apt install spice-webdavd`
 
-### Ubuntu devel (daily-live) images
+### Ubuntu daily-live images
 
-`quickget` can also download/refresh devel images via `zsync` for Ubuntu
-developers and testers.
+`quickget` can also download/refresh daily-live images via `zsync` for
+Ubuntu developers and testers.
 
 ``` bash
-quickget ubuntu devel
-quickemu --vm ubuntu-devel.conf
+quickget ubuntu daily-live
+quickemu --vm ubuntu-daily-live.conf
 ```
 
-You can run `quickget ubuntu devel` to refresh your daily development
-image as often as you like, it will even automatically switch to a new
-series.
+You can run `quickget ubuntu daily-live` to refresh your daily
+development image as often as you like, it will even automatically
+switch to a new series.
 
 ### Ubuntu Flavours
 
@@ -375,6 +377,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
