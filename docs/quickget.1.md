@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: November 26, 2023
+date: April 12, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -46,7 +46,9 @@ configuration for `quickemu` to use to build and run
 
 # NOTES
 
-## Ubuntu Guest
+## Creating Linux guests 🐧
+
+### Ubuntu
 
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
@@ -102,17 +104,18 @@ You can also use `quickget` with options to:
 ``` shell
     # show an OS ISO download URL for {os} {release} [edition] 
     quickget --show-iso-url fedora 38 Silverblue   
-    # test if and OS ISO is available for {os} {release} [edition]
+    # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
     quickget --open-distro-homepage  ubuntu-mate
+    # Only download image file into current directory, without creating VM
+    quickget --download-iso elementary 7.1
 ```
 
-The `--show-iso-url` and `--test-iso-url` options **do not** work for
-`Windows` (`quickget` will begin downloading the requested release and
-edition of windows)
+The `--show-iso-url`, `--test-iso-url`, and `--download-iso` options are
+fully functional for all operating systems, including Windows and macOS.
 
-## Other Operating Systems
+### Other Operating Systems
 
 `quickget` also supports:
 
@@ -123,16 +126,23 @@ edition of windows)
 -   `archcraft` (Archcraft)
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
+-   `artixlinux` (Artix Linux)
+-   `athenaos` (Athenaos)
 -   `batocera` (Batocera)
+-   `bazzite` (Bazzite)
+-   `biglinux` (BigLinux)
 -   `blendos` (BlendOS)
 -   `bodhi` (Bodhi)
 -   `bunsenlabs` (Bunsenlabs)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
+-   `chimeralinux` (Chimera Linux)
+-   `crunchbang++` (Crunchbang++)
 -   `debian` (Debian)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
 -   `dragonflybsd` (DragonFlyBSD)
+-   `easyos` (EasyOS)
 -   `elementary` (elementary OS)
 -   `endeavouros` (EndeavourOS)
 -   `endless` (Endless OS)
@@ -142,8 +152,9 @@ edition of windows)
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
+-   `gnomeos` (GNOME OS)
+-   `guix` (Guix)
 -   `haiku` (Haiku)
--   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -155,21 +166,27 @@ edition of windows)
 -   `mxlinux` (MX Linux)
 -   `netboot` (netboot.xyz)
 -   `netbsd` (NetBSD)
+-   `nitrux` (Nitrux)
 -   `nixos` (NixOS)
 -   `openbsd` (OpenBSD)
 -   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
 -   `oraclelinux` (Oracle Linux)
+-   `parrotsec` (Parrot Security)
 -   `peppermint` (PeppermintOS)
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
+-   `primtux` (Primtux)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
 -   `siduction` (Siduction)
 -   `slackware` (Slackware)
+-   `slax` (Slax)
+-   `slint` (Slint)
+-   `slitaz` (SliTaz GNU/Linux)
 -   `solus` (Solus)
--   `spiral` (Spiral)
+-   `spirallinux` (Spirallinux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
 -   `trisquel` (Trisquel)
@@ -180,6 +197,8 @@ edition of windows)
 -   `vxlinux` (VX Linux)
 -   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
+
+### Custom Linux guests
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -206,7 +225,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-## macOS Guest
+## Creating macOS Guests 🍏
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -216,8 +235,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
-`ventura` are supported.
+macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
+`ventura` and `sonoma` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
@@ -227,8 +246,8 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
             click **Erase**.
         -   Enter a `Name:` for the disk
         -   If you are installing macOS Mojave or later (Catalina, Big
-            Sur, Monterey and Ventura), choose any of the APFS options
-            as the filesystem. MacOS Extended may not work.
+            Sur, Monterey, Ventura and Sonoma), choose any of the APFS
+            options as the filesystem. MacOS Extended may not work.
     -   Click **Erase**.
     -   Click **Done**.
     -   Close Disk Utility
@@ -250,23 +269,17 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey` and
     macOS disk image will only ever get larger and will not shrink even
     when you delete lots of data inside macOS.
     -   To enable TRIM, open the Terminal application and type the
-        following command followed by pressing
-        `<kbd>`{=html}enter`</kbd>`{=html} to tell macos to use the TRIM
-        command on the hard disk when files are deleted:
+        following command followed by pressing command on the hard disk
+        when files are deleted:
 
 ``` bash
 sudo trimforce enable
 ```
 
 You will be prompted to enter your account's password to gain the
-privilege needed. Once you've entered your password and pressed
-`<kbd>`{=html}enter`</kbd>`{=html} the command will request confirmation
-in the form of two questions that require you to type
-`<kbd>`{=html}y`</kbd>`{=html} (for a "yes" response) followed by
-`<kbd>`{=html}enter`</kbd>`{=html} to confirm. If you press
-`<kbd>`{=html}enter`</kbd>`{=html} without first typing
-`<kbd>`{=html}y`</kbd>`{=html} the system will consider that a negative
-response as though you said "no":
+privilege needed. Once you've entered your password and pressed in the
+form of two questions that require you to type response as though you
+said "no":
 
 ``` plain
 IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
@@ -311,6 +324,7 @@ There are some considerations when running macOS via Quickemu.
     -   Big Sur
     -   Monterey
     -   Ventura
+    -   Sonoma
 -   `quickemu` will automatically download the required
     [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
     and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
@@ -358,17 +372,27 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Windows 8, 10 & 11 Guests
+## Creating Windows guests 🪟
 
-`quickget` can download
-[Windows10](https://www.microsoft.com/software-download/windows10) and
-[Windows 11](https://www.microsoft.com/software-download/windows11)
+`quickget` can download [**Windows
+10**](https://www.microsoft.com/software-download/windows10) and
+[**Windows 11**](https://www.microsoft.com/software-download/windows11)
 automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-Windows 8.1 is also supported but doesn't feature any automated
+**Windows 8.1** is also supported but doesn't feature any automated
 installation or driver optimisation.
+
+`quickget` can also download [Windows 10
+LTSC](https://www.microsoft.com/en-us/evalcenter/download-windows-10-enterprise)
+and Windows Server
+[2012-r2](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2012-r2),
+[2016](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2016),
+[2019](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2019),
+and
+[2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022).
+No automated installation is supported for these releases.
 
 ``` bash
 quickget windows 11
@@ -381,6 +405,16 @@ quickemu --vm windows-11.conf
     these credentials:
     -   Username: `Quickemu`
     -   Password: `quickemu`
+
+### Regional versions
+
+By default `quickget` will download the *"English International"*
+release (*"English (United States)"* for server releases), but you can
+optionally specify one of the supported languages: For example:
+
+``` bash
+quickget windows 11 "Chinese (Traditional)"
+```
 
 The default Windows 11 configuration looks like this:
 
