@@ -27,6 +27,14 @@ function cleanup() {
   fi
 }
 
+function os_about() {
+    local SIMPLE_NAME=""
+    local ABOUT=""
+    SIMPLE_NAME="${1}"
+    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
+    echo "${ABOUT}"
+}
+
 if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
     test_iso_url="on"
     if [ -n "$4" ]; then
