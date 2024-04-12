@@ -225,6 +225,52 @@ function list_csv() {
   exit 0
 }
 
+list_isos() {
+    local showIsoUrl=on
+    local DIR="/dev/null"
+    local URL
+    local FUNC
+    local OPTION
+    local OS
+
+    for OS in $(os_support); do
+        case ${OS} in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    validate_release releases_"${OS}"
+                    get_"${OS}" "${OPTION}" | cut_1 || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    echo "skipped: ${OS} ${RELEASE} ${OPTION}"
+                    #validate_release releases_${OS}
+                    #get_${OS} ${OPTION} | cut_1
+                done
+            #TODO NEEDED?
+            elif [[ "${OS}" == "macos" ]]; then
+                validate_release releases_"${OS}"
+                get_macos || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
+            elif [[ "${OS}" == *"ubuntu"* ]]; then
+                validate_release releases_ubuntu
+                get_ubuntu || echo "${OS} ${RELEASE} ERROR!"
+            elif [[ "${OS}" == *"ubuntu-server"* ]]; then
+                validate_release releases_ubuntu
+                get_ubuntu-server || echo "${OS} ${RELEASE} ERROR!"
+            else
+                validate_release releases_"${OS}"
+                get_"${OS}" "${RELEASE}" | cut_1 || echo "${OS} ${RELEASE} ERROR!"
+            fi
+        done
+    done
+    exit 0
+}
+
 function os_support() {
     echo alma \
     alpine \
