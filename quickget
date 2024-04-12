@@ -109,6 +109,7 @@ function pretty_name() {
     peppermint)         PRETTY_NAME="PeppermintOS";;
     popos)              PRETTY_NAME="Pop!_OS";;
     primtux)            PRETTY_NAME="Primtux";;
+    pureos)             PRETTY_NAME="PureOS";;
     reactos)            PRETTY_NAME="ReactOS";;
     rebornos)           PRETTY_NAME="RebornOS";;
     rockylinux)         PRETTY_NAME="Rocky Linux";;
@@ -287,6 +288,7 @@ function os_support() {
     popos \
     porteus \
     primtux \
+    pureos \
     reactos \
     rebornos \
     rockylinux \
@@ -389,6 +391,7 @@ function os_homepages(){
         popos)             HOMEPAGE="https://pop.system76.com/";;
         porteus)           HOMEPAGE="http://www.porteus.org/";;
         primtux)           HOMEPAGE="https://primtux.fr/";;
+        pureos)            HOMEPAGE="https://www.pureos.net/";;
         reactos)           HOMEPAGE="https://reactos.org/";;
         rebornos)          HOMEPAGE="https://rebornos.org/";;
         rockylinux)        HOMEPAGE="https://rockylinux.org/";;
@@ -853,6 +856,13 @@ function releases_primtux() {
 
 function editions_primtux() {
     echo 2022-10
+}
+
+function releases_pureos() {
+    wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4 
+}
+function editions_pureos() {
+    echo gnome plasma
 }
 
 function releases_reactos() {
@@ -2375,18 +2385,35 @@ function get_primtux() {
     local HASH=""
     local URL=""
     local ISO=""
-
     ISO="PrimTux${RELEASE}-amd64-${EDITION}.iso"
     URL="https://sourceforge.net/projects/primtux/files/Distribution"
     HASH=$(wget -q -O- "${URL}/${ISO}.md5" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_pureos() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local PureName=
+    PureName="$(wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 4)"
+    local PureDate=
+    PureDate="$(wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 6)"
+    local PureDateSquashed="${PureDate//'-'/}"
+    edition="${EDITION,,}"
+    URL="https://downloads.puri.sm/${PureName}/${edition}/${PureDate}"
+    ISO="pureos-${RELEASE}-${edition}-live-${PureDateSquashed}_amd64.iso"
+    local IsoTrimmed=
+    IsoTrimmed="${ISO%.*}"
+    HASH="$(wget -q -O- "${URL}/${IsoTrimmed}.checksums_sha256.txt" | grep -m 1 '.iso' | cut -d '.' -f 1)"
+    echo "${URL}/${ISO} ${HASH}" 
+}
+
+
 function get_reactos() {
     local HASH=""
     local URL=""
-    local TMPURL=""
-
     URL=$(curl -Lfs "https://sourceforge.net/projects/reactos/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
     echo "${URL} ${HASH}"
 }
