@@ -325,6 +325,14 @@ function os_support() {
     zorin
 }
 
+function os_homepage(){
+    local SIMPLE_NAME=""
+    local HOMEP=""
+    SIMPLE_NAME="${1}"
+    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
+    echo "$HOMEP"
+}
+
 function os_homepages(){
     local SIMPLE_NAME=""
     local HOMEPAGE=""
