@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#shellcheck disable=SC1001,1003,1083,2016,2046,2086,2155,2206,2207,2068,2071,2076,2162,2317
+#hellcheck disable=SC1001,1003,1083,2016,2046,2086,2155,2206,2207,2068,2071,2076,2162,2317
 export LC_ALL=C
 #set -x
 
@@ -143,7 +143,7 @@ function pretty_name() {
     local SIMPLE_NAME=""
     local PRETTY_NAME=""
     SIMPLE_NAME="${1}"
-    PRETTY_NAME=$(os_info ${SIMPLE_NAME} | cut -d'|' -f1)
+    PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
     echo "${PRETTY_NAME}"
 }
 
@@ -151,7 +151,7 @@ function os_basedof() {
     local SIMPLE_NAME=""
     local BASED=""
     SIMPLE_NAME="${1}"
-    BASED=$(os_info ${SIMPLE_NAME} | cut -d'|' -f2)
+    BASED=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f2)
     echo "${BASED}"
 }
 
@@ -159,7 +159,7 @@ function os_credentials() {
     local SIMPLE_NAME=""
     local CREDE=""
     SIMPLE_NAME="${1}"
-    CREDE=$(os_info ${SIMPLE_NAME} | cut -d'|' -f3)
+    CREDE=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f3)
     echo "${CREDE}"
 }
 
@@ -167,7 +167,7 @@ function os_homepage(){
     local SIMPLE_NAME=""
     local HOMEP=""
     SIMPLE_NAME="${1}"
-    HOMEP=$(os_info ${SIMPLE_NAME} | cut -d'|' -f4)
+    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
     echo "$HOMEP"
 }
 
@@ -175,7 +175,7 @@ function os_about() {
     local SIMPLE_NAME=""
     local ABOUT=""
     SIMPLE_NAME="${1}"
-    ABOUT=$(os_info ${SIMPLE_NAME} | cut -d'|' -f5)
+    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
     echo "${ABOUT}"
 }
 
@@ -317,8 +317,8 @@ list_isos() {
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
-                    validate_release releases_${OS}
-                    get_${OS} ${OPTION} | cut_1 || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
+                    validate_release releases_"${OS}"
+                    get_"${OS}" "${OPTION}" | cut_1 || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
@@ -337,8 +337,8 @@ list_isos() {
                 validate_release releases_ubuntu
                 get_ubuntu-server || echo "${OS} ${RELEASE} ERROR!"
             else
-                validate_release releases_${OS}
-                get_${OS} ${RELEASE} | cut_1 || echo "${OS} ${RELEASE} ERROR!"
+                validate_release releases_"${OS}"
+                get_"${OS}" "${RELEASE}" | cut_1 || echo "${OS} ${RELEASE} ERROR!"
             fi
         done
     done
@@ -353,9 +353,9 @@ test_isos() {
     local OS
 
     check_it() {
-        validate_release releases_${OS}
-        URL=$(get_${OS} ${OPTION} | cut_1)
-        GOOD=$(timeout 3 wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+        validate_release releases_"${OS}"
+        URL=$(get_"${OS}" "${OPTION}" | cut_1)
+        GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
         if [[ "${GOOD}" == "OK" ]]; then
             echo "OK - ${OS} ${RELEASE} ${OPTION} ${URL}"
         else
@@ -385,7 +385,7 @@ test_isos() {
             elif [[ "${OS}" == *"ubuntu"* ]]; then
                 #validate_release releases_ubuntu
                 URL=$(get_ubuntu)
-                GOOD=$(timeout 3 wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
                 if [[ "${GOOD}" == "OK" ]]; then
                     echo "OK - ${OS} ${RELEASE} ${URL}"
                 else
@@ -394,16 +394,16 @@ test_isos() {
             elif [[ "${OS}" == *"ubuntu-server"* ]]; then
                 #validate_release releases_ubuntu
                 URL="$(get_ubuntu-server)"
-                GOOD=$(timeout 3 wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
                 if [[ "${GOOD}" == "OK" ]]; then
                     echo "OK - ${OS} ${RELEASE} ${URL}"
                 else
                     echo "ERROR - ${OS} ${RELEASE} ${URL}"
                 fi
             else
-                validate_release releases_${OS}
-                URL=$(get_${OS} ${RELEASE} | cut_1)
-                GOOD=$(timeout 3 wget -q --spider ${URL} && echo 'OK' || echo 'ERROR!')
+                validate_release releases_"${OS}"
+                URL=$(get_"${OS}" "${RELEASE}" | cut_1)
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
                 if [[ "${GOOD}" == "OK" ]]; then
                     echo "OK - ${OS} ${RELEASE} ${URL}"
                 else
@@ -553,7 +553,7 @@ function releases_archlinux() {
 function releases_arcolinux() {
     local RLIST
     RLIST=$(curl -s https://ant.seedhost.eu/arcolinux/iso/ | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | tr '\r\n' ' ')
-    echo ${RLIST}
+    echo "${RLIST}"
 }
 
 function editions_arcolinux() {
@@ -665,7 +665,7 @@ function releases_debian() {
     DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- | grep '\.[0-9]/' | cut -d\> -f9 | cut -d\/ -f1)
     local DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- | grep -e '>[1-9][0-9]\.' | grep -v 'live' | cut -d\> -f9 | cut -d\/ -f1 )
 
-    echo ${DEBCURRENT} # ${DEBOLD}
+    echo "${DEBCURRENT}" # ${DEBOLD}
 }
 
 function editions_debian() {
@@ -684,7 +684,7 @@ function releases_dragonflybsd() {
     # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
     # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
     DBSD_RELEASES=$(curl -sL  http://mirror-master.dragonflybsd.org/iso-images/| grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' )
-    echo $DBSD_RELEASES
+    echo "$DBSD_RELEASES"
 }
 
 function releases_easyos() {
@@ -702,7 +702,7 @@ function releases_elementary() {
 
 function releases_endeavouros() {
     local ENDEAVOUR_RELEASES="$(curl -s https://mirror.alpix.eu/endeavouros/iso/ | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13-)"
-    echo ${ENDEAVOUR_RELEASES,,}
+    echo "${ENDEAVOUR_RELEASES,,}"
 }
 
 function releases_endless() {
@@ -737,7 +737,7 @@ function editions_fedora() {
 
 function releases_freebsd(){
     local FBSD_RELEASES=$(curl -sL https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/|grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/')
-    echo ${FBSD_RELEASES}
+    echo "${FBSD_RELEASES}"
 }
 
 function editions_freebsd(){
@@ -774,7 +774,7 @@ function editions_ghostbsd() {
 
 function releases_gnomeos() {
     local GNOMEOS_RELEASES=$(curl -s https://download.gnome.org/gnomeos/ | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
-    echo nightly ${GNOMEOS_RELEASES}
+    echo nightly "${GNOMEOS_RELEASES}"
 }
 
 function releases_guix() {
@@ -866,7 +866,7 @@ function releases_netboot() {
 
 function releases_netbsd() {
     local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' |tr -d '"/' |sort -nr )
-    echo ${NBSD_RELEASES}
+    echo "${NBSD_RELEASES}"
 }
 
 function releases_nitrux() {
@@ -883,7 +883,7 @@ function editions_nixos(){
 
 function releases_openbsd(){
     local OBSD_RELEASES=$(curl -sL https://mirror.leaseweb.com/pub/OpenBSD/|grep -e '6\.[8-9]/' -e '[7-9]\.'|cut -d\" -f4|tr -d '/')
-    echo ${OBSD_RELEASES}
+    echo "${OBSD_RELEASES}"
 }
 
 function releases_openindiana(){
@@ -1056,13 +1056,13 @@ function releases_truenas-scale() {
 
 function releases_ubuntu() {
     local VERSION_DATA="$(IFS=$'\n' wget -qO- https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
-    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
-    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
+    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<"${VERSION_DATA}" | sort))
     local LTS_SUPPORT=()
     local INTERIM_SUPPORT=()
 
     for i in "${SUPPORTED_VERSIONS[@]}"; do
-        if [[ $(expr ${i%.*} % 2) == 0 && ${i#*.} == "04" ]]; then
+        if [[ $(expr "${i%.*}" % 2) == 0 && ${i#*.} == "04" ]]; then
             LTS_SUPPORT+=($i)
         else
             INTERIM_SUPPORT+=($i)
@@ -1093,8 +1093,8 @@ function releases_ubuntu-server() {
     local INTERIM_SUPPORT=()
 
     for i in "${!ALL_VERSIONS[@]}"; do
-        if [[ $i == 0 || ${ALL_VERSIONS[$i]} > ${ALL_VERSIONS[$(expr $i - 1)]} ]]; then
-            if [[ $(expr ${ALL_VERSIONS[${i}]%.*} % 2) == 0 && ${ALL_VERSIONS[${i}]#*.} == "04" ]]; then
+        if [[ $i == 0 || ${ALL_VERSIONS[$i]} > ${ALL_VERSIONS[$(expr "$i" - 1)]} ]]; then
+            if [[ $(expr "${ALL_VERSIONS[${i}]%.*}" % 2) == 0 && ${ALL_VERSIONS[${i}]#*.} == "04" ]]; then
                 LTS_SUPPORT+=(${ALL_VERSIONS[$i]})
             else
                 INTERIM_SUPPORT+=(${ALL_VERSIONS[$i]})
@@ -1228,7 +1228,7 @@ function web_get() {
         echo "${URL}"
         exit 0
     elif [ "${testIsoUrl}" == on ]; then
-        echo -n "Testing if $(echo ${URL} | rev | cut -d'/' -f1 | rev) is available... "
+        echo -n "Testing if $(echo "${URL}" | rev | cut -d'/' -f1 | rev) is available... "
         wget -q --spider "${URL}" && echo 'Sucessfull' || echo 'ERROR!'
         exit 0
     elif [ "${downloadIso}" == on ]; then
@@ -1241,7 +1241,7 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
+        echo Downloading $(pretty_name "${OS}") "${RELEASE}" ${EDITION:+ $EDITION} from "${URL}"
     fi
 
     if command -v aria2c &>/dev/null; then
@@ -1289,7 +1289,7 @@ function zsync_get() {
             exit 1
         fi
 
-        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
+        echo -e Downloading $(pretty_name "${OS}") "${RELEASE}" ${EDITION+ ${EDITION}} from "${URL}"'\n'
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -1478,10 +1478,10 @@ EOF
 
     echo
     echo "To start your $(pretty_name "${OS}") virtual machine run:"
-    if [ ${OS} == "slint" ]; then
+    if [ "${OS}" == "slint" ]; then
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
-    elif [ ${OS} == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
-        echo "    quickemu --vm $(echo ${CONF_FILE} | rev | cut -d'.' -f2-9 | rev)$n.conf"
+    elif [ "${OS}" == "whonix" ] && [[ $ISO =~ ".xz" ]] && [ "${EDITION}" == "workstation" ]; then
+        echo "    quickemu --vm $(echo "${CONF_FILE}" | rev | cut -d'.' -f2-9 | rev)$n.conf"
         #echo "    quickemu --vm $new_dir.conf"
     else
         echo "    quickemu --vm ${CONF_FILE}"
@@ -1568,7 +1568,7 @@ function get_antix() {
       ;;
     esac
 
-    HASH=$(wget -q -O- ${URL}/README.txt | grep "${ISO}" | cut_1 | head -1)
+    HASH=$(wget -q -O- "${URL}"/README.txt | grep "${ISO}" | cut_1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1579,7 +1579,7 @@ function get_archcraft() {
     #local TMPURL=""
 
     # Check where the URL redirects using curl. Output to a nonexistent directory so it's not possible to successfully download the image
-    URL=$(curl -Lfs "https://sourceforge.net/projects/archcraft/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    URL=$(curl -Lfs "https://sourceforge.net/projects/archcraft/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/"$RANDOM"/"$RANDOM")
     echo "${URL} ${HASH}"
 }
 
@@ -1607,9 +1607,9 @@ function get_artixlinux() {
     local ISO=""
     local URL="https://iso.artixlinux.org/iso"
 
-    DATE=$(wget -q -O- ${URL}/sha256sums | cut -d'-' -f4 | head -1)
+    DATE=$(wget -q -O- "${URL}"/sha256sums | cut -d'-' -f4 | head -1)
     ISO="artix-${EDITION}-${DATE}-x86_64.iso"
-    HASH=$(wget -q -O- ${URL}/sha256sums | grep "${ISO}")
+    HASH=$(wget -q -O- "${URL}"/sha256sums | grep "${ISO}")
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1637,7 +1637,7 @@ function get_athenaos() {
 function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
-    local ISO="$(curl -sl ${URL}/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
+    local ISO="$(curl -sl "${URL}"/ | grep -e 'batocera.*img.gz'|cut -d\" -f2)"
 
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1656,8 +1656,8 @@ function get_biglinux() {
     local HASH=""
     local ISO=""
     local URL="https://iso.biglinux.com.br/"
-    ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- ${URL}) | sort -u | tail -n2 | head -n1)
-    HASH=$(curl -s ${URL}${ISO}.md5 | grep -Eo '[[:alnum:]]{32}')
+    ISO=$(grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' <(wget -q -O- "${URL}") | sort -u | tail -n2 | head -n1)
+    HASH=$(curl -s "${URL}""${ISO}".md5 | grep -Eo '[[:alnum:]]{32}')
     echo "${URL}${ISO} ${HASH}"
 }
 
@@ -1670,8 +1670,8 @@ function get_blendos() {
     #
     # We have to provide edition/release as RELEASE or have a major refactor
     # But this works for now ... or does it ....
-    URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
-    HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
+    URL=$(grep "${RELEASE}" /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
+    HASH=$(grep "${RELEASE}" /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
     # ## fix up variables for path naming
     EDITION=${RELEASE%%/*}
     RELEASE=${RELEASE##*/}
@@ -1726,12 +1726,12 @@ function get_centos-stream() {
       8)
         ISO="CentOS-Stream-${RELEASE}-x86_64-latest-${EDITION}.iso"
         URL="https://mirrors.ocf.berkeley.edu/centos/8-stream/isos/x86_64"
-        HASH=$(wget -q -O- ${URL}/CHECKSUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        HASH=$(wget -q -O- "${URL}"/CHECKSUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
         ;;
       9)
         ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
         URL="https://mirrors.ocf.berkeley.edu/centos-stream/9-stream/BaseOS/x86_64/iso"
-        HASH=$(wget -q -O- ${URL}/${ISO}.SHA256SUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+        HASH=$(wget -q -O- "${URL}"/"${ISO}".SHA256SUM | grep "SHA256 (${ISO}" | cut -d' ' -f4)
         ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
@@ -1891,7 +1891,7 @@ function get_endeavouros() {
     local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Find EndeavourOS releases from mirror, pick one matching release
     local ENDEAVOUR_RELEASES="$(curl -s "${URL}"/ | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
-    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i ${RELEASE}).iso"
+    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
 
     HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
@@ -1937,7 +1937,7 @@ function get_fedora() {
       *) VARIANT="Spins";;
     esac
 
-    JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
+    JSON=$(wget -q -O- "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'"${VARIANT}"'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -2237,7 +2237,7 @@ function get_macos() {
         fi
     fi
 
-    if [ $skipVerification != true ]; then
+    if [ "$skipVerification" != true ]; then
         if ! python3 "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
             echo "Verification failed."
             exit 1
@@ -2282,9 +2282,9 @@ function get_manjaro() {
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
 
     if [[ ${RELEASE} != "sway" ]]; then
-        URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}"."${RELEASE}""${EDITION}".image)"
     else
-        URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
     fi
     HASH=$(wget -qO- "${URL}.sha512" | cut_1)
     echo "${URL} ${HASH}"
@@ -2674,7 +2674,7 @@ function get_truenas-scale() {
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-scale/"
 
-    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    URL=$(wget -q "${DLINFO}" -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
     HASH=$(wget -q "${URL}.sha256" -O- | cut_1 )
     echo "${URL} ${HASH}"
 }
@@ -2685,8 +2685,8 @@ function get_truenas-core() {
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-core/"
 
-    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
-    HASH=$(wget -q ${URL}.sha256 -O- | cut_1)
+    URL=$(wget -q "${DLINFO}" -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
+    HASH=$(wget -q "${URL}".sha256 -O- | cut_1)
     echo "${URL} ${HASH}"
 }
 
@@ -2705,16 +2705,16 @@ function get_ubuntu-server() {
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
         DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     else
         DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso)
-        ISO=$(cut -d' ' -f3 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d' ' -f3 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     fi
 
-    if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+    if [ -z "$ISO" ] || [ -z "$HASH" ]; then
+        echo "$(pretty_name "$OS") ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
 
@@ -2761,16 +2761,16 @@ function get_ubuntu() {
 
     if wget -q --spider "${URL}/SHA256SUMS"; then
         DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
-        HASH=$(cut_1 <<<${DATA} | sed '1q;d')
+        ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
+        HASH=$(cut_1 <<<"${DATA}" | sed '1q;d')
     else
         DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     fi
 
-    if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+    if [ -z "$ISO" ] || [ -z "$HASH" ]; then
+        echo "$(pretty_name "$OS") ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
 
@@ -2842,7 +2842,7 @@ function get_zorin() {
     local ISO=""
     local URL=""
 
-    URL=$(curl -Lfs "https://zrn.co/${RELEASE}${EDITION}" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    URL=$(curl -Lfs "https://zrn.co/${RELEASE}${EDITION}" -w %{url_effective} -o /this/is/a/nonexistent/directory/"$RANDOM"/"$RANDOM")
     echo "${URL} ${HASH}"
 }
 
@@ -3262,9 +3262,9 @@ function download_windows-server() {
     iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")"
 
     if [ "${COUNTRY}" != "US" ]; then
-        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} in "${LANG}" from "$iso_download_link"
+        echo Downloading $(pretty_name "${OS}") "${PRETTY_RELEASE}" in "${LANG}" from "$iso_download_link"
     else
-        echo Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} from "$iso_download_link"
+        echo Downloading $(pretty_name "${OS}") "${PRETTY_RELEASE}" from "$iso_download_link"
     fi
 
     FILE_NAME="${iso_download_link##*/}"
@@ -3405,9 +3405,9 @@ function download_windows() {
     fi
 
     if [ "${LANG}" != "English International" ]; then
-        echo Downloading Windows ${RELEASE} in "${LANG}" from "$iso_download_link"
+        echo Downloading Windows "${RELEASE}" in "${LANG}" from "$iso_download_link"
     else
-        echo Downloading Windows ${RELEASE} from "$iso_download_link"
+        echo Downloading Windows "${RELEASE}" from "$iso_download_link"
     fi
 
     # Download ISO
@@ -3423,7 +3423,7 @@ function get_windows() {
     if [ "${RELEASE}" == "10-ltsc" ]; then
         download_windows-server windows-10-enterprise ltsc
     elif [ "${OS}" == "windows-server" ]; then
-        download_windows-server windows-server-${RELEASE}
+        download_windows-server windows-server-"${RELEASE}"
     else
         download_windows "${RELEASE}"
     fi
@@ -3480,8 +3480,8 @@ create_vm() {
       check_hash "${ISO}" "${HASH}"
     fi
 
-    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
-        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+    if [ "${OS}" == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip "${VM_PATH}"/"${ISO}" -d "${VM_PATH}"
         ISO=$(find "${VM_PATH}" -type f -iname '*.iso')
     fi
 
@@ -3506,8 +3506,8 @@ create_vm() {
         ISO="${ISO/.img/}"
     fi
 
-    if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
-        unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
+    if [ "${OS}" == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
+        unzip "${VM_PATH}"/"${ISO}" -d "${VM_PATH}"
         ISO=$(find "${VM_PATH}" -type f \( -iname '*.iso' ! -iname '*.zip' \))
     fi
 
@@ -3678,25 +3678,25 @@ function show_os_info() {
     OS="${1}"
     os_supported
     if command -v neofetch > /dev/null; then
-        neofetch -l --ascii_distro ${OS}
+        neofetch -l --ascii_distro "${OS}"
     fi
-    echo ${OS}
+    echo "${OS}"
     echo -n 'Pretty name: '
-    pretty_name ${OS}
+    pretty_name "${OS}"
     echo -n 'Based of: '
-    os_basedof ${OS}
+    os_basedof "${OS}"
 
-    if [ -z "$(os_credentials ${OS})" ]; then
+    if [ -z "$(os_credentials "${OS}")" ]; then
         echo 'Credentials: Unknown'
     else
         echo -n 'Credentials: '
-        os_credentials ${OS}
+        os_credentials "${OS}"
     fi
 
     echo -n 'Homepage: '
-    os_homepage ${OS}
+    os_homepage "${OS}"
     echo -n 'Info: '
-    os_about ${OS}
+    os_about "${OS}"
 
     if [[ ! $(type -t "editions_${OS}") == function ]]; then
         echo -n 'Releases: '
@@ -3740,10 +3740,10 @@ case "${1}" in
     ;;
   '-o'|'--os-homepage')
     OS="${2}"
-    if [ -z "$(os_homepage ${OS})" ]; then
+    if [ -z "$(os_homepage "${OS}")" ]; then
         os_error
     else
-        open_url "$(os_homepage ${OS})"
+        open_url "$(os_homepage "${OS}")"
         exit 0
     fi
     ;;
@@ -3773,7 +3773,7 @@ if [ -n "${2}" ]; then
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
-        EDITIONS=($(editions_${OS}))
+        EDITIONS=($(editions_"${OS}"))
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
@@ -3826,8 +3826,8 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 
-elif [ $(releases_${OS} | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
-    RELEASE=$(releases_${OS})
+elif [ $(releases_"${OS}" | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
+    RELEASE=$(releases_"${OS}")
     VM_PATH="${OS}"
     create_vm "$("get_${OS}")"
 else
