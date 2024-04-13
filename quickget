@@ -119,6 +119,7 @@ function pretty_name() {
     tinycore)           PRETTY_NAME="Tiny Core Linux";;
     truenas-core)       PRETTY_NAME="TrueNAS Core";;
     truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
+    tuxedo-os)          PRETTY_NAME="Tuxedo OS";;
     ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
     ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
     ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
@@ -305,6 +306,7 @@ function os_support() {
     trisquel \
     truenas-core \
     truenas-scale \
+    tuxedo-os \
     ubuntu \
     ubuntu-budgie \
     ubuntucinnamon \
@@ -408,6 +410,7 @@ function os_homepages(){
         trisquel)          HOMEPAGE="https://trisquel.info/";;
         truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
         truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
+        tuxedo-os)         HOMEPAGE="https://www.tuxedocomputers.com";;
         ubuntu)            HOMEPAGE="https://ubuntu.com/";;
         ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
         ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
@@ -973,6 +976,10 @@ function releases_truenas-core() {
 
 function releases_truenas-scale() {
     echo 22.02 22.12
+}
+
+function releases_tuxedo-os() {
+    echo current
 }
 
 function releases_ubuntu() {
@@ -2602,6 +2609,17 @@ function get_truenas-core() {
     URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
     HASH=$(wget -q ${URL}.sha256 -O- | cut -d' ' -f1)
 
+    echo "${URL} ${HASH}"
+}
+
+function get_tuxedo-os() {
+
+    local ISO=""
+    local URL=""
+    local Current=
+    Current="$(wget -O- -q "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
+    URL="https://os.tuxedocomputers.com/${Current}"
+    HASH="$(wget -q -O- "https://os.tuxedocomputers.com/checksums/${Current}.sha256" | cut -d ' ' -f 1)"
     echo "${URL} ${HASH}"
 }
 
