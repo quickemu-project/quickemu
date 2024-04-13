@@ -3443,6 +3443,12 @@ fi
 
 LANGS=()
 
+os_not_supported() {
+    echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support | fold -s -w "$(tput cols)"
+    exit 1
+}
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
