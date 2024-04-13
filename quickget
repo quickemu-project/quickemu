@@ -3443,6 +3443,26 @@ fi
 
 LANGS=()
 
+handle_missing() {
+    # Handle odd missing Fedora combinations
+    if [[ $OS == fedora ]] ; then
+        if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
+            echo "ERROR! Unsupported combination"
+            echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+            exit 1;
+        fi
+    fi
+
+    # Handle missing Manjaro Sway minimal
+    if [[ $OS == manjaro ]] ; then
+        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
+            echo "ERROR! Unsupported combination"
+            echo "       Manjaro Sway does not have a minimal edition"
+            exit 1;
+        fi
+    fi
+}
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
@@ -3501,24 +3521,7 @@ if [ -n "${2}" ]; then
             exit 1
         fi
 
-        # Handle odd missing fedora cominations
-        if [[ $OS == fedora ]] ; then
-            if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
-                echo "ERROR! Unsupported combination"
-                echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
-                exit 1;
-            fi
-        fi
-
-        # Handle missing Mangaro Sway minimal
-        if [[ $OS == manjaro ]] ; then
-            if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
-                echo "ERROR! Unsupported combination"
-                echo "       Manjaro Sway does not have a minimal edition"
-                exit 1;
-            fi
-        fi
-
+        handle_missing
 
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
         create_vm "$("get_${OS}" "${EDITION}")"
