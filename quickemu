@@ -1165,7 +1165,7 @@ function vm_boot() {
     else
         # shellcheck disable=SC2054,SC2206
         args+=(-device virtio-blk-pci,drive=SystemDisk
-            -drive id=SystemDisk,if=none,format=${disk_format:-qcow2},file="${disk_img}" ${STATUS_QUO})
+            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
     fi
 
     # https://wiki.qemu.org/Documentation/9psetup
@@ -1408,6 +1408,13 @@ function sound_card_param_check() {
         echo "ERROR! Requested sound card '${SOUND_CARD}' is not recognised."
         exit 1
     fi
+}
+
+function sound_card_param_check() {
+  if [ "${SOUND_CARD}" != "intel-hda" ] && [ "${SOUND_CARD}" != "ac97" ] && [ "${SOUND_CARD}" != "es1370" ] && [ "${SOUND_CARD}" != "sb16" ] && [ "${SOUND_CARD}" != "none" ]; then
+    echo "ERROR! Requested sound card '${SOUND_CARD}' is not recognised."
+    exit 1
+  fi
 }
 
 function viewer_param_check() {
@@ -1771,13 +1778,13 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     fi
 
     if [ -e "${disk_img}" ]; then
-		DiskChkMsg="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
-		if [[ $DiskChkMsg ]]; then
-		    echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
-		    echo; echo "$DiskChkMsg" ; echo
-		    exit 1
-		fi
-	fi
+        DiskChkMsg="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
+        if [[ $DiskChkMsg ]]; then
+            echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
+            echo; echo "$DiskChkMsg" ; echo
+            exit 1
+        fi
+    fi
 
     VMDIR=$(dirname "${disk_img}")
     VMNAME=$(basename "${VM}" .conf)
@@ -1787,7 +1794,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     if [ ! -f "${disk_img}" ]; then
         cd "${VMPATH}"
     fi
-    
+
     # Backwards compatibility for ${driver_iso}
     if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
         fixed_iso="${driver_iso}"
