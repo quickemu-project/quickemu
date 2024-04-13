@@ -1,0 +1,31 @@
+--- # reviewdog
+name: reviewdog
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    name: github check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haya14busa/action-cond@v1
+        id: reporter
+        with:
+          cond: ${{ github.event_name == 'pull_request' }}
+          if_true: "github-pr-review"
+          if_false: "github-check"
+      - uses: reviewdog/action-shellcheck@v1
+        with:
+          reporter: ${{ steps.reporter.outputs.value }}
+          level: warning
+          github_token: ${{ secrets.github_token }}
+          pattern: |
+            quickget
+            quickemu
