@@ -3443,6 +3443,13 @@ fi
 
 LANGS=()
 
+os_error_edition() {
+    echo -en "ERROR! You must specify an edition.\n - Editions: "
+    #TODO ERROR here
+    "editions_${OS}"
+    exit 1
+}
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
@@ -3496,9 +3503,7 @@ if [ -n "${2}" ]; then
                 exit 1
             fi
         else
-            echo -en "ERROR! You must specify an edition.\n - Editions: "
-            editions_"${OS}"
-            exit 1
+            os_error_edition
         fi
 
         # Handle odd missing fedora cominations
