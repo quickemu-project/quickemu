@@ -524,13 +524,15 @@ function releases_biglinux() {
 }
 
 function releases_blendos() {
-    # Pull the rss feed
+    echo latest
+}
+
+function editions_blendos() {
     wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
 
-    local RLIST
-    RLIST=$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d/ -f 8-9 | sort -r -t/  --key=2 |grep -e '16878' -e '168[8-9]'| tr '\r\n' ' ')
-    echo "${RLIST}"
-
+    local BLENDOS_EDITIONS
+    BLENDOS_EDITIONS="$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d '/' -f 8 | sort | uniq | tr '\n' ' ')"
+    echo "${BLENDOS_EDITIONS}"
 }
 
 function releases_bunsenlabs() {
@@ -1561,23 +1563,15 @@ function get_biglinux() {
 }
 
 function get_blendos() {
-
     local HASH=""
     local URL=""
+    local latest_blendos_release
 
-    # BlendOS has more editions and releases but there's a tracker indirect and other issues
-    # so easier to use the rss feed
-    #
-    # We have to provide edition/release as RELEASE or have a major refactor
-    # But this works for now ... or does it ....
-    URL=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
-    HASH=$(grep ${RELEASE} /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
-    # ## fix up variables for path naming
-      EDITION=${RELEASE%%/*}
-      RELEASE=${RELEASE##*/}
-      # For UX maybe show the date of the release
-      #echo ${RELEASE##*/} "(" $(date -d @${RELEASE##*/}) ")"
-      # maybe $(date -d @${RELEASE##*/} '+%Y%m%d')
+    latest_blendos_release="$(grep "${EDITION}" /tmp/blendos-isos.rss | grep -Po '(?<=blendos/files/ISOs/"${EDITION}"/)[0-9]+(?=/blendOS.iso)' | sort -nr | head -n 1)"
+
+    URL=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso' | head -n 1)
+    HASH=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}' | head -n 1)
+
       echo "${URL} ${HASH}"
 }
 
