@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 13, 2024
+date: April 14, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -53,7 +53,7 @@ configuration for `quickemu` to use to build and run
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget ubuntu 22.04
 quickemu --vm ubuntu-22.04.conf
 ```
@@ -72,7 +72,7 @@ quickemu --vm ubuntu-22.04.conf
 `quickget` can also download/refresh daily-live images via `zsync` for
 Ubuntu developers and testers.
 
-``` bash
+``` shell
 quickget ubuntu daily-live
 quickemu --vm ubuntu-daily-live.conf
 ```
@@ -206,7 +206,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` bash
+``` shell
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -214,7 +214,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` bash
+``` shell
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -230,7 +230,7 @@ quickemu --vm debian-bullseye.conf
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -272,7 +272,7 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
         following command followed by pressing command on the hard disk
         when files are deleted:
 
-``` bash
+``` shell
 sudo trimforce enable
 ```
 
@@ -298,7 +298,7 @@ soon as the command completes.
 
 The default macOS configuration looks like this:
 
-``` bash
+``` shell
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -366,7 +366,7 @@ If the wired ethernet device is not `en0`, then then go to *System
 Preferences* -\> *Network*, delete all the network devices and apply the
 changes. Next, open a terminal and run the following:
 
-``` bash
+``` shell
 sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 ```
 
@@ -394,7 +394,7 @@ and
 [2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022).
 No automated installation is supported for these releases.
 
-``` bash
+``` shell
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -412,13 +412,13 @@ By default `quickget` will download the *"English International"*
 release (*"English (United States)"* for server releases), but you can
 optionally specify one of the supported languages: For example:
 
-``` bash
+``` shell
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` bash
+``` shell
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"

@@ -8,7 +8,7 @@
 
 </div>
 
-```bash
+``` shell
 quickget ubuntu-mate 22.04
 quickemu --vm ubuntu-mate-22.04.conf
 ```
@@ -17,7 +17,7 @@ quickemu --vm ubuntu-mate-22.04.conf
 
 <img src=".github/screenshot.png" alt="Quickemu Screenshot" />
 
-**Made with 💝 for <img src=".github/tux.png" align="top" width="24" />.**
+**Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/>.**
 
 Quickemu is available in the repositories of the following distros
 (packaging status by [Repology.org](https://repology.org/)):
@@ -59,7 +59,9 @@ The original objective of the project was to enable [quick testing of
 Linux distributions](#creating-linux-guests-) where the virtual machine
 configurations can be stored anywhere (such as external USB storage or
 your home directory) and no elevated permissions are required to run the
-virtual machines. **Quickemu now also includes comprehensive support for
+virtual machines.
+
+**Quickemu now also includes comprehensive support for
 [macOS](#creating-macos-guests-) and
 [Windows](#creating-windows-guests-)**.
 
@@ -97,7 +99,7 @@ Quickemu is available from the AUR (Arch user repository), and can be
 installed via any AUR helper. Assuming your AUR helper is yay, Run the
 following command:
 
-``` bash
+``` shell
 yay -Sy quickemu
 ```
 
@@ -108,7 +110,7 @@ project's GitHub releases
 page](https://github.com/quickemu-project/quickemu/releases). Download
 the .deb and install it with `apt-get`.
 
-``` bash
+``` shell
 sudo apt-get install ./quickemu_x.y.z-1_all.deb
 ```
 
@@ -119,7 +121,7 @@ includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04
 (Hirsute). To install Quickemu and all the dependencies run the
 following in a terminal:
 
-``` bash
+``` shell
 sudo apt-add-repository ppa:flexiondotorg/quickemu
 sudo apt update
 sudo apt install quickemu
@@ -129,13 +131,13 @@ sudo apt install quickemu
 
 To quickly try quickemu:
 
-``` sh
+``` shell
 nix-shell -p quickemu
 ```
 
 To install via Nix profile:
 
-``` sh
+``` shell
 nix-env -iA pkgs.quickemu
 ```
 
@@ -152,13 +154,13 @@ To install via NixOS config:
 
 To install via Flakes:
 
-``` sh
+``` shell
 # TODO (flake users, please add an example!)
 ```
 
 ### Other Linux hosts (installing from source)
 
-``` bash
+``` shell
 git clone --filter=blob:none https://github.com/wimpysworld/quickemu
 cd quickemu
 ```
@@ -204,13 +206,13 @@ These examples may save a little typing:
 
 This also applies to derivatives:
 
-``` sh
+``` shell
 sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
-``` sh
+``` shell
 sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
@@ -220,7 +222,7 @@ This is a **work in progress** (see [issue
 248](https://github.com/quickemu-project/quickemu/issues/248) for other
 steps and changes that may enable running on MacOS)
 
-``` sh
+``` shell
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 ```
 
@@ -235,7 +237,7 @@ graphical user interface is also available:
 
 To install Quickgui on Ubuntu:
 
-``` sh
+``` shell
 sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
@@ -265,7 +267,7 @@ installations, snapshots and disk management
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget ubuntu 22.04
 quickemu --vm ubuntu-22.04.conf
 ```
@@ -284,7 +286,7 @@ quickemu --vm ubuntu-22.04.conf
 `quickget` can also download/refresh daily-live images via `zsync` for
 Ubuntu developers and testers.
 
-``` bash
+``` shell
 quickget ubuntu daily-live
 quickemu --vm ubuntu-daily-live.conf
 ```
@@ -418,7 +420,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` bash
+``` shell
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -426,7 +428,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` bash
+``` shell
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -442,7 +444,7 @@ quickemu --vm debian-bullseye.conf
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -484,7 +486,7 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
         following command followed by pressing command on the hard disk
         when files are deleted:
 
-``` bash
+``` shell
 sudo trimforce enable
 ```
 
@@ -510,7 +512,7 @@ soon as the command completes.
 
 The default macOS configuration looks like this:
 
-``` bash
+``` shell
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -578,7 +580,7 @@ If the wired ethernet device is not `en0`, then then go to *System
 Preferences* -\> *Network*, delete all the network devices and apply the
 changes. Next, open a terminal and run the following:
 
-``` bash
+``` shell
 sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 ```
 
@@ -606,7 +608,7 @@ and
 [2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022).
 No automated installation is supported for these releases.
 
-``` bash
+``` shell
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -624,13 +626,13 @@ By default `quickget` will download the *"English International"*
 release (*"English (United States)"* for server releases), but you can
 optionally specify one of the supported languages: For example:
 
-``` bash
+``` shell
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` bash
+``` shell
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"
@@ -658,7 +660,7 @@ To use SPICE add `--display spice` to the Quickemu invocation, this
 requires that the `spicy` client is installed, available from the
 `spice-client-gtk` package in Debian/Ubuntu.
 
-``` bash
+``` shell
 quickemu --vm ubuntu-22.04.conf --display spice
 ```
 
@@ -672,14 +674,14 @@ To start a VM with SPICE enabled, but no display attached use
 available from the `spice-client-gtk` package in Debian/Ubuntu to
 connect to the running VM
 
-``` bash
+``` shell
 quickemu --vm ubuntu-22.04.conf --display none
 ```
 
 You can also use the `.ports` file in the VM directory to lookup what
 SSH and SPICE ports the VM is connected to.
 
-``` bash
+``` shell
 cat ubuntu-22.04/ubuntu-22.04.ports
 ```
 
@@ -687,7 +689,7 @@ If, for example, the SSH port is set to 22220, and assuming your VM has
 a started SSH service (details vary by OS), you can typically SSH into
 it from the host as follows:
 
-``` bash
+``` shell
 ssh -p 22220 your_vm_user@localhost
 ```
 
@@ -696,7 +698,7 @@ ssh -p 22220 your_vm_user@localhost
 Qemu provides support for using BrlAPI to display braille output on a
 real or fake device.
 
-``` bash
+``` shell
 quickemu --vm ubuntu-22.04.conf --braille --display sdl
 ```
 
@@ -763,7 +765,7 @@ the guest.
 
 You can install the minimal Samba components on Ubuntu using:
 
-``` bash
+``` shell
 sudo apt install --no-install-recommends samba
 ```
 
@@ -905,10 +907,10 @@ import cog
 # cannot use check_result() because of non-zero return
 result=subprocess.run(["./quickemu", "--help"], capture_output=True, text=True)
 help=result.stdout
-cog.out(f"\n```\n{help}\n```\n")
+cog.out(f"\n``` text\n{help}\n```\n")
 ]]] -->
 
-```
+``` text
 
 Usage
   quickemu --vm ubuntu.conf [optional params]
@@ -959,7 +961,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in
 `~/.local/share/applications`. Here is an example of how to create a
 shortcut.
 
-``` bash
+``` shell
 quickemu --vm ubuntu-22.04-desktop.conf --shortcut
 ```
 
@@ -984,13 +986,13 @@ must match the resolution of the screen.
 
 To know which screen to use, type:
 
-``` bash
+``` shell
 xrandr --listmonitors | grep -v Monitors
 ```
 
 The command will output something like this:
 
-``` bash
+``` shell
  0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
  1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
 ```
@@ -999,7 +1001,7 @@ The first number is what needs to be passed to the `--screen` option.
 
 For example:
 
-``` bash
+``` shell
 quickemu --vm vm.conf --screen 0
 ```
 

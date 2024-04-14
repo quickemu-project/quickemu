@@ -2,10 +2,13 @@
 *.conf
 *.dmg
 *.fd
+*.fixed
 *.img
 *.iso
 *.lock
 *.log
+*.markdownlint.jsonc
+*.markdownlint.yaml
 *.msi
 *.part
 *.permall
