@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 13, 2024
+date: April 14, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -156,7 +156,9 @@ The original objective of the project was to enable [quick testing of
 Linux distributions](#creating-linux-guests-) where the virtual machine
 configurations can be stored anywhere (such as external USB storage or
 your home directory) and no elevated permissions are required to run the
-virtual machines. **Quickemu now also includes comprehensive support for
+virtual machines.
+
+**Quickemu now also includes comprehensive support for
 [macOS](#creating-macos-guests-) and
 [Windows](#creating-windows-guests-)**.
 
@@ -227,13 +229,13 @@ These examples may save a little typing:
 
 This also applies to derivatives:
 
-``` sh
+``` shell
 sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
-``` sh
+``` shell
 sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
@@ -243,7 +245,7 @@ This is a **work in progress** (see [issue
 248](https://github.com/quickemu-project/quickemu/issues/248) for other
 steps and changes that may enable running on MacOS)
 
-``` sh
+``` shell
 brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 ```
 
@@ -258,7 +260,7 @@ graphical user interface is also available:
 
 To install Quickgui on Ubuntu:
 
-``` sh
+``` shell
 sudo add-apt-repository ppa:yannick-mauray/quickgui
 sudo apt update
 sudo apt install quickgui
@@ -288,7 +290,7 @@ installations, snapshots and disk management
 `quickget` will automatically download an Ubuntu release and create the
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget ubuntu 22.04
 quickemu --vm ubuntu-22.04.conf
 ```
@@ -307,7 +309,7 @@ quickemu --vm ubuntu-22.04.conf
 `quickget` can also download/refresh daily-live images via `zsync` for
 Ubuntu developers and testers.
 
-``` bash
+``` shell
 quickget ubuntu daily-live
 quickemu --vm ubuntu-daily-live.conf
 ```
@@ -441,7 +443,7 @@ configuration.
 -   Download a .iso image of a Linux distribution
 -   Create a VM configuration file; for example `debian-bullseye.conf`
 
-``` bash
+``` shell
 guest_os="linux"
 disk_img="debian-bullseye/disk.qcow2"
 iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
@@ -449,7 +451,7 @@ iso="debian-bullseye/firmware-11.0.0-amd64-DVD-1.iso"
 
 -   Use `quickemu` to start the virtual machine:
 
-``` bash
+``` shell
 quickemu --vm debian-bullseye.conf
 ```
 
@@ -465,7 +467,7 @@ quickemu --vm debian-bullseye.conf
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
 
-``` bash
+``` shell
 quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
@@ -507,7 +509,7 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
         following command followed by pressing command on the hard disk
         when files are deleted:
 
-``` bash
+``` shell
 sudo trimforce enable
 ```
 
@@ -533,7 +535,7 @@ soon as the command completes.
 
 The default macOS configuration looks like this:
 
-``` bash
+``` shell
 guest_os="macos"
 img="macos-catalina/RecoveryImage.img"
 disk_img="macos-catalina/disk.qcow2"
@@ -601,7 +603,7 @@ If the wired ethernet device is not `en0`, then then go to *System
 Preferences* -\> *Network*, delete all the network devices and apply the
 changes. Next, open a terminal and run the following:
 
-``` bash
+``` shell
 sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 ```
 
@@ -629,7 +631,7 @@ and
 [2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022).
 No automated installation is supported for these releases.
 
-``` bash
+``` shell
 quickget windows 11
 quickemu --vm windows-11.conf
 ```
@@ -647,13 +649,13 @@ By default `quickget` will download the *"English International"*
 release (*"English (United States)"* for server releases), but you can
 optionally specify one of the supported languages: For example:
 
-``` bash
+``` shell
 quickget windows 11 "Chinese (Traditional)"
 ```
 
 The default Windows 11 configuration looks like this:
 
-``` bash
+``` shell
 guest_os="windows"
 disk_img="windows-11/disk.qcow2"
 iso="windows-11/windows-11.iso"
@@ -671,46 +673,48 @@ secureboot="off"
 
 Here are the usage instructions:
 
+``` text
 
-    Usage
-      quickemu --vm ubuntu.conf [optional params]
+Usage
+  quickemu --vm ubuntu.conf [optional params]
 
-    List of optional parameters:
-      --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
-      --braille                         : Enable braille support. Requires SDL.
-      --delete-disk                     : Delete the disk image and EFI variables
-      --delete-vm                       : Delete the entire VM and it's configuration
-      --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'
-      --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
-      --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
-      --screen <screen>                 : Use specified screen to determine the window size.
-      --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified.
-      --shortcut                        : Create a desktop shortcut
-      --snapshot apply <tag>            : Apply/restore a snapshot.
-      --snapshot create <tag>           : Create a snapshot.
-      --snapshot delete <tag>           : Delete a snapshot.
-      --snapshot info                   : Show disk/snapshot info.
-      --status-quo                      : Do not commit any changes to disk/snapshot.
-      --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
-      --width <width>                   : Set VM screen width. Does nothing without --height
-      --height <height>                 : Set VM screen height. Does nothing without --width
-      --ssh-port <port>                 : Set ssh-port manually
-      --spice-port <port>               : Set spice-port manually
-      --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'
-      --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'
-      --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')
-      --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')
-      --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)
-      --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'
-      --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')
-      --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')
-      --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'
-      --keyboard_layout <layout>        : Set keyboard layout.
-      --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
-      --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
-      --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'
-      --extra_args <arguments>          : Pass additional arguments to qemu
-      --version                         : Print version
+List of optional parameters:
+  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
+  --braille                         : Enable braille support. Requires SDL.
+  --delete-disk                     : Delete the disk image and EFI variables
+  --delete-vm                       : Delete the entire VM and it's configuration
+  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'
+  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)
+  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers
+  --screen <screen>                 : Use specified screen to determine the window size.
+  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified.
+  --shortcut                        : Create a desktop shortcut
+  --snapshot apply <tag>            : Apply/restore a snapshot.
+  --snapshot create <tag>           : Create a snapshot.
+  --snapshot delete <tag>           : Delete a snapshot.
+  --snapshot info                   : Show disk/snapshot info.
+  --status-quo                      : Do not commit any changes to disk/snapshot.
+  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
+  --width <width>                   : Set VM screen width. Does nothing without --height
+  --height <height>                 : Set VM screen height. Does nothing without --width
+  --ssh-port <port>                 : Set ssh-port manually
+  --spice-port <port>               : Set spice-port manually
+  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'
+  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'
+  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')
+  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')
+  --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)
+  --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'
+  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')
+  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')
+  --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'
+  --keyboard_layout <layout>        : Set keyboard layout.
+  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
+  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
+  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'
+  --extra_args <arguments>          : Pass additional arguments to qemu
+  --version                         : Print version
+```
 
 ## Desktop shortcuts
 
@@ -718,7 +722,7 @@ Desktop shortcuts can be created for a VM, the shortcuts are saved in
 `~/.local/share/applications`. Here is an example of how to create a
 shortcut.
 
-``` bash
+``` shell
 quickemu --vm ubuntu-22.04-desktop.conf --shortcut
 ```
 
@@ -743,13 +747,13 @@ must match the resolution of the screen.
 
 To know which screen to use, type:
 
-``` bash
+``` shell
 xrandr --listmonitors | grep -v Monitors
 ```
 
 The command will output something like this:
 
-``` bash
+``` shell
  0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
  1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
 ```
@@ -758,7 +762,7 @@ The first number is what needs to be passed to the `--screen` option.
 
 For example:
 
-``` bash
+``` shell
 quickemu --vm vm.conf --screen 0
 ```
 
