@@ -862,7 +862,7 @@ function editions_primtux() {
 }
 
 function releases_pureos() {
-    wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4 
+    wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4
 }
 function editions_pureos() {
     echo gnome plasma
@@ -2414,7 +2414,7 @@ function get_pureos() {
     local IsoTrimmed=
     IsoTrimmed="${ISO%.*}"
     HASH="$(wget -q -O- "${URL}/${IsoTrimmed}.checksums_sha256.txt" | grep -m 1 '.iso' | cut -d '.' -f 1)"
-    echo "${URL}/${ISO} ${HASH}" 
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 
