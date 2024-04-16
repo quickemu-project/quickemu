@@ -3,7 +3,6 @@ name: 'Run shellcheck with reviewdog'
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
