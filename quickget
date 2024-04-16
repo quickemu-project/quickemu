@@ -3662,6 +3662,12 @@ fi
 
 LANGS=()
 
+os_not_supported() {
+    echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support | fold -s -w "$(tput cols)"
+    exit 1
+}
+
 os_path_error() {
     echo "ERROR! You must specify path."
     os_error
