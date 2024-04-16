@@ -3575,13 +3575,11 @@ function download_windows_workstation() {
     # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
-    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
 
-    # Limit untrusted size for input validation
-    iso_download_page_html="$(echo "$iso_download_page_html" | head -c 102400)"
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
     local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
@@ -3589,8 +3587,8 @@ function download_windows_workstation() {
 
     # Permit Session ID
     # "org_id" is always the same value
-    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
-        # This should only happen if there's been some change to how this API works (copy whatever fix Fido implements)
+    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+        # This should only happen if there's been some change to how this API works
         handle_curl_error $?
         return $?
     }
@@ -3602,7 +3600,7 @@ function download_windows_workstation() {
     # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
     # We must make this request so our next one will be allowed
     # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
-    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
         handle_curl_error $?
         return $?
     }
@@ -3617,22 +3615,9 @@ function download_windows_workstation() {
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")" || {
-        # This should only happen if there's been some change to how this API works
-        handle_curl_error $?
-        return $?
-    }
+    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
 
     local failed=0
-
-    if [ "${LANG}" == "English (United States)" ]; then
-        LANG="English"
-    fi
-
-    local HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
-
-    # Limit untrusted size for input validation
-    iso_download_link_html="$(echo "$iso_download_link_html" | head -c 4096)"
 
     if ! [ "$iso_download_link_html" ]; then
         # This should only happen if there's been some change to how this API works
@@ -3641,11 +3626,10 @@ function download_windows_workstation() {
     fi
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
+        echo " - Microsoft blocked the automated download request based on your IP address."
         if [ "${show_iso_url}" == 'on' ] || [ "${test_iso_url}" == 'on' ]; then
-            echo " - Failed to get URL: Microsoft blocked the automated download request based on your IP address."
             exit 1
         fi
-        echo " - Microsoft blocked the automated download request based on your IP address."
         failed=1
     fi
 
@@ -3669,25 +3653,26 @@ function download_windows_workstation() {
     fi
 
     if [ "${show_iso_url}" == 'on' ]; then
-	    echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
-	    exit 0
+        echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${iso_download_link}"
-	    exit 0
+        wget --spider "${iso_download_link}"
+        exit 0
     fi
 
-    if [ "${LANG}" != "English International" ]; then
-        echo Downloading Windows ${RELEASE} in "${LANG}" from "$iso_download_link"
-    else
-        echo Downloading Windows ${RELEASE} from "$iso_download_link"
-    fi
+    echo "Downloading Windows ${RELEASE} (${LANG}): $iso_download_link"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
-    web_get "$iso_download_link" "${VM_PATH}" "${FILE_NAME}"
+    curl_windows "${VM_PATH}" "${FILE_NAME}" "1.3" "$iso_download_link"
     # Only Windows 11 hashes can be found directly from Microsoft's page.
     if [ "${windows_version}" == 11 ]; then
-        check_hash "${FILE_NAME}" "${HASH}"
+        local HASH_LANG="${LANG}"
+        if [ "${LANG}" == "English (United States)" ]; then
+            HASH_LANG="English"
+        fi
+        local HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$HASH_LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
+        check_hash "${VM_PATH}/${FILE_NAME}" "${HASH}"
     fi
 }
 
