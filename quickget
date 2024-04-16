@@ -3730,6 +3730,36 @@ os_path_error() {
     exit 1
 }
 
+os_error_release() {
+    echo "ERROR! You must specify a release."
+    case ${OS} in
+      *ubuntu-server*)
+        echo -n " - Releases: "
+        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *ubuntu*)
+        echo -n " - Releases: "
+        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *windows*)
+        echo -n " - Releases: "
+        "releases_${OS}"
+        echo -n " - Languages: "
+        "languages_${OS}" && echo "${LANGS[@]}"
+        ;;
+      *)
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+            echo -n ' - Editions: '
+            "editions_${OS}"
+        else
+            echo -n " - Releases: "
+            "releases_${OS}" | fold -s -w "$(tput cols)"
+        fi
+        ;;
+    esac
+    exit 1
+}
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
@@ -3868,32 +3898,7 @@ elif [ "${open_distro_homepage}" == 'on' ]; then
     HOMEPAGE=$(os_homepages ${OS})
     open_url "${HOMEPAGE}" && exit 0
 else
-    echo "ERROR! You must specify a release."
-    case ${OS} in
-      *ubuntu-server*)
-        echo -n " - Releases: "
-        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *ubuntu*)
-        echo -n " - Releases: "
-        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *windows*)
-        echo -n " - Releases: "
-        "releases_${OS}"
-        echo -n " - Languages: "
-        "languages_${OS}" && echo "${LANGS[@]}"
-        ;;
-      *)
-      echo -n " - Releases: "
-      "releases_${OS}" | fold -s -w "$(tput cols)"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-          echo -n " - Editions: "
-          editions_"${OS}" | fold -s -w "$(tput cols)"
-        fi
-        ;;
-    esac
-    exit 1
+    os_error_release
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
