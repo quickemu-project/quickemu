@@ -27,6 +27,14 @@ function cleanup() {
   fi
 }
 
+function os_about() {
+    local SIMPLE_NAME=""
+    local ABOUT=""
+    SIMPLE_NAME="${1}"
+    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
+    echo "${ABOUT}"
+}
+
 function os_credentials() {
     local SIMPLE_NAME=""
     local CREDE=""
