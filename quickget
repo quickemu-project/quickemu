@@ -3339,6 +3339,12 @@ handle_curl_error() {
         7)
             echo "Failed to contact Microsoft servers! Is there an Internet connection or is the server down?"
             ;;
+        8)
+            echo "Microsoft servers returned a malformed HTTP response!"
+            ;;
+        22)
+            echo "Microsoft servers returned a failing HTTP status code!"
+            ;;
         23)
             echo "Failed at writing Windows media to disk! Out of disk space or permission error? Exiting..."
             return "$fatal_error_action"
@@ -3350,15 +3356,15 @@ handle_curl_error() {
         36)
             echo "Failed to continue earlier download!"
             ;;
-        22)
-            echo "Microsoft servers returned failing HTTP status code!"
+        63)
+            echo "Microsoft servers returned an unexpectedly large response!"
             ;;
         # POSIX defines exit statuses 1-125 as usable by us
         # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
         $((error_code <= 125)))
-            # Must be some other server error (possibly with this specific request/file)
-            # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and HTTP(S) request, using only the curl features we're using, and a sane build
-            echo "Server returned an error status!"
+            # Must be some other server or network error (possibly with this specific request/file)
+            # This is when accounting for all possible errors in the curl manual assuming a correctly formed curl command and an HTTP(S) request, using only the curl features we're using, and a sane build
+            echo "Miscellaneous server or network error!"
             ;;
         126 | 127)
             echo "Curl command not found! Please install curl and try again. Exiting..."
