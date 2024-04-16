@@ -181,6 +181,7 @@ elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
         set -- "$2"
     fi
 fi
+
 function os_credentials() {
     local SIMPLE_NAME=""
     local CREDE=""
