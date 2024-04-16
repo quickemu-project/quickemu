@@ -3470,7 +3470,6 @@ function download_windows_server() {
         *)              PRETTY_RELEASE="$RELEASE";;
     esac
 
-
     case "$LANG" in
         "English (Great Britain)")
             CULTURE="en-gb"
