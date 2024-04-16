@@ -3872,12 +3872,11 @@ os_error_release() {
         "languages_${OS}" && echo "${LANGS[@]}"
         ;;
       *)
+        echo -n " - Releases: "
+        "releases_${OS}" | fold -s -w "$(tput cols)"
         if [[ $(type -t "editions_${OS}") == function ]]; then
             echo -n ' - Editions: '
             "editions_${OS}"
-        else
-            echo -n " - Releases: "
-            "releases_${OS}" | fold -s -w "$(tput cols)"
         fi
         ;;
     esac
