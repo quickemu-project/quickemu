@@ -2387,7 +2387,7 @@ function get_macos() {
     elif [ -x /usr/bin/chunkcheck ]; then
         CHUNKCHECK="/usr/bin/chunkcheck"
     else
-        web_get "https://raw.githubusercontent.com/wimpysworld/quickemu/master/chunkcheck" "${HOME}/.quickemu"
+        web_get "https://raw.githubusercontent.com/quickemu-project/quickemu/master/chunkcheck" "${HOME}/.quickemu"
         CHUNKCHECK="${HOME}/.quickemu/chunkcheck"
     fi
 

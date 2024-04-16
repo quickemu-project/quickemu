@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: quickemu
 Upstream-Contact: Martin Wimpress <code@wimpress.io>
-Source: https://github.com/wimpysworld/quickemu
+Source: https://github.com/quickemu-project/quickemu
 
 Files: *
 Copyright: 2020-2021 Martin Wimpress <code@wimpress.io>

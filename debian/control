@@ -5,9 +5,9 @@ Maintainer: Martin Wimpress <code@wimpress.io>
 Build-Depends:
  debhelper-compat (= 12),
 Standards-Version: 4.5.1
-Homepage: https://github.com/wimpysworld/quickemu
-Vcs-Browser: https://github.com/wimpysworld/quickemu
-Vcs-Git: https://github.com/wimpysworld/quickemu.git
+Homepage: https://github.com/quickemu-project/quickemu
+Vcs-Browser: https://github.com/quickemu-project/quickemu
+Vcs-Git: https://github.com/quickemu-project/quickemu.git
 Rules-Requires-Root: no
 
 Package: quickemu
