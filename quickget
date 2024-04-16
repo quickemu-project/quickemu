@@ -3846,6 +3846,8 @@ if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support
     exit 1
+fi
+
 help_message() {
     #shellcheck disable=SC2016
     printf '                           _              _
@@ -3892,8 +3894,6 @@ supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version 
     os_support | fold -s -w "$(tput cols)"
     exit 0
 }
-
-fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
