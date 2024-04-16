@@ -27,13 +27,6 @@ function cleanup() {
   fi
 }
 
-function os_about() {
-    local SIMPLE_NAME=""
-    local ABOUT=""
-    SIMPLE_NAME="${1}"
-    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
-    echo "${ABOUT}"
-}
 
 function os_credentials() {
     local SIMPLE_NAME=""
@@ -148,6 +141,14 @@ function os_info() {
       zorin)            INFO="Zorin OS|Ubuntu||https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
     esac
     echo "${INFO}"
+}
+
+function os_about() {
+    local SIMPLE_NAME=""
+    local ABOUT=""
+    SIMPLE_NAME="${1}"
+    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
+    echo "${ABOUT}"
 }
 
 function os_basedof() {
