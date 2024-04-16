@@ -1576,6 +1576,14 @@ function make_vm_config() {
         truenas*)
             GUEST="truenas"
             IMAGE_TYPE="iso";;
+        ubuntu*)
+            GUEST="linux"
+            IMAGE_TYPE="iso"
+            local SHORT_RELEASE="$(echo "${RELEASE}" | sed s'/\.//g')"
+            if [ ${SHORT_RELEASE} -lt 1604 ]; then
+                GUEST="linux_old"
+            fi
+            ;;
         windows)
             GUEST="windows"
             IMAGE_TYPE="iso";;

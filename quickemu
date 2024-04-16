@@ -479,7 +479,7 @@ function vm_boot() {
 
     # Make any OS specific adjustments
     case ${guest_os} in
-    batocera|*bsd|freedos|haiku|linux|*solaris)
+    batocera|*bsd|freedos|haiku|linux*|*solaris)
         CPU="-cpu host,kvm=on"
         if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
             CPU="${CPU},topoext"
@@ -742,7 +742,9 @@ function vm_boot() {
     fi
 
     # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
-    if [ "${guest_os}" == "linux" ]; then
+    if [ "${guest_os}" == "linux_old" ]; then
+        DISPLAY_DEVICE="vmware-svga"
+    elif [ "${guest_os}" == "linux" ]; then
         case ${OUTPUT} in
         none|spice|spice-app)
             DISPLAY_DEVICE="virtio-gpu";;
