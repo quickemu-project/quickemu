@@ -3841,8 +3841,8 @@ handle_missing() {
 }
 
 os_error() {
-    echo "ERROR! You must specify an operating system."
-    echo "- Supported Operating Systems:"
+    echo 'ERROR! You must specify an operating system.'
+    echo '- Supported Operating Systems:'
     os_support | fold -s -w "$(tput cols)"
     echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
@@ -3855,34 +3855,34 @@ os_not_supported() {
 }
 
 os_path_error() {
-    echo "ERROR! You must specify path."
+    echo 'ERROR! You must specify path.'
     os_error
     exit 1
 }
 
 os_error_release() {
-    echo "ERROR! You must specify a release."
+    echo 'ERROR! You must specify a release.'
     case ${OS} in
       *ubuntu-server*)
-        echo -n " - Releases: "
+        echo -n ' - Releases: '
         releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
       *ubuntu*)
-        echo -n " - Releases: "
+        echo -n ' - Releases: '
         releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
         ;;
       *windows*)
-        echo -n " - Releases: "
+        echo -n ' - Releases: '
         "releases_${OS}"
-        echo -n " - Languages: "
+        echo -n ' - Languages: '
         "languages_${OS}" && echo "${LANGS[@]}"
         ;;
       *)
-        echo -n " - Releases: "
+        echo -n ' - Releases: '
         "releases_${OS}" | fold -s -w "$(tput cols)"
         if [[ $(type -t "editions_${OS}") == function ]]; then
             echo -n ' - Editions: '
-            "editions_${OS}"
+            "editions_${OS}" | fold -s -w "$(tput cols)"
         fi
         ;;
     esac
