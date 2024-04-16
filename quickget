@@ -413,7 +413,7 @@ list_isos() {
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
                     validate_release releases_"${OS}"
-                    get_"${OS}" "${OPTION}" | cut_1 || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
+                    get_"${OS}" "${OPTION}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
@@ -425,16 +425,16 @@ list_isos() {
             #TODO NEEDED?
             elif [[ "${OS}" == "macos" ]]; then
                 validate_release releases_"${OS}"
-                get_macos || echo "${OS} ${RELEASE} ${OPTION} ERROR!"
+                get_macos || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
             elif [[ "${OS}" == *"ubuntu"* ]]; then
                 validate_release releases_ubuntu
-                get_ubuntu || echo "${OS} ${RELEASE} ERROR!"
+                get_ubuntu || echo "ERROR! - ${OS} ${RELEASE}"
             elif [[ "${OS}" == *"ubuntu-server"* ]]; then
                 validate_release releases_ubuntu
-                get_ubuntu-server || echo "${OS} ${RELEASE} ERROR!"
+                get_ubuntu-server || echo "ERROR! - ${OS} ${RELEASE}"
             else
                 validate_release releases_"${OS}"
-                get_"${OS}" "${RELEASE}" | cut_1 || echo "${OS} ${RELEASE} ERROR!"
+                get_"${OS}" "${RELEASE}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE}"
             fi
         done
     done
