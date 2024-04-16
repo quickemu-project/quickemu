@@ -3439,7 +3439,11 @@ function curl_windows() {
 }
 
 function download_windows_server() {
-    # Download enterprise evaluation windows versions
+    # Copyright (C) 2024 Elliot Killick <contact@elliotkillick.com>
+    # This function is adapted from the Mido project:
+    # https://github.com/ElliotKillick/Mido
+
+    # Download enterprise evaluation Windows versions
     local windows_version="$1"
     local enterprise_type="$2"
 
@@ -3522,18 +3526,9 @@ function download_windows_server() {
 }
 
 function download_windows_workstation() {
+    # This function is adapted from the Mido project:
+    # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
-    # This function aims to precisely emulate what Fido does down to the URL requests and HTTP headers (exceptions: updated user agent and referer adapts to Windows version instead of always being "windows11") but written in POSIX sh (with coreutils) and curl instead of PowerShell (also simplified to greatly reduce attack surface)
-    # However, differences such as the order of HTTP headers and TLS stacks (could be used to do TLS fingerprinting) still exist
-    #
-    # Command translated: ./Fido -Win 10 -Lang English -Verbose
-    # "English" = "English (United States)" (as opposed to the default "English (International)")
-    # For testing Fido, replace all "https://" with "http://" and remove all instances of "-MaximumRedirection 0" (to allow redirection of HTTP traffic to HTTPS) so HTTP requests can easily be inspected in Wireshark
-    # Fido (command-line only) works under PowerShell for Linux if that makes it easier for you
-    # UPDATE: Fido v1.4.2+ no longer works without being edited on Linux due to these issues on the Fido GitHub repo (and possibly others after these): #56 and #58
-    #
-    # If this function in Mido fails to work for you then please test with the Fido script before creating an issue because we basically just copy what Fido does exactly:
-    # https://github.com/pbatard/Fido
 
     # Either 8, 10, or 11
     local windows_version="$1"
