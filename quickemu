@@ -548,7 +548,14 @@ function vm_boot() {
 
         OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
         # Disable S3 support in the VM to prevent macOS suspending during install
-        GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
+        GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
+
+        # Disable High Precision Timer
+        if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+          MACHINE_TYPE+=",hpet=off"
+        else
+          GUEST_TWEAKS+=" -no-hpet"
+        fi
 
         # Tune Qemu optimisations based on the macOS release, or fallback to lowest
         # common supported options if none is specified.
@@ -596,7 +603,14 @@ function vm_boot() {
         fi
         # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
         #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-        GUEST_TWEAKS="-no-hpet -global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1"
+        GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1"
+
+        # Disable High Precision Timer
+        if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+          MACHINE_TYPE+=",hpet=off"
+        else
+          GUEST_TWEAKS+=" -no-hpet"
+        fi
 
         if [ -z "${disk_size}" ]; then
             disk_size="64G"
