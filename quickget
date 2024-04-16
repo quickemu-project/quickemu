@@ -3392,6 +3392,41 @@ handle_curl_error() {
     return 1
 }
 
+function curl_windows() {
+    local part_ext=".PART"
+    local vm_path="$1"
+    local out_file="$2"
+    local tls_version="$3"
+    local url="$4"
+
+    mkdir -p "${vm_path}"
+
+    real_file="${vm_path}/${out_file}"
+    part_file="${vm_path}/${out_file}${part_ext}"
+
+    # --location: Microsoft likes to change which endpoint these downloads are stored on but is usually kind enough to add redirects
+    # --fail: Return an error on server errors where the HTTP response code is 400 or greater
+    curl --progress-bar --location --output "${part_file}" --continue-at - --max-filesize 10G --fail --proto =https "--tlsv$tls_version" --http1.1 -- "$url" || {
+        error_code=$?
+        handle_curl_error "$error_code"
+        error_action=$?
+
+        # Clean up and make sure a future resume doesn't happen from a bad download resume file
+        if [ -f "${part_file}" ]; then
+            # If file is empty, bad HTTP code, or bad download resume file
+            if [ ! -s "${part_file}" ] || [ "$error_code" = 22 ] || [ "$error_code" = 36 ]; then
+                echo "- Deleting failed download..."
+                rm -f "${part_file}"
+            fi
+        fi
+
+        return "$error_action"
+    }
+
+    # Full downloaded succeeded
+    mv "${part_file}" "${real_file}"
+}
+
 function download_windows-server() {
     # Download enterprise evaluation windows versions
     local windows_version="$1"
