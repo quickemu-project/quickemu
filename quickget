@@ -3662,6 +3662,13 @@ fi
 
 LANGS=()
 
+os_error_edition() {
+    echo -en "ERROR! You must specify an edition.\n - Editions: "
+    #TODO ERROR here
+    "editions_${OS}"
+    exit 1
+}
+
 os_supported_lang() {
     echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
     echo -n ' - Editions: '
@@ -3811,9 +3818,7 @@ if [ -n "${2}" ]; then
                 exit 1
             fi
         else
-            echo -en "ERROR! You must specify an edition.\n - Editions: "
-            editions_"${OS}"
-            exit 1
+            os_error_edition
         fi
 
         handle_missing
