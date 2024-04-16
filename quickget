@@ -35,12 +35,6 @@ function os_about() {
     echo "${ABOUT}"
 }
 
-function os_credentials() {
-    local SIMPLE_NAME=""
-    local CREDE=""
-    SIMPLE_NAME="${1}"
-    CREDE=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f3)
-    echo "${CREDE}"
 }
 
 function os_info() {
@@ -188,6 +182,13 @@ elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
         set -- "$2"
     fi
 fi
+function os_credentials() {
+    local SIMPLE_NAME=""
+    local CREDE=""
+    SIMPLE_NAME="${1}"
+    CREDE=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f3)
+    echo "${CREDE}"
+}
 
 function pretty_name() {
   local SIMPLE_NAME=""
