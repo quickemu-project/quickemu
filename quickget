@@ -920,11 +920,11 @@ function editions_endless() {
 }
 
 function releases_fedora() {
+  echo 39 38
 }
 
 function releases_batocera() {
   echo latest
-    echo 39 38
 }
 
 function editions_fedora() {
