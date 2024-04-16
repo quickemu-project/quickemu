@@ -250,12 +250,14 @@ function vm_boot() {
     elif [ -e /etc/os-release ]; then
         LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
     fi
+    # Strip quotes from LSB_DESCRIPTION
+    LSB_DESCRIPTION="$(echo "${LSB_DESCRIPTION}" | sed 's/"//')"
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
     echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
 
     HOST_CPU_CORES=$(nproc)
-    HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed 's/  //g')
+    HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
     HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
     HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
 
