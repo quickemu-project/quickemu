@@ -718,6 +718,11 @@ function os_homepages(){
     echo "${HOMEPAGE}"
 }
 
+# Get string before first whitespace (HASH)
+function cut_1() {
+    cut -d' ' -f1
+}
+
 function releases_alma() {
     echo 9 8
 }
