@@ -189,6 +189,14 @@ elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
     fi
 fi
 
+function os_homepage(){
+    local SIMPLE_NAME=""
+    local HOMEP=""
+    SIMPLE_NAME="${1}"
+    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
+    echo "$HOMEP"
+}
+
 function pretty_name() {
   local SIMPLE_NAME=""
   local PRETTY_NAME=""
