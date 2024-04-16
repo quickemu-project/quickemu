@@ -739,11 +739,11 @@ function editions_antix() {
 	echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
 }
 
-function releases_archlinux() {
+function releases_archcraft() {
     echo latest
 }
 
-function releases_archcraft() {
+function releases_archlinux() {
     echo latest
 }
 
@@ -798,6 +798,10 @@ function releases_athenaos() {
     wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
 }
 
+function releases_batocera() {
+    echo latest
+}
+
 function releases_bazzite() {
     echo $(wget -q -O- "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | tr '\n' ' ')
 }
@@ -818,16 +822,16 @@ function editions_blendos() {
     echo "${BLENDOS_EDITIONS}"
 }
 
-function releases_bunsenlabs() {
-    echo latest
-}
-
 function releases_bodhi() {
     echo 7.0.0
 }
 
 function editions_bodhi() {
     echo standard hwe s76
+}
+
+function releases_bunsenlabs() {
+    echo latest
 }
 
 function releases_cachyos() {
@@ -911,11 +915,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-  echo 39 38
-}
-
-function releases_batocera() {
-  echo latest
+    echo 39 38
 }
 
 function editions_fedora() {
@@ -1027,6 +1027,10 @@ function releases_lmde(){
     echo 5
 }
 
+function releases_macos() {
+    echo high-sierra mojave catalina big-sur monterey ventura sonoma
+}
+
 function releases_mageia(){
     echo 8
 }
@@ -1035,31 +1039,20 @@ function editions_mageia(){
     echo Plasma GNOME Xfce
 }
 
+function editions_manjaro(){
+    echo full minimal
+}
+
+function releases_manjaro() {
+    echo xfce gnome plasma budgie cinnamon i3 mate sway
+}
+
 function releases_mxlinux(){
     echo 21.3
 }
 
 function editions_mxlinux(){
     echo Xfce KDE Fluxbox
-}
-
-function editions_manjaro(){
-    echo full minimal
-}
-
-function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura sonoma
-}
-
-function releases_manjaro() {
-    echo xfce \
-    gnome \
-    plasma \
-    budgie \
-    cinnamon \
-    i3 \
-    mate \
-    sway
 }
 
 function releases_netboot() {
