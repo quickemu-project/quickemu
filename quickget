@@ -441,6 +441,60 @@ list_isos() {
     exit 0
 }
 
+test_isos() {
+    local testIsoUrl=on
+    local DIR="/dev/null"
+    local FUNC
+    local OPTION
+    local OS
+
+    check_it() {
+        validate_release releases_"${OS}"
+        URL=$(get_"${OS}" "${OPTION}" | cut_1)
+        GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+    }
+
+    for OS in $(os_support); do
+        local GOOD=""
+        case "${OS}" in
+          *ubuntu-server*) FUNC="ubuntu-server";;
+          *ubuntu*) FUNC="ubuntu";;
+          *) FUNC="${OS}";;
+        esac
+        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+            if [[ $(type -t "editions_${OS}") == function ]]; then
+                for OPTION in $(editions_"${OS}"); do
+                    check_it
+                done
+            elif [[ "${OS}" == "windows"* ]]; then
+                # skipping because of microsoft
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    GOOD='ERROR!'
+                done
+            elif [[ "${OS}" == *"ubuntu"* ]]; then
+                URL=$(get_"${OS}" )
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+            elif [[ "${OS}" == *"ubuntu-server"* ]]; then
+                URL="$(get_ubuntu-server)"
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+            else
+                validate_release releases_"${OS}"
+                URL=$(get_"${OS}" "${RELEASE}" | cut_1)
+                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+            fi
+
+        if [[ "${GOOD}" == "OK" ]]; then
+            echo "OK - ${OS} ${RELEASE} ${OPTION} ${URL}"
+        else
+            echo "ERROR - ${OS} ${RELEASE} ${OPTION} ${URL}"
+        fi
+
+        done
+    done
+    exit 0
+}
+
 function os_support() {
     echo alma \
     alpine \
