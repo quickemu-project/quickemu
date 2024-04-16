@@ -27,9 +27,6 @@ function cleanup() {
   fi
 }
 
-
-}
-
 function os_info() {
     local SIMPLE_NAME=""
     local INFO=""
