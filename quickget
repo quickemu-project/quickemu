@@ -3662,6 +3662,14 @@ fi
 
 LANGS=()
 
+os_error() {
+    echo "ERROR! You must specify an operating system."
+    echo "- Supported Operating Systems:"
+    os_support | fold -s -w "$(tput cols)"
+    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
+    exit 1
+}
+
 os_not_supported() {
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support | fold -s -w "$(tput cols)"
