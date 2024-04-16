@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 14, 2024
+date: April 16, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -414,6 +414,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
 -   `primtux` (Primtux)
+-   `pureos` (PureOS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
@@ -429,6 +430,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
+-   `tuxedo-os` (Tuxedo OS)
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
