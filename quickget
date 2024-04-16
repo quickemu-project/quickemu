@@ -27,6 +27,14 @@ function cleanup() {
   fi
 }
 
+function os_credentials() {
+    local SIMPLE_NAME=""
+    local CREDE=""
+    SIMPLE_NAME="${1}"
+    CREDE=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f3)
+    echo "${CREDE}"
+}
+
 function os_info() {
     local SIMPLE_NAME=""
     local INFO=""
