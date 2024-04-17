@@ -992,7 +992,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    wget -q https://github.com/HoloISO/holoiso/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
+    wget -q https://github.com/HoloISO/releases/releases/latest -O- | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -1 | cut -d/ -f3
 }
 
 function releases_kali() {
@@ -1446,10 +1446,6 @@ function web_get() {
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}: ${FILE}
-    fi
-
-    if [ "${OS}" != "macos" ]; then
-      USER_AGENT="InternetRecovery/1.0"
     fi
 
     if command -v curl &>/dev/null; then
@@ -2277,11 +2273,9 @@ function get_haiku() {
 
 function get_holoiso() {
     #local HASH=""
-    local ISO=$(wget -q -O- "https://api.github.com/repos/HoloISO/holoiso/releases" | sed 's/ /\n/g' | grep "HoloISO_${RELEASES}" | cut -d'\' -f1 | cut -d'/' -f4)
-    local URL="https://cd2.holoiso.ru.eu.org"
-    # Can't find hash
-    #HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
-    echo "${URL}/${ISO} #${HASH}"
+    local URL
+    URL=$(wget -q -O- "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
+    echo "${URL}"
 }
 
 function get_kali() {
