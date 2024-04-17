@@ -286,23 +286,17 @@ function pretty_name_new() {
 }
 
 function validate_release() {
-  local DISPLAY_NAME=""
-  local RELEASE_GENERATOR=""
-  local RELEASES=""
-
-  DISPLAY_NAME="$(pretty_name "${OS}")"
-  case ${OS} in
-    *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
-    *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
-    *) RELEASE_GENERATOR="${1}";;
-  esac
-
-  RELEASES=$(${RELEASE_GENERATOR})
-  if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-      echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
-      echo -n "${RELEASES}"
-      exit 1
-  fi
+    local DISPLAY_NAME=""
+    local RELEASE_GENERATOR=""
+    local RELEASES=""
+    DISPLAY_NAME="$(pretty_name "${OS}")"
+    case ${OS} in
+      *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
+      *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
+      *) RELEASE_GENERATOR="${1}";;
+    esac
+    RELEASES=$(${RELEASE_GENERATOR})
+    os_supported_release
 }
 
 function list_json() {
