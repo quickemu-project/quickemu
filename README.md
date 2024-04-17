@@ -172,6 +172,7 @@ requirements manually:
     SPICE & VirtFS support**
 -   [bash](https://www.gnu.org/software/bash/) (*4.0 or newer*)
 -   [Coreutils](https://www.gnu.org/software/coreutils/)
+-   [curl](https://curl.se/)
 -   [EDK II](https://github.com/tianocore/edk2)
 -   [grep](https://www.gnu.org/software/grep/)
 -   [jq](https://stedolan.github.io/jq/)
