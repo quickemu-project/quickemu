@@ -14,6 +14,7 @@ Package: quickemu
 Architecture: all
 Depends:
  coreutils,
+ curl,
  genisoimage,
  jq,
  procps,
