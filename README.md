@@ -26,7 +26,7 @@ Quickemu is available in the repositories of the following distros
 <tbody>
 <tr valign="top">
 <td>
-  
+
 [![Packaging
 status of quickemu](https://repology.org/badge/vertical-allrepos/quickemu.svg?header=quickemu)](https://repology.org/project/quickemu/versions)
 
@@ -35,7 +35,7 @@ status of quickemu](https://repology.org/badge/vertical-allrepos/quickemu.svg?he
 
 [![Packaging
 status](https://repology.org/badge/vertical-allrepos/quickgui.svg?header=quickgui)](https://repology.org/project/quickgui/versions)
-  
+
 </td>
 </tr>
 </tbody>
@@ -317,8 +317,8 @@ with your preferred flavour.
 You can also use `quickget` with options to:
 
 ``` shell
-    # show an OS ISO download URL for {os} {release} [edition] 
-    quickget --show-iso-url fedora 38 Silverblue   
+    # show an OS ISO download URL for {os} {release} [edition]
+    quickget --show-iso-url fedora 38 Silverblue
     # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
