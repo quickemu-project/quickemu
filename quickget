@@ -2731,11 +2731,7 @@ function get_rockylinux() {
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
     local URL=""
 
-    case ${RELEASE} in
-      9.1) URL="https://download.rockylinux.org/pub/rocky/9/isos/x86_64";;
-      8.7) URL="https://download.rockylinux.org/pub/rocky/8/isos/x86_64";;
-      *)   URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64";;
-    esac
+    URL="http://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
     HASH=$(wget -q -O- "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
