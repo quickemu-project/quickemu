@@ -867,10 +867,11 @@ function releases_crunchbang++() {
 }
 
 function releases_debian() {
-    DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
-    local DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- |grep -e '>[1-9][0-9]\.'|grep -v 'live' | cut -d\> -f9|cut -d\/ -f1 )
-
-    echo  ${DEBOLD} ${DEBCURRENT}
+    local DEBOLD
+    DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- | grep '\.[0-9]/' | cut -d\> -f9 | cut -d\/ -f1)
+    DEBOLD=$(wget -q https://cdimage.debian.org/cdimage/archive/ -O- | grep -e '>[1-9][0-9]\.' | grep -v 'live' | cut -d\> -f9 | cut -d'/' -f1 | tac)
+    echo -n "${DEBCURRENT}"
+    echo ${DEBOLD}
 }
 
 function editions_debian() {
