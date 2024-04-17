@@ -342,7 +342,7 @@ function list_csv() {
     SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-      if [[ "${OS}" == *"ubuntu"* ]] && [ "${RELEASE}" == "devel" ] && [ ${HAS_ZSYNC} -eq 1 ]; then
+      if [[ "${OS}" == *"ubuntu"* ]] && [[ ${RELEASE} == *"daily"*  ]] && [ ${HAS_ZSYNC} -eq 1 ]; then
         DOWNLOADER="zsync"
       else
         DOWNLOADER="${DL}"
