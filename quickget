@@ -313,7 +313,7 @@ function list_json() {
 
 function list_csv() {
   local DISPLAY_NAME
-  local DL=""
+  local DL="wget"
   local DOWNLOADER
   local FUNC
   local OPTION
@@ -326,12 +326,6 @@ function list_csv() {
   # Check if zsync is available
   if command -v zsync &>/dev/null; then
     HAS_ZSYNC=1
-  fi
-
-  if command -v aria2c &>/dev/null; then
-    DL="aria2c"
-  elif command -v wget &>/dev/null; then
-    DL="wget"
   fi
 
   echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
@@ -1423,6 +1417,7 @@ function web_get() {
     local DIR="${2}"
     local FILE=""
     local URL="${1}"
+    local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 
     if [ -n "${3}" ]; then
         FILE="${3}"
@@ -1456,23 +1451,28 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION} from ${URL}
+        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}: ${FILE}
     fi
 
-    if command -v aria2c &>/dev/null; then
-        if ! aria2c --stderr -x16 --continue=true --summary-interval=0 --download-result=hide --console-log-level=error "${URL}" --dir "${DIR}" -o "${FILE}" "${HEADERS[@]}"; then
-          echo #Necessary as aria2c in suppressed mode does not have new lines
-          echo "ERROR! Failed to download ${URL} with aria2c. Try running 'quickget' again."
-          exit 1
+    if [ "${OS}" != "macos" ]; then
+      USER_AGENT="InternetRecovery/1.0"
+    fi
+
+    if command -v curl &>/dev/null; then
+        if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+            echo "ERROR! Failed to download ${URL} with curl."
+            echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
+            exit 1
         fi
-        echo #Necessary as aria2c in suppressed mode does not have new lines
     elif command -v wget2 &>/dev/null; then
         if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-            echo "ERROR! Failed to download ${URL} with wget2. Try running 'quickget' again."
+            echo "ERROR! Failed to download ${URL} with wget2."
+            echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
             exit 1
         fi
     elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-        echo "ERROR! Failed to download ${URL} with wget. Try running 'quickget' again."
+        echo "ERROR! Failed to download ${URL} with wget."
+        echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
         exit 1
     fi
 }
@@ -1513,7 +1513,7 @@ function zsync_get() {
             rm "${DIR}/${OUT}.zs-old"
         fi
     else
-        echo "INFO: zsync not found, falling back to wget/aria2c"
+        echo "INFO: zsync not found, falling back to curl/wget"
         if [ -n "${3}" ]; then
             web_get "${1}" "${2}" "${3}"
         else
