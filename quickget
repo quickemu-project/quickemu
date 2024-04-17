@@ -2418,7 +2418,7 @@ function get_macos() {
         if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
             exit 1
         fi
-        echo 'Skipping verification' && skipVerification=true
+        echo 'Skipping verification' && skipVerification="true"
     fi
 
     OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
@@ -2462,12 +2462,13 @@ function get_macos() {
         fi
     fi
 
-    if [ $skipVerification != true ]; then
-        if ! python3 "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+    if [ "${skipVerification}" != "true" ]; then
+        if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
             echo "Verification failed."
             exit 1
+        else
+            echo "Verified macOS ${RELEASE} image using chunklist."
         fi
-        echo "Verified macOS ${RELEASE} image using chunklist."
     else
         echo "Skipping verification of image."
     fi
