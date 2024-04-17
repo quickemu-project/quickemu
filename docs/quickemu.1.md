@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 14, 2024
+date: April 17, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -414,6 +414,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
 -   `primtux` (Primtux)
+-   `pureos` (PureOS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
 -   `rockylinux` (Rocky Linux)
@@ -429,6 +430,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
+-   `tuxedo-os` (Tuxedo OS)
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
@@ -506,17 +508,24 @@ macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
     macOS disk image will only ever get larger and will not shrink even
     when you delete lots of data inside macOS.
     -   To enable TRIM, open the Terminal application and type the
-        following command followed by pressing command on the hard disk
-        when files are deleted:
+        following command followed by pressing
+        `<kbd>`{=html}enter`</kbd>`{=html} to tell macos to use the TRIM
+        command on the hard disk when files are deleted:
 
 ``` shell
 sudo trimforce enable
 ```
 
 You will be prompted to enter your account's password to gain the
-privilege needed. Once you've entered your password and pressed in the
-form of two questions that require you to type response as though you
-said "no":
+privilege needed. Once you've entered your password and pressed
+`<kbd>`{=html}enter`</kbd>`{=html} the command will request confirmation
+in the form of two questions that require you to type
+`<kbd>`{=html}y`</kbd>`{=html} (for a "yes" response) followed by
+`<kbd>`{=html}enter`</kbd>`{=html} to confirm.
+
+If you press `<kbd>`{=html}enter`</kbd>`{=html} without first typing
+`<kbd>`{=html}y`</kbd>`{=html} the system will consider that a negative
+response as though you said "no":
 
 ``` plain
 IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
