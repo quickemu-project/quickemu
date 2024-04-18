@@ -3312,6 +3312,17 @@ function curl_windows() {
             fi
         fi
 
+        local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
+        case "$windows_version" in
+          8 | 10) url="${url}ISO";;
+        esac
+
+        echo
+        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
+        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
+        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
+        echo " - Continuing with the VM creation process..."
+
         return "$error_action"
     }
 
