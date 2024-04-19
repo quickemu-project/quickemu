@@ -2663,16 +2663,16 @@ function get_pureos() {
     local ISO=""
     local URL=""
     local PureName=
-    PureName="$(wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 4)"
+    PureName="$(web_pipe "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 4)"
     local PureDate=
-    PureDate="$(wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 6)"
+    PureDate="$(web_pipe "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '/' -f 6)"
     local PureDateSquashed="${PureDate//'-'/}"
     edition="${EDITION,,}"
     URL="https://downloads.puri.sm/${PureName}/${edition}/${PureDate}"
     ISO="pureos-${RELEASE}-${edition}-live-${PureDateSquashed}_amd64.iso"
     local IsoTrimmed=
     IsoTrimmed="${ISO%.*}"
-    HASH="$(wget -q -O- "${URL}/${IsoTrimmed}.checksums_sha256.txt" | grep -m 1 '.iso' | cut -d '.' -f 1)"
+    HASH="$(web_pipe "${URL}/${IsoTrimmed}.checksums_sha256.txt" | grep -m 1 '.iso' | cut -d '.' -f 1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
