@@ -2947,14 +2947,14 @@ function get_void() {
     local HASH=""
     local ISO=""
     local URL="https://repo-default.voidlinux.org/live/current"
-    DATE=$(wget -q -O- "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
+    DATE=$(web_pipe "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
     case ${EDITION} in
       glibc) ISO="void-live-x86_64-${DATE}-base.iso";;
       musl) ISO="void-live-x86_64-musl-${DATE}-base.iso";;
       xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
       xfce-musl) ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
-    HASH="$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
