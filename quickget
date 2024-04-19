@@ -2309,7 +2309,7 @@ function get_linuxmint() {
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
