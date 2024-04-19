@@ -1895,13 +1895,9 @@ function get_blendos() {
 }
 
 function get_vanillaos() {
-  # maybe use github api and dynamism for R2.0 but for 22.10 just
-  # hit their CDN
-  #
-  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.md5.txt
-  # https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt
-    local HASH=$(curl -s "https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.sha256.txt" | cut -d' ' -f1)
-    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r8/VanillaOS-22.10-all.20230226.iso"
+    # TODO: Dynamically get the latest release from GitHub
+    local HASH=$(web_pipe "https://cdn.vanillaos.org/assets/ISO/22.10-r9/VanillaOS-22.10-all.20231009.sha256.txt" | cut_1)
+    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r9/VanillaOS-22.10-all.20231009.iso"
     echo "${URL} ${HASH}"
 }
 
