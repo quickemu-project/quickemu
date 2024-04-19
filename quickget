@@ -2653,7 +2653,7 @@ function get_primtux() {
     local ISO=""
     ISO="PrimTux${RELEASE}-amd64-${EDITION}.iso"
     URL="https://sourceforge.net/projects/primtux/files/Distribution"
-    HASH=$(wget -q -O- "${URL}/${ISO}.md5" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
