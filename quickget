@@ -1891,7 +1891,7 @@ function get_blendos() {
     latest_blendos_release="$(grep "${EDITION}" /tmp/blendos-isos.rss | cut -d '/' -f 9 | sort -nr | head -n 1)"
     URL=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
     HASH=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
-      echo "${URL} ${HASH}"
+    echo "${URL} ${HASH}"
 }
 
 function get_vanillaos() {
@@ -1905,7 +1905,7 @@ function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
     local ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
-     echo "${URL}/${ISO} ${HASH}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bazzite() {
@@ -1957,7 +1957,6 @@ function get_centos-stream() {
         HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
         ;;
     esac
-
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2012,9 +2011,9 @@ function get_debian() {
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
     DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
-   case ${RELEASE} in
+    case ${RELEASE} in
       "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-      *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
+      *) URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
     if [ "${EDITION}" == "netinst" ]; then
         URL="${URL/-live/}"
@@ -2119,7 +2118,7 @@ function get_endless() {
     # Endless edition names are "base" for the small minimal one or the Language for the large full release
     # The isos are stamped as they are finished so ....
     case ${EDITION} in
-      base)
+        base)
           FILE_TS="230127-211122";;
         fr)
           FILE_TS="230127-213415";;
@@ -2129,10 +2128,10 @@ function get_endless() {
           FILE_TS="230127-212646";;
         pt_BR)
           FILE_TS="230127-220328";;
-      esac
-      URL="https://images-dl.endlessm.com/release/${RELEASE}/eos-amd64-amd64/${EDITION}"
-      ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
-      echo "${URL}/${ISO}"
+    esac
+    URL="https://images-dl.endlessm.com/release/${RELEASE}/eos-amd64-amd64/${EDITION}"
+    ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_fedora() {
