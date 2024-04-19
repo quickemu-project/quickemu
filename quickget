@@ -2849,9 +2849,9 @@ function get_tuxedo-os() {
     local ISO=""
     local URL=""
     local Current=
-    Current="$(wget -O- -q "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
+    Current="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
     URL="https://os.tuxedocomputers.com/${Current}"
-    HASH="$(wget -q -O- "https://os.tuxedocomputers.com/checksums/${Current}.sha256" | cut -d ' ' -f 1)"
+    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${Current}.sha256" | cut -d ' ' -f 1)"
     echo "${URL} ${HASH}"
 }
 
