@@ -2011,7 +2011,7 @@ function get_debian() {
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
-    DEBCURRENT=$(wget -q https://cdimage.debian.org/debian-cd/ -O- |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
+    DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
    case ${RELEASE} in
       "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
       *)      URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
@@ -2021,7 +2021,7 @@ function get_debian() {
         URL="${URL/hybrid/cd}"
         ISO="${ISO/-live/}"
     fi
-    HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
