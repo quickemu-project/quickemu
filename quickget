@@ -1880,7 +1880,7 @@ function get_bunsenlabs() {
     local HASH=""
     local ISO="beryllium-1-amd64.hybrid.iso"
     local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(wget -q -O- "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
