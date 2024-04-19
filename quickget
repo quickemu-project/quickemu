@@ -2514,7 +2514,7 @@ function get_netbsd() {
     local HASH=""
     local ISO="NetBSD-${RELEASE}-amd64.iso"
     local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images/"
-    HASH=$(wget -q -O- "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
