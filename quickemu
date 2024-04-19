@@ -251,7 +251,7 @@ function vm_boot() {
         LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
     fi
     # Strip quotes from LSB_DESCRIPTION
-    LSB_DESCRIPTION="$(echo "${LSB_DESCRIPTION}" | sed 's/"//')"
+    LSB_DESCRIPTION="$(echo "${LSB_DESCRIPTION}" | sed 's/"//g')"
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
     echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
