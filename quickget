@@ -2643,7 +2643,7 @@ function get_porteus() {
     edition="${EDITION~~}"
     ISO="Porteus-${edition}-v${RELEASE}-x86_64.iso"
     URL="https://mirrors.dotsrc.org/porteus/x86_64/Porteus-v${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/sha256sums.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
