@@ -2823,7 +2823,7 @@ function get_trisquel() {
       kde) ISO="triskel_${RELEASE}_amd64.iso";;
       sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
