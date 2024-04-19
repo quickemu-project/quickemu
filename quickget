@@ -1302,7 +1302,7 @@ function releases_truenas-core() {
 }
 
 function releases_truenas-scale() {
-    echo 22.12 22.02
+    echo 23
 }
 
 function releases_tuxedo-os() {
