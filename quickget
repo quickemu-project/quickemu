@@ -2300,7 +2300,7 @@ function get_linuxlite() {
     local HASH=""
     local ISO="linux-lite-${RELEASE}-64bit.iso"
     local URL="https://sourceforge.net/projects/linux-lite/files/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
