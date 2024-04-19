@@ -2598,8 +2598,8 @@ function get_parrotsec() {
     local URL=""
     ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
     URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
-    HASH="$(wget -q -O- ${URL}/signed-hashes.txt | grep ${ISO} | cut -d' ' -f1)"
-    echo "${URL}/${ISO}" "${HASH}"
+    HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep "${ISO}" | cut_1)"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_peppermint() {
