@@ -1845,9 +1845,9 @@ function get_artixlinux() {
     local HASH=""
     local ISO=""
     local URL="https://iso.artixlinux.org/iso"
-    DATE=$(wget -q -O- ${URL}/sha256sums | cut -d'-' -f4 | head -1)
+    DATE=$(web_pipe "${URL}/sha256sums" | cut -d'-' -f4 | head -1)
     ISO="artix-${EDITION}-${DATE}-x86_64.iso"
-    HASH=$(wget -q -O- ${URL}/sha256sums | grep "${ISO}")
+    HASH=$(web_pipe "${URL}/sha256sums" | grep "${ISO}")
     echo "${URL}/${ISO} ${HASH}"
 }
 
