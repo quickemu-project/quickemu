@@ -1444,6 +1444,11 @@ function check_hash() {
     fi
 }
 
+function web_pipe() {
+    local URL="${1}"
+    curl --silent --location "${URL}"
+}
+
 function web_get() {
     local DIR="${2}"
     local FILE=""
