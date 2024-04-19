@@ -138,12 +138,12 @@ function os_info() {
     echo "${INFO}"
 }
 
-function os_about() {
+pretty_name() {
     local SIMPLE_NAME=""
-    local ABOUT=""
+    local PRETTY_NAME=""
     SIMPLE_NAME="${1}"
-    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
-    echo "${ABOUT}"
+    PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
+    echo "${PRETTY_NAME}"
 }
 
 function os_basedof() {
@@ -153,38 +153,6 @@ function os_basedof() {
     BASED=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f2)
     echo "${BASED}"
 }
-
-if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
-    test_iso_url="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
-    show_iso_url="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
-    open_distro_homepage="on"
-    set -- "$2"
-elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
-    download_iso="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-fi
 
 function os_credentials() {
     local SIMPLE_NAME=""
@@ -200,93 +168,6 @@ function os_homepage(){
     SIMPLE_NAME="${1}"
     HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
     echo "$HOMEP"
-}
-
-function pretty_name() {
-  local SIMPLE_NAME=""
-  local PRETTY_NAME=""
-  SIMPLE_NAME="${1}"
-  case ${SIMPLE_NAME} in
-    alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linux";;
-    android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
-    archcraft)          PRETTY_NAME="Archcraft";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
-    artixlinux)         PRETTY_NAME="Artix Linux";;
-    atheanos)           PRETTY_NAME="Athena OS";;
-    biglinux)           PRETTY_NAME="BigLinux";;
-    blendos)            PRETTY_NAME="BlendOS";;
-    cachyos)            PRETTY_NAME="CachyOS";;
-    centos-stream)      PRETTY_NAME="CentOS Stream";;
-    chimeralinux)       PRETTY_NAME="Chimera Linux";;
-    crunchbang++)       PRETTY_NAME="Crunchbang++";;
-    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
-    easyos)             PRETTY_NAME="EasyOS";;
-    elementary)         PRETTY_NAME="elementary OS";;
-    endeavouros)        PRETTY_NAME="EndeavourOS";;
-    endless)            PRETTY_NAME="Endless OS";;
-    freebsd)            PRETTY_NAME="FreeBSD";;
-    freedos)            PRETTY_NAME="FreeDOS";;
-    garuda)             PRETTY_NAME="Garuda Linux";;
-    ghostbsd)           PRETTY_NAME="GhostBSD";;
-    gnomeos)            PRETTY_NAME="GNOME OS";;
-    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
-    kdeneon)            PRETTY_NAME="KDE Neon";;
-    kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxlite)          PRETTY_NAME="Linux Lite";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
-    lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
-    mageia)             PRETTY_NAME="Mageia";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
-    netboot)            PRETTY_NAME="netboot.xyz";;
-    netbsd)             PRETTY_NAME="NetBSD";;
-    nitrux)             PRETTY_NAME="Nitrux";;
-    nixos)              PRETTY_NAME="NixOS";;
-    macos)              PRETTY_NAME="macOS";;
-    openbsd)            PRETTY_NAME="OpenBSD";;
-    openindiana)        PRETTY_NAME="OpenIndiana";;
-    opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
-    parrotsec)          PRETTY_NAME="Parrot Security";;
-    peppermint)         PRETTY_NAME="PeppermintOS";;
-    popos)              PRETTY_NAME="Pop!_OS";;
-    primtux)            PRETTY_NAME="Primtux";;
-    pureos)             PRETTY_NAME="PureOS";;
-    reactos)            PRETTY_NAME="ReactOS";;
-    rebornos)           PRETTY_NAME="RebornOS";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slint)              PRETTY_NAME="Slint";;
-    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
-    sparkylinux)        PRETTY_NAME="SparkyLinux";;
-    tinycore)           PRETTY_NAME="Tiny Core Linux";;
-    truenas-core)       PRETTY_NAME="TrueNAS Core";;
-    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
-    tuxedo-os)          PRETTY_NAME="Tuxedo OS";;
-    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
-    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
-    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
-    ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
-    vanillaos)          PRETTY_NAME="Vanilla OS";;
-    void)               PRETTY_NAME="Void Linux";;
-    vxlinux)            PRETTY_NAME="VX Linux";;
-    windows-server)     PRETTY_NAME="Windows Server";;
-    xerolinux)          PRETTY_NAME="XeroLinux";;
-    zorin)              PRETTY_NAME="Zorin OS";;
-    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
-  esac
-  echo "${PRETTY_NAME}"
-}
-
-function pretty_name_new() {
-    local SIMPLE_NAME=""
-    local PRETTY_NAME=""
-    SIMPLE_NAME="${1}"
-    PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
-    echo "${PRETTY_NAME}"
 }
 
 function validate_release() {
@@ -596,119 +477,6 @@ function os_support() {
     zorin
 }
 
-function os_homepage(){
-    local SIMPLE_NAME=""
-    local HOMEP=""
-    SIMPLE_NAME="${1}"
-    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
-    echo "$HOMEP"
-}
-
-function os_homepages(){
-    local SIMPLE_NAME=""
-    local HOMEPAGE=""
-    SIMPLE_NAME="${1}"
-    case ${SIMPLE_NAME} in
-        alma)              HOMEPAGE="https://almalinux.org/";;
-        alpine)            HOMEPAGE="https://alpinelinux.org/";;
-        android)           HOMEPAGE="https://www.android-x86.org/";;
-        antix)             HOMEPAGE="https://antixlinux.com/";;
-        archlinux)         HOMEPAGE="https://archlinux.org/";;
-        archcraft)         HOMEPAGE="https://archcraft.io/";;
-        arcolinux)         HOMEPAGE="https://arcolinux.com/";;
-        artixlinux)        HOMEPAGE="https://artixlinux.org/";;
-        athenaos)          HOMEPAGE="https://athenaos.org/";;
-        batocera)          HOMEPAGE="https://batocera.org/";;
-        bazzite)           HOMEPAGE="https://bazzite.gg/";;
-        biglinux)          HOMEPAGE="https://www.biglinux.com.br/";;
-        blendos)           HOMEPAGE="https://blendos.co/";;
-        bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
-        bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
-        cachyos)           HOMEPAGE="https://cachyos.org/";;
-        centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
-        chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
-        crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
-        debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/";;
-        devuan)            HOMEPAGE="https://www.devuan.org/";;
-        dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
-        easyos)            HOMEPAGE="https://easyos.org/";;
-        edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
-        elementary)        HOMEPAGE="https://elementary.io/";;
-        endeavouros)       HOMEPAGE="https://endeavouros.com/";;
-        endless)           HOMEPAGE="https://www.endlessos.org/os";;
-        fedora)            HOMEPAGE="https://www.fedoraproject.org/";;
-        freebsd)           HOMEPAGE="https://www.freebsd.org/";;
-        freedos)           HOMEPAGE="https://freedos.org/";;
-        garuda)            HOMEPAGE="https://garudalinux.org/";;
-        gentoo)            HOMEPAGE="https://www.gentoo.org/";;
-        ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
-        gnomeos)           HOMEPAGE="https://os.gnome.org/";;
-        guix)              HOMEPAGE="https://guix.gnu.org/";;
-        haiku)             HOMEPAGE="https://www.haiku-os.org/";;
-        holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
-        kali)              HOMEPAGE="https://www.kali.org/";;
-        kdeneon)           HOMEPAGE="https://neon.kde.org/";;
-        kolibrios)         HOMEPAGE="http://kolibrios.org/en/";;
-        kubuntu)           HOMEPAGE="https://kubuntu.org/";;
-        linuxlite)         HOMEPAGE="https://www.linuxliteos.com/";;
-        linuxmint)         HOMEPAGE="https://linuxmint.com/";;
-        lmde)              HOMEPAGE="https://www.linuxmint.com/download_lmde.php";;
-        mageia)            HOMEPAGE="https://www.mageia.org/";;
-        manjaro)           HOMEPAGE="https://manjaro.org/";;
-        mxlinux)           HOMEPAGE="https://mxlinux.org/";;
-        netboot)           HOMEPAGE="https://netboot.xyz/";;
-        netbsd)            HOMEPAGE="https://www.netbsd.org/";;
-        nitrux)            HOMEPAGE="https://nxos.org/";;
-        nixos)             HOMEPAGE="https://nixos.org/";;
-        lubuntu)           HOMEPAGE="https://lubuntu.me/";;
-        macos)             HOMEPAGE="https://www.apple.com/macos/";;
-        openbsd)           HOMEPAGE="https://www.openbsd.org/";;
-        openindiana)       HOMEPAGE="https://www.openindiana.org/";;
-        opensuse)          HOMEPAGE="https://www.opensuse.org/";;
-        oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
-        parrotsec)         HOMEPAGE="https://www.parrotsec.org/";;
-        peppermint)        HOMEPAGE="https://peppermintos.com/";;
-        popos)             HOMEPAGE="https://pop.system76.com/";;
-        porteus)           HOMEPAGE="http://www.porteus.org/";;
-        primtux)           HOMEPAGE="https://primtux.fr/";;
-        pureos)            HOMEPAGE="https://www.pureos.net/";;
-        reactos)           HOMEPAGE="https://reactos.org/";;
-        rebornos)          HOMEPAGE="https://rebornos.org/";;
-        rockylinux)        HOMEPAGE="https://rockylinux.org/";;
-        siduction)         HOMEPAGE="https://siduction.org/";;
-        slackware)         HOMEPAGE="http://www.slackware.com/";;
-        slax)              HOMEPAGE="https://www.slax.org/";;
-        slint)             HOMEPAGE="https://slint.fr/";;
-        slitaz)            HOMEPAGE="https://www.slitaz.org/";;
-        solus)             HOMEPAGE="https://getsol.us/";;
-        sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
-        spirallinux)       HOMEPAGE="https://spirallinux.github.io/";;
-        tails)             HOMEPAGE="https://tails.net/";;
-        tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
-        trisquel)          HOMEPAGE="https://trisquel.info/";;
-        truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
-        truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
-        tuxedo-os)         HOMEPAGE="https://www.tuxedocomputers.com";;
-        ubuntu)            HOMEPAGE="https://ubuntu.com/";;
-        ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
-        ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/";;
-        ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
-        ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
-        ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
-        ubuntu-unity)      HOMEPAGE="https://ubuntuunity.org/";;
-        vanillaos)         HOMEPAGE="https://vanillaos.org/";;
-        void)              HOMEPAGE="https://voidlinux.org/";;
-        vxlinux)           HOMEPAGE="https://vxlinux.org/";;
-        windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
-        windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
-        xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
-        xubuntu)           HOMEPAGE="https://xubuntu.org/";;
-        zorin)             HOMEPAGE="https://zorin.com/os/";;
-    esac
-    echo "${HOMEPAGE}"
-}
 
 # Get string before first whitespace (HASH)
 function cut_1() {
@@ -3641,14 +3409,11 @@ create_vm() {
     make_vm_config "${ISO}"
 }
 
-trap cleanup EXIT
-
-if ((BASH_VERSINFO[0] < 4)); then
-    echo "Sorry, you need bash 4.0 or newer to run this script."
-    exit 1
-fi
-
-LANGS=()
+os_supported() {
+    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
+        os_not_supported
+    fi
+}
 
 os_supported_release() {
     if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
@@ -3755,40 +3520,6 @@ os_error_release() {
     exit 1
 }
 
-if [ -n "${1}" ]; then
-    OS="${1,,}"
-    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
-        list_csv
-    elif [ "${OS}" == "list_json" ]; then
-        list_json
-    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-        WHERE=$(dirname "${BASH_SOURCE[0]}")
-        "${WHERE}/quickemu" --version
-        exit 0
-    fi
-else
-    echo "ERROR! You must specify an operating system."
-    echo -n " - Operating Systems: "
-    os_support
-    echo "
-        You can also use these arguments:
-        Only show ISO download URL
-            --show-iso-url / -s {distro} {release} [edition]
-        Test if ISO is available
-            --test-iso-url / -t {distro} {release} [edition]
-        Open distro homepage
-            --open-distro-homepage / -o {distro}
-        Only download ISO
-            --download-iso / -d {distro} {release} [edition]"
-    exit 1
-fi
-
-if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support
-    exit 1
-fi
-
 help_message() {
     #shellcheck disable=SC2016
     printf '                           _              _
@@ -3833,8 +3564,65 @@ Posible arguments:
 --------------------------------------------------------------
 supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
     os_support | fold -s -w "$(tput cols)"
-    exit 0
 }
+
+trap cleanup EXIT
+
+if ((BASH_VERSINFO[0] < 4)); then
+    echo "Sorry, you need bash 4.0 or newer to run this script."
+    exit 1
+fi
+
+LANGS=()
+
+case "${1}" in
+  -1*|-2*|-3*|-4*|-5*)
+    while getopts ":12345" opt; do
+        case $opt in
+          1) os_info "${2}" | cut -d'|' -f1;;
+          2) os_info "${2}" | cut -d'|' -f2;;
+          3) os_info "${2}" | cut -d'|' -f3;;
+          4) os_info "${2}" | cut -d'|' -f4;;
+          5) os_info "${2}" | cut -d'|' -f5;;
+        esac
+    done
+    exit 0
+    ;;
+  '--download'|'-d') downloadIso=on; shift;;
+  '--iso-somewhere'|'-i') echo "TODO:";;
+  '--open-homepage'|'-o')
+    if [ -z "$(os_info "${2}")" ]; then
+        os_error
+    else
+        open_url "$(os_info "${2}" | cut -d'|' -f4)"
+        exit 0
+    fi
+    ;;
+  '--version'|'-v') WHERE=$(dirname "${BASH_SOURCE[0]}"); "${WHERE}/quickemu" --version; exit 0;;
+  '--help'|'-h') help_message; exit 0;;
+  '--check'|'-c') testIsoUrl=on; shift;;
+  '--check-all'|'-ca') testIsoUrl=on;;
+  '--url'|'-u') showIsoUrl=on; shift;;
+  '--url-all'|'-ua') showIsoUrl=on;;
+  '--list-csv'|'-lc') list_csv;;
+  '--list-json'|'-lj') list_json;;
+  '--list'|'-l') time list_supported;;
+  '--list-urls'|'-lu') time list_isos;;
+  '--test-urls'|'-tu') time test_isos;;
+esac
+
+if [ -n "${1}" ]; then
+    OS="${1,,}"
+    case "${OS}" in
+    '-i'|'--os-info'|'-o'|'--os-homepage'|'-d'|'--iso-download')
+        os_error
+        ;;
+    esac
+else
+    os_error
+fi
+
+os_supported
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
@@ -3886,9 +3674,10 @@ if [ -n "${2}" ]; then
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
     fi
-elif [ "${open_distro_homepage}" == 'on' ]; then
-    HOMEPAGE=$(os_homepages ${OS})
-    open_url "${HOMEPAGE}" && exit 0
+elif [ $(releases_"${OS}" | wc -w) -eq 1 ] && [[ ! $(type -t "editions_${OS}") == function ]]; then
+    RELEASE=$(releases_"${OS}")
+    VM_PATH="${OS}"
+    create_vm "$("get_${OS}")"
 else
     os_error_release
 fi
