@@ -1809,7 +1809,7 @@ function get_antix() {
                   URL="${URL_runit}"
       ;;
     esac
-    HASH=$(wget -q -O- ${URL}/README.txt | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/README.txt" | grep "${ISO}" | cut -d' ' -f1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
