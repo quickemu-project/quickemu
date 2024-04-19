@@ -1601,9 +1601,12 @@ function make_vm_config() {
         ubuntu*)
             GUEST="linux"
             IMAGE_TYPE="iso"
-            local SHORT_RELEASE="$(echo "${RELEASE}" | sed s'/\.//g')"
-            if [ ${SHORT_RELEASE} -lt 1604 ]; then
-                GUEST="linux_old"
+            # If there is a point in the release, check if it is less than 16.04
+            if [[ "${RELEASE}" == "*.*" ]]; then
+                local SHORT_RELEASE=${RELEASE//./}
+                if [ "${SHORT_RELEASE}" -lt 1604 ]; then
+                    GUEST="linux_old"
+                fi
             fi
             ;;
         windows)
