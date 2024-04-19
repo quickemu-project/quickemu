@@ -2251,12 +2251,10 @@ function get_gnomeos() {
 }
 
 function get_guix() {
-    #local HASH=""
-    #local ISO="guix-system-vm-image-1.4.0.x86_64-linux.qcow2"
-    local ISO="guix-system-install-1.4.0.x86_64-linux.iso"
-    local URL="https://ftpmirror.gnu.org/gnu/guix"
-    #HASH=$(wget -q -O- "${URL}/${ISO}.sig")
-    echo "${URL}/${ISO}" #${HASH}"
+    local HASH=""
+    local ISO="guix-system-install-${RELEASE}.x86_64-linux.iso"
+    local URL="https://ftpmirror.gnu.org/gnu/guix/"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_haiku() {
