@@ -2831,8 +2831,8 @@ function get_truenas-scale() {
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-scale/"
-    URL=$(wget -q ${DLINFO} -O- | grep -o "\"https://.*${RELEASE}.*\.iso\""|cut -d\" -f2)
-    HASH=$(wget -q "${URL}.sha256" -O- | cut_1 )
+    URL=$(web_pipe ${DLINFO} | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}.sha256" | cut_1)
     echo "${URL} ${HASH}"
 }
 
