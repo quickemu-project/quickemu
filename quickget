@@ -2157,7 +2157,7 @@ function get_freebsd() {
     local HASH=""
     local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-${EDITION}.iso"
     local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2168,11 +2168,11 @@ function get_freedos() {
     case ${RELEASE} in
         1.2)
           ISO="FD12CD.iso"
-          HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1)
+          HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut_1)
           ;;
         1.3)
           ISO="FD13-LiveCD.zip"
-          HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1)
+          HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut_1)
           ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
