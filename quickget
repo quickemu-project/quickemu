@@ -1768,13 +1768,13 @@ function get_android() {
     local JSON_ALL=""
     local JSON_REL=""
     local URL="https://mirrors.gigenet.com/OSDN/android-x86"
-    JSON_ALL=$(wget -q -O- "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =" | cut -d'=' -f2-)
+    JSON_ALL=$(web_pipe "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =" | cut -d'=' -f2-)
     JSON_REL=$(echo "${JSON_ALL}" | jq --arg ver "${OS}-${EDITION}-${RELEASE}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
     ISO=$(echo "${JSON_REL}" | jq -r .n)
     HASH=$(echo "${JSON_REL}" | jq -r .hash.sha256)
     # Traverse the directories to find the .iso location
-    for DIR in $(wget -4 -q -O- "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
-        if wget -4 -q -O- "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
+    for DIR in $(web_pipe "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
+        if web_pipe "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
             URL="${URL}/${DIR}"
             break
         fi
