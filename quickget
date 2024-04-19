@@ -1156,7 +1156,7 @@ function releases_reactos() {
 }
 
 function releases_redox() {
-    echo latest
+    echo livedisk harddrive
 }
 
 function editions_redox() {
@@ -2653,15 +2653,13 @@ function get_rebornos() {
 }
 
 function get_redox() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
-    local URL=""
-    URL="https://static.redox-os.org/img/x86_64"
-    # For now number is set manually, will see how often will be updated..
-    NUMBER="2024-04-18_975"
-    ISO="redox_${EDITION}_x86_64_${NUMBER}_livedisk.iso.zst"
-    HASH=$(wget -qO- https://static.redox-os.org/img/x86_64/SHA256SUM | grep ${ISO} | cut_1)
+    local URL="https://static.redox-os.org/img/x86_64"
+    local DATA
+    DATA="$(curl -s "${URL}/SHA256SUM" | grep ".iso" | grep "${EDITION}" | grep "${RELEASE}")"
+    ISO="$(echo "${DATA}" | cut -d '*' -f2)"
+    HASH="$(echo "${DATA}" | cut_1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3674,6 +3672,12 @@ create_vm() {
     if [[ ${OS} == "redox" ]] && [[ ${ISO} =~ ".zst" ]]; then
         zstd -d  "${VM_PATH}/${ISO}"
         ISO="${ISO/.zst/}"
+        if [[ ${ISO} =~ ".img" ]]; then
+            qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+            ISO="${ISO/.img/}"
+        else
+            ISO="${ISO/.zst/}"
+        fi
     fi
 
     make_vm_config "${ISO}"
