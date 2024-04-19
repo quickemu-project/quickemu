@@ -1492,7 +1492,8 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}: ${FILE}
+        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}
+        echo "- URL: ${URL}"
     fi
 
     if command -v curl &>/dev/null; then
@@ -1500,7 +1501,7 @@ function web_get() {
         # Output to nonexistent directory so the download fails fast
         local REDIRECT_URL=$(curl --silent --location --fail "${URL}" --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM})
         if [ "${REDIRECT_URL}" != "${URL}" ]; then
-            echo "Redirected to ${REDIRECT_URL}"
+            echo "- Redirected: ${REDIRECT_URL}"
             URL="${REDIRECT_URL}"
         fi
         if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
