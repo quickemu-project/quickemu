@@ -31,7 +31,12 @@ function cleanup() {
     fi
 }
 
-function os_info() {
+# Get string before first whitespace (HASH)
+cut_1() {
+    cut -d' ' -f1
+}
+
+os_info() {
     local SIMPLE_NAME=""
     local INFO=""
     SIMPLE_NAME="${1}"
@@ -708,11 +713,6 @@ function os_homepages(){
         zorin)             HOMEPAGE="https://zorin.com/os/";;
     esac
     echo "${HOMEPAGE}"
-}
-
-# Get string before first whitespace (HASH)
-function cut_1() {
-    cut -d' ' -f1
 }
 
 function releases_alma() {
