@@ -2675,8 +2675,7 @@ function get_pureos() {
 
 function get_reactos() {
     local HASH=""
-    local URL=""
-    URL=$(curl -Lfs "https://sourceforge.net/projects/reactos/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    local URL="https://sourceforge.net/projects/reactos/files/latest/download"
     echo "${URL} ${HASH}"
 }
 
