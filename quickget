@@ -1742,7 +1742,7 @@ function get_alma() {
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
     local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
-    HASH="$(wget -q -O- "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
+    HASH="$(web_pipe "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
