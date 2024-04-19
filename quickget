@@ -2740,7 +2740,7 @@ function get_slint() {
     # Change to latest if needed
     ISO="slint64-15.0-5.iso"
     URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f4)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
