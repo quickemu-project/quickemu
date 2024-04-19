@@ -1836,7 +1836,7 @@ function get_arcolinux() {
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha1" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha1" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
