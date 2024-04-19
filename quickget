@@ -1935,10 +1935,10 @@ function get_cachyos() {
     local ISO=""
     local URL=""
     local release=""
-    release=$(curl "https://mirror.cachyos.org/ISO/${EDITION}/" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | tail -n 1)
+    release=$(web_pipe "https://mirror.cachyos.org/ISO/${EDITION}/" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | tail -n 1)
     ISO="cachyos-${EDITION}-linux-${release}.iso"
     URL="https://mirror.cachyos.org/ISO/${EDITION}/${release}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
