@@ -2722,14 +2722,14 @@ function get_slax() {
     case ${EDITION} in
       debian)
         URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
-        ISO=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
+        ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
         ;;
       slackware)
         URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x"
-        ISO=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
+        ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1)
         ;;
     esac
-    HASH=$(wget -q -O- "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
+    HASH=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
