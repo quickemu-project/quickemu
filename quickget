@@ -2916,11 +2916,11 @@ function get_ubuntu() {
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
     if wget -q --spider "${URL}/SHA256SUMS"; then
-        DATA=$(wget -qO- "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
         ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
         HASH=$(cut -d' ' -f1 <<<${DATA} | sed '1q;d')
     else
-        DATA=$(wget -qO- "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
         ISO=$(cut -d'*' -f2 <<<${DATA})
         HASH=$(cut -d' ' -f1 <<<${DATA})
     fi
