@@ -103,6 +103,7 @@ function os_info() {
       pureos)           INFO="PureOS|Debian||https://www.pureos.net/|A fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation.";;
       reactos)          INFO="ReactOS|Independent||https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
       rebornos)         INFO="RebornOS|Arch||https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
+      redox)            INFO="Redox OS|Independent||https://www.redox-os.org|Microkernel-based operating system, with a large number of supported programs and components, to create a full-featured user and application environment.";;
       rockylinux)       INFO="Rocky Linux|RedHat||https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
       siduction)        INFO="Siduction|Debian||https://siduction.org/|Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian.";;
       slackware)        INFO="Slackware|Independent||http://www.slackware.com/|Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities.";;
@@ -496,7 +497,8 @@ test_isos() {
     exit 0
 }
 
-function os_support() {
+# OS support list
+os_support() {
     echo alma \
     alpine \
     android \
@@ -563,6 +565,7 @@ function os_support() {
     pureos \
     reactos \
     rebornos \
+    redox \
     rockylinux \
     siduction \
     slackware \
@@ -1150,6 +1153,14 @@ function editions_pureos() {
 
 function releases_reactos() {
     echo latest
+}
+
+function releases_redox() {
+    echo latest
+}
+
+function editions_redox() {
+    echo demo desktop server
 }
 
 function releases_rebornos() {
@@ -2633,6 +2644,27 @@ function get_reactos() {
     echo "${URL} ${HASH}"
 }
 
+function get_rebornos() {
+    local ISO=""
+    local HASH=""
+    ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    echo "${ISO} ${HASH}"
+}
+
+function get_redox() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="https://static.redox-os.org/img/x86_64"
+    # For now number is set manually, will see how often will be updated..
+    NUMBER="2024-04-18_975"
+    ISO="redox_${EDITION}_x86_64_${NUMBER}_livedisk.iso.zst"
+    HASH=$(wget -qO- https://static.redox-os.org/img/x86_64/SHA256SUM | grep ${ISO} | cut_1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
 function get_rockylinux() {
     local EDITION="${1:-}"
     if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]
@@ -3638,6 +3670,12 @@ create_vm() {
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
     fi
+
+    if [[ ${OS} == "redox" ]] && [[ ${ISO} =~ ".zst" ]]; then
+        zstd -d  "${VM_PATH}/${ISO}"
+        ISO="${ISO/.zst/}"
+    fi
+
     make_vm_config "${ISO}"
 }
 
