@@ -1490,6 +1490,13 @@ function web_get() {
     fi
 
     if command -v curl &>/dev/null; then
+        # Check for URL redirections
+        # Output to nonexistent directory so the download fails fast
+        local REDIRECT_URL=$(curl --silent --location --fail "${URL}" --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM})
+        if [ "${REDIRECT_URL}" != "${URL}" ]; then
+            echo "Redirected to ${REDIRECT_URL}"
+            URL="${REDIRECT_URL}"
+        fi
         if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
             echo "ERROR! Failed to download ${URL} with curl."
             echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
