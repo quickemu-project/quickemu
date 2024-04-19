@@ -2460,8 +2460,8 @@ function get_macos() {
 
 function get_mageia() {
     local EDITION="${1:-}"
-    local ISO=$(wget -q https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" -O- | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
-    local HASH=$(wget -q -O- "${ISO}.sha512" | cut_1)
+    local ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
+    local HASH=$(web_pipe "${ISO}.sha512" | cut_1)
     echo "${ISO} ${HASH}"
 }
 
