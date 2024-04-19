@@ -1926,7 +1926,7 @@ function get_bodhi() {
       standard) ISO="bodhi-${RELEASE}-64.iso";;
       *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
