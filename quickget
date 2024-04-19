@@ -2752,7 +2752,7 @@ function get_slitaz() {
       preferred) ISO="slitaz-rolling";;
       *) ISO="slitaz-rolling-${RELEASE}";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
     echo "${URL}/${ISO}.iso ${HASH}"
 }
 
