@@ -2103,9 +2103,9 @@ function get_endeavouros() {
     local HASH=""
     local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Find EndeavourOS releases from mirror, pick one matching release
-    local ENDEAVOUR_RELEASES="$(curl -s "${URL}"/ | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
-    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i ${RELEASE}).iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha512sum" | cut  -d' ' -f1)
+    local ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
+    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
