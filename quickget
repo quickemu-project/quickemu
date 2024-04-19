@@ -2808,7 +2808,7 @@ function get_tinycore() {
     elif [ "${EDITION}" == "CorePure64" ] || [ "${EDITION}" == "TinyCorePure64" ]; then
         URL="http://www.tinycorelinux.net/14.x/x86_64/release"
     fi
-    HASH=$(wget -q -O- "${URL}/${ISO}.md5.txt" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
