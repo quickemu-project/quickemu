@@ -2055,7 +2055,7 @@ function get_devuan() {
       chimaera) ISO="devuan_${RELEASE}_4.0.2_amd64_desktop-live.iso";;
       daedalus) ISO="devuan_${RELEASE}_5.0.0_amd64_desktop-live.iso";;
     esac
-    HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHASUMS.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
