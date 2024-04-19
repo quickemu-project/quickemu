@@ -2318,7 +2318,7 @@ function get_lmde() {
     local HASH=""
     local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
-    HASH=$(wget -q -O- "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
