@@ -1298,7 +1298,7 @@ function releases_truenas() {
 }
 
 function releases_truenas-core() {
-    echo 13.0 12.0
+    echo 13
 }
 
 function releases_truenas-scale() {
