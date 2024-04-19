@@ -2776,7 +2776,7 @@ function get_sparkylinux() {
       minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
       *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut_1)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
