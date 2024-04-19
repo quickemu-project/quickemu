@@ -370,6 +370,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `gnomeos` (GNOME OS)
 -   `guix` (Guix)
 -   `haiku` (Haiku)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)

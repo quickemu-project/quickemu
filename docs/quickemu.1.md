@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 17, 2024
+date: April 19, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -393,6 +393,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `gnomeos` (GNOME OS)
 -   `guix` (Guix)
 -   `haiku` (Haiku)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
