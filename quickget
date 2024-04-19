@@ -2039,7 +2039,7 @@ function get_deepin() {
       EDITION="1010"
       ISO="deepin-desktop-community-${EDITION}-amd64.iso"
     fi
-    HASH=$(wget -q -O- "${URL}/SHA256SUMS" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut_1)
     #echo "${URL}/${ISO} ${HASH}"
     web_get "${URL}/${ISO}" "${VM_PATH}"
     check_hash "${ISO}" "${HASH}"
