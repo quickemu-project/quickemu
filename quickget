@@ -1445,7 +1445,13 @@ function check_hash() {
 }
 
 function web_pipe() {
+    # Check for URL redirections
+    # Output to nonexistent directory so the download fails fast
     local URL="${1}"
+    local REDIRECT_URL=$(curl --silent --location --fail "${URL}" --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM})
+    if [ "${REDIRECT_URL}" != "${URL}" ]; then
+        URL="${REDIRECT_URL}"
+    fi
     curl --silent --location "${URL}"
 }
 
