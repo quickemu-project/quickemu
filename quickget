@@ -2473,18 +2473,18 @@ function get_manjaro() {
     local URL=""
     local TYPE=""
     case ${RELEASE} in
-      sway) MANIFEST="$( wget -qO- https://mirror.manjaro-sway.download/manjaro-sway/release.json )";;
+      sway) MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)";;
       gnome|xfce|plasma) TYPE="official";;
       *) TYPE="community";;
     esac
-    [[ ${RELEASE} != "sway" ]] && MANIFEST="$(wget -qO- https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    [[ ${RELEASE} != "sway" ]] && MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
     [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
     if [[ ${RELEASE} != "sway" ]]; then
         URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
     else
         URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
     fi
-    HASH=$(wget -qO- "${URL}.sha512" | cut_1)
+    HASH=$(web_pipe "${URL}.sha512" | cut_1)
     echo "${URL} ${HASH}"
 }
 
