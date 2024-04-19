@@ -11,9 +11,7 @@ export LC_ALL=C
 # 5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
 # 6. Update make_vm_config() - add any *required* new OS tweaks
 # 7. Create a get_newos() function - that does something like this: (Look at other OS)
-#AD. For cutting first field with hash you can use function
-#       cut_1
-#    instead of "cut -d' ' -f1"
+#    For cutting first field with hash you can use function `cut_1` instead of `cut -d' ' -f1``
 #
 #function get_newos() {
 #    local EDITION="${1:-}"
@@ -21,7 +19,7 @@ export LC_ALL=C
 #    local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
 #    local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
 #
-#    HASH=$(wget -q -O- "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
+#    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
 #    echo "${URL}/${ISO} ${HASH}"
 #}
 
