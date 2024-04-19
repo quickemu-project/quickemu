@@ -2224,7 +2224,7 @@ function get_ghostbsd() {
       mate) ISO="GhostBSD-${RELEASE}.iso";;
       xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
