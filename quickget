@@ -2980,7 +2980,7 @@ function get_zorin() {
     local HASH=""
     local ISO=""
     local URL=""
-    URL=$(curl -Lfs "https://zrn.co/${RELEASE}${EDITION}" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    URL="https://zrn.co/${RELEASE}${EDITION}"
     echo "${URL} ${HASH}"
 }
 
