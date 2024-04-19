@@ -2535,7 +2535,7 @@ function get_nixos() {
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
