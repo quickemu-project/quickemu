@@ -2498,7 +2498,7 @@ function get_mxlinux() {
       KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
       Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
     esac
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
