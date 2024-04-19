@@ -2080,7 +2080,7 @@ function get_easyos() {
         YEAR="2024";;
     esac
     URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/md5.sum.txt" | cut  -d' ' -f1)
+    HASH=$(web_pipe "${URL}/md5.sum.txt" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
