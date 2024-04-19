@@ -2063,7 +2063,7 @@ function get_dragonflybsd() {
     local HASH=""
     local ISO="dfly-x86_64-${RELEASE}_REL.iso.bz2"
     local URL="http://mirror-master.dragonflybsd.org/iso-images"
-    HASH=$(wget -q -O- "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
