@@ -2506,7 +2506,7 @@ function get_netboot() {
     local ISO="netboot.xyz.iso"
     local HASH=""
     local URL="https://boot.netboot.xyz/ipxe"
-    HASH=$(wget -q -O- "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
