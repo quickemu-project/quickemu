@@ -2630,8 +2630,8 @@ function get_popos() {
     local HASH=""
     local ISO=""
     local URL=""
-    URL=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
-    HASH=$(wget -q -O- "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
+    URL=$(web_pipe "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
+    HASH=$(web_pipe "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
     echo "${URL} ${HASH}"
 }
 
