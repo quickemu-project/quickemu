@@ -136,7 +136,6 @@ os_info() {
       whonix)           INFO="Whonix|Debian||https://www.whonix.org/|Superior Internet Privacy with Whonix™ As handy as an app - delivering maximum anonymity and security.";;
       windows)          INFO="Windows|proprietary||https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
       windows-server)   INFO="Windows Server|proprietary||https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
-      xerolinux)        INFO="XeroLinux|Arch||https://xerolinux.xyz/|Arch-Based Distro, that provides you with an easy way to install Arch and a well optimized, beautifully Customized Plasma Desktop, that you can later shape to suite your needs!";;
       xubuntu)          INFO="Xubuntu|Ubuntu||https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
       zorin)            INFO="Zorin OS|Ubuntu||https://zorin.com/os/|Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting.";;
     esac
@@ -307,7 +306,6 @@ function pretty_name() {
     void)               PRETTY_NAME="Void Linux";;
     vxlinux)            PRETTY_NAME="VX Linux";;
     windows-server)     PRETTY_NAME="Windows Server";;
-    xerolinux)          PRETTY_NAME="XeroLinux";;
     zorin)              PRETTY_NAME="Zorin OS";;
     *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
   esac
@@ -643,7 +641,6 @@ function os_support() {
     vxlinux \
     windows \
     windows-server \
-    xerolinux \
     xubuntu \
     zorin
 }
@@ -755,7 +752,6 @@ function os_homepages(){
         vxlinux)           HOMEPAGE="https://vxlinux.org/";;
         windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
         windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
-        xerolinux)         HOMEPAGE="https://xerolinux.xyz/";;
         xubuntu)           HOMEPAGE="https://xubuntu.org/";;
         zorin)             HOMEPAGE="https://zorin.com/os/";;
     esac
@@ -1401,10 +1397,6 @@ function releases_windows-server() {
 
 function languages_windows-server() {
     LANGS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
-}
-
-function releases_xerolinux() {
-    echo kde
 }
 
 function releases_zorin() {
@@ -2963,15 +2955,6 @@ function get_vxlinux() {
     local ISO="vx-${RELEASE}.iso"
     local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
     HASH=$(wget -q -O- "${URL}/vx-${RELEASE}.md5" | cut  -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_xerolinux() {
-    local HASH=""
-    local URL=""
-    local ISO="xerolinux-2022.12-x86_64.iso"
-    local URL="https://sourceforge.net/projects/xerolinux/files/Releases"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
