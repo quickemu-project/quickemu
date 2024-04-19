@@ -1967,9 +1967,9 @@ function get_chimeralinux() {
     local DATE=""
     local ISO=""
     local URL="https://repo.chimera-linux.org/live/${RELEASE}"
-    DATE=$(wget -q -O- "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
+    DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
     ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
-    HASH=$(wget -q -O- "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
