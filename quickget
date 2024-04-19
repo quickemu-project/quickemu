@@ -2260,11 +2260,8 @@ function get_guix() {
 function get_haiku() {
     local EDITION="${1:-}"
     local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
-    # local URL="https://cdn.haiku-os.org/haiku-release/${RELEASE}" # domain gone
-    local URL="http://mirror.rit.edu/haiku/${RELEASE}" # NY, USA
-    # local URL="https://mirrors.tnonline.net/haiku/haiku-release/${RELEASE}" # Sweden
-    # local URL="https://mirror.aarnet.edu.au/pub/haiku/${RELEASE}" # Aus
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    local URL="http://mirror.rit.edu/haiku/${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
