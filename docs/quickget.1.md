@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 17, 2024
+date: April 19, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -102,8 +102,8 @@ with your preferred flavour.
 You can also use `quickget` with options to:
 
 ``` shell
-    # show an OS ISO download URL for {os} {release} [edition] 
-    quickget --show-iso-url fedora 38 Silverblue   
+    # show an OS ISO download URL for {os} {release} [edition]
+    quickget --show-iso-url fedora 38 Silverblue
     # test if an OS ISO is available for {os} {release} [edition]
     quickget --test-iso-url nixos 23.05 plasma5
     # open an OS distribution homepage in a browser
@@ -155,6 +155,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `gnomeos` (GNOME OS)
 -   `guix` (Guix)
 -   `haiku` (Haiku)
+-   `holoiso` (SteamOS HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
