@@ -2711,7 +2711,7 @@ function get_slackware() {
     local HASH=""
     local ISO="slackware64-${RELEASE}-install-dvd.iso"
     local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.md5" |  cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
