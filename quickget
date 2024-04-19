@@ -2553,7 +2553,7 @@ function get_openindiana(){
     local URL=""
     URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
     ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" |cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 function get_opensuse() {
