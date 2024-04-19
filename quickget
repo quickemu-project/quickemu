@@ -2761,7 +2761,7 @@ function get_solus() {
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
-    HASH=$(wget -q -O- "${URL}/${ISO}.sha256sum" | cut_1)
+    HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
