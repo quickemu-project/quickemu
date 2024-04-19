@@ -138,68 +138,96 @@ function os_info() {
     echo "${INFO}"
 }
 
-function os_about() {
-    local SIMPLE_NAME=""
-    local ABOUT=""
-    SIMPLE_NAME="${1}"
-    ABOUT=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f5)
-    echo "${ABOUT}"
+os_error() {
+    echo 'ERROR! You must specify an operating system.'
+    echo '- Supported Operating Systems:'
+    os_support | fold -s -w "$(tput cols)"
+    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
+    exit 1
 }
 
-function os_basedof() {
-    local SIMPLE_NAME=""
-    local BASED=""
-    SIMPLE_NAME="${1}"
-    BASED=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f2)
-    echo "${BASED}"
+os_path_error() {
+    echo 'ERROR! You must specify path.'
+    os_error
+    exit 1
 }
 
-if [ "${1}" == '--test-iso-url' ] || [ "${1}" == '-t' ]; then
-    test_iso_url="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-elif [ "${1}" == '--show-iso-url' ] || [ "${1}" ==  '-s' ]; then
-    show_iso_url="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-elif [ "${1}" == '--open-distro-homepage' ] || [ "${1}" == '-o' ]; then
-    open_distro_homepage="on"
-    set -- "$2"
-elif [ "${1}" == '--download-iso'  ] || [ "${1}" == '-d' ]; then
-    download_iso="on"
-    if [ -n "$4" ]; then
-        set -- "$2" "$3" "$4"
-    elif [ -n "$3" ]; then
-        set -- "$2" "$3"
-    else
-        set -- "$2"
-    fi
-fi
-
-function os_credentials() {
-    local SIMPLE_NAME=""
-    local CREDE=""
-    SIMPLE_NAME="${1}"
-    CREDE=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f3)
-    echo "${CREDE}"
+os_not_supported() {
+    echo -e "ERROR! ${OS} is not a supported OS.\n"
+    os_support | fold -s -w "$(tput cols)"
+    exit 1
 }
 
-function os_homepage(){
-    local SIMPLE_NAME=""
-    local HOMEP=""
-    SIMPLE_NAME="${1}"
-    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
-    echo "$HOMEP"
+os_supported() {
+    if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
+        os_not_supported
+    fi
+}
+
+os_supported_release() {
+    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
+        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+        echo -n 'Supported releases: '
+        "releases_${OS}"
+        exit 1
+    fi
+}
+
+os_error_release() {
+    echo 'ERROR! You must specify a release.'
+    case ${OS} in
+      *ubuntu-server*)
+        echo -n ' - Releases: '
+        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *ubuntu*)
+        echo -n ' - Releases: '
+        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+        ;;
+      *windows*)
+        echo -n ' - Releases: '
+        "releases_${OS}"
+        echo -n ' - Languages: '
+        "languages_${OS}" && echo "${LANGS[@]}"
+        ;;
+      *)
+        echo -n ' - Releases: '
+        "releases_${OS}" | fold -s -w "$(tput cols)"
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+            echo -n ' - Editions: '
+            "editions_${OS}" | fold -s -w "$(tput cols)"
+        fi
+        ;;
+    esac
+    exit 1
+}
+
+os_supported_edition() {
+    if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
+        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
+        echo -n ' - Editions: '
+        for EDITION in "${EDITIONS[@]}"; do
+            echo -n "${EDITION} "
+        done
+        echo ""
+        exit 1
+    fi
+}
+
+os_error_edition() {
+    echo -en "ERROR! You must specify an edition.\n - Editions: "
+    #TODO ERROR here
+    "editions_${OS}"
+    exit 1
+}
+
+os_supported_lang() {
+    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
+    echo -n ' - Editions: '
+    for LANG in "${LANGS[@]}"; do
+        echo -n "${LANG} "
+    done
+    exit 1
 }
 
 function pretty_name() {
@@ -287,6 +315,25 @@ function pretty_name_new() {
     SIMPLE_NAME="${1}"
     PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
     echo "${PRETTY_NAME}"
+}
+
+handle_missing() {
+    # Handle odd missing Fedora combinations
+    if [[ $OS == fedora ]] ; then
+        if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
+            echo "ERROR! Unsupported combination"
+            echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+            exit 1;
+        fi
+    fi
+    # Handle missing Manjaro Sway minimal
+    if [[ $OS == manjaro ]] ; then
+        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
+            echo "ERROR! Unsupported combination"
+            echo "       Manjaro Sway does not have a minimal edition"
+            exit 1;
+        fi
+    fi
 }
 
 function validate_release() {
@@ -3649,111 +3696,6 @@ if ((BASH_VERSINFO[0] < 4)); then
 fi
 
 LANGS=()
-
-os_supported_release() {
-    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-        echo -n 'Supported releases: '
-        "releases_${OS}"
-        exit 1
-    fi
-}
-
-os_supported_edition() {
-    if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
-        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
-        echo -n ' - Editions: '
-        for EDITION in "${EDITIONS[@]}"; do
-            echo -n "${EDITION} "
-        done
-        echo ""
-        exit 1
-    fi
-}
-
-os_error_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
-}
-
-os_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
-    echo -n ' - Editions: '
-    for LANG in "${LANGS[@]}"; do
-        echo -n "${LANG} "
-    done
-    exit 1
-}
-
-handle_missing() {
-    # Handle odd missing Fedora combinations
-    if [[ $OS == fedora ]] ; then
-        if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
-            echo "ERROR! Unsupported combination"
-            echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
-            exit 1;
-        fi
-    fi
-    # Handle missing Manjaro Sway minimal
-    if [[ $OS == manjaro ]] ; then
-        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
-            echo "ERROR! Unsupported combination"
-            echo "       Manjaro Sway does not have a minimal edition"
-            exit 1;
-        fi
-    fi
-}
-
-os_error() {
-    echo 'ERROR! You must specify an operating system.'
-    echo '- Supported Operating Systems:'
-    os_support | fold -s -w "$(tput cols)"
-    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
-    exit 1
-}
-
-os_not_supported() {
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support | fold -s -w "$(tput cols)"
-    exit 1
-}
-
-os_path_error() {
-    echo 'ERROR! You must specify path.'
-    os_error
-    exit 1
-}
-
-os_error_release() {
-    echo 'ERROR! You must specify a release.'
-    case ${OS} in
-      *ubuntu-server*)
-        echo -n ' - Releases: '
-        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *ubuntu*)
-        echo -n ' - Releases: '
-        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *windows*)
-        echo -n ' - Releases: '
-        "releases_${OS}"
-        echo -n ' - Languages: '
-        "languages_${OS}" && echo "${LANGS[@]}"
-        ;;
-      *)
-        echo -n ' - Releases: '
-        "releases_${OS}" | fold -s -w "$(tput cols)"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-            echo -n ' - Editions: '
-            "editions_${OS}" | fold -s -w "$(tput cols)"
-        fi
-        ;;
-    esac
-    exit 1
-}
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
