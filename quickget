@@ -3807,6 +3807,9 @@ case "${1}" in
   '--list-json'|'-lj')
     list_json
     ;;
+  '--list'|'-l')
+    time list_supported
+    ;;
 esac
 
 if [ -n "${1}" ]; then
