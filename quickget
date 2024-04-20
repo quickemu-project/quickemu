@@ -3552,12 +3552,16 @@ case "${1}" in
   '--list-csv'|'-lc'|'list')
     list_csv
     ;;
+    #TODO: Argument list_json should be DEPRECATED!
+  '--list-json'|'-lj'|'list_json')
+    list_json
+    ;;
 esac
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
-    if [ "${OS}" == "list_json" ]; then
-        list_json
+    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
+        list_csv
     fi
 else
     error_specify_os
