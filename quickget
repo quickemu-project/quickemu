@@ -3805,6 +3805,10 @@ case "${1}" in
     just="show"
     shift
     ;;
+  '--url-all'|'-ua')
+    just="show"
+    shift
+    ;;
   '--list-csv'|'-lc')
     list_csv
     ;;
