@@ -3810,6 +3810,10 @@ case "${1}" in
   '--list'|'-l')
     time list_supported
     ;;
+  '--list-urls'|'-lu')
+    shift
+    time list_isos
+    ;;
 esac
 
 if [ -n "${1}" ]; then
