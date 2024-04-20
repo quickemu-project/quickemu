@@ -3523,6 +3523,10 @@ case "${1}" in
     just="download"
     shift
     ;;
+  '--create-config'|'-cc')
+    just="custom"
+    echo "TODO:"
+    ;;
   '--open-homepage'|'-o')
     if [ -z "$(os_info "${2}")" ]; then
         error_specify_os
