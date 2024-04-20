@@ -802,40 +802,11 @@ function editions_arcolinux() {
 }
 
 function releases_artixlinux() {
-    echo stable
+    web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -1
 }
 
 function editions_artixlinux() {
-    echo base-dinit \
-    base-openrc \
-    base-runit \
-    base-s6 \
-    cinnamon-dinit \
-    cinnamon-openrc \
-    cinnamon-runit \
-    cinnamon-s6 \
-    lxde-dinit \
-    lxde-openrc \
-    lxde-runit \
-    lxde-s6 \
-    lxqt-dinit \
-    lxqt-openrc \
-    lxqt-runit \
-    lxqt-s6 \
-    mate-dinit \
-    mate-openrc \
-    mate-runit \
-    mate-s6 \
-    plasma-dinit \
-    plasma-openrc \
-    plasma-runit \
-    plasma-s6 \
-    xfce-dinit \
-    xfce-openrc \
-    xfce-runit \
-    xfce-s6 \
-    community-gtk-openrc \
-    community-qt-openrc
+    web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u | tr '\n' ' '
 }
 
 function releases_athenaos() {
@@ -1864,8 +1835,7 @@ function get_artixlinux() {
     local HASH=""
     local ISO=""
     local URL="https://iso.artixlinux.org/iso"
-    DATE=$(web_pipe "${URL}/sha256sums" | cut -d'-' -f4 | head -1)
-    ISO="artix-${EDITION}-${DATE}-x86_64.iso"
+    ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
     HASH=$(web_pipe "${URL}/sha256sums" | grep "${ISO}")
     echo "${URL}/${ISO} ${HASH}"
 }
