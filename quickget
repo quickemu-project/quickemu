@@ -3540,6 +3540,10 @@ case "${1}" in
     help_message
     exit 0
     ;;
+  '--check'|'-c')
+    just="test"
+    shift
+    ;;
 esac
 
 if [ -n "${1}" ]; then
