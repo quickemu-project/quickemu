@@ -1171,7 +1171,7 @@ function editions_popos() {
 }
 
 function releases_porteus() {
-    echo 5.01 5.0
+    echo 5.01
 }
 
 function editions_porteus() {
