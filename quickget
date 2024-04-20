@@ -2083,14 +2083,10 @@ function get_easyos() {
 function get_elementary() {
     local HASH=""
     case ${RELEASE} in
-      7.0)
-        local ISO="elementaryos-${RELEASE}-stable.20230129rc.iso"
-        ;;
-      7.1)
-        local ISO="elementaryos-${RELEASE}-stable.20230926rc.iso"
-        HASH="5c7f6b388e5787c366587985301ea05ab16e4cc0de3be2b3d6a559ce81a2f102"
-        ;;
+        7.0) STAMP="20230129rc";;
+        7.1) STAMP="20230926rc";;
     esac
+    local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
 }
