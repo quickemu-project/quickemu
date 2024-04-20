@@ -957,7 +957,7 @@ function releases_endless() {
 }
 
 function editions_endless() {
-  echo base en fr pt_BR es
+    echo base en fr pt_BR es
 }
 
 function releases_fedora() {
@@ -965,21 +965,21 @@ function releases_fedora() {
 }
 
 function editions_fedora() {
-  echo Workstation \
-  Budgie \
-  Cinnamon \
-  i3 \
-  KDE \
-  LXDE \
-  LXQt \
-  Mate \
-  Xfce \
-  Silverblue \
-  Sericea \
-  Kinoite \
-  Sway \
-  Server \
-  Onyx
+    echo Workstation \
+    Budgie \
+    Cinnamon \
+    i3 \
+    KDE \
+    LXDE \
+    LXQt \
+    Mate \
+    Xfce \
+    Silverblue \
+    Sericea \
+    Kinoite \
+    Sway \
+    Server \
+    Onyx
 }
 
 function releases_freebsd(){
@@ -1522,13 +1522,13 @@ function zsync_get() {
     local FILE="${1##*/}"
     local OUT=""
     local URL="${1}"
-	# Test mode for ISO
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo "${URL}"
-	    exit 0
+    # Test mode for ISO
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo "${URL}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${URL}"
-	    exit 0
+        wget --spider "${URL}"
+        exit 0
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
@@ -2072,10 +2072,8 @@ function get_easyos() {
     local YEAR=""
     ISO="easy-${RELEASE}-amd64.img"
     case ${RELEASE} in
-      5.6.5|5.6.4|5.6.3|5.6.2|5.6.1|5.5.5|5.5.4)
-        YEAR="2023";;
-      5.7|5.6.7|5.6.6)
-        YEAR="2024";;
+        5.6.5|5.6.4|5.6.3|5.6.2|5.6.1) YEAR="2023";;
+        5.7|5.6.7|5.6.6)               YEAR="2024";;
     esac
     URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
     HASH=$(web_pipe "${URL}/md5.sum.txt" | cut_1)
@@ -2132,8 +2130,8 @@ function get_fedora() {
     local URL=""
     local VARIANT=""
     case ${EDITION} in
-      Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
-      *) VARIANT="Spins";;
+        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+        *) VARIANT="Spins";;
     esac
     JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'")')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
@@ -2195,8 +2193,8 @@ function get_ghostbsd() {
     local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
     local HASH=""
     case ${EDITION} in
-      mate) ISO="GhostBSD-${RELEASE}.iso";;
-      xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
+        mate) ISO="GhostBSD-${RELEASE}.iso";;
+        xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
