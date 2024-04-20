@@ -3572,6 +3572,11 @@ case "${1}" in
         exit 0
     fi
     ;;
+  '--version'|'-v')
+    WHERE=$(dirname "${BASH_SOURCE[0]}")
+    "${WHERE}/quickemu" --version
+    exit 0
+    ;;
 esac
 
 if [ -n "${1}" ]; then
@@ -3580,10 +3585,6 @@ if [ -n "${1}" ]; then
         list_csv
     elif [ "${OS}" == "list_json" ]; then
         list_json
-    elif [ "${OS}" == "--version" ] || [ "${OS}" == "-version" ] || [ "${OS}" == "version" ]; then
-        WHERE=$(dirname "${BASH_SOURCE[0]}")
-        "${WHERE}/quickemu" --version
-        exit 0
     fi
 else
     error_specify_os
