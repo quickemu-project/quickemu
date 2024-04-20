@@ -1439,12 +1439,14 @@ function check_hash() {
     fi
 }
 
+# Download a file from the web and pipe it to stdout
 function web_pipe() {
     local URL=""
     URL=$(web_redirect "${1}")
     curl --silent --location "${URL}"
 }
 
+# Download a file from the web
 function web_get() {
     local URL=""
     URL=$(web_redirect "${1}")
@@ -1506,6 +1508,7 @@ function web_get() {
     fi
 }
 
+# checks if a URL needs to be redirected and returns the final URL
 function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
@@ -1518,6 +1521,7 @@ function web_redirect() {
     fi
 }
 
+# checks is a URL is reachable
 function web_check() {
     local URL=""
     URL=$(web_redirect "${1}")
