@@ -859,8 +859,8 @@ function releases_blendos() {
 }
 
 function editions_blendos() {
-    wget -q https://sourceforge.net/projects/blendos/rss?path=/ISOs/ -O- | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
-    local BLENDOS_EDITIONS
+    web_pipe "https://sourceforge.net/projects/blendos/rss?path=/ISOs/" | grep -E -o 'https://.*blendOS\.iso.*</media:hash' >/tmp/blendos-isos.rss
+    local BLENDOS_EDITIONS=""
     BLENDOS_EDITIONS="$(grep -E -o 'https://.*blendOS\.iso.*</media:hash' /tmp/blendos-isos.rss | cut -d '/' -f 8 | sort | uniq | tr '\n' ' ')"
     echo "${BLENDOS_EDITIONS}"
 }
