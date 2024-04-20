@@ -140,6 +140,19 @@ os_info() {
     echo "${INFO}"
 }
 
+function show_os_info() {
+     while getopts ":12345" opt; do
+        case $opt in
+          1) os_info "${2}" | cut -d'|' -f1;;
+          2) os_info "${2}" | cut -d'|' -f2;;
+          3) os_info "${2}" | cut -d'|' -f3;;
+          4) os_info "${2}" | cut -d'|' -f4;;
+          5) os_info "${2}" | cut -d'|' -f5;;
+          *) echo "Wrong choice!" && exit 1;;
+        esac
+    done
+}
+
 function pretty_name() {
     echo $(show_os_info -1 "${1}")
 }
