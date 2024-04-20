@@ -1520,7 +1520,7 @@ function web_redirect() {
     fi
 }
 
-# checks is a URL is reachable
+# checks if a URL is reachable
 function web_check() {
     local URL=""
     URL=$(web_redirect "${1}")
