@@ -1832,8 +1832,7 @@ function get_archlinux() {
 function get_archcraft() {
     local HASH=""
     local URL=""
-    # Check where the URL redirects using curl. Output to a nonexistent directory so it's not possible to successfully download the image
-    URL=$(curl -Lfs "https://sourceforge.net/projects/archcraft/files/latest/download" -w %{url_effective} -o /this/is/a/nonexistent/directory/$RANDOM/$RANDOM)
+    URL="https://sourceforge.net/projects/archcraft/files/latest/download"
     echo "${URL} ${HASH}"
 }
 
