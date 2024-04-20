@@ -3548,13 +3548,15 @@ case "${1}" in
     just="test"
     shift
     ;;
+    #TODO: Argument list should be DEPRECATED!
+  '--list-csv'|'-lc'|'list')
+    list_csv
+    ;;
 esac
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
-    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
-        list_csv
-    elif [ "${OS}" == "list_json" ]; then
+    if [ "${OS}" == "list_json" ]; then
         list_json
     fi
 else
