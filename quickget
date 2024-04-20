@@ -1296,7 +1296,7 @@ function check_hash() {
     local iso=""
     local hash=""
     local hash_algo=""
-    if [ "${download_iso}" == "on" ]; then
+    if [ "${just}" == 'download' ]; then
         iso="${1}"
     else
         iso="${VM_PATH}/${1}"
@@ -1357,7 +1357,7 @@ function web_get() {
     elif [ "${test_iso_url}" == 'on' ]; then
         wget --spider "${URL}"
         exit 0
-    elif [ "${download_iso}" == 'on' ]; then
+    elif [ "${just}" == 'download' ]; then
         DIR="$(pwd)"
     fi
 
@@ -1459,7 +1459,7 @@ function make_vm_config() {
     local IMAGE_TYPE=""
     local GUEST=""
     local SEC_BOOT=""
-    if [ "${download_iso}" == "on" ]; then
+    if [ "${just}" == 'download' ]; then
         exit 0
     fi
     IMAGE_FILE="${1}"
@@ -2249,7 +2249,7 @@ function get_macos() {
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
         exit 0
-    elif [ "${download_iso}" == 'on' ]; then
+    elif [ "${just}" == 'download' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         web_get "${chunkListLink}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
@@ -3461,7 +3461,7 @@ function get_windows() {
         download_windows_workstation "${RELEASE}"
     fi
 
-    if [ "${download_iso}" == 'on' ]; then
+    if [ "${just}" == 'download' ]; then
         exit 0
     fi
 
