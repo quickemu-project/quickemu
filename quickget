@@ -3563,6 +3563,10 @@ case "${1}" in
     shift
     time list_isos
     ;;
+  '--test-urls'|'-tu')
+    shift
+    time test_isos
+    ;;
 esac
 
 if [ -n "${1}" ]; then
