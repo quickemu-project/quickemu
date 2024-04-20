@@ -1244,7 +1244,7 @@ function releases_slitaz() {
 }
 
 function releases_solus() {
-    echo 4.3
+    echo 4.5
 }
 
 function editions_solus() {
