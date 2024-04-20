@@ -777,7 +777,7 @@ function editions_android() {
 }
 
 function releases_antix() {
-    echo 23 22 21
+    echo 23.1 23 22 21
 }
 
 function editions_antix() {
