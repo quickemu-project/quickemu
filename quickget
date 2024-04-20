@@ -287,6 +287,15 @@ function list_json() {
 }
 
 function list_csv() {
+    CSV_DATA="$(csv_data)"
+
+    echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
+    sort -f <<<"${CSV_DATA}"
+
+    exit 0
+}
+
+function csv_data() {
     local DISPLAY_NAME
     local DL=""
     local DOWNLOADER
@@ -303,7 +312,6 @@ function list_csv() {
         HAS_ZSYNC=1
     fi
 
-    echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
     for OS in $(os_support); do
         DISPLAY_NAME="$(pretty_name "${OS}")"
 
@@ -336,9 +344,9 @@ function list_csv() {
             else
                 echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
             fi
-        done
+        done &
     done
-    exit 0
+    wait
 }
 
 function create_config() {
