@@ -3544,6 +3544,10 @@ case "${1}" in
     just="test"
     shift
     ;;
+  '--check-all'|'-ca')
+    just="test"
+    shift
+    ;;
 esac
 
 if [ -n "${1}" ]; then
