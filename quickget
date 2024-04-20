@@ -1517,6 +1517,18 @@ function web_get() {
     fi
 }
 
+function web_redirect() {
+    local URL="${1}"
+    # Check for URL redirections
+    # Output to nonexistent directory so the download fails fast
+    local REDIRECT_URL=$(curl --silent --location --fail --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    if [ "${REDIRECT_URL}" != "${URL}" ]; then
+        echo "${REDIRECT_URL}"
+    else
+        echo "${URL}"
+    fi
+}
+
 function zsync_get() {
     local DIR="${2}"
     local FILE="${1##*/}"
