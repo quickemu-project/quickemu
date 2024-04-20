@@ -3801,6 +3801,9 @@ case "${1}" in
     just="test"
     shift
     ;;
+  '--list-csv'|'-lc')
+    list_csv
+    ;;
 esac
 
 if [ -n "${1}" ]; then
