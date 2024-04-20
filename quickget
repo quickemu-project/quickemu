@@ -1244,7 +1244,7 @@ function web_get() {
         fi
     done
     # Test mode for ISO
-    if [ "${show_iso_url}" == 'on' ]; then
+    if [ "${just}" == 'show' ]; then
         echo "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
@@ -1308,7 +1308,7 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
     # Test mode for ISO
-    if [ "${show_iso_url}" == 'on' ]; then
+    if [ "${just}" == 'show' ]; then
         echo "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
@@ -2135,7 +2135,7 @@ function get_macos() {
     local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
-    if [ "${show_iso_url}" == 'on' ]; then
+    if [ "${just}" == 'show' ]; then
         echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
         exit 0
     elif [ "${just}" == 'test' ]; then
@@ -3296,7 +3296,7 @@ function download_windows_workstation() {
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
         echo " - Microsoft blocked the automated download request based on your IP address."
-        if [ "${show_iso_url}" == 'on' ] || [ "${just}" == 'test' ]; then
+        if [ "${just}" == 'show' ] || [ "${just}" == 'test' ]; then
             exit 1
         fi
         failed=1
@@ -3321,7 +3321,7 @@ function download_windows_workstation() {
         return 1
     fi
 
-    if [ "${show_iso_url}" == 'on' ]; then
+    if [ "${just}" == 'show' ]; then
         echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
         exit 0
     elif [ "${just}" == 'test' ]; then
