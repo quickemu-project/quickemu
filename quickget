@@ -3564,6 +3564,14 @@ case "${1}" in
     just="download"
     shift
     ;;
+  '--open-homepage'|'-o')
+    if [ -z "$(os_info "${2}")" ]; then
+        error_specify_os
+    else
+        open_url "$(os_info "${2}" | cut -d'|' -f4)"
+        exit 0
+    fi
+    ;;
 esac
 
 if [ -n "${1}" ]; then
@@ -3633,9 +3641,6 @@ if [ -n "${2}" ]; then
         validate_release "releases_${OS}"
         create_vm "$("get_${OS}")"
     fi
-elif [ "${open_distro_homepage}" == 'on' ]; then
-    HOMEPAGE=$(os_homepages ${OS})
-    open_url "${HOMEPAGE}" && exit 0
 else
     os_error_release
 fi
