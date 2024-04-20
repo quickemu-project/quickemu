@@ -3536,6 +3536,10 @@ case "${1}" in
     "${WHERE}/quickemu" --version
     exit 0
     ;;
+  '--help'|'-h')
+    help_message
+    exit 0
+    ;;
 esac
 
 if [ -n "${1}" ]; then
