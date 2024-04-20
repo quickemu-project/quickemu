@@ -933,10 +933,12 @@ function releases_dragonflybsd() {
 }
 
 function releases_easyos() {
-    #local RLIST
-    #RLIST=$(curl -s https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
-    #RLIST=$(wget -q -O- 'https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/' | grep 'href="' | tail +2 | cut -d'/' -f1 | cut -d'"' -f6)
-    #echo ${RLIST}
+    #local Y2023=""
+    #local Y2024=""
+    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #echo -n ${2024}
+    #echo ${Y2023}
     # Not dynamic for now
     echo 5.7 5.6.7 5.6.6 5.6.5 5.6.4 5.6.3 5.6.2 5.6.1
 }
