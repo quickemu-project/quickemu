@@ -1247,7 +1247,7 @@ function web_get() {
     if [ "${show_iso_url}" == 'on' ]; then
         echo "${URL}"
         exit 0
-    elif [ "${test_iso_url}" == 'on' ]; then
+    elif [ "${just}" == 'test' ]; then
         wget --spider "${URL}"
         exit 0
     elif [ "${just}" == 'download' ]; then
@@ -1311,7 +1311,7 @@ function zsync_get() {
     if [ "${show_iso_url}" == 'on' ]; then
         echo "${URL}"
         exit 0
-    elif [ "${test_iso_url}" == 'on' ]; then
+    elif [ "${just}" == 'test' ]; then
         wget --spider "${URL}"
         exit 0
     elif command -v zsync &>/dev/null; then
@@ -2138,7 +2138,7 @@ function get_macos() {
     if [ "${show_iso_url}" == 'on' ]; then
         echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
         exit 0
-    elif [ "${test_iso_url}" == 'on' ]; then
+    elif [ "${just}" == 'test' ]; then
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
         exit 0
@@ -3296,7 +3296,7 @@ function download_windows_workstation() {
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
         echo " - Microsoft blocked the automated download request based on your IP address."
-        if [ "${show_iso_url}" == 'on' ] || [ "${test_iso_url}" == 'on' ]; then
+        if [ "${show_iso_url}" == 'on' ] || [ "${just}" == 'test' ]; then
             exit 1
         fi
         failed=1
@@ -3324,7 +3324,7 @@ function download_windows_workstation() {
     if [ "${show_iso_url}" == 'on' ]; then
         echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
         exit 0
-    elif [ "${test_iso_url}" == 'on' ]; then
+    elif [ "${just}" == 'test' ]; then
         wget --spider "${iso_download_link}"
         exit 0
     fi
