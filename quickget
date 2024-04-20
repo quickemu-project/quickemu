@@ -851,7 +851,7 @@ function releases_bazzite() {
 }
 
 function releases_biglinux() {
-    echo kde
+    echo $(web_pipe "https://iso.biglinux.com.br/" | grep biglinux | grep iso | cut -d'_' -f2 | uniq | sort -r)
 }
 
 function releases_blendos() {
