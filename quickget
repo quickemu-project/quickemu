@@ -981,7 +981,7 @@ function editions_fedora() {
 }
 
 function releases_freebsd(){
-    local FBSD_RELEASES=$(curl -sL https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/|grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/' | tr '\n' ' ')
+    local FBSD_RELEASES=$(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/" |grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/' | sort -r | tr '\n' ' ')
     echo "${FBSD_RELEASES}"
 }
 
