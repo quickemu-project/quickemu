@@ -1274,7 +1274,7 @@ function releases_tails() {
 }
 
 function releases_tinycore() {
-    echo 14.0
+    echo 15.0 14.0
 }
 
 function editions_tinycore() {
