@@ -1448,7 +1448,8 @@ function web_get() {
         echo "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        wget --spider "${URL}"
+        echo -n "Testing if $(echo "${URL}" | rev | cut -d'/' -f1 | rev) is available... "
+        wget -q --spider "${URL}" && echo 'Sucessfull' || echo 'ERROR!'
         exit 0
     elif [ "${just}" == 'download' ]; then
         DIR="$(pwd)"
