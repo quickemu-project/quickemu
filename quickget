@@ -781,7 +781,7 @@ function releases_antix() {
 }
 
 function editions_antix() {
-	echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+    echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
 }
 
 function releases_archcraft() {
@@ -1439,13 +1439,13 @@ function web_get() {
             shift
         fi
     done
-	# Test mode for ISO
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo "${URL}"
-	    exit 0
+    # Test mode for ISO
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo "${URL}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
-	    wget --spider "${URL}"
-	    exit 0
+        wget --spider "${URL}"
+        exit 0
     elif [ "${download_iso}" == 'on' ]; then
         DIR="$(pwd)"
     fi
@@ -2335,13 +2335,13 @@ function get_macos() {
     local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
-	if [ "${show_iso_url}" == 'on' ]; then
-	    echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
-	    exit 0
+    if [ "${show_iso_url}" == 'on' ]; then
+        echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+        exit 0
     elif [ "${test_iso_url}" == 'on' ]; then
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
         wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
-	    exit 0
+        exit 0
     elif [ "${download_iso}" == 'on' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
