@@ -1010,7 +1010,8 @@ function editions_gentoo() {
 }
 
 function releases_ghostbsd() {
-    echo 22.01.12 21.11.24 21.10.16
+    web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -n 5 | tr '\n' ' '
+    echo
 }
 
 function editions_ghostbsd() {
