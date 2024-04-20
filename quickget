@@ -2400,7 +2400,7 @@ function get_macos() {
     elif [ "${download_iso}" == 'on' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-        curl --progress-bar "${chunkListLink}" -o RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        web_get "${chunkListLink}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
 
     else
@@ -2414,7 +2414,7 @@ function get_macos() {
         if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
             echo "Downloading macOS ${RELEASE} from ${downloadLink}"
             web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-            curl --progress-bar "${chunkListLink}" -o "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+            web_get "${chunkListLink}" "${VM_PATH}/RecoveryImage.chunklist" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         fi
     fi
 
