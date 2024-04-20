@@ -3767,6 +3767,13 @@ if [ ! -e "${CURL}" ]; then
 fi
 CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
 
+case "${1}" in
+  -1*|-2*|-3*|-4*|-5*)
+    show_os_info "${1}" "${2}"
+    exit 0
+    ;;
+esac
+
 if [ -n "${1}" ]; then
     OS="${1,,}"
     if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
