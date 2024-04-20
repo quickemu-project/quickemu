@@ -793,9 +793,8 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    local RLIST
-    RLIST=$(curl -s https://ant.seedhost.eu/arcolinux/iso/ | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | tr '\r\n' ' ')
-    echo ${RLIST}
+    web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | sort -r | head -n 5 | tr '\n' ' '
+    echo
 }
 
 function editions_arcolinux() {
@@ -1837,7 +1836,7 @@ function get_arcolinux() {
     local EDITION="${1:-}"
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
-    local URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
+    local URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha1" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
