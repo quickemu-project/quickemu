@@ -3804,6 +3804,9 @@ case "${1}" in
   '--list-csv'|'-lc')
     list_csv
     ;;
+  '--list-json'|'-lj')
+    list_json
+    ;;
 esac
 
 if [ -n "${1}" ]; then
