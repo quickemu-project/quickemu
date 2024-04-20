@@ -918,7 +918,7 @@ function editions_debian() {
 }
 
 function releases_deepin() {
-    echo 20.7 20.6 20.5 20.4 20.3 20.2.4 20.2.3 20.2.2 20.2.1 20.2 20.1 20
+    web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r | tr '\n' ' '
 }
 
 function releases_devuan() {
