@@ -1079,7 +1079,7 @@ function releases_macos() {
 }
 
 function releases_mageia(){
-    echo 8
+    echo 9 8
 }
 
 function editions_mageia(){
