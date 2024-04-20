@@ -1185,7 +1185,7 @@ function editions_primtux() {
 }
 
 function releases_pureos() {
-    wget -q -O- "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4
+    web_pipe "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4
 }
 function editions_pureos() {
     echo gnome plasma
