@@ -922,7 +922,7 @@ function releases_deepin() {
 }
 
 function releases_devuan() {
-    echo beowulf chimaera daedalus
+    echo daedalus chimaera beowulf
 }
 
 function releases_dragonflybsd() {
