@@ -140,6 +140,10 @@ os_info() {
     echo "${INFO}"
 }
 
+function pretty_name() {
+    echo $(show_os_info -1 "${1}")
+}
+
 os_error() {
     echo 'ERROR! You must specify an operating system.'
     echo '- Supported Operating Systems:'
@@ -230,92 +234,6 @@ os_supported_lang() {
         echo -n "${LANG} "
     done
     exit 1
-}
-
-function pretty_name() {
-  local SIMPLE_NAME=""
-  local PRETTY_NAME=""
-  SIMPLE_NAME="${1}"
-  case ${SIMPLE_NAME} in
-    alma)               PRETTY_NAME="Alma Linux";;
-    alpine)             PRETTY_NAME="Alpine Linux";;
-    android)            PRETTY_NAME="Android x86";;
-    archlinux)          PRETTY_NAME="Arch Linux";;
-    archcraft)          PRETTY_NAME="Archcraft";;
-    arcolinux)          PRETTY_NAME="Arco Linux";;
-    artixlinux)         PRETTY_NAME="Artix Linux";;
-    atheanos)           PRETTY_NAME="Athena OS";;
-    biglinux)           PRETTY_NAME="BigLinux";;
-    blendos)            PRETTY_NAME="BlendOS";;
-    cachyos)            PRETTY_NAME="CachyOS";;
-    centos-stream)      PRETTY_NAME="CentOS Stream";;
-    chimeralinux)       PRETTY_NAME="Chimera Linux";;
-    crunchbang++)       PRETTY_NAME="Crunchbang++";;
-    dragonflybsd)       PRETTY_NAME="DragonFlyBSD";;
-    easyos)             PRETTY_NAME="EasyOS";;
-    elementary)         PRETTY_NAME="elementary OS";;
-    endeavouros)        PRETTY_NAME="EndeavourOS";;
-    endless)            PRETTY_NAME="Endless OS";;
-    freebsd)            PRETTY_NAME="FreeBSD";;
-    freedos)            PRETTY_NAME="FreeDOS";;
-    garuda)             PRETTY_NAME="Garuda Linux";;
-    ghostbsd)           PRETTY_NAME="GhostBSD";;
-    gnomeos)            PRETTY_NAME="GNOME OS";;
-    holoiso)            PRETTY_NAME="SteamOS HoloISO";;
-    kdeneon)            PRETTY_NAME="KDE Neon";;
-    kolibrios)          PRETTY_NAME="KolibriOS";;
-    linuxlite)          PRETTY_NAME="Linux Lite";;
-    linuxmint)          PRETTY_NAME="Linux Mint";;
-    lmde)               PRETTY_NAME="Linux Mint Debian Edition";;
-    mageia)             PRETTY_NAME="Mageia";;
-    mxlinux)            PRETTY_NAME="MX Linux";;
-    netboot)            PRETTY_NAME="netboot.xyz";;
-    netbsd)             PRETTY_NAME="NetBSD";;
-    nitrux)             PRETTY_NAME="Nitrux";;
-    nixos)              PRETTY_NAME="NixOS";;
-    macos)              PRETTY_NAME="macOS";;
-    openbsd)            PRETTY_NAME="OpenBSD";;
-    openindiana)        PRETTY_NAME="OpenIndiana";;
-    opensuse)           PRETTY_NAME="openSUSE";;
-    oraclelinux)        PRETTY_NAME="Oracle Linux";;
-    parrotsec)          PRETTY_NAME="Parrot Security";;
-    peppermint)         PRETTY_NAME="PeppermintOS";;
-    popos)              PRETTY_NAME="Pop!_OS";;
-    primtux)            PRETTY_NAME="Primtux";;
-    pureos)             PRETTY_NAME="PureOS";;
-    reactos)            PRETTY_NAME="ReactOS";;
-    rebornos)           PRETTY_NAME="RebornOS";;
-    rockylinux)         PRETTY_NAME="Rocky Linux";;
-    slint)              PRETTY_NAME="Slint";;
-    slitaz)             PRETTY_NAME="SliTaz GNU/Linux";;
-    sparkylinux)        PRETTY_NAME="SparkyLinux";;
-    tinycore)           PRETTY_NAME="Tiny Core Linux";;
-    truenas-core)       PRETTY_NAME="TrueNAS Core";;
-    truenas-scale)      PRETTY_NAME="TrueNAS Scale";;
-    tuxedo-os)          PRETTY_NAME="Tuxedo OS";;
-    ubuntu-budgie)      PRETTY_NAME="Ubuntu Budgie";;
-    ubuntucinnamon)     PRETTY_NAME="Ubuntu Cinnamon";;
-    ubuntukylin)        PRETTY_NAME="Ubuntu Kylin";;
-    ubuntu-mate)        PRETTY_NAME="Ubuntu MATE";;
-    ubuntu-server)      PRETTY_NAME="Ubuntu Server";;
-    ubuntustudio)       PRETTY_NAME="Ubuntu Studio";;
-    ubuntu-unity)       PRETTY_NAME="Ubuntu Unity";;
-    vanillaos)          PRETTY_NAME="Vanilla OS";;
-    void)               PRETTY_NAME="Void Linux";;
-    vxlinux)            PRETTY_NAME="VX Linux";;
-    windows-server)     PRETTY_NAME="Windows Server";;
-    zorin)              PRETTY_NAME="Zorin OS";;
-    *)                  PRETTY_NAME="${SIMPLE_NAME^}";;
-  esac
-  echo "${PRETTY_NAME}"
-}
-
-function pretty_name_new() {
-    local SIMPLE_NAME=""
-    local PRETTY_NAME=""
-    SIMPLE_NAME="${1}"
-    PRETTY_NAME=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f1)
-    echo "${PRETTY_NAME}"
 }
 
 handle_missing() {
