@@ -3470,6 +3470,55 @@ create_vm() {
     make_vm_config "${ISO}"
 }
 
+help_message() {
+    #shellcheck disable=SC2016
+    printf '                           _              _
+         __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
+        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
+       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_      MIT
+        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║   license
+           ║_║  version: %s ║___/ part of Quickemu project
+--------------------------------------------------------------
+         > Quickly create and run optimised Linux, <
+       > Windows and macOS desktop virtual machines. <
+
+ Project - https://github.com/quickemu-project/quickemu
+ Discord - https://wimpysworld.io/discord
+--------------------------------------------------------------
+
+Basic Usage:
+ quickget <os> <release> [edition]
+ quickget ubuntu 22.04
+
+Advanced Usage:
+ quickget <arg> [path] <os> [re] [ed]
+ quickget --download ubuntu 22.04
+
+Arguments:
+ -[12345]              <os>           : Show info* about OS
+ --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
+ --create-config (-cc) <os> [path/url]: Create default VM config for image
+ --open-homepage  (-o) <os>           : Open homepage for the OS
+ --version        (-v)                : Show version
+ --help           (-h)                : Show this help message
+-------------- For testing & development ---------------------
+ --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
+ --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
+ --url-all       (-ua) <os>           : Show all download URLs for an OS
+ --check-all     (-ca) <os>           : Check all downloads for an OS are available
+ --list           (-l)                : List all supported systems in plain text
+ --list-csv      (-lc)                : List all supported systems in csv format
+ --list-json     (-lj)                : List all supported systems in json format
+ --list-urls     (-lu)                : List all supported systems download URLs
+ --test-urls     (-tu)                : Check all downloads for all OSs are available
+--------------------------------------------------------------
+   *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
+    Can be used in any combination like -13254 or -52
+
+supported Operating Systems:\n' "$(quickemu --version)"
+    os_support | fold -s -w "$(tput cols)"
+}
+
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4)); then
@@ -3690,52 +3739,6 @@ if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
     exit 1
 fi
 
-help_message() {
-    #shellcheck disable=SC2016
-    printf '                           _              _
-         __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
-        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
-       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_      MIT
-        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║   license
-           ║_║  version: %s ║___/ part of QUICKEMU project
- QEMU %s --------------------------------------------------
-         > Quickly create and run optimised Linux, <
-       > Windows and macOS desktop virtual machines. <
-   homepage   -    Not Yet
-  repository  - https://github.com/quickemu-project/quickemu
- official GUI - https://github.com/quickemu-project/quickgui
-  by Wimpy https://github.com/flexiondotorg and contributors
- Discord - https://discord.gg/wimpy-s-world-712850672223125565
---------------------------------------------------------------
-
-Basic Usage:
- quickget <os> <release> [edition]
- quickget alpine latest
-
-Advanced Usage:
- quickget <arg> [path] <os> [re] [ed]
- quickget -d peppermint latest devuan-xfce
-
-Posible arguments:
- --help             (-h)                : Show this help message and exit
- --os-info          (-i) <os>           : Show info about OS
- --os-homepage      (-o) <os>           : Open OS homepage in default browser
- --iso-download     (-d) <os> <re> [ed] : Just download ISO
- --custom           (-c) <os> <ISO path>: Create VM with downloaded ISO*
- --version          (-v)                : Show version and exit
- * To prepare custom VM config (Not supported by quickget) use:
-   quickget --custom <some name> <path to ISO>
--------------- for developers / testing ----------------------
- --list-json       (-lj)                : Show OS info in json format
- --list-csv        (-lc)                : Show OS info in csv format
- --list-supported  (-ls)                : List all supported OS,releases,editions
- --list-isos       (-li)                : List all supported ISOs
- --test-isos       (-ti)                : Test if ISOs are available
---------------------------------------------------------------
-supported Operating Systems:\n' "$(quickemu --version)" "$(qemu-x86_64 -version | head -1 | cut -d' ' -f3)"
-    os_support | fold -s -w "$(tput cols)"
-    exit 0
-}
 
 if [ -n "${2}" ]; then
     RELEASE="${2,,}"
