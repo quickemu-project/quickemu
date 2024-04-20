@@ -1448,8 +1448,7 @@ function web_pipe() {
 
 # Download a file from the web
 function web_get() {
-    local URL=""
-    URL=$(web_redirect "${1}")
+    local URL="${1}"
     local DIR="${2}"
     local FILE=""
     local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
@@ -1459,6 +1458,9 @@ function web_get() {
     else
         FILE="${URL##*/}"
     fi
+
+    # Process any URL redirections after the file name has been extracted
+    URL=$(web_redirect "${URL}")
 
     while (( "$#" )); do
         if [[ $1 == --header ]]; then
