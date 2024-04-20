@@ -313,6 +313,7 @@ function csv_data() {
     fi
 
     for OS in $(os_support); do
+        local EDITIONS=""
         DISPLAY_NAME="$(pretty_name "${OS}")"
 
         case ${OS} in
@@ -324,6 +325,10 @@ function csv_data() {
         PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
         SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+            EDITIONS=$(editions_"${OS}")
+        fi
+
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
             if [[ "${OS}" == *"ubuntu"* ]] && [[ ${RELEASE} == *"daily"*  ]] && [ ${HAS_ZSYNC} -eq 1 ]; then
                 DOWNLOADER="zsync"
@@ -332,8 +337,8 @@ function csv_data() {
             fi
 
             # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
+            if [[ ${EDITIONS} ]]; then
+                for OPTION in ${EDITIONS}; do
                     echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
