@@ -249,6 +249,11 @@ function pretty_name() {
     echo $(show_os_info -1 "${1}")
 }
 
+# Just in case quickget wanna use homepage
+function os_homepage(){
+    echo $(show_os_info -4 "${1}")
+}
+
 handle_missing() {
     # Handle odd missing Fedora combinations
     if [[ $OS == fedora ]] ; then
@@ -572,119 +577,6 @@ function os_support() {
     windows-server \
     xubuntu \
     zorin
-}
-
-function os_homepage(){
-    local SIMPLE_NAME=""
-    local HOMEP=""
-    SIMPLE_NAME="${1}"
-    HOMEP=$(os_info "${SIMPLE_NAME}" | cut -d'|' -f4)
-    echo "$HOMEP"
-}
-
-function os_homepages(){
-    local SIMPLE_NAME=""
-    local HOMEPAGE=""
-    SIMPLE_NAME="${1}"
-    case ${SIMPLE_NAME} in
-        alma)              HOMEPAGE="https://almalinux.org/";;
-        alpine)            HOMEPAGE="https://alpinelinux.org/";;
-        android)           HOMEPAGE="https://www.android-x86.org/";;
-        antix)             HOMEPAGE="https://antixlinux.com/";;
-        archlinux)         HOMEPAGE="https://archlinux.org/";;
-        archcraft)         HOMEPAGE="https://archcraft.io/";;
-        arcolinux)         HOMEPAGE="https://arcolinux.com/";;
-        artixlinux)        HOMEPAGE="https://artixlinux.org/";;
-        athenaos)          HOMEPAGE="https://athenaos.org/";;
-        batocera)          HOMEPAGE="https://batocera.org/";;
-        bazzite)           HOMEPAGE="https://bazzite.gg/";;
-        biglinux)          HOMEPAGE="https://www.biglinux.com.br/";;
-        blendos)           HOMEPAGE="https://blendos.co/";;
-        bodhi)             HOMEPAGE="https://www.bodhilinux.com/";;
-        bunsenlabs)        HOMEPAGE="https://www.bunsenlabs.org/";;
-        cachyos)           HOMEPAGE="https://cachyos.org/";;
-        centos-stream)     HOMEPAGE="https://www.centos.org/centos-stream/";;
-        chimeralinux)      HOMEPAGE="https://chimera-linux.org/";;
-        crunchbang++)      HOMEPAGE="https://www.crunchbangplusplus.org/";;
-        debian)            HOMEPAGE="https://www.debian.org/";;
-        deepin)            HOMEPAGE="https://www.deepin.org/";;
-        devuan)            HOMEPAGE="https://www.devuan.org/";;
-        dragonflybsd)      HOMEPAGE="https://www.dragonflybsd.org/";;
-        easyos)            HOMEPAGE="https://easyos.org/";;
-        edubuntu)          HOMEPAGE="https://www.edubuntu.org/";;
-        elementary)        HOMEPAGE="https://elementary.io/";;
-        endeavouros)       HOMEPAGE="https://endeavouros.com/";;
-        endless)           HOMEPAGE="https://www.endlessos.org/os";;
-        fedora)            HOMEPAGE="https://www.fedoraproject.org/";;
-        freebsd)           HOMEPAGE="https://www.freebsd.org/";;
-        freedos)           HOMEPAGE="https://freedos.org/";;
-        garuda)            HOMEPAGE="https://garudalinux.org/";;
-        gentoo)            HOMEPAGE="https://www.gentoo.org/";;
-        ghostbsd)          HOMEPAGE="https://www.ghostbsd.org/";;
-        gnomeos)           HOMEPAGE="https://os.gnome.org/";;
-        guix)              HOMEPAGE="https://guix.gnu.org/";;
-        haiku)             HOMEPAGE="https://www.haiku-os.org/";;
-        holoiso)           HOMEPAGE="https://github.com/HoloISO/holoiso";;
-        kali)              HOMEPAGE="https://www.kali.org/";;
-        kdeneon)           HOMEPAGE="https://neon.kde.org/";;
-        kolibrios)         HOMEPAGE="http://kolibrios.org/en/";;
-        kubuntu)           HOMEPAGE="https://kubuntu.org/";;
-        linuxlite)         HOMEPAGE="https://www.linuxliteos.com/";;
-        linuxmint)         HOMEPAGE="https://linuxmint.com/";;
-        lmde)              HOMEPAGE="https://www.linuxmint.com/download_lmde.php";;
-        mageia)            HOMEPAGE="https://www.mageia.org/";;
-        manjaro)           HOMEPAGE="https://manjaro.org/";;
-        mxlinux)           HOMEPAGE="https://mxlinux.org/";;
-        netboot)           HOMEPAGE="https://netboot.xyz/";;
-        netbsd)            HOMEPAGE="https://www.netbsd.org/";;
-        nitrux)            HOMEPAGE="https://nxos.org/";;
-        nixos)             HOMEPAGE="https://nixos.org/";;
-        lubuntu)           HOMEPAGE="https://lubuntu.me/";;
-        macos)             HOMEPAGE="https://www.apple.com/macos/";;
-        openbsd)           HOMEPAGE="https://www.openbsd.org/";;
-        openindiana)       HOMEPAGE="https://www.openindiana.org/";;
-        opensuse)          HOMEPAGE="https://www.opensuse.org/";;
-        oraclelinux)       HOMEPAGE="https://www.oracle.com/linux/";;
-        parrotsec)         HOMEPAGE="https://www.parrotsec.org/";;
-        peppermint)        HOMEPAGE="https://peppermintos.com/";;
-        popos)             HOMEPAGE="https://pop.system76.com/";;
-        porteus)           HOMEPAGE="http://www.porteus.org/";;
-        primtux)           HOMEPAGE="https://primtux.fr/";;
-        pureos)            HOMEPAGE="https://www.pureos.net/";;
-        reactos)           HOMEPAGE="https://reactos.org/";;
-        rebornos)          HOMEPAGE="https://rebornos.org/";;
-        rockylinux)        HOMEPAGE="https://rockylinux.org/";;
-        siduction)         HOMEPAGE="https://siduction.org/";;
-        slackware)         HOMEPAGE="http://www.slackware.com/";;
-        slax)              HOMEPAGE="https://www.slax.org/";;
-        slint)             HOMEPAGE="https://slint.fr/";;
-        slitaz)            HOMEPAGE="https://www.slitaz.org/";;
-        solus)             HOMEPAGE="https://getsol.us/";;
-        sparkylinux)       HOMEPAGE="https://sparkylinux.org/";;
-        spirallinux)       HOMEPAGE="https://spirallinux.github.io/";;
-        tails)             HOMEPAGE="https://tails.net/";;
-        tinycore)          HOMEPAGE="http://www.tinycorelinux.net/";;
-        trisquel)          HOMEPAGE="https://trisquel.info/";;
-        truenas-core)      HOMEPAGE="https://www.truenas.com/truenas-core/";;
-        truenas-scale)     HOMEPAGE="https://www.truenas.com/truenas-scale/";;
-        tuxedo-os)         HOMEPAGE="https://www.tuxedocomputers.com";;
-        ubuntu)            HOMEPAGE="https://ubuntu.com/";;
-        ubuntu-budgie)     HOMEPAGE="https://ubuntubudgie.org/";;
-        ubuntucinnamon)    HOMEPAGE="https://ubuntucinnamon.org/";;
-        ubuntukylin)       HOMEPAGE="https://ubuntukylin.com/";;
-        ubuntu-mate)       HOMEPAGE="https://ubuntu-mate.org/";;
-        ubuntu-server)     HOMEPAGE="https://ubuntu.com/server";;
-        ubuntustudio)      HOMEPAGE="https://ubuntustudio.org/";;
-        ubuntu-unity)      HOMEPAGE="https://ubuntuunity.org/";;
-        vanillaos)         HOMEPAGE="https://vanillaos.org/";;
-        void)              HOMEPAGE="https://voidlinux.org/";;
-        vxlinux)           HOMEPAGE="https://vxlinux.org/";;
-        windows)           HOMEPAGE="https://www.microsoft.com/en-us/windows/";;
-        windows-server)    HOMEPAGE="https://www.microsoft.com/en-us/windows-server/";;
-        xubuntu)           HOMEPAGE="https://xubuntu.org/";;
-        zorin)             HOMEPAGE="https://zorin.com/os/";;
-    esac
-    echo "${HOMEPAGE}"
 }
 
 function releases_alma() {
