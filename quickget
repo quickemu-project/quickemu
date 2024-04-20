@@ -1105,7 +1105,7 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-    local NBSD_RELEASES=$(curl -sL  http://cdn.netbsd.org/pub/NetBSD/iso/ | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | sort -nr | tr '\n' ' ')
+    local NBSD_RELEASES=$(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | sort -nr | tr '\n' ' ')
     echo "${NBSD_RELEASES}"
 }
 
