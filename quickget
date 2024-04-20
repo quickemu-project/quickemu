@@ -946,7 +946,7 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    local ENDEAVOUR_RELEASES="$(curl -s https://mirror.alpix.eu/endeavouros/iso/ | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | tr '\n' ' ')"
+    local ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
     echo "${ENDEAVOUR_RELEASES,,}"
 }
 
