@@ -1446,9 +1446,10 @@ function web_pipe() {
 }
 
 function web_get() {
+    local URL=""
+    URL=$(web_redirect "${1}")
     local DIR="${2}"
     local FILE=""
-    local URL="${1}"
     local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 
     if [ -n "${3}" ]; then
@@ -1487,13 +1488,6 @@ function web_get() {
     fi
 
     if command -v curl &>/dev/null; then
-        # Check for URL redirections
-        # Output to nonexistent directory so the download fails fast
-        local REDIRECT_URL=$(curl --silent --location --fail "${URL}" --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM})
-        if [ "${REDIRECT_URL}" != "${URL}" ]; then
-            echo "- Redirected: ${REDIRECT_URL}"
-            URL="${REDIRECT_URL}"
-        fi
         if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
             echo "ERROR! Failed to download ${URL} with curl."
             echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
