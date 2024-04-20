@@ -1307,7 +1307,7 @@ function releases_tuxedo-os() {
 }
 
 function releases_ubuntu() {
-    local VERSION_DATA="$(IFS=$'\n' wget -qO- https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    local VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
     local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
     local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
     local LTS_SUPPORT=()
@@ -1338,7 +1338,7 @@ function releases_ubuntu() {
 }
 
 function releases_ubuntu-server() {
-    local ALL_VERSIONS=($(IFS=$'\n' wget -qO- http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version'))
+    local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version'))
     local LTS_SUPPORT=()
     local INTERIM_SUPPORT=()
     for i in "${!ALL_VERSIONS[@]}"; do
