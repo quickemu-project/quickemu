@@ -1200,8 +1200,8 @@ function releases_rebornos() {
 }
 
 function get_rebornos() {
-    local ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    local HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    local ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    local HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
     echo "${ISO} ${HASH}"
 }
 
