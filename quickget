@@ -3784,6 +3784,11 @@ case "${1}" in
         exit 0
     fi
     ;;
+  '--version'|'-v')
+    WHERE=$(dirname "${BASH_SOURCE[0]}")
+    "${WHERE}/quickemu" --version
+    exit 0
+    ;;
 esac
 
 if [ -n "${1}" ]; then
