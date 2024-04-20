@@ -1020,7 +1020,7 @@ function editions_ghostbsd() {
 
 function releases_gnomeos() {
     local GNOMEOS_RELEASES=""
-    GNOMEOS_RELEASES="$(curl -s https://download.gnome.org/gnomeos/ | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr | tr '\n' ' ')"
+    GNOMEOS_RELEASES="$(web_pipe "https://download.gnome.org/gnomeos/" | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr | tr '\n' ' ')"
     echo nightly "${GNOMEOS_RELEASES}"
 }
 
