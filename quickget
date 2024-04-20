@@ -3548,6 +3548,10 @@ case "${1}" in
     just="test"
     shift
     ;;
+  '--url'|'-u')
+    just="show"
+    shift
+    ;;
     #TODO: Argument list should be DEPRECATED!
   '--list-csv'|'-lc'|'list')
     list_csv
