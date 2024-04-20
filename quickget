@@ -1071,7 +1071,7 @@ function editions_lmde(){
 }
 
 function releases_lmde(){
-    echo 5
+    echo 6
 }
 
 function releases_macos() {
