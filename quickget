@@ -1416,9 +1416,7 @@ function check_hash() {
 
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
-    local URL=""
-    URL=$(web_redirect "${1}")
-    curl --silent --location "${URL}"
+    curl --silent --location "${1}"
 }
 
 # Download a file from the web
