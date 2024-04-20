@@ -1529,6 +1529,12 @@ function web_redirect() {
     fi
 }
 
+function web_check() {
+    local URL=""
+    URL=$(web_redirect "${1}")
+    curl --silent --location --head --output /dev/null --fail "${URL}"
+}
+
 function zsync_get() {
     local DIR="${2}"
     local FILE="${1##*/}"
