@@ -1489,22 +1489,21 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    if command -v curl &>/dev/null; then
-        if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-            echo "ERROR! Failed to download ${URL} with curl."
+    if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+        echo "ERROR! Failed to download ${URL} with curl."
+        echo "       Will try again with wget."
+        rm -f "${DIR}/${FILE}"
+        if command -v wget2 &>/dev/null; then
+            if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
+                echo "ERROR! Failed to download ${URL} with wget2."
+                echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
+                exit 1
+            fi
+        elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
+            echo "ERROR! Failed to download ${URL} with wget."
             echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
             exit 1
         fi
-    elif command -v wget2 &>/dev/null; then
-        if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-            echo "ERROR! Failed to download ${URL} with wget2."
-            echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
-            exit 1
-        fi
-    elif ! wget --quiet --continue --tries=3 --read-timeout=10 --show-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" "${HEADERS[@]}"; then
-        echo "ERROR! Failed to download ${URL} with wget."
-        echo "       Try deleting '${DIR}/${FILE}' running 'quickget' again."
-        exit 1
     fi
 }
 
