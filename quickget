@@ -839,7 +839,7 @@ function editions_artixlinux() {
 }
 
 function releases_athenaos() {
-    wget -q -O- 'https://sourceforge.net/projects/athena-iso/rss?path=/' | grep '.iso/download"' | cut -d'=' -f5 | cut -d'"' -f2 | cut -d'/' -f7 | cut -d'v' -f2 | sed ':a;N;$!ba;s/\n/ /g'
+    web_pipe "https://api.github.com/repos/Athena-OS/athena/releases" | grep 'download_url' | grep rolling | cut -d'/' -f8 | uniq | tr '\n' ' '
 }
 
 function releases_batocera() {
@@ -1854,17 +1854,9 @@ function get_artixlinux() {
 
 function get_athenaos() {
     local HASH=""
-    local URL=""
-    local ISO=""
-    case ${RELEASE} in
-      rolling)
-        ISO="athena-rolling-x86_64.iso"
-        URL="https://sourceforge.net/projects/athena-iso/files/rolling"
-        ;;
-      *)
-        ISO="athena-20${RELEASE}-x86_64.iso"
-        URL="https://sourceforge.net/projects/athena-iso/files/v${RELEASE}"
-    esac
+    local URL="https://github.com/Athena-OS/athena/releases/download/${RELEASE}"
+    local ISO="athena-rolling-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
