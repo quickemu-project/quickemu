@@ -1136,7 +1136,8 @@ function editions_openindiana(){
 }
 
 function releases_opensuse(){
-    echo 15.4 15.3 15.2 15.1 15.0 microos tumbleweed
+    web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r | tr '\n' ' '
+    echo microos tumbleweed
 }
 
 function releases_oraclelinux() {
