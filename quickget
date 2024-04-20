@@ -3772,6 +3772,10 @@ case "${1}" in
     show_os_info "${1}" "${2}"
     exit 0
     ;;
+  '--download'|'-d')
+    just="download"
+    shift
+    ;;
 esac
 
 if [ -n "${1}" ]; then
