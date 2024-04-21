@@ -845,7 +845,7 @@ function editions_bodhi() {
 }
 
 function releases_bunsenlabs() {
-    echo latest
+    echo boron
 }
 
 function releases_cachyos() {
