@@ -809,7 +809,7 @@ function editions_artixlinux() {
 }
 
 function releases_athenaos() {
-    web_pipe "https://api.github.com/repos/Athena-OS/athena/releases" | grep 'download_url' | grep rolling | cut -d'/' -f8 | uniq | tr '\n' ' '
+    echo $(web_pipe "https://api.github.com/repos/Athena-OS/athena/releases" | grep 'download_url' | grep rolling | cut -d'/' -f8 | uniq | tr '\n' ' ')
 }
 
 function releases_batocera() {
