@@ -813,7 +813,7 @@ function releases_athenaos() {
 }
 
 function releases_batocera() {
-    echo latest
+    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail +2 | head -n 5)
 }
 
 function releases_bazzite() {
@@ -1884,7 +1884,7 @@ function get_vanillaos() {
 
 function get_batocera() {
     local HASH=""
-    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/last"
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
     local ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
     echo "${URL}/${ISO} ${HASH}"
 }
