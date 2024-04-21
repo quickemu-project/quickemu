@@ -211,6 +211,13 @@ function error_specify_release() {
     exit 1
 }
 
+function error_specify_edition() {
+    echo -en "ERROR! You must specify an edition.\n - Editions: "
+    #TODO ERROR here
+    "editions_${OS}"
+    exit 1
+}
+
 function error_not_supported_os() {
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support | fold -s -w "$(tput cols)"
@@ -236,13 +243,6 @@ function error_not_supported_edition() {
         echo ""
         exit 1
     fi
-}
-
-os_error_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
 }
 
 function error_not_supported_lang() {
@@ -3487,13 +3487,6 @@ fi
 
 LANGS=()
 
-os_error_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
-}
-
 handle_missing() {
     # Handle odd missing Fedora combinations
     if [[ $OS == fedora ]] ; then
@@ -3575,7 +3568,7 @@ if [ -n "${2}" ]; then
             EDITION="${3}"
             error_not_supported_edition
         else
-            os_error_edition
+            error_specify_edition
         fi
         handle_missing
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
