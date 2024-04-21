@@ -34,6 +34,12 @@ function cut_1() {
     cut -d' ' -f1
 }
 
+{
+    {
+        {
+            { ### UGGLY BUUGS TO SEE reviewdog barking
+
+
 os_info() {
     local SIMPLE_NAME=""
     local INFO=""
