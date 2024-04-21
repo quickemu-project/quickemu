@@ -170,12 +170,6 @@ function error_specify_os() {
     exit 1
 }
 
-os_path_error() {
-    echo 'ERROR! You must specify path.'
-    os_error
-    exit 1
-}
-
 os_supported() {
     if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
         os_not_supported
@@ -215,6 +209,13 @@ function error_specify_edition() {
     echo -en "ERROR! You must specify an edition.\n - Editions: "
     #TODO ERROR here
     "editions_${OS}"
+    exit 1
+}
+
+#TODO: Not yet used!
+function error_specify_path() {
+    echo 'ERROR! You must specify path.'
+    error_specify_os
     exit 1
 }
 
@@ -3504,12 +3505,6 @@ handle_missing() {
             exit 1;
         fi
     fi
-}
-
-os_path_error() {
-    echo 'ERROR! You must specify path.'
-    os_error
-    exit 1
 }
 
 CURL=$(command -v curl)
