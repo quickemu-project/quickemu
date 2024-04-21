@@ -39,7 +39,7 @@ os_info() {
     local INFO=""
     SIMPLE_NAME="${1}"
     case ${SIMPLE_NAME} in
-      #name)            INFO=" PrettyName|BasedOf|Credentials|Homepage|Info";;
+      #name)            INFO="PrettyName|BasedOf|Credentials|Homepage|Info";;
       alma)             INFO="Alma Linux|Fedora,RedHat||https://almalinux.org/|Community owned and governed, forever-free enterprise Linux distribution, focused on long-term stability, providing a robust production-grade platform. AlmaLinux OS is binary compatible with RHEL®.";;
       alpine)           INFO="Alpine Linux|Independent||https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
       android)          INFO="Android x86|Independent||https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
