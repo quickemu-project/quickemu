@@ -2291,7 +2291,7 @@ function get_macos() {
     fi
 
     if [ -z "${CHUNKCHECK}" ]; then
-        read -p "ERROR! Can not find chunkcheck. Will not be able to verify image. Proceed anyways?" skipVerification
+        read -p "ERROR! Can not find chunkcheck. Will not be able to verify image. Proceed anyway?" skipVerification
         if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
             exit 1
         fi
