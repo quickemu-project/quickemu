@@ -182,7 +182,7 @@ os_supported() {
     fi
 }
 
-os_error_release() {
+function error_specify_release() {
     echo 'ERROR! You must specify a release.'
     case ${OS} in
       *ubuntu-server*)
@@ -3519,35 +3519,6 @@ os_path_error() {
     exit 1
 }
 
-os_error_release() {
-    echo 'ERROR! You must specify a release.'
-    case ${OS} in
-      *ubuntu-server*)
-        echo -n ' - Releases: '
-        releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *ubuntu*)
-        echo -n ' - Releases: '
-        releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
-        ;;
-      *windows*)
-        echo -n ' - Releases: '
-        "releases_${OS}"
-        echo -n ' - Languages: '
-        "languages_${OS}" && echo "${LANGS[@]}"
-        ;;
-      *)
-        echo -n ' - Releases: '
-        "releases_${OS}" | fold -s -w "$(tput cols)"
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-            echo -n ' - Editions: '
-            "editions_${OS}" | fold -s -w "$(tput cols)"
-        fi
-        ;;
-    esac
-    exit 1
-}
-
 CURL=$(command -v curl)
 if [ ! -e "${CURL}" ]; then
     echo "ERROR! curl not found. Please make install curl"
@@ -3643,7 +3614,7 @@ if [ -n "${2}" ]; then
         create_vm "$("get_${OS}")"
     fi
 else
-    os_error_release
+    error_specify_release
 fi
 
 # vim:tabstop=4:shiftwidth=4:expandtab
