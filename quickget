@@ -2593,9 +2593,8 @@ function get_rebornos() {
 
 function get_rockylinux() {
     local EDITION="${1:-}"
-    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]
-    then
-      EDITION="dvd1"
+    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]; then
+        EDITION="dvd1"
     fi
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
