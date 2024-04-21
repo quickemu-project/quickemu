@@ -1920,7 +1920,7 @@ function get_garuda() {
     local ISO=""
     local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
     ISO=${EDITION}/latest.iso
-    HASH="$(wget -q -O- "${URL}/${ISO}.sha256" | cut_1)"
+    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut_1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
