@@ -1835,14 +1835,6 @@ function get_biglinux() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_bunsenlabs() {
-    local HASH=""
-    local ISO="boron-1-240123-amd64.hybrid.iso"
-    local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut_1)
-    echo "${URL}/${ISO} ${HASH}"
-}
-
 function get_blendos() {
     local HASH=""
     local ISO="blendos-${RELEASE}-stable-${EDITION}.iso"
@@ -1876,6 +1868,14 @@ function get_bodhi() {
       *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_bunsenlabs() {
+    local HASH=""
+    local ISO="boron-1-240123-amd64.hybrid.iso"
+    local URL="https://ddl.bunsenlabs.org/ddl"
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
