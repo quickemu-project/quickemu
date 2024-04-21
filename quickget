@@ -1158,12 +1158,6 @@ function releases_rebornos() {
     echo latest
 }
 
-function get_rebornos() {
-    local ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    local HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
-    echo "${ISO} ${HASH}"
-}
-
 function releases_rockylinux() {
     echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 8.3
 }
@@ -2584,6 +2578,14 @@ function get_reactos() {
     local HASH=""
     local URL="https://sourceforge.net/projects/reactos/files/latest/download"
     echo "${URL} ${HASH}"
+}
+
+function get_rebornos() {
+    local ISO=""
+    local HASH=""
+    ISO=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(wget -q -O- "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    echo "${ISO} ${HASH}"
 }
 
 function get_rockylinux() {
