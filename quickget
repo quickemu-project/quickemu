@@ -350,7 +350,7 @@ function list_csv() {
     exit 0
 }
 
-list_supported() {
+function list_supported() {
     # output OS RELEASE EDITION (usefull for straight testing...)
     local DL=""
     local FUNC
@@ -381,7 +381,7 @@ list_supported() {
     exit 0
 }
 
-list_isos() {
+function list_isos() {
     local showIsoUrl=on
     local DIR="/dev/null"
     local URL
@@ -426,7 +426,7 @@ list_isos() {
     exit 0
 }
 
-test_isos() {
+function test_isos() {
     local testIsoUrl=on
     local DIR="/dev/null"
     local FUNC
@@ -3382,7 +3382,7 @@ function get_windows() {
     fi
 }
 
-open_url() {
+function open_url() {
     local URL="$1";
     xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
 }
