@@ -103,8 +103,8 @@ os_info() {
       peppermint)       INFO="PeppermintOS|Debian,Devuan||https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
       popos)            INFO="Pop!_OS|Ubuntu||https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
       porteus)          INFO="Porteus|Slackware||http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
+      primtux)          INFO="PrimTux|Ubuntu||https://primtux.fr/|A complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware.";;
       pureos)           INFO="PureOS|Debian||https://www.pureos.net/|A fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation.";;
-      primtux)          INFO="PrimTux|Ubuntu||https://primtux.fr/|Upgrade for obsolete equipment and benefiting the school or educational environment in the spirit of education.";;
       reactos)          INFO="ReactOS|Independent||https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
       rebornos)         INFO="RebornOS|Arch||https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
       rockylinux)       INFO="Rocky Linux|RedHat||https://rockylinux.org/|Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux®.";;
