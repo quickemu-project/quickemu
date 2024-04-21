@@ -1815,7 +1815,7 @@ function get_archlinux() {
 function get_archcraft() {
     local HASH=""
     local URL=""
-    URL="https://sourceforge.net/projects/archcraft/files/latest/download"
+    URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
     echo "${URL} ${HASH}"
 }
 
