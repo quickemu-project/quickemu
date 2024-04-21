@@ -240,7 +240,7 @@ os_error_edition() {
     exit 1
 }
 
-os_supported_lang() {
+function error_not_supported_lang() {
     echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
     echo -n ' - Editions: '
     for LANG in "${LANGS[@]}"; do
@@ -3553,15 +3553,6 @@ os_error_edition() {
     exit 1
 }
 
-os_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
-    echo -n ' - Editions: '
-    for LANG in "${LANGS[@]}"; do
-        echo -n "${LANG} "
-    done
-    exit 1
-}
-
 handle_missing() {
     # Handle odd missing Fedora combinations
     if [[ $OS == fedora ]] ; then
@@ -3755,7 +3746,7 @@ if [ -n "${2}" ]; then
         if [ -n "${3}" ]; then
             LANG="${3}"
             if [[ ! ${LANGS[*]} =~ "${LANG}" ]]; then
-                os_supported_lang
+                error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${LANG// /-}" | tr -d '()')"
         fi
