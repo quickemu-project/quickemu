@@ -1808,8 +1808,8 @@ function get_archlinux() {
     local ISO=""
     local URL="https://mirror.rackspace.com/archlinux"
     ISO=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
-    HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha1_sum')
-    echo "${URL}/${ISO} ${HASH}"
+    HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha256_sum')
+    echo "${URL}${ISO} ${HASH}"
 }
 
 function get_archcraft() {
