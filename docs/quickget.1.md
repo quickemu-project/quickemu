@@ -81,6 +81,10 @@ You can run `quickget ubuntu daily-live` to refresh your daily
 development image as often as you like, it will even automatically
 switch to a new series.
 
+The project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+may have further information.
+
 ### Ubuntu Flavours
 
 All the official Ubuntu flavours are supported, just replace `ubuntu`
@@ -99,21 +103,44 @@ with your preferred flavour.
 -   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
-You can also use `quickget` with options to:
+You can also use `quickget` with advanced options :
+
+``` text
+ -[12345]              <os>           : Show info* about OS
+ --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
+ --create-config (-cc) <os> [path/url]: Create default VM config for image
+ --open-homepage  (-o) <os>           : Open homepage for the OS
+ --version        (-v)                : Show version
+ --help           (-h)                : Show this help message
+ --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
+ --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
+ --url-all       (-ua) <os>           : Show all download URLs for an OS
+ --check-all     (-ca) <os>           : Check all downloads for an OS are available
+ --list           (-l)                : List all supported systems in plain text
+ --list-csv      (-lc)                : List all supported systems in csv format
+ --list-json     (-lj)                : List all supported systems in json format
+ --list-urls     (-lu)                : List all supported systems download URLs
+ --test-urls     (-tu)                : Check all downloads for all OSs are available
+```
+
+Here are some typical uses
 
 ``` shell
     # show an OS ISO download URL for {os} {release} [edition]
-    quickget --show-iso-url fedora 38 Silverblue
+    quickget --url fedora 38 Silverblue
     # test if an OS ISO is available for {os} {release} [edition]
-    quickget --test-iso-url nixos 23.05 plasma5
+    quickget --check nixos unstable plasma5
     # open an OS distribution homepage in a browser
-    quickget --open-distro-homepage  ubuntu-mate
+    quickget --open-homepage  ubuntu-mate
     # Only download image file into current directory, without creating VM
-    quickget --download-iso elementary 7.1
+    quickget --download elementary 7.1
 ```
 
-The `--show-iso-url`, `--test-iso-url`, and `--download-iso` options are
-fully functional for all operating systems, including Windows and macOS.
+The `--url`, `--check`, and `--download` options are fully functional
+for all operating systems, including Windows and macOS.
+
+Further information is available from the project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features)
 
 ### Other Operating Systems
 
@@ -127,17 +154,17 @@ fully functional for all operating systems, including Windows and macOS.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `artixlinux` (Artix Linux)
--   `athenaos` (Athenaos)
+-   `athenaos` (Athena OS)
 -   `batocera` (Batocera)
--   `bazzite` (Bazzite)
--   `biglinux` (BigLinux)
+-   `bazzite` (bazzite)
+-   `biglinux` (Big Linux)
 -   `blendos` (BlendOS)
 -   `bodhi` (Bodhi)
--   `bunsenlabs` (Bunsenlabs)
+-   `bunsenlabs` (Bunsenlab)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `chimeralinux` (Chimera Linux)
--   `crunchbang++` (Crunchbang++)
+-   `crunchbang++` (#!++)
 -   `debian` (Debian)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
@@ -152,7 +179,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
--   `gnomeos` (GNOME OS)
+-   `gnomeos` ()
 -   `guix` (Guix)
 -   `haiku` (Haiku)
 -   `holoiso` (SteamOS HoloISO)
@@ -177,7 +204,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `peppermint` (PeppermintOS)
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
--   `primtux` (Primtux)
+-   `primtux` (PrimTux)
 -   `pureos` (PureOS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
@@ -186,22 +213,22 @@ fully functional for all operating systems, including Windows and macOS.
 -   `slackware` (Slackware)
 -   `slax` (Slax)
 -   `slint` (Slint)
--   `slitaz` (SliTaz GNU/Linux)
+-   `slitaz` (SliTaz)
 -   `solus` (Solus)
 -   `sparkylinux` (SparkyLinux)
--   `spirallinux` (Spirallinux)
+-   `spirallinux` (Spiral Linux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
 -   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
--   `tuxedo-os` (Tuxedo OS)
+-   `tuxedo-os` ()
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
 -   `zorin` (Zorin OS)
 
-### Custom Linux guests
+### [Custom Linux guests](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines#manually-create-linux-guests)
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -228,7 +255,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-## Creating macOS Guests 🍏
+## [Creating macOS Guests](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests) 🍏
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -382,7 +409,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Creating Windows guests 🪟
+## [Creating Windows guests](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
 
 `quickget` can download [**Windows
 10**](https://www.microsoft.com/software-download/windows10) and

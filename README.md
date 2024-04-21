@@ -91,9 +91,9 @@ virtual machines.
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
 -   Graphical user interfaces available
 
-## Installation
+## [Installation](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
 
-### Arch Linux hosts
+### [Arch Linux hosts](https://github.com/quickemu-project/quickemu/wiki/01-Installation#arch-linux)
 
 Quickemu is available from the AUR (Arch user repository), and can be
 installed via any AUR helper. Assuming your AUR helper is yay, Run the
@@ -103,18 +103,17 @@ following command:
 yay -Sy quickemu
 ```
 
-### Debian and derivatives
+### [Debian and derivatives](https://github.com/quickemu-project/quickemu/wiki/01-Installation#debian-and-derivatives)
 
-A [.deb package is available for Debian and derivatives in this
-project's GitHub releases
-page](https://github.com/quickemu-project/quickemu/releases). Download
-the .deb and install it with `apt-get`.
+A [.deb package](https://github.com/quickemu-project/quickemu/releases)
+is available for Debian and derivatives in this project's GitHub
+releases page. Download the .deb and install it with `apt-get`.
 
 ``` shell
 sudo apt-get install ./quickemu_x.y.z-1_all.deb
 ```
 
-### Ubuntu hosts
+### [Ubuntu hosts](https://github.com/quickemu-project/quickemu/wiki/01-Installation#ubuntu)
 
 Quickemu is available from a PPA for Ubuntu users. The Quickemu PPA also
 includes a back port of QEMU 6.0.0 for 20.04 (Focal) and 21.04
@@ -127,7 +126,7 @@ sudo apt update
 sudo apt install quickemu
 ```
 
-### NixOS hosts
+### [NixOS hosts](https://github.com/quickemu-project/quickemu/wiki/01-Installation#nixos-hosts)
 
 To quickly try quickemu:
 
@@ -158,11 +157,13 @@ To install via Flakes:
 # TODO (flake users, please add an example!)
 ```
 
-### Other Linux hosts (installing from source)
+### [Other Linux hosts (installing from source)](https://github.com/quickemu-project/quickemu/wiki/01-Installation#any-linux-installing-from-source)
 
 ``` shell
 git clone --filter=blob:none https://github.com/quickemu-project/quickemu
 cd quickemu
+# optionally
+sudo make install
 ```
 
 When installing from source, you will need to install the following
@@ -208,13 +209,13 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` shell
-sudo apt install qemu bash coreutils ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install qemu bash coreutils edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
@@ -224,10 +225,12 @@ This is a **work in progress** (see [issue
 steps and changes that may enable running on MacOS)
 
 ``` shell
-brew install qemu bash coreutils grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
+brew install qemu bash coreutils curl grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
 ```
 
-## GUI (quickgui)
+## [Alternative Frontends](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
+
+### Quickgui
 
 While `quickemu` and `quickget` are designed for the terminal, a
 graphical user interface is also available:
@@ -248,12 +251,12 @@ Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 [Philipp Kiemle](https://github.com/daPhipz) for creating the
 **[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
 
-## TUI (qqx)
+### qqX
 
-From Nov 2023, there is also a multi option desktop integrated text
-interface, the **quickemu quickget X terminal project**, a.k.a. **qqX**,
-with lots of unique tools and utilities to help you make light work of
-installations, snapshots and disk management
+There is also a multi option desktop integrated text interface, the
+**quickemu quickget X terminal project**, or **qqX**, with lots of
+unique tools and utilities to help you make light work of installations,
+snapshots and disk management
 
 -   **[qqX](https://github.com/TuxVinyards/qqX)** is independently
     curated by [Alex Genovese](https://github.com/TuxVinyards) (see the
@@ -296,6 +299,10 @@ You can run `quickget ubuntu daily-live` to refresh your daily
 development image as often as you like, it will even automatically
 switch to a new series.
 
+The project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+may have further information.
+
 ### Ubuntu Flavours
 
 All the official Ubuntu flavours are supported, just replace `ubuntu`
@@ -314,21 +321,44 @@ with your preferred flavour.
 -   `ubuntu-unity` (Ubuntu Unity)
 -   `xubuntu` (Xubuntu)
 
-You can also use `quickget` with options to:
+You can also use `quickget` with advanced options :
+
+``` text
+ -[12345]              <os>           : Show info* about OS
+ --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
+ --create-config (-cc) <os> [path/url]: Create default VM config for image
+ --open-homepage  (-o) <os>           : Open homepage for the OS
+ --version        (-v)                : Show version
+ --help           (-h)                : Show this help message
+ --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
+ --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
+ --url-all       (-ua) <os>           : Show all download URLs for an OS
+ --check-all     (-ca) <os>           : Check all downloads for an OS are available
+ --list           (-l)                : List all supported systems in plain text
+ --list-csv      (-lc)                : List all supported systems in csv format
+ --list-json     (-lj)                : List all supported systems in json format
+ --list-urls     (-lu)                : List all supported systems download URLs
+ --test-urls     (-tu)                : Check all downloads for all OSs are available
+```
+
+Here are some typical uses
 
 ``` shell
     # show an OS ISO download URL for {os} {release} [edition]
-    quickget --show-iso-url fedora 38 Silverblue
+    quickget --url fedora 38 Silverblue
     # test if an OS ISO is available for {os} {release} [edition]
-    quickget --test-iso-url nixos 23.05 plasma5
+    quickget --check nixos unstable plasma5
     # open an OS distribution homepage in a browser
-    quickget --open-distro-homepage  ubuntu-mate
+    quickget --open-homepage  ubuntu-mate
     # Only download image file into current directory, without creating VM
-    quickget --download-iso elementary 7.1
+    quickget --download elementary 7.1
 ```
 
-The `--show-iso-url`, `--test-iso-url`, and `--download-iso` options are
-fully functional for all operating systems, including Windows and macOS.
+The `--url`, `--check`, and `--download` options are fully functional
+for all operating systems, including Windows and macOS.
+
+Further information is available from the project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features)
 
 ### Other Operating Systems
 
@@ -342,17 +372,17 @@ fully functional for all operating systems, including Windows and macOS.
 -   `archlinux` (Arch Linux)
 -   `arcolinux` (Arco Linux)
 -   `artixlinux` (Artix Linux)
--   `athenaos` (Athenaos)
+-   `athenaos` (Athena OS)
 -   `batocera` (Batocera)
--   `bazzite` (Bazzite)
--   `biglinux` (BigLinux)
+-   `bazzite` (bazzite)
+-   `biglinux` (Big Linux)
 -   `blendos` (BlendOS)
 -   `bodhi` (Bodhi)
--   `bunsenlabs` (Bunsenlabs)
+-   `bunsenlabs` (Bunsenlab)
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `chimeralinux` (Chimera Linux)
--   `crunchbang++` (Crunchbang++)
+-   `crunchbang++` (#!++)
 -   `debian` (Debian)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
@@ -367,7 +397,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `garuda` (Garuda Linux)
 -   `gentoo` (Gentoo)
 -   `ghostbsd` (GhostBSD)
--   `gnomeos` (GNOME OS)
+-   `gnomeos` ()
 -   `guix` (Guix)
 -   `haiku` (Haiku)
 -   `holoiso` (SteamOS HoloISO)
@@ -392,7 +422,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `peppermint` (PeppermintOS)
 -   `popos` (Pop!\_OS)
 -   `porteus` (Porteus)
--   `primtux` (Primtux)
+-   `primtux` (PrimTux)
 -   `pureos` (PureOS)
 -   `reactos` (ReactOS)
 -   `rebornos` (RebornOS)
@@ -401,22 +431,22 @@ fully functional for all operating systems, including Windows and macOS.
 -   `slackware` (Slackware)
 -   `slax` (Slax)
 -   `slint` (Slint)
--   `slitaz` (SliTaz GNU/Linux)
+-   `slitaz` (SliTaz)
 -   `solus` (Solus)
 -   `sparkylinux` (SparkyLinux)
--   `spirallinux` (Spirallinux)
+-   `spirallinux` (Spiral Linux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
 -   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
--   `tuxedo-os` (Tuxedo OS)
+-   `tuxedo-os` ()
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
 -   `zorin` (Zorin OS)
 
-### Custom Linux guests
+### [Custom Linux guests](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines#manually-create-linux-guests)
 
 Or you can download a Linux image and manually create a VM
 configuration.
@@ -443,7 +473,7 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
-## Creating macOS Guests 🍏
+## [Creating macOS Guests](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests) 🍏
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -597,7 +627,7 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 
 Now reboot, and the App Store should work.
 
-## Creating Windows guests 🪟
+## [Creating Windows guests](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
 
 `quickget` can download [**Windows
 10**](https://www.microsoft.com/software-download/windows10) and
@@ -911,17 +941,6 @@ machines.
 
 Here are the usage instructions:
 
-
-<!-- [[[cog
-import subprocess
-
-import cog
-# cannot use check_result() because of non-zero return
-result=subprocess.run(["./quickemu", "--help"], capture_output=True, text=True)
-help=result.stdout
-cog.out(f"\n``` text\n{help}\n```\n")
-]]] -->
-
 ``` text
 
 Usage
@@ -963,9 +982,7 @@ List of optional parameters:
   --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'
   --extra_args <arguments>          : Pass additional arguments to qemu
   --version                         : Print version
-
 ```
-<!-- [[[end]]] -->
 
 ## Desktop shortcuts
 

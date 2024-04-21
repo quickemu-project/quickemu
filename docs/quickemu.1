@@ -353,12 +353,12 @@ These examples may save a little typing:
 This also applies to derivatives:
 .IP
 .EX
-sudo apt install qemu bash coreutils ovmf grep jq lsb\-base procps python3 genisoimage usbutils util\-linux sed socat spice\-client\-gtk libtss2\-tcti\-swtpm0 wget xdg\-user\-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq lsb\-base procps python3 genisoimage usbutils util\-linux sed socat spice\-client\-gtk libtss2\-tcti\-swtpm0 wget xdg\-user\-dirs zsync unzip
 .EE
 .SS Install requirements on Fedora hosts
 .IP
 .EX
-sudo dnf install qemu bash coreutils edk2\-tools grep jq lsb procps python3 genisoimage usbutils util\-linux sed socat spice\-gtk\-tools swtpm wget xdg\-user\-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2\-tools grep jq lsb procps python3 genisoimage usbutils util\-linux sed socat spice\-gtk\-tools swtpm wget xdg\-user\-dirs xrandr unzip
 .EE
 .SS Install requirements on macOS hosts
 This is a \f[B]work in progress\f[R] (see \c
@@ -368,9 +368,13 @@ issue 248
 \ for other steps and changes that may enable running on MacOS)
 .IP
 .EX
-brew install qemu bash coreutils grep jq python\[at]3.10 cdrtools gnu\-sed spice\-gtk wget zsync
+brew install qemu bash coreutils curl grep jq python\[at]3.10 cdrtools gnu\-sed spice\-gtk wget zsync
 .EE
-.SS GUI (quickgui)
+.SS \c
+.UR https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends
+Alternative Frontends
+.UE \c
+.SS Quickgui
 While \f[CR]quickemu\f[R] and \f[CR]quickget\f[R] are designed for the
 terminal, a graphical user interface is also available:
 .IP \[bu] 2
@@ -409,11 +413,11 @@ Philipp Kiemle
 Quickemu icons
 .UE \c
 \f[R] 🎨
-.SS TUI (qqx)
-From Nov 2023, there is also a multi option desktop integrated text
-interface, the \f[B]quickemu quickget X terminal project\f[R], a.k.a.
-\f[B]qqX\f[R], with lots of unique tools and utilities to help you make
-light work of installations, snapshots and disk management
+.SS qqX
+There is also a multi option desktop integrated text interface, the
+\f[B]quickemu quickget X terminal project\f[R], or \f[B]qqX\f[R], with
+lots of unique tools and utilities to help you make light work of
+installations, snapshots and disk management
 .IP \[bu] 2
 \f[B]\c
 .UR https://github.com/TuxVinyards/qqX
@@ -471,6 +475,12 @@ quickemu \-\-vm ubuntu\-daily\-live.conf
 You can run \f[CR]quickget ubuntu daily\-live\f[R] to refresh your daily
 development image as often as you like, it will even automatically
 switch to a new series.
+.PP
+The project \c
+.UR https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines
+wiki
+.UE \c
+\ may have further information.
 .SS Ubuntu Flavours
 All the official Ubuntu flavours are supported, just replace
 \f[CR]ubuntu\f[R] with your preferred flavour.
@@ -499,22 +509,47 @@ All the official Ubuntu flavours are supported, just replace
 .IP \[bu] 2
 \f[CR]xubuntu\f[R] (Xubuntu)
 .PP
-You can also use \f[CR]quickget\f[R] with options to:
+You can also use \f[CR]quickget\f[R] with advanced options :
+.IP
+.EX
+ \-[12345]              <os>           : Show info* about OS
+ \-\-download       (\-d) <os> <re> [ed] : Download the ISO only; no VM configuration
+ \-\-create\-config (\-cc) <os> [path/url]: Create default VM config for image
+ \-\-open\-homepage  (\-o) <os>           : Open homepage for the OS
+ \-\-version        (\-v)                : Show version
+ \-\-help           (\-h)                : Show this help message
+ \-\-url            (\-u) <os> <re> [ed] : Show download URL for an OS release/edition
+ \-\-check          (\-c) <os> [re] [ed] : Check download an OS release/edition is available
+ \-\-url\-all       (\-ua) <os>           : Show all download URLs for an OS
+ \-\-check\-all     (\-ca) <os>           : Check all downloads for an OS are available
+ \-\-list           (\-l)                : List all supported systems in plain text
+ \-\-list\-csv      (\-lc)                : List all supported systems in csv format
+ \-\-list\-json     (\-lj)                : List all supported systems in json format
+ \-\-list\-urls     (\-lu)                : List all supported systems download URLs
+ \-\-test\-urls     (\-tu)                : Check all downloads for all OSs are available
+.EE
+.PP
+Here are some typical uses
 .IP
 .EX
     # show an OS ISO download URL for {os} {release} [edition]
-    quickget \-\-show\-iso\-url fedora 38 Silverblue
+    quickget \-\-url fedora 38 Silverblue
     # test if an OS ISO is available for {os} {release} [edition]
-    quickget \-\-test\-iso\-url nixos 23.05 plasma5
+    quickget \-\-check nixos unstable plasma5
     # open an OS distribution homepage in a browser
-    quickget \-\-open\-distro\-homepage  ubuntu\-mate
+    quickget \-\-open\-homepage  ubuntu\-mate
     # Only download image file into current directory, without creating VM
-    quickget \-\-download\-iso elementary 7.1
+    quickget \-\-download elementary 7.1
 .EE
 .PP
-The \f[CR]\-\-show\-iso\-url\f[R], \f[CR]\-\-test\-iso\-url\f[R], and
-\f[CR]\-\-download\-iso\f[R] options are fully functional for all
-operating systems, including Windows and macOS.
+The \f[CR]\-\-url\f[R], \f[CR]\-\-check\f[R], and
+\f[CR]\-\-download\f[R] options are fully functional for all operating
+systems, including Windows and macOS.
+.PP
+Further information is available from the project \c
+.UR https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features
+wiki
+.UE \c
 .SS Other Operating Systems
 \f[CR]quickget\f[R] also supports:
 .IP \[bu] 2
@@ -534,19 +569,19 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]artixlinux\f[R] (Artix Linux)
 .IP \[bu] 2
-\f[CR]athenaos\f[R] (Athenaos)
+\f[CR]athenaos\f[R] (Athena OS)
 .IP \[bu] 2
 \f[CR]batocera\f[R] (Batocera)
 .IP \[bu] 2
-\f[CR]bazzite\f[R] (Bazzite)
+\f[CR]bazzite\f[R] (bazzite)
 .IP \[bu] 2
-\f[CR]biglinux\f[R] (BigLinux)
+\f[CR]biglinux\f[R] (Big Linux)
 .IP \[bu] 2
 \f[CR]blendos\f[R] (BlendOS)
 .IP \[bu] 2
 \f[CR]bodhi\f[R] (Bodhi)
 .IP \[bu] 2
-\f[CR]bunsenlabs\f[R] (Bunsenlabs)
+\f[CR]bunsenlabs\f[R] (Bunsenlab)
 .IP \[bu] 2
 \f[CR]cachyos\f[R] (CachyOS)
 .IP \[bu] 2
@@ -554,7 +589,7 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]chimeralinux\f[R] (Chimera Linux)
 .IP \[bu] 2
-\f[CR]crunchbang++\f[R] (Crunchbang++)
+\f[CR]crunchbang++\f[R] (#!++)
 .IP \[bu] 2
 \f[CR]debian\f[R] (Debian)
 .IP \[bu] 2
@@ -584,7 +619,7 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]ghostbsd\f[R] (GhostBSD)
 .IP \[bu] 2
-\f[CR]gnomeos\f[R] (GNOME OS)
+\f[CR]gnomeos\f[R] ()
 .IP \[bu] 2
 \f[CR]guix\f[R] (Guix)
 .IP \[bu] 2
@@ -634,7 +669,7 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]porteus\f[R] (Porteus)
 .IP \[bu] 2
-\f[CR]primtux\f[R] (Primtux)
+\f[CR]primtux\f[R] (PrimTux)
 .IP \[bu] 2
 \f[CR]pureos\f[R] (PureOS)
 .IP \[bu] 2
@@ -652,13 +687,13 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]slint\f[R] (Slint)
 .IP \[bu] 2
-\f[CR]slitaz\f[R] (SliTaz GNU/Linux)
+\f[CR]slitaz\f[R] (SliTaz)
 .IP \[bu] 2
 \f[CR]solus\f[R] (Solus)
 .IP \[bu] 2
 \f[CR]sparkylinux\f[R] (SparkyLinux)
 .IP \[bu] 2
-\f[CR]spirallinux\f[R] (Spirallinux)
+\f[CR]spirallinux\f[R] (Spiral Linux)
 .IP \[bu] 2
 \f[CR]tails\f[R] (Tails)
 .IP \[bu] 2
@@ -670,7 +705,7 @@ operating systems, including Windows and macOS.
 .IP \[bu] 2
 \f[CR]truenas\-scale\f[R] (TrueNAS Scale)
 .IP \[bu] 2
-\f[CR]tuxedo\-os\f[R] (Tuxedo OS)
+\f[CR]tuxedo\-os\f[R] ()
 .IP \[bu] 2
 \f[CR]vanillaos\f[R] (Vanilla OS)
 .IP \[bu] 2
@@ -679,7 +714,10 @@ operating systems, including Windows and macOS.
 \f[CR]vxlinux\f[R] (VX Linux)
 .IP \[bu] 2
 \f[CR]zorin\f[R] (Zorin OS)
-.SS Custom Linux guests
+.SS \c
+.UR https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines#manually-create-linux-guests
+Custom Linux guests
+.UE \c
 Or you can download a Linux image and manually create a VM
 configuration.
 .IP \[bu] 2
@@ -711,7 +749,11 @@ enable copy/paste and USB redirection.
 Install the SPICE WebDAV agent (\f[CR]spice\-webdavd\f[R]) in the guest
 to enable file sharing.
 .RE
-.SS Creating macOS Guests 🍏
+.SS \c
+.UR https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests
+Creating macOS Guests
+.UE \c
+\ 🍏
 \f[CR]quickget\f[R] automatically downloads a macOS recovery image and
 creates a virtual machine configuration.
 .IP
@@ -945,7 +987,11 @@ sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
 .EE
 .PP
 Now reboot, and the App Store should work.
-.SS Creating Windows guests 🪟
+.SS \c
+.UR https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines
+Creating Windows guests
+.UE \c
+\ 🪟
 \f[CR]quickget\f[R] can download \c
 .UR https://www.microsoft.com/software-download/windows10
 \f[B]Windows 10\f[R]
