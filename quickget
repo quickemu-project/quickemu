@@ -30,7 +30,7 @@ function cleanup() {
 }
 
 # Get string before first whitespace (HASH)
-cut_1() {
+function cut_1() {
     cut -d' ' -f1
 }
 
