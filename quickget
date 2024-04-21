@@ -1775,31 +1775,26 @@ function get_android() {
 function get_antix() {
     local EDITION="${1:-}"
     local HASH=""
-    local ISO=""
+    local ISO="antiX-${RELEASE}"
+    local README="README"
     local URL="https://sourceforge.net/projects/antix-linux/files/Final/antiX-${RELEASE}"
-    case ${RELEASE} in
-      21) URL_runit="${URL}/runit-bullseye";;
-      *) URL_runit="${URL}/runit-antiX-${RELEASE}";;
-    esac
+
+    # antiX uses a different URL and ISO naming for runit editions
+    if [[ "${EDITION}" == *"runit"* ]];then
+        ISO+="-runit"
+        README="README2"
+        case ${RELEASE} in
+            21) URL+="/runit-bullseye";;
+            *)  URL+="/runit-antiX-${RELEASE}";;
+        esac
+    fi
     case ${EDITION} in
-      net-sysv)  ISO="antiX-${RELEASE}-net_x64-net.iso";;
-      core-sysv) ISO="antiX-${RELEASE}_x64-core.iso";;
-      base-sysv) ISO="antiX-${RELEASE}_x64-base.iso";;
-      full-sysv) ISO="antiX-${RELEASE}_x64-full.iso";;
-      net-runit)  ISO="antiX-${RELEASE}-runit-net_x64-net.iso"
-                  URL="${URL_runit}"
-      ;;
-      core-runit) ISO="antiX-${RELEASE}-runit_x64-core.iso"
-                  URL="${URL_runit}"
-      ;;
-      base-runit) ISO="antiX-${RELEASE}-runit_x64-base.iso"
-                  URL="${URL_runit}"
-      ;;
-      full-runit) ISO="antiX-${RELEASE}-runit_x64-full.iso"
-                  URL="${URL_runit}"
-      ;;
+        base-*) ISO+="_x64-base.iso";;
+        core-*) ISO+="_x64-core.iso";;
+        full-*) ISO+="_x64-full.iso";;
+        net-*)  ISO+="-net_x64-net.iso";;
     esac
-    HASH=$(web_pipe "${URL}/README.txt" | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut_1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
