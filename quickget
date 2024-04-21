@@ -3549,11 +3549,11 @@ case "${1}" in
     just="show"
     shift
     ;;
-    #TODO: Argument list should be DEPRECATED!
-  '--list-csv'|'-lc'|'list')
+    #TODO: Argument without dashes should be DEPRECATED!
+  '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
     list_csv
     ;;
-    #TODO: Argument list_json should be DEPRECATED!
+    #TODO: Argument without dashes should be DEPRECATED!
   '--list-json'|'-lj'|'list_json')
     list_json
     ;;
@@ -3572,9 +3572,6 @@ esac
 
 if [ -n "${1}" ]; then
     OS="${1,,}"
-    if [ "${OS}" == "list" ] || [ "${OS}" == "list_csv" ]; then
-        list_csv
-    fi
 else
     error_specify_os
 fi
