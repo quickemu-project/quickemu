@@ -162,7 +162,7 @@ function os_homepage(){
     echo $(show_os_info -4 "${1}")
 }
 
-os_error() {
+function error_specify_os() {
     echo 'ERROR! You must specify an operating system.'
     echo '- Supported Operating Systems:'
     os_support | fold -s -w "$(tput cols)"
@@ -3513,14 +3513,6 @@ handle_missing() {
     fi
 }
 
-os_error() {
-    echo 'ERROR! You must specify an operating system.'
-    echo '- Supported Operating Systems:'
-    os_support | fold -s -w "$(tput cols)"
-    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
-    exit 1
-}
-
 os_path_error() {
     echo 'ERROR! You must specify path.'
     os_error
@@ -3586,20 +3578,7 @@ if [ -n "${1}" ]; then
         exit 0
     fi
 else
-    echo "ERROR! You must specify an operating system."
-    echo -n " - Operating Systems: "
-    os_support
-    echo "
-        You can also use these arguments:
-        Only show ISO download URL
-            --show-iso-url / -s {distro} {release} [edition]
-        Test if ISO is available
-            --test-iso-url / -t {distro} {release} [edition]
-        Open distro homepage
-            --open-distro-homepage / -o {distro}
-        Only download ISO
-            --download-iso / -d {distro} {release} [edition]"
-    exit 1
+    error_specify_os
 fi
 
 os_supported
