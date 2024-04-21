@@ -936,21 +936,7 @@ function releases_fedora() {
 }
 
 function editions_fedora() {
-    echo Workstation \
-    Budgie \
-    Cinnamon \
-    i3 \
-    KDE \
-    LXDE \
-    LXQt \
-    Mate \
-    Xfce \
-    Silverblue \
-    Sericea \
-    Kinoite \
-    Sway \
-    Server \
-    Onyx
+    echo Workstation Budgie Cinnamon i3 KDE LXDE LXQt Mate Xfce Silverblue Sericea Kinoite Sway Server Onyx
 }
 
 function releases_freebsd(){
