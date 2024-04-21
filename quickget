@@ -857,7 +857,7 @@ function editions_cachyos() {
 }
 
 function releases_centos-stream() {
-    echo 9 8
+    echo $(web_pipe "https://linuxsoft.cern.ch/centos-stream/" | grep "\-stream" | cut -d'"' -f 6 | cut -d'-' -f 1)
 }
 
 function editions_centos-stream() {
@@ -1914,20 +1914,9 @@ function get_cachyos() {
 }
 
 function get_centos-stream() {
-    local HASH=""
-    local ISO=""
-    case ${RELEASE} in
-      8)
-        ISO="CentOS-Stream-${RELEASE}-x86_64-latest-${EDITION}.iso"
-        URL="https://mirrors.ocf.berkeley.edu/centos/8-stream/isos/x86_64"
-        HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
-        ;;
-      9)
-        ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
-        URL="https://mirrors.ocf.berkeley.edu/centos-stream/9-stream/BaseOS/x86_64/iso"
-        HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
-        ;;
-    esac
+    local ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
+    local URL="https://linuxsoft.cern.ch/centos-stream/${RELEASE}-stream/BaseOS/x86_64/iso"
+    local HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
