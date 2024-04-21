@@ -1430,7 +1430,7 @@ guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        echo "Setting executable ${CONF_FILE}"
+        echo "Setting ${CONF_FILE} executable"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
@@ -1519,9 +1519,7 @@ EOF
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
     fi
-    echo
-    echo "To start your $(pretty_name "${OS}") virtual machine run:"
-
+    echo -e "\nTo start your $(pretty_name "${OS}") virtual machine run:"
     if [ ${OS} == "slint" ]; then
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
