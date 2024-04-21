@@ -74,6 +74,7 @@ os_info() {
       garuda)           INFO="Garuda Linux|Arch||https://garudalinux.org/|Feature rich and easy to use Linux distribution.";;
       gentoo)           INFO="Gentoo|Independent||https://www.gentoo.org/|Highly flexible, source-based Linux distribution.";;
       ghostbsd)         INFO="GhostBSD|FreeBSD||https://www.ghostbsd.org/|Simple, elegant desktop BSD Operating System.";;
+      gnomeos)          INFO="GNOME OS|Independant||https://os.gnome.org/|Alpha nightly bleeding edge distro of GNOME";;
       guix)             INFO="Guix|Independent||https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
       haiku)            INFO="Haiku|Independent||https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
       holoiso)          INFO="SteamOS HoloISO|Arch,SteamOS||https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
