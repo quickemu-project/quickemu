@@ -121,6 +121,7 @@ os_info() {
       trisquel)         INFO="Trisquel|Debian,Ubuntu||https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
       truenas-core)     INFO="TrueNAS Core|FreeBSD||https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
       truenas-scale)    INFO="TrueNAS Scale|Debian||https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
+      tuxedo-os)        INFO="Tuxedo OS|Ubuntu||https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
       ubuntu)           INFO="Ubuntu|Debian||https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
       ubuntu-budgie)    INFO="Ubuntu Budgie|Ubuntu||https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
       ubuntucinnamon)   INFO="Ubuntu Cinnamon|Ubuntu||https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
