@@ -853,7 +853,7 @@ function releases_cachyos() {
 }
 
 function editions_cachyos() {
-    echo kde gnome
+    echo $(web_pipe "https://mirror.cachyos.org/ISO/" | grep "title=" | grep -v testing | grep -v cli | cut -d'"' -f4 | cut -d '/' -f1 | sort)
 }
 
 function releases_centos-stream() {
@@ -1906,15 +1906,11 @@ function get_bodhi() {
 }
 
 function get_cachyos() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-    local release=""
-    release=$(web_pipe "https://mirror.cachyos.org/ISO/${EDITION}/" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | tail -n 1)
-    ISO="cachyos-${EDITION}-linux-${release}.iso"
-    URL="https://mirror.cachyos.org/ISO/${EDITION}/${release}"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut_1)
-    echo "${URL}/${ISO} ${HASH}"
+    local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
+    local REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
+    local ISO="cachyos-${EDITION}-linux-${REL}.iso"
+    local HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut_1)
+    echo "${URL}/${REL}/${ISO} ${HASH}"
 }
 
 function get_centos-stream() {
