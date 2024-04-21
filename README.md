@@ -403,6 +403,7 @@ fully functional for all operating systems, including Windows and macOS.
 -   `slint` (Slint)
 -   `slitaz` (SliTaz GNU/Linux)
 -   `solus` (Solus)
+-   `sparkylinux` (SparkyLinux)
 -   `spirallinux` (Spirallinux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
@@ -413,7 +414,6 @@ fully functional for all operating systems, including Windows and macOS.
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
--   `xerolinux` (XeroLinux)
 -   `zorin` (Zorin OS)
 
 ### Custom Linux guests

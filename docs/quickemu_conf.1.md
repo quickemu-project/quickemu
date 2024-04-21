@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 19, 2024
+date: April 21, 2024
 footer: quickemu_conf
 header: Quickemu Configuration Manual
 section: 1
