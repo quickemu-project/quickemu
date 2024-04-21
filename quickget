@@ -1329,7 +1329,7 @@ function releases_ubuntu-server() {
 }
 
 function releases_vanillaos() {
-    echo 22.10
+    echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
 }
 
 function releases_void() {
@@ -1870,10 +1870,10 @@ function get_blendos() {
 }
 
 function get_vanillaos() {
-    # TODO: Dynamically get the latest release from GitHub
-    local HASH=$(web_pipe "https://cdn.vanillaos.org/assets/ISO/22.10-r9/VanillaOS-22.10-all.20231009.sha256.txt" | cut_1)
-    local URL="https://cdn.vanillaos.org/assets/ISO/22.10-r9/VanillaOS-22.10-all.20231009.iso"
-    echo "${URL} ${HASH}"
+    local ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
+    local HASH_URL=$(echo "${ISO}" | sed s'|\.iso|\.sha256\.txt|g')
+    local HASH=$(web_pipe "${HASH_URL}" | cut_1)
+    echo "${ISO} ${HASH}"
 }
 
 function get_batocera() {
