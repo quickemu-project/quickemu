@@ -1821,14 +1821,6 @@ function get_athenaos() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_biglinux() {
-    local HASH=""
-    local ISO="biglinux_${RELEASE}_${EDITION}.iso"
-    local URL="https://iso.biglinux.com.br"
-    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep -Eo '[[:alnum:]]{32}')
-    echo "${URL}/${ISO} ${HASH}"
-}
-
 function get_batocera() {
     local HASH=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
@@ -1842,6 +1834,14 @@ function get_bazzite() {
     local URL="https://github.com/ublue-os/bazzite/releases/download/v${RELEASE}"
     ISO=$(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '"' -f4 | cut -d'.' -f1-5 | grep "${RELEASE}" | cut -d'/' -f9)
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | grep 'SHA256' | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_biglinux() {
+    local HASH=""
+    local ISO="biglinux_${RELEASE}_${EDITION}.iso"
+    local URL="https://iso.biglinux.com.br"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep -Eo '[[:alnum:]]{32}')
     echo "${URL}/${ISO} ${HASH}"
 }
 
