@@ -177,15 +177,6 @@ os_supported() {
     fi
 }
 
-os_supported_release() {
-    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-        echo -n 'Supported releases: '
-        "releases_${OS}"
-        exit 1
-    fi
-}
-
 os_error_release() {
     echo 'ERROR! You must specify a release.'
     case ${OS} in
@@ -219,6 +210,15 @@ function error_not_supported_os() {
     echo -e "ERROR! ${OS} is not a supported OS.\n"
     os_support | fold -s -w "$(tput cols)"
     exit 1
+}
+
+function error_not_supported_release() {
+    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
+        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+        echo -n 'Supported releases: '
+        "releases_${OS}"
+        exit 1
+    fi
 }
 
 function error_not_supported_edition() {
@@ -280,7 +280,7 @@ function validate_release() {
       *) RELEASE_GENERATOR="${1}";;
     esac
     RELEASES=$(${RELEASE_GENERATOR})
-    os_supported_release
+    error_not_supported_release
 }
 
 function list_json() {
@@ -3545,15 +3545,6 @@ if ((BASH_VERSINFO[0] < 4)); then
 fi
 
 LANGS=()
-
-os_supported_release() {
-    if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
-        echo -n 'Supported releases: '
-        "releases_${OS}"
-        exit 1
-    fi
-}
 
 os_error_edition() {
     echo -en "ERROR! You must specify an edition.\n - Editions: "
