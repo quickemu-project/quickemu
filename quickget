@@ -172,7 +172,7 @@ function error_specify_os() {
 
 os_supported() {
     if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
-        os_not_supported
+        error_not_supported_os
     fi
 }
 
