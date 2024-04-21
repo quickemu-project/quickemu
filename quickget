@@ -1904,11 +1904,11 @@ function get_freedos() {
     case ${RELEASE} in
       1.2)
         ISO="FD12CD.iso"
-        HASH=$(wget -q -O- "${URL}/FD12.sha" | grep "${ISO}" | cut_1)
+        HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut_1)
         ;;
       1.3)
         ISO="FD13-LiveCD.zip"
-        HASH=$(wget -q -O- "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut_1)
+        HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut_1)
         ;;
     esac
     echo "${URL}/${ISO} ${HASH}"
