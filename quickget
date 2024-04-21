@@ -1670,12 +1670,9 @@ function get_biglinux() {
 
 function get_blendos() {
     local HASH=""
-    local URL=""
-    local latest_blendos_release
-    latest_blendos_release="$(grep "${EDITION}" /tmp/blendos-isos.rss | cut -d '/' -f 9 | sort -nr | head -n 1)"
-    URL=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o 'https://.*blendOS\.iso')
-    HASH=$(grep "${EDITION}/${latest_blendos_release}" /tmp/blendos-isos.rss | grep -E -o '[[:alnum:]]{32}')
-    echo "${URL} ${HASH}"
+    local ISO="blendos-${RELEASE}-stable-${EDITION}.iso"
+    local URL="https://mirror.ico277.xyz/blendos/${EDITION}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_bodhi() {
