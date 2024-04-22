@@ -3531,14 +3531,6 @@ case "${1}" in
     help_message
     exit 0
     ;;
-  '--check'|'-c')
-    just="test"
-    shift
-    ;;
-  '--check-all'|'-ca')
-    just="test"
-    shift
-    ;;
   '--url'|'-u')
     just="show"
     shift
@@ -3546,6 +3538,16 @@ case "${1}" in
   '--url-all'|'-ua')
     just="show"
     shift
+    time list_isos "${1}"
+    ;;
+  '--check'|'-c')
+    just="test"
+    shift
+    ;;
+  '--check-all'|'-ca')
+    just="test"
+    shift
+    time test_isos "${1}"
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
@@ -3557,14 +3559,6 @@ case "${1}" in
     ;;
   '--list'|'-l')
     time list_supported
-    ;;
-  '--list-urls'|'-lu')
-    shift
-    time list_isos
-    ;;
-  '--test-urls'|'-tu')
-    shift
-    time test_isos
     ;;
 esac
 
