@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 export LC_ALL=C
+#
 
 # Here the quick 'n dirty guide to adding a new OS to quickget
 #
