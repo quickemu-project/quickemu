@@ -384,18 +384,19 @@ function list_supported() {
 }
 
 function list_isos() {
-    local showIsoUrl=on
     local DIR="/dev/null"
     local URL
     local FUNC
     local OPTION
-    local OS
-    for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
+    local OS="${1}"
+    if [[ "${OS}" == *ubuntu-server* ]]; then
+        FUNC="ubuntu-server"
+    elif [[ "${OS}" == *ubuntu* ]]; then
+        FUNC="ubuntu"
+    else
+        FUNC="${OS}"
+    fi
+    for OS in ${FUNC}; do
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 for OPTION in $(editions_"${OS}"); do
@@ -413,12 +414,12 @@ function list_isos() {
             elif [[ "${OS}" == "macos" ]]; then
                 validate_release releases_"${OS}"
                 get_macos || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
-            elif [[ "${OS}" == *"ubuntu"* ]]; then
-                validate_release releases_ubuntu
-                get_ubuntu || echo "ERROR! - ${OS} ${RELEASE}"
-            elif [[ "${OS}" == *"ubuntu-server"* ]]; then
+            elif [[ "${OS}" == *ubuntu-server* ]]; then
                 validate_release releases_ubuntu
                 get_ubuntu-server || echo "ERROR! - ${OS} ${RELEASE}"
+            elif [[ "${OS}" == *ubuntu* ]]; then
+                validate_release releases_ubuntu
+                get_ubuntu || echo "ERROR! - ${OS} ${RELEASE}"
             else
                 validate_release releases_"${OS}"
                 get_"${OS}" "${RELEASE}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE}"
