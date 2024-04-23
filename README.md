@@ -568,64 +568,9 @@ macos_release="catalina"
     -   And VirtIO Block Media (disks) are supported/stable in Catalina
         and newer.
 
-### macOS compatibility
-
-There are some considerations when running macOS via Quickemu.
-
--   Supported macOS releases:
-    -   High Sierra
-    -   Mojave
-    -   Catalina **(Recommended)**
-    -   Big Sur
-    -   Monterey
-    -   Ventura
-    -   Sonoma
--   `quickemu` will automatically download the required
-    [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
-    and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
--   Optimised by default, but no GPU acceleration is available.
-    -   Host CPU vendor is detected and guest CPU is optimised
-        accordingly.
-    -   [VirtIO Block
-        Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is
-        used for the system disk where supported.
-    -   [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used
-        for the mouse.
-    -   VirtIO Network (`virtio-net`) is supported and enabled on macOS
-        Big Sur and newer but previous releases use `vmxnet3`.
-    -   VirtIO Memory Ballooning is supported and enabled on macOS Big
-        Sur and newer but disabled for other support macOS releases.
--   USB host and SPICE pass-through is:
-    -   UHCI (USB 2.0) on macOS Catalina and earlier.
-    -   XHCI (USB 3.0) on macOS Big Sur and newer.
--   Display resolution can only be changed via macOS System Preferences.
--   **Full Duplex audio requires [VoodooHDA
-    OC](https://github.com/chris1111/VoodooHDA-OC) or pass-through a USB
-    audio-device to the macOS guest VM**.
--   NOTE! [Gatekeeper](https://disable-gatekeeper.github.io/) and
-    [System Integrity Protection
-    (SIP)](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)
-    need to be disabled to install VoodooHDA OC
--   File sharing between guest and host is available via
-    [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE
-    webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
--   Copy/paste via SPICE agent is **not available on macOS**.
-
-### macOS App Store
-
-If you see *"Your device or computer could not be verified"* when you
-try to login to the App Store, make sure that your wired ethernet device
-is `en0`. Use `ifconfig` in a terminal to verify this.
-
-If the wired ethernet device is not `en0`, then then go to *System
-Preferences* -\> *Network*, delete all the network devices and apply the
-changes. Next, open a terminal and run the following:
-
-``` shell
-sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
-```
-
-Now reboot, and the App Store should work.
+There is further advice and information about macOS guests in the
+project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests).
 
 ## [Creating Windows guests](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
 
@@ -661,31 +606,8 @@ quickemu --vm windows-11.conf
     -   Username: `Quickemu`
     -   Password: `quickemu`
 
-### Regional versions
-
-By default `quickget` will download the *"English International"*
-release (*"English (United States)"* for server releases), but you can
-optionally specify one of the supported languages: For example:
-
-``` shell
-quickget windows 11 "Chinese (Traditional)"
-```
-
-The default Windows 11 configuration looks like this:
-
-``` shell
-guest_os="windows"
-disk_img="windows-11/disk.qcow2"
-iso="windows-11/windows-11.iso"
-fixed_iso="windows-11/virtio-win.iso"
-tpm="on"
-secureboot="off"
-```
-
--   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
--   `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
--   `tpm="on"` instructs `quickemu` to create a software emulated TPM
-    device using `swtpm`.
+Further information is available from the project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)
 
 ## Connecting to your VM
 
