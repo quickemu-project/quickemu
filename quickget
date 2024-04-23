@@ -383,7 +383,7 @@ function list_supported() {
     exit 0
 }
 
-function list_isos() {
+function list_url_all() {
     local DIR="/dev/null"
     local URL
     local FUNC
@@ -396,35 +396,33 @@ function list_isos() {
     else
         FUNC="${OS}"
     fi
-    for OS in ${FUNC}; do
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    validate_release releases_"${OS}"
-                    get_"${OS}" "${OPTION}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "skipped: ${OS} ${RELEASE} ${OPTION}"
-                    #validate_release releases_${OS}
-                    #get_${OS} ${OPTION} | cut_1
-                done
-            #TODO NEEDED?
-            elif [[ "${OS}" == "macos" ]]; then
+    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+        if [[ $(type -t "editions_${OS}") == function ]]; then
+            for OPTION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                get_macos || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
-            elif [[ "${OS}" == *ubuntu-server* ]]; then
-                validate_release releases_ubuntu
-                get_ubuntu-server || echo "ERROR! - ${OS} ${RELEASE}"
-            elif [[ "${OS}" == *ubuntu* ]]; then
-                validate_release releases_ubuntu
-                get_ubuntu || echo "ERROR! - ${OS} ${RELEASE}"
-            else
-                validate_release releases_"${OS}"
-                get_"${OS}" "${RELEASE}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE}"
-            fi
-        done
+                get_"${OS}" "${OPTION}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
+            done
+        elif [[ "${OS}" == "windows"* ]]; then
+            "languages_${OS}"
+            for OPTION in "${LANGS[@]}"; do
+                echo "skipped: ${OS} ${RELEASE} ${OPTION}"
+                #validate_release releases_${OS}
+                #get_${OS} ${OPTION} | cut_1
+            done
+        #TODO NEEDED?
+        elif [[ "${OS}" == "macos" ]]; then
+            validate_release releases_"${OS}"
+            get_macos || echo "ERROR! - ${OS} ${RELEASE} ${OPTION}"
+        elif [[ "${OS}" == *ubuntu-server* ]]; then
+            validate_release releases_ubuntu
+            get_ubuntu-server || echo "ERROR! - ${OS} ${RELEASE}"
+        elif [[ "${OS}" == *ubuntu* ]]; then
+            validate_release releases_ubuntu
+            get_ubuntu || echo "ERROR! - ${OS} ${RELEASE}"
+        else
+            validate_release releases_"${OS}"
+            get_"${OS}" "${RELEASE}" | cut_1 || echo "ERROR! - ${OS} ${RELEASE}"
+        fi
     done
     exit 0
 }
@@ -3537,7 +3535,7 @@ case "${1}" in
   '--url-all'|'-ua')
     just="show"
     shift
-    time list_isos "${1}"
+    list_url_all "${1}"
     ;;
   '--check'|'-c')
     just="test"
