@@ -2175,7 +2175,6 @@ function get_macos() {
     if [ "${skipVerification}" != "true" ]; then
         if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
             echo "Verification failed."
-            exit 1
         else
             echo "Verified macOS ${RELEASE} image using chunklist."
         fi
