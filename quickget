@@ -429,7 +429,7 @@ function list_isos() {
     exit 0
 }
 
-function test_isos() {
+function list_check_all() {
     local DIR="/dev/null"
     local FUNC
     local OPTION
@@ -448,6 +448,7 @@ function test_isos() {
     else
         FUNC="${OS}"
     fi
+ 
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for OPTION in $(editions_"${OS}"); do
@@ -3545,7 +3546,7 @@ case "${1}" in
   '--check-all'|'-ca')
     just="test"
     shift
-    time test_isos "${1}"
+    list_check_all "${1}"
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
