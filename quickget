@@ -436,7 +436,7 @@ function test_isos() {
     check_it() {
         validate_release releases_"${OS}"
         URL=$(get_"${OS}" "${OPTION}" | cut_1)
-        GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+        GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
     }
 
     for OS in $(os_support); do
@@ -457,24 +457,24 @@ function test_isos() {
                 # skipping because of microsoft
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
-                    GOOD='ERROR!'
+                    GOOD='FAIL'
                 done
             elif [[ "${OS}" == *"ubuntu"* ]]; then
                 URL=$(get_"${OS}" )
-                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
             elif [[ "${OS}" == *"ubuntu-server"* ]]; then
                 URL="$(get_ubuntu-server)"
-                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
             else
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" "${RELEASE}" | cut_1)
-                GOOD=$(timeout 3 wget -q --spider "${URL}" && echo 'OK' || echo 'ERROR!')
+                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
             fi
 
-            if [[ "${GOOD}" == "OK" ]]; then
-                echo "OK - ${OS} ${RELEASE} ${OPTION} ${URL}"
+            if [[ "${GOOD}" == "PASS" ]]; then
+                echo "PASS - ${OS} ${RELEASE} ${OPTION} ${URL}"
             else
-                echo "ERROR - ${OS} ${RELEASE} ${OPTION} ${URL}"
+                echo "FAIL - ${OS} ${RELEASE} ${OPTION} ${URL}"
             fi
         done
     done
@@ -1252,7 +1252,7 @@ function web_get() {
         exit 0
     elif [ "${just}" == 'test' ]; then
         echo -n "Testing if $(echo "${URL}" | rev | cut -d'/' -f1 | rev) is available... "
-        wget -q --spider "${URL}" && echo 'Sucessfull' || echo 'ERROR!'
+        web_check "${URL}" && echo 'PASS' || echo 'FAIL'
         exit 0
     elif [ "${just}" == 'download' ]; then
         DIR="$(pwd)"
@@ -1326,7 +1326,7 @@ function zsync_get() {
         echo "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        wget --spider "${URL}"
+        web_check "${URL}"
         exit 0
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
@@ -2148,8 +2148,8 @@ function get_macos() {
         echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" "${downloadLink}"
-        wget --spider --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}" "${chunkListLink}"
+        web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+        web_check "${chunkListLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         exit 0
     elif [ "${just}" == 'download' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
@@ -2604,7 +2604,7 @@ function get_ubuntu-server() {
     else
         URL="https://releases.ubuntu.com/${RELEASE}"
     fi
-    if wget -q --spider "${URL}/SHA256SUMS"; then
+    if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
         ISO=$(cut -d'*' -f2 <<<${DATA})
         HASH=$(cut_1 <<<${DATA})
@@ -2654,7 +2654,7 @@ function get_ubuntu() {
     else
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
-    if wget -q --spider "${URL}/SHA256SUMS"; then
+    if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
         ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
         HASH=$(cut_1 <<<${DATA} | sed '1q;d')
@@ -3332,7 +3332,7 @@ function download_windows_workstation() {
         echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        wget --spider "${iso_download_link}"
+        web_check "${iso_download_link}"
         exit 0
     fi
 
