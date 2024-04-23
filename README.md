@@ -440,7 +440,7 @@ Further information is available from the project
 -   `trisquel` (Trisquel)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
--   `tuxedo-os` (Tuxedo OS)
+-   `tuxedo` (Tuxedo OS)
 -   `vanillaos` (Vanilla OS)
 -   `void` (Void Linux)
 -   `vxlinux` (VX Linux)
