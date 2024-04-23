@@ -352,6 +352,23 @@ function list_csv() {
     exit 0
 }
 
+function create_config() {
+    local OS="${1}"
+    local DESTINATION="${2}"
+    local USE
+
+    if [[ "${DESTINATION}" == "http://"* ]] || [[ "${DESTINATION}" == "https://"* ]]; then
+        web_get "${DESTINATION}" "${OS}"
+        echo "#TODO: create config!"
+    elif [[ "${DESTINATION}" == "/"* ]]; then
+        cp "${OS}" "${DESTINATION}"/
+        echo "#TODO: create config!"
+    else
+        echo "You forget write full path?" && exit 1
+    fi
+    exit 0
+}
+
 function list_supported() {
     # output OS RELEASE EDITION (usefull for straight testing...)
     local DL=""
@@ -3508,8 +3525,9 @@ case "${1}" in
     shift
     ;;
   '--create-config'|'-cc')
-    just="custom"
-    echo "TODO:"
+    just="config"
+    shift
+    create_config "${@}"
     ;;
   '--open-homepage'|'-o')
     if [ -z "$(os_info "${2}")" ]; then
