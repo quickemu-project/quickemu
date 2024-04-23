@@ -2288,6 +2288,7 @@ function get_openindiana(){
     HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
 function get_opensuse() {
     local HASH=""
     local ISO=""
