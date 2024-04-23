@@ -970,6 +970,7 @@ function editions_primtux() {
 function releases_pureos() {
     web_pipe "https://www.pureos.net/download/" | grep -m 1 "downloads.puri" | cut -d '"' -f 2 | cut -d '-' -f 4
 }
+
 function editions_pureos() {
     echo gnome plasma
 }
@@ -2156,7 +2157,6 @@ function get_macos() {
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
-
     else
         echo "Downloading macOS firmware"
         web_get "${OpenCore_qcow2}" "${VM_PATH}"
