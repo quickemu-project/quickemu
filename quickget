@@ -1221,6 +1221,7 @@ function web_pipe() {
 
 # Download a file from the web
 function web_get() {
+    local HEADERS=()
     local URL="${1}"
     local DIR="${2}"
     local FILE=""
@@ -1235,14 +1236,16 @@ function web_get() {
     # Process any URL redirections after the file name has been extracted
     URL=$(web_redirect "${URL}")
 
+    # Process any headers
     while (( "$#" )); do
-        if [[ $1 == --header ]]; then
-            HEADERS+=("$1" "$2")
+        if [ "${1}" == "--header" ]; then
+            HEADERS+=("${1}" "${2}")
             shift 2
         else
             shift
         fi
     done
+
     # Test mode for ISO
     if [ "${just}" == 'show' ]; then
         echo "${URL}"
