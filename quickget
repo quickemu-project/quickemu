@@ -343,8 +343,8 @@ function csv_data() {
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+                for LANG in "${LANGS[@]}"; do
+                    echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
                 done
             else
                 echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
@@ -372,30 +372,7 @@ function create_config() {
 }
 
 function list_supported() {
-    # output OS RELEASE EDITION (usefull for straight testing...)
-    local FUNC=""
-    local OS=""
-    for OS in $(os_support); do
-        FUNC="${OS}"
-        if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
-            FUNC="ubuntu"
-        fi
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-            # If the OS has an editions_() function, use it.
-            if [[ $(type -t "editions_${OS}") == function ]]; then
-                for EDITION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${EDITION}"
-                done
-            elif [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for LANG in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${LANG}"
-                done
-            else
-                echo "${OS} ${RELEASE}"
-            fi
-        done
-    done
+    list_csv | cut -d ',' -f2,3,4 | tr ',' ' '
     exit 0
 }
 
