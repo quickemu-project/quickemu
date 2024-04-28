@@ -712,9 +712,8 @@ function releases_debian() {
     local NEW=""
     local OLD=""
     NEW=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
-    OLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac)
-    echo -n "${NEW} "
-    echo ${OLD}
+    OLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac | head -20)
+    echo ${NEW} ${OLD}
 }
 
 function editions_debian() {
