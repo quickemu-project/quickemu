@@ -647,7 +647,7 @@ function releases_artixlinux() {
 }
 
 function editions_artixlinux() {
-    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u | tr '\n' ' ')
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u)
 }
 
 function releases_athenaos() {
