@@ -421,7 +421,7 @@ function show_url_result() {
     echo -e "${OS} ${URL}"
 }
 
-function list_url_all() {
+function test_all() {
     OS="${1}"
     os_supported
 
@@ -437,13 +437,22 @@ function list_url_all() {
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
-                show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                if [ "${OPERATION}" == "show" ]; then
+                    show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                elif [ "${OPERATION}" == "test" ]; then
+                    CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                    show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
             for LANG in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
-                show_url_result "${OS}" "${RELEASE}" "${LANG}" "SKIP"
+                if [ "${OPERATION}" == "show" ]; then
+                    show_url_result "${OS}" "${RELEASE}" "${LANG}" "SKIP"
+                elif [ "${OPERATION}" == "test" ]; then
+                    show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
+                fi
             done
         elif [[ "${OS}" == "macos" ]]; then
             validate_release releases_macos
@@ -457,49 +466,9 @@ function list_url_all() {
         else
             validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut_1 | head -1)
-            show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
-        fi
-    done
-}
-
-function list_check_all() {
-    OS="${1}"
-    os_supported
-
-    local CHECK=""
-    local FUNC="${OS}"
-    if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
-        FUNC="ubuntu"
-    fi
-    local URL=""
-
-    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
-        if [[ $(type -t "editions_${OS}") == function ]]; then
-            for EDITION in $(editions_"${OS}"); do
-                validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut_1 | head -1)
-                CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
-            done
-        else
-            if [[ "${OS}" == "windows"* ]]; then
-                "languages_${OS}"
-                for LANG in "${LANGS[@]}"; do
-                    validate_release releases_"${OS}"
-                    show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
-                done
-            elif [[ "${OS}" == "macos" ]]; then
-                validate_release releases_macos
-                (get_macos)
-            elif [ "${OS}" == "ubuntu-server" ]; then
-                validate_release releases_ubuntu-server
-                (get_ubuntu-server)
-            elif [[ "${OS}" == *ubuntu* ]]; then
-                validate_release releases_ubuntu
-                (get_ubuntu)
-            else
-                validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut_1 | head -1)
+            if [ "${OPERATION}" == "show" ]; then
+                show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+            elif [ "${OPERATION}" == "test" ]; then
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
                 show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             fi
@@ -3451,10 +3420,10 @@ case "${1}" in
     # if no OS is specified, list all URLs for all supported OSes
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (list_url_all "${OS}")
+            (test_all "${OS}")
         done
     else
-        list_url_all "${1}"
+        test_all "${1}"
     fi
     exit 0
     ;;
@@ -3468,10 +3437,10 @@ case "${1}" in
     # if no OS is specified, check all URLs for all supported OSes
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (list_check_all "${OS}")
+            (test_all "${OS}")
         done
     else
-        list_check_all "${1}"
+        test_all "${1}"
     fi
     exit 0
     ;;
