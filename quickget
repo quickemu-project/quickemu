@@ -414,7 +414,6 @@ function list_url_all() {
     os_supported
 
     local CHECK=""
-    local OPTION=""
     local FUNC="${OS}"
     if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
         FUNC="ubuntu"
@@ -430,9 +429,9 @@ function list_url_all() {
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
-            for OPTION in "${LANGS[@]}"; do
+            for LANG in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
-                show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
+                show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
             done
         elif [[ "${OS}" == "macos" ]]; then
             validate_release releases_macos
@@ -457,7 +456,6 @@ function list_check_all() {
     os_supported
 
     local CHECK=""
-    local OPTION=""
     local FUNC="${OS}"
     if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
         FUNC="ubuntu"
@@ -475,9 +473,9 @@ function list_check_all() {
         else
             if [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
+                for LANG in "${LANGS[@]}"; do
                     validate_release releases_"${OS}"
-                    show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
+                    show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
                 done
             elif [[ "${OS}" == "macos" ]]; then
                 validate_release releases_macos
