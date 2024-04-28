@@ -435,8 +435,8 @@ function list_url_all() {
                 show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
             done
         elif [[ "${OS}" == "macos" ]]; then
-            validate_release releases_"${OS}"
-            echo -e "SKIP:\t${OS}\t${RELEASE}"
+            validate_release releases_macos
+            (get_macos)
         elif [ "${OS}" == "ubuntu-server" ]; then
             validate_release releases_ubuntu-server
             (get_ubuntu-server)
@@ -480,8 +480,8 @@ function list_check_all() {
                     show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
                 done
             elif [[ "${OS}" == "macos" ]]; then
-                validate_release releases_"${OS}"
-                echo -e "SKIP:\t${OS}\t${RELEASE}"
+                validate_release releases_macos
+                (get_macos)
             elif [ "${OS}" == "ubuntu-server" ]; then
                 validate_release releases_ubuntu-server
                 (get_ubuntu-server)
@@ -2084,8 +2084,8 @@ function get_macos() {
         echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
-        web_check "${chunkListLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
+        show_test_result ${CHECK} "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${just}" == 'download' ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
