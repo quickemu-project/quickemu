@@ -675,7 +675,7 @@ function releases_batocera() {
 }
 
 function releases_bazzite() {
-    echo $(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | tr '\n' ' ')
+    echo $(web_pipe "https://api.github.com/repos/ublue-os/bazzite/releases" | grep 'download_url' | grep 'sum' | cut -d '/' -f8 | cut -d'v' -f2 | head -n 5)
 }
 
 function releases_biglinux() {
