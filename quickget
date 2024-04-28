@@ -898,8 +898,8 @@ function releases_netboot() {
 }
 
 function releases_netbsd() {
-    local NBSD_RELEASES=$(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | sort -nr | tr '\n' ' ')
-    echo "${NBSD_RELEASES}"
+    # V8 is EOL so filter it out
+    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr)
 }
 
 function releases_nitrux() {
