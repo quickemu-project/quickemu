@@ -601,7 +601,13 @@ function editions_alma() {
 }
 
 function releases_alpine() {
-    echo latest 3.19 3.18 3.17 3.16 3.15 3.14 3.13 3.12
+    local REL=""
+    local RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    for REL in ${RELS}; do
+        if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
+            echo -n "${REL} "
+        fi
+    done
 }
 
 function releases_android() {
