@@ -1747,11 +1747,13 @@ function get_devuan() {
     local HASH=""
     local ISO=""
     local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
+    local VER=""
     case ${RELEASE} in
-      beowulf) ISO="devuan_${RELEASE}_3.1.1_amd64_desktop-live.iso";;
-      chimaera) ISO="devuan_${RELEASE}_4.0.2_amd64_desktop-live.iso";;
-      daedalus) ISO="devuan_${RELEASE}_5.0.0_amd64_desktop-live.iso";;
+      beowulf)  VER="3.1.1";;
+      chimaera) VER="4.0.3";;
+      daedalus) VER="5.0.0";;
     esac
+    ISO="devuan_${RELEASE}_${VER}_amd64_desktop-live.iso"
     HASH=$(web_pipe "${URL}/SHASUMS.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
