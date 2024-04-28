@@ -919,8 +919,7 @@ function releases_openbsd(){
 }
 
 function releases_openindiana(){
-    web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5 | tr '\n' ' '
-    echo
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5 | tr '\n' ' ')
 }
 
 function editions_openindiana(){
