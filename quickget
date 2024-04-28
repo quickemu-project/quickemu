@@ -1113,7 +1113,7 @@ function releases_vanillaos() {
 }
 
 function releases_void() {
-    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru)
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -3)
 }
 
 function editions_void() {
