@@ -747,7 +747,7 @@ function editions_debian() {
 }
 
 function releases_deepin() {
-    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r | tr '\n' ' ')
+    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r)
 }
 
 function releases_devuan() {
@@ -934,11 +934,11 @@ function editions_nixos(){
 }
 
 function releases_openbsd(){
-    echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r | tr '\n' ' ')
+    echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r)
 }
 
 function releases_openindiana(){
-    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5 | tr '\n' ' ')
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5)
 }
 
 function editions_openindiana(){
@@ -946,8 +946,7 @@ function editions_openindiana(){
 }
 
 function releases_opensuse(){
-    web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r | tr '\n' ' '
-    echo microos tumbleweed
+    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
 }
 
 function releases_oraclelinux() {
@@ -1056,11 +1055,11 @@ function editions_solus() {
 }
 
 function releases_sparkylinux() {
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru | tr '\n' ' ')
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru)
 }
 
 function editions_sparkylinux() {
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u | tr '\n' ' ')
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
 }
 
 function releases_spirallinux() {
