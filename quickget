@@ -1546,12 +1546,8 @@ function get_alma() {
 function get_alpine() {
     local HASH=""
     local ISO=""
-    local URL=""
+    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
     local VERSION=""
-    case ${RELEASE} in
-      latest) URL="https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64";;
-      *) URL="https://dl-cdn.alpinelinux.org/alpine/v${RELEASE}/releases/x86_64";;
-    esac
     VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
     ISO="alpine-virt-${VERSION}-x86_64.iso"
     HASH=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
