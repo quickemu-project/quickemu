@@ -1056,7 +1056,7 @@ function releases_tails() {
 }
 
 function releases_tinycore() {
-    echo 15.0 14.0
+    echo 15 14
 }
 
 function editions_tinycore() {
@@ -2454,14 +2454,13 @@ function get_tails() {
 }
 
 function get_tinycore() {
+    local ARCH="x86"
     local HASH=""
-    local ISO="${EDITION}-${RELEASE}.iso"
-    local URL=""
-    if [ "${EDITION}" == "Core" ] || [ "${EDITION}" == "TinyCore" ] || [ "${EDITION}" == "CorePlus" ]; then
-        URL="http://www.tinycorelinux.net/14.x/x86/release"
-    elif [ "${EDITION}" == "CorePure64" ] || [ "${EDITION}" == "TinyCorePure64" ]; then
-        URL="http://www.tinycorelinux.net/14.x/x86_64/release"
-    fi
+    local ISO="${EDITION}-${RELEASE}.0.iso"
+    case "${EDITION}" in
+        *Pure*) ARCH+="_64";;
+    esac
+    local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
     HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
