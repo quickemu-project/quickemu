@@ -715,7 +715,7 @@ function editions_chimeralinux() {
 }
 
 function releases_crunchbang++() {
-    echo 12 11 10 9 8
+    echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
 }
 
 function releases_debian() {
@@ -1721,35 +1721,8 @@ function get_chimeralinux() {
 
 function get_crunchbang++() {
     local HASH=""
-    local ISO=""
-    local URL=""
-    local URLPART=""
-    local URLPART2=""
-    URLPART="https://github.com/CBPP/cbpp"
-    case ${RELEASE} in
-      8)
-        URLPART2="releases/download/v1.0-amd64"
-        ISO="cbpp-1.0-amd64-20150428.iso"
-        ;;
-      9)
-        URLPART2="9-amd64/releases/download/v9.0"
-        ISO="cbpp-9.0-amd64-20170621.iso"
-        ;;
-      10)
-        URLPART2="releases/download/v10"
-        ISO="cbpp-10.1-amd64-20190713.iso"
-        ;;
-      11)
-        URLPART2="releases/download/v11.2"
-        ISO="cbpp-11.2-amd64-20230514.iso"
-        ;;
-      12)
-        URLPART2="releases/download/v12.0"
-        ISO="cbpp-12.0-amd64-20230611.iso"
-        ;;
-    esac
-    URL="${URLPART}/${URLPART2}"
-    echo "${URL}/${ISO} ${HASH}"
+    local ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
+    echo "${ISO} ${HASH}"
 }
 
 function get_debian() {
