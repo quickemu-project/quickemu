@@ -1296,8 +1296,7 @@ function web_redirect() {
 # checks if a URL is reachable
 function web_check() {
     local HEADERS=()
-    local URL=""
-    URL=$(web_redirect "${1}")
+    local URL="${1}"
     # Process any headers
     while (( "$#" )); do
         if [ "${1}" == "--header" ]; then
