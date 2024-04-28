@@ -432,7 +432,7 @@ function list_url_all() {
             "languages_${OS}"
             for OPTION in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
-                echo -e "SKIP:\t${OS}\t${RELEASE}\t${OPTION}\t${URL}"
+                show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
             done
         elif [[ "${OS}" == "macos" ]]; then
             validate_release releases_"${OS}"
@@ -470,14 +470,14 @@ function list_check_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+                show_test_result ${CHECK} "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             done
         else
             if [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for OPTION in "${LANGS[@]}"; do
                     validate_release releases_"${OS}"
-                    echo -e "SKIP:\t${OS}\t${RELEASE}\t${OPTION}\t${URL}"
+                    show_test_result SKIP "${OS}" "${RELEASE}" "${OPTION}" "${URL}"
                 done
             elif [[ "${OS}" == "macos" ]]; then
                 validate_release releases_"${OS}"
@@ -492,7 +492,7 @@ function list_check_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+                show_test_result ${CHECK} "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             fi
         fi
     done
@@ -1245,7 +1245,7 @@ function web_get() {
         exit 0
     elif [ "${just}" == 'test' ]; then
         CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+        show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${just}" == 'download' ]; then
         DIR="$(pwd)"
