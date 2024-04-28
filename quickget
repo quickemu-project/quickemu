@@ -3553,7 +3553,7 @@ fi
 os_supported
 
 if [ -n "${2}" ]; then
-    RELEASE="${2,,}"
+    RELEASE="${2}"
     VM_PATH="${OS}-${RELEASE}"
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
