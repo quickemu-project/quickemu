@@ -719,11 +719,12 @@ function releases_crunchbang++() {
 }
 
 function releases_debian() {
-    local DEBOLD
-    DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
-    DEBOLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac)
-    echo -n "${DEBCURRENT} "
-    echo ${DEBOLD}
+    local NEW=""
+    local OLD=""
+    NEW=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
+    OLD=$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep -e '>[1-9][0-9]\.' | grep -v 'live' | grep -v NEVER | cut -d'>' -f 9 | cut -d'/' -f 1 | tac)
+    echo -n "${NEW} "
+    echo ${OLD}
 }
 
 function editions_debian() {
@@ -1728,18 +1729,17 @@ function get_crunchbang++() {
 function get_debian() {
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
-    local URL=""
-    DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" |grep '\.[0-9]/'|cut -d\> -f9|cut -d\/ -f1)
-    case ${RELEASE} in
+    local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid"
+    local DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
+    case "${RELEASE}" in
       "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
-      *) URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid/";;
     esac
     if [ "${EDITION}" == "netinst" ]; then
         URL="${URL/-live/}"
         URL="${URL/hybrid/cd}"
         ISO="${ISO/-live/}"
     fi
-    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
+    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1 | head -1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
