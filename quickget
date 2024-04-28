@@ -799,8 +799,7 @@ function editions_gentoo() {
 }
 
 function releases_ghostbsd() {
-    web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -n 5 | tr '\n' ' '
-    echo
+    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -3)
 }
 
 function editions_ghostbsd() {
@@ -808,9 +807,7 @@ function editions_ghostbsd() {
 }
 
 function releases_gnomeos() {
-    local GNOMEOS_RELEASES=""
-    GNOMEOS_RELEASES="$(web_pipe "https://download.gnome.org/gnomeos/" | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr | tr '\n' ' ')"
-    echo nightly "${GNOMEOS_RELEASES}"
+    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep -o -P '(?<=<a href=").*(?=/" title=")' | sort -nr)
 }
 
 function releases_guix() {
@@ -1896,24 +1893,18 @@ function get_ghostbsd() {
 
 function get_gnomeos() {
     local HASH=""
-    local ISO=""
-    local URL=""
+    local ISO="gnome_os_installer_${RELEASE}.iso"
+    local URL="https://download.gnome.org/gnomeos/${RELEASE}"
     case ${RELEASE} in
         nightly)
-            URL="https://os.gnome.org/download/latest"
-            ISO="gnome_os_installer.iso";;
-        # The download.gnome.org mirror does not currently link to ISOs for 44.rc or 45.rc
-        44.rc|45.rc)
-            URL="https://mirror.umd.edu/gnome/gnomeos/${RELEASE}"
-            ISO="gnome_os_installer_${RELEASE}.iso";;
-        3.38*)
-            URL="https://download.gnome.org/gnomeos/${RELEASE}"
-            ISO="gnome_os_installer.iso";;
-        *)
-            URL="https://download.gnome.org/gnomeos/${RELEASE}"
-            ISO="gnome_os_installer_${RELEASE}.iso";;
+            ISO="gnome_os_installer.iso"
+            URL="https://os.gnome.org/download/latest";;
+        46.0) ISO="gnome_os_installer_46.iso";;
+        3*) ISO="gnome_os_installer.iso";;
     esac
-    echo "${URL}/${ISO} ${HASH}"
+    # Process the URL redirections; required for GNOME
+    ISO=$(web_redirect "${URL}/${ISO}")
+    echo "${ISO} ${HASH}"
 }
 
 function get_guix() {
