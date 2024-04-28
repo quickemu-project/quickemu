@@ -1008,7 +1008,7 @@ function editions_siduction() {
 }
 
 function releases_slackware() {
-    echo 15.0 14.2
+    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -5)
 }
 
 function releases_slax() {
