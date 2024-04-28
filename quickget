@@ -415,9 +415,10 @@ function list_url_all() {
     fi
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
-            for OPTION in $(editions_"${OS}"); do
+            for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                get_"${OS}" "${OPTION}" | cut_1 || echo "FAIL - ${OS} ${RELEASE} ${OPTION}"
+                URL=$(get_"${OS}" | cut_1 | head -1)
+                echo "${URL}"
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
@@ -466,7 +467,7 @@ function list_check_all() {
  
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
-            for OPTION in $(editions_"${OS}"); do
+            for EDITION in $(editions_"${OS}"); do
                 check_it
             done
         elif [[ "${OS}" == "windows"* ]]; then
@@ -1560,7 +1561,6 @@ EOF
 }
 
 function get_alma() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
     local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
@@ -1584,7 +1584,6 @@ function get_alpine() {
 }
 
 function get_android() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local JSON_ALL=""
@@ -1605,7 +1604,6 @@ function get_android() {
 }
 
 function get_antix() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="antiX-${RELEASE}"
     local README="README"
@@ -1647,7 +1645,6 @@ function get_archlinux() {
 }
 
 function get_arcolinux() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="arcolinux${EDITION:0:1}-${RELEASE}-x86_64.iso"
     local URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
@@ -1656,7 +1653,6 @@ function get_arcolinux() {
 }
 
 function get_artixlinux() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://iso.artixlinux.org/iso"
@@ -1705,7 +1701,6 @@ function get_blendos() {
 }
 
 function get_bodhi() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://sourceforge.net/projects/bodhilinux/files/${RELEASE}"
@@ -1741,7 +1736,6 @@ function get_centos-stream() {
 }
 
 function get_chimeralinux() {
-    local EDITION="${1:-}"
     local URL="https://repo.chimera-linux.org/live/${RELEASE}"
     local DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
     local ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
@@ -1783,7 +1777,6 @@ function get_crunchbang++() {
 }
 
 function get_debian() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL=""
@@ -1901,7 +1894,6 @@ function get_endless() {
 }
 
 function get_fedora() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local JSON=""
@@ -1918,7 +1910,6 @@ function get_fedora() {
 }
 
 function get_freebsd() {
-    local EDITION="${1}"
     local HASH=""
     local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-${EDITION}.iso"
     local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
@@ -1944,7 +1935,6 @@ function get_freedos() {
 }
 
 function get_garuda() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
@@ -1966,7 +1956,6 @@ function get_gentoo() {
 }
 
 function get_ghostbsd() {
-    local EDITION="${1:-}"
     local ISO=""
     local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
     local HASH=""
@@ -2008,7 +1997,6 @@ function get_guix() {
 }
 
 function get_haiku() {
-    local EDITION="${1:-}"
     local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
     local URL="http://mirror.rit.edu/haiku/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
@@ -2055,7 +2043,6 @@ function get_linuxlite() {
 }
 
 function get_linuxmint() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
@@ -2064,7 +2051,6 @@ function get_linuxmint() {
 }
 
 function get_lmde() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
     local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
@@ -2207,14 +2193,12 @@ function get_macos() {
 }
 
 function get_mageia() {
-    local EDITION="${1:-}"
     local ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
     local HASH=$(web_pipe "${ISO}.sha512" | cut_1)
     echo "${ISO} ${HASH}"
 }
 
 function get_manjaro() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local MANIFEST=""
@@ -2237,7 +2221,6 @@ function get_manjaro() {
 }
 
 function get_mxlinux() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
@@ -2279,7 +2262,6 @@ function get_nitrux() {
 }
 
 function get_nixos() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
@@ -2341,7 +2323,6 @@ function get_oraclelinux() {
 }
 
 function get_parrotsec() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -2352,7 +2333,6 @@ function get_parrotsec() {
 }
 
 function get_peppermint() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://sourceforge.net/projects/peppermintos/files/isos"
@@ -2375,7 +2355,6 @@ function get_peppermint() {
 }
 
 function get_popos() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -2385,7 +2364,6 @@ function get_popos() {
 }
 
 function get_porteus() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -2407,7 +2385,6 @@ function get_primtux() {
 }
 
 function get_pureos() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -2438,7 +2415,6 @@ function get_rebornos() {
 }
 
 function get_rockylinux() {
-    local EDITION="${1:-}"
     if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]; then
         EDITION="dvd1"
     fi
@@ -2511,7 +2487,6 @@ function get_slitaz() {
 }
 
 function get_solus() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
     local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
@@ -2520,7 +2495,6 @@ function get_solus() {
 }
 
 function get_sparkylinux() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
@@ -2535,7 +2509,6 @@ function get_sparkylinux() {
 }
 
 function get_spirallinux() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
     local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
@@ -2567,7 +2540,6 @@ function get_tinycore() {
 }
 
 function get_trisquel() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
@@ -2704,7 +2676,6 @@ function get_vanillaos() {
 
 function get_void() {
     local DATE=""
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL="https://repo-default.voidlinux.org/live/current"
@@ -2728,7 +2699,6 @@ function get_vxlinux() {
 }
 
 function get_zorin() {
-    local EDITION="${1:-}"
     local HASH=""
     local ISO=""
     local URL=""
