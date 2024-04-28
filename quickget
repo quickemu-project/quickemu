@@ -1025,7 +1025,7 @@ function releases_slint() {
 }
 
 function releases_slitaz() {
-    echo preferred core core64 loram core-5in1 preinit
+    echo $(web_pipe "http://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
 }
 
 function releases_solus() {
@@ -2404,10 +2404,6 @@ function get_slitaz() {
     local HASH=""
     local ISO="slitaz-rolling-${RELEASE}"
     local URL="http://mirror.slitaz.org/iso/rolling"
-    case ${RELEASE} in
-      preferred) ISO="slitaz-rolling";;
-      *) ISO="slitaz-rolling-${RELEASE}";;
-    esac
     HASH=$(web_pipe "${URL}/${ISO}.md5" | cut_1)
     echo "${URL}/${ISO}.iso ${HASH}"
 }
