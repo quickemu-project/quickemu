@@ -2495,6 +2495,7 @@ function get_tuxedoos() {
 function get_ubuntu-server() {
     local HASH=""
     local ISO=""
+    local NAME="live-server"
     local URL=""
     [[ $RELEASE = daily ]] && RELEASE=daily-live
     if [[ "${RELEASE}" == "daily"* ]]; then
@@ -2502,18 +2503,19 @@ function get_ubuntu-server() {
     else
         URL="https://releases.ubuntu.com/${RELEASE}"
     fi
+
+    case "${RELEASE}" in
+      14*|16*) NAME="server";;
+    esac
+
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
         ISO=$(cut -d'*' -f2 <<<${DATA})
         HASH=$(cut_1 <<<${DATA})
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'live-server' | grep amd64 | grep iso)
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
         ISO=$(cut -d' ' -f3 <<<${DATA})
         HASH=$(cut_1 <<<${DATA})
-    fi
-    if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
-        exit 1
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
