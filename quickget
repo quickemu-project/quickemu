@@ -2164,8 +2164,8 @@ function get_mxlinux() {
 }
 
 function get_netboot() {
-    local ISO="netboot.xyz.iso"
     local HASH=""
+    local ISO="netboot.xyz.iso"
     local URL="https://boot.netboot.xyz/ipxe"
     HASH=$(web_pipe "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
