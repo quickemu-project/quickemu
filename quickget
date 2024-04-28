@@ -651,7 +651,7 @@ function releases_archlinux() {
 }
 
 function releases_arcolinux() {
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | sort -r | head -n 5 | tr '\n' ' ')
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | sort -r | head -n 5)
 }
 
 function editions_arcolinux() {
