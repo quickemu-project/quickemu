@@ -480,7 +480,7 @@ function list_check_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                show_test_result ${CHECK} "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             done
         else
             if [[ "${OS}" == "windows"* ]]; then
@@ -502,7 +502,7 @@ function list_check_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                show_test_result ${CHECK} "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             fi
         fi
     done
@@ -2094,7 +2094,7 @@ function get_macos() {
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
         local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
-        show_test_result ${CHECK} "${OS}" "${RELEASE}" "" "${downloadLink}"
+        show_test_result "${CHECK}" "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
