@@ -34,7 +34,7 @@ function cut_1() {
     cut -d' ' -f1
 }
 
-os_info() {
+function os_info() {
     local SIMPLE_NAME=""
     local INFO=""
     SIMPLE_NAME="${1}"
@@ -172,7 +172,7 @@ function error_specify_os() {
     exit 1
 }
 
-os_supported() {
+function os_supported() {
     if [[ ! " $(os_support) " =~ " ${OS} " ]]; then
         error_not_supported_os
     fi
@@ -257,7 +257,7 @@ function error_not_supported_lang() {
     exit 1
 }
 
-handle_missing() {
+function handle_missing() {
     # Handle odd missing Fedora combinations
     if [[ $OS == fedora ]] ; then
         if [[ ${RELEASE} = "33" && ${EDITION} = "i3" ]] || [[ ${RELEASE} = "34" && ${EDITION} = "Cinnamon" ]] || [[ "${RELEASE}" < "39" && ${EDITION} = "Onyx" ]]; then
@@ -3408,7 +3408,7 @@ function open_url() {
     xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
 }
 
-create_vm() {
+function create_vm() {
     # shellcheck disable=SC2206
     local URL_HASH=(${1// / })
     local URL="${URL_HASH[0]}"
