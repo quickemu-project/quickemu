@@ -1036,13 +1036,11 @@ function editions_solus() {
 }
 
 function releases_sparkylinux() {
-    web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru | tr '\n' ' '
-    echo
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru | tr '\n' ' ')
 }
 
 function editions_sparkylinux() {
-    web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u | tr '\n' ' '
-    echo
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u | tr '\n' ' ')
 }
 
 function releases_spirallinux() {
