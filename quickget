@@ -1158,7 +1158,7 @@ function releases_zorin() {
 }
 
 function editions_zorin() {
-    echo core64 lite64 education64 edulite64
+    echo core64 lite64 education64
 }
 
 function check_hash() {
@@ -2612,7 +2612,8 @@ function get_zorin() {
     local HASH=""
     local ISO=""
     local URL=""
-    URL="https://zrn.co/${RELEASE}${EDITION}"
+    # Process the URL redirections; required for Zorin
+    URL=$(web_redirect "https://zrn.co/${RELEASE}${EDITION}")
     echo "${URL} ${HASH}"
 }
 
