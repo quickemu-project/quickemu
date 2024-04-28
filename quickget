@@ -267,13 +267,6 @@ function handle_missing() {
         fi
     fi
     # Handle missing Manjaro Sway minimal
-    if [[ $OS == manjaro ]] ; then
-        if [[ ${RELEASE} == "sway" && ${EDITION} == "minimal" ]] ; then
-            echo "ERROR! Unsupported combination"
-            echo "       Manjaro Sway does not have a minimal edition"
-            exit 1;
-        fi
-    fi
 }
 
 function validate_release() {
@@ -889,7 +882,7 @@ function editions_manjaro(){
 }
 
 function releases_manjaro() {
-    echo xfce gnome plasma budgie cinnamon i3 mate sway
+    echo xfce gnome plasma cinnamon i3 sway
 }
 
 function releases_mxlinux(){
