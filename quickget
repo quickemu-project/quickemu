@@ -364,26 +364,23 @@ function create_config() {
 
 function list_supported() {
     # output OS RELEASE EDITION (usefull for straight testing...)
-    local DL=""
-    local FUNC
-    local OPTION
-    local OS
+    local FUNC=""
+    local OS=""
     for OS in $(os_support); do
-        case ${OS} in
-          *ubuntu-server*) FUNC="ubuntu-server";;
-          *ubuntu*) FUNC="ubuntu";;
-          *) FUNC="${OS}";;
-        esac
+        FUNC="${OS}"
+        if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
+            FUNC="ubuntu"
+        fi
         for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
             # If the OS has an editions_() function, use it.
             if [[ $(type -t "editions_${OS}") == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
-                    echo "${OS} ${RELEASE} ${OPTION}"
+                for EDITION in $(editions_"${OS}"); do
+                    echo "${OS} ${RELEASE} ${EDITION}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
-                for OPTION in "${LANGS[@]}"; do
-                    echo "${OS} ${RELEASE} ${OPTION}"
+                for LANG in "${LANGS[@]}"; do
+                    echo "${OS} ${RELEASE} ${LANG}"
                 done
             else
                 echo "${OS} ${RELEASE}"
