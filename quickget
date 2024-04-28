@@ -413,6 +413,7 @@ function list_url_all() {
     else
         FUNC="${OS}"
     fi
+
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
@@ -423,23 +424,22 @@ function list_url_all() {
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
             for OPTION in "${LANGS[@]}"; do
-                echo "skipped: ${OS} ${RELEASE} ${OPTION}"
-                #validate_release releases_${OS}
-                #get_${OS} ${OPTION} | cut_1
+                validate_release releases_"${OS}"
+                echo -e "SKIP:\t${OS}\t${RELEASE}\t${OPTION}\t${URL}"
             done
-        #TODO NEEDED?
         elif [[ "${OS}" == "macos" ]]; then
             validate_release releases_"${OS}"
-            get_macos || echo "FAIL - ${OS} ${RELEASE} ${OPTION}"
+            echo -e "SKIP:\t${OS}\t${RELEASE}"
         elif [[ "${OS}" == *ubuntu-server* ]]; then
-            validate_release releases_ubuntu
-            get_ubuntu-server || echo "FAIL - ${OS} ${RELEASE}"
+            validate_release releases_ubuntu-server
+            (get_ubuntu-server)
         elif [[ "${OS}" == *ubuntu* ]]; then
             validate_release releases_ubuntu
-            get_ubuntu || echo "FAIL - ${OS} ${RELEASE}"
+            (get_ubuntu)
         else
             validate_release releases_"${OS}"
-            get_"${OS}" "${RELEASE}" | cut_1 || echo "FAIL - ${OS} ${RELEASE}"
+            URL=$(get_"${OS}" | cut_1 | head -1)
+            echo "${URL}"
         fi
     done
     exit 0
