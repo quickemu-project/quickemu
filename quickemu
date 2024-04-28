@@ -523,23 +523,38 @@ function vm_boot() {
         esac
         ;;
     macos)
-        #https://www.nicksherlock.com/2020/06/installing-macos-big-sur-on-proxmox/
+        # https://www.nicksherlock.com/2020/04/installing-macos-catalina-on-proxmox-with-opencore/
+        # https://www.nicksherlock.com/2022/10/installing-macos-13-ventura-on-proxmox/
+        # Penryn  https://github.com/search?q=repo%3Akholia%2FOSX-KVM%20%20GenuineIntel&type=code
+        # https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+        # quickget current list: high-sierra mojave catalina big-sur monterey ventura sonoma
         # A CPU with SSE4.1 support is required for >= macOS Sierra
+        # A CPU with SSE4.2 support is required for >= macOS Catalina
         # A CPU with AVX2 support is required for >= macOS Ventura
         case ${macos_release} in
         ventura|sonoma)
             if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
+                # noTSX stops cpuid errors https://duckduckgo.com/?t=ffab&q=CPUID.07H%3AEBX.rtm+%5Bbit+11%5D&ia=web also cited by NickSherlock for Ventura install
                 CPU="-cpu Haswell-noTSX-IBRS,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc"
             else
-                echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 and AVX2 support."
+                echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
+                exit 1
+            fi
+            ;;
+        catalina|big-sur|monterey)
+            if check_cpu_flag sse4_2; then
+                # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
+                # Warn on AMD:           +fma4,+pcid
+                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+            else
+                echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                 exit 1
             fi
             ;;
         *)
             if check_cpu_flag sse4_1; then
-                # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
-                # Warn on AMD:           +fma4,+pcid
-                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+                # as above but 4.1 (for older hosts)
+                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.1,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
             else
                 echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
                 exit 1
