@@ -915,8 +915,7 @@ function editions_nixos(){
 }
 
 function releases_openbsd(){
-    local OBSD_RELEASES=$(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r | tr '\n' ' ')
-    echo "${OBSD_RELEASES}"
+    echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r | tr '\n' ' ')
 }
 
 function releases_openindiana(){
