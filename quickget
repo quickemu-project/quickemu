@@ -440,13 +440,13 @@ function list_url_all() {
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
-                echo "${URL}"
+                show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
             for LANG in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
-                show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
+                show_url_result "${OS}" "${RELEASE}" "${LANG}" "SKIP"
             done
         elif [[ "${OS}" == "macos" ]]; then
             validate_release releases_macos
@@ -460,7 +460,7 @@ function list_url_all() {
         else
             validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut_1 | head -1)
-            echo "${URL}"
+            show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         fi
     done
     exit 0
@@ -1254,7 +1254,7 @@ function web_get() {
 
     # Test mode for ISO
     if [ "${just}" == 'show' ]; then
-        echo "${URL}"
+        show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
         CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
@@ -2094,7 +2094,7 @@ function get_macos() {
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
     if [ "${just}" == 'show' ]; then
-        echo -e "Recovery URL (inaccessible through normal browser):\n${downloadLink}\nChunklist (used for verifying the Recovery Image):\n${chunkListLink}\nFirmware URLs:\n${OpenCore_qcow2}\n${OVMF_CODE}\n${OVMF_VARS}"
+        show_url_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${just}" == 'test' ]; then
         local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
