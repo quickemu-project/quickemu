@@ -992,7 +992,7 @@ function releases_rebornos() {
 }
 
 function releases_rockylinux() {
-    echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 8.3
+    echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | sort -ru)
 }
 
 function editions_rockylinux() {
