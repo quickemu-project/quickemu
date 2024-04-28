@@ -394,13 +394,14 @@ function list_supported() {
 }
 
 function list_url_all() {
-    local URL
-    local OPTION
+    local CHECK=""
+    local OPTION=""
     local OS="${1}"
     local FUNC="${OS}"
     if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
         FUNC="ubuntu"
     fi
+    local URL=""
 
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
@@ -434,21 +435,22 @@ function list_url_all() {
 }
 
 function list_check_all() {
-    local URL
-    local OPTION
+    local CHECK=""
+    local OPTION=""
     local OS="${1}"
     local FUNC="${OS}"
     if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
         FUNC="ubuntu"
     fi
+    local URL=""
 
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
-                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                echo -e "${GOOD}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+                CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
             done
         else
             if [[ "${OS}" == "windows"* ]]; then
@@ -469,8 +471,8 @@ function list_check_all() {
             else
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
-                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                echo -e "${GOOD}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+                CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
             fi
         fi
     done
@@ -1195,6 +1197,7 @@ function web_pipe() {
 
 # Download a file from the web
 function web_get() {
+    local CHECK=""
     local HEADERS=()
     local URL="${1}"
     local DIR="${2}"
@@ -1225,8 +1228,8 @@ function web_get() {
         echo "${URL}"
         exit 0
     elif [ "${just}" == 'test' ]; then
-        GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        echo -e "${GOOD}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+        CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+        echo -e "${CHECK}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
         exit 0
     elif [ "${just}" == 'download' ]; then
         DIR="$(pwd)"
