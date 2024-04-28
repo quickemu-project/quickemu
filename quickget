@@ -2216,7 +2216,7 @@ function get_netboot() {
 function get_netbsd() {
     local HASH=""
     local ISO="NetBSD-${RELEASE}-amd64.iso"
-    local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images/"
+    local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images"
     HASH=$(web_pipe "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2285,7 +2285,7 @@ function get_oraclelinux() {
     local ISO=""
     local VER_MAJ=${RELEASE::1}
     local VER_MIN=${RELEASE:2:1}
-    local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64/"
+    local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64"
     case ${VER_MAJ} in
       7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
       *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
