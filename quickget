@@ -446,17 +446,10 @@ function list_url_all() {
 }
 
 function list_check_all() {
-    local DIR="/dev/null"
+    local URL
     local FUNC
     local OPTION
     local OS="${1}"
-
-    check_it() {
-        validate_release releases_"${OS}"
-        URL=$(get_"${OS}" "${OPTION}" | cut_1)
-        GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-    }
-
     if [[ "${OS}" == *ubuntu-server* ]]; then
         FUNC="ubuntu-server"
     elif [[ "${OS}" == *ubuntu* ]]; then
@@ -464,34 +457,37 @@ function list_check_all() {
     else
         FUNC="${OS}"
     fi
- 
+
     for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
-                check_it
+                validate_release releases_"${OS}"
+                URL=$(get_"${OS}" | cut_1 | head -1)
+                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                echo -e "${GOOD}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
             done
-        elif [[ "${OS}" == "windows"* ]]; then
-            # skipping because of microsoft
-            "languages_${OS}"
-            for OPTION in "${LANGS[@]}"; do
-                GOOD='FAIL!'
-            done
-        elif [[ "${OS}" == *"ubuntu"* ]]; then
-            URL=$(get_"${OS}" )
-            GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        elif [[ "${OS}" == *"ubuntu-server"* ]]; then
-            URL="$(get_ubuntu-server)"
-            GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
         else
-            validate_release releases_"${OS}"
-            URL=$(get_"${OS}" "${RELEASE}" | cut_1)
-            GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        fi
-
-        if [[ "${GOOD}" == "PASS" ]]; then
-            echo "PASS - ${OS} ${RELEASE} ${OPTION} ${URL}"
-        else
-            echo "FAIL - ${OS} ${RELEASE} ${OPTION} ${URL}"
+            if [[ "${OS}" == "windows"* ]]; then
+                "languages_${OS}"
+                for OPTION in "${LANGS[@]}"; do
+                    validate_release releases_"${OS}"
+                    echo -e "SKIP:\t${OS}\t${RELEASE}\t${OPTION}\t${URL}"
+                done
+            elif [[ "${OS}" == "macos" ]]; then
+                validate_release releases_"${OS}"
+                echo -e "SKIP:\t${OS}\t${RELEASE}"
+            elif [[ "${OS}" == *ubuntu-server* ]]; then
+                validate_release releases_ubuntu-server
+                (get_ubuntu-server)
+            elif [[ "${OS}" == *ubuntu* ]]; then
+                validate_release releases_ubuntu
+                (get_ubuntu)
+            else
+                validate_release releases_"${OS}"
+                URL=$(get_"${OS}" | cut_1 | head -1)
+                GOOD=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                echo -e "${GOOD}:\t${OS}\t${RELEASE}\t${EDITION}\t${URL}"
+            fi
         fi
     done
     exit 0
