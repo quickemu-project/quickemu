@@ -1190,7 +1190,7 @@ function check_hash() {
     local iso=""
     local hash=""
     local hash_algo=""
-    if [ "${just}" == 'download' ]; then
+    if [ "${OPERATION}" == "download" ]; then
         iso="${1}"
     else
         iso="${VM_PATH}/${1}"
@@ -1249,14 +1249,14 @@ function web_get() {
     done
 
     # Test mode for ISO
-    if [ "${just}" == 'show' ]; then
+    if [ "${OPERATION}" == "show" ]; then
         show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
-    elif [ "${just}" == 'test' ]; then
+    elif [ "${OPERATION}" == "test" ]; then
         CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
         show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
-    elif [ "${just}" == 'download' ]; then
+    elif [ "${OPERATION}" == "download" ]; then
         DIR="$(pwd)"
     fi
 
@@ -1323,10 +1323,10 @@ function zsync_get() {
     local OUT=""
     local URL="${1}"
     # Test mode for ISO
-    if [ "${just}" == 'show' ]; then
+    if [ "${OPERATION}" == "show" ]; then
         echo "${URL}"
         exit 0
-    elif [ "${just}" == 'test' ]; then
+    elif [ "${OPERATION}" == "test" ]; then
         web_check "${URL}"
         exit 0
     elif command -v zsync &>/dev/null; then
@@ -1367,7 +1367,7 @@ function make_vm_config() {
     local IMAGE_TYPE=""
     local GUEST=""
     local SEC_BOOT=""
-    if [ "${just}" == 'download' ]; then
+    if [ "${OPERATION}" == "download" ]; then
         exit 0
     fi
     IMAGE_FILE="${1}"
@@ -2089,14 +2089,14 @@ function get_macos() {
     local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
-    if [ "${just}" == 'show' ]; then
+    if [ "${OPERATION}" == "show" ]; then
         show_url_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
-    elif [ "${just}" == 'test' ]; then
+    elif [ "${OPERATION}" == "test" ]; then
         local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
         show_test_result ${CHECK} "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
-    elif [ "${just}" == 'download' ]; then
+    elif [ "${OPERATION}" == "download" ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
@@ -3273,7 +3273,7 @@ function get_windows() {
         download_windows_workstation "${RELEASE}"
     fi
 
-    if [ "${just}" == 'download' ]; then
+    if [ "${OPERATION}" == "download" ]; then
         exit 0
     fi
 
@@ -3404,7 +3404,7 @@ if ((BASH_VERSINFO[0] < 4)); then
 fi
 
 LANGS=()
-
+OPERATION=""
 CURL=$(command -v curl)
 if [ ! -e "${CURL}" ]; then
     echo "ERROR! curl not found. Please make install curl"
@@ -3418,11 +3418,11 @@ case "${1}" in
     exit 0
     ;;
   '--download'|'-d')
-    just="download"
+    OPERATION="download"
     shift
     ;;
   '--create-config'|'-cc')
-    just="config"
+    OPERATION="config"
     shift
     create_config "${@}"
     ;;
@@ -3444,11 +3444,11 @@ case "${1}" in
     exit 0
     ;;
   '--url'|'-u')
-    just="show"
+    OPERATION="show"
     shift
     ;;
   '--url-all'|'-ua')
-    just="show"
+    OPERATION="show"
     shift
     # if no OS is specified, list all URLs for all supported OSes
     if [ -z "${1}" ]; then
@@ -3460,11 +3460,11 @@ case "${1}" in
     fi
     ;;
   '--check'|'-c')
-    just="test"
+    OPERATION="test"
     shift
     ;;
   '--check-all'|'-ca')
-    just="test"
+    OPERATION="test"
     shift
     # if no OS is specified, check all URLs for all supported OSes
     if [ -z "${1}" ]; then
