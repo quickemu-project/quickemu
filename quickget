@@ -390,35 +390,26 @@ function list_supported() {
     exit 0
 }
 
-function show_test_result() {
-    local RESULT="${1}"
-    local OS="${2}"
-    local RELEASE="${3}"
-    local EDITION="${4:-}"
-    local URL="${5:-}"
-    if [ -n "${EDITION}" ]; then
-        OS="${OS}-${RELEASE}-${EDITION}"
-    else
-        OS="${OS}-${RELEASE}"
-    fi
-    # Pad the OS string to 32 characters
-    OS=$(printf "%-35s" "${OS}")
-    echo -e "${RESULT}: ${OS} ${URL}"
-}
-
-function show_url_result() {
+function test_result() {
     local OS="${1}"
     local RELEASE="${2}"
     local EDITION="${3:-}"
     local URL="${4:-}"
+    local RESULT="${5:-}"
     if [ -n "${EDITION}" ]; then
         OS="${OS}-${RELEASE}-${EDITION}"
     else
         OS="${OS}-${RELEASE}"
     fi
-    # Pad the OS string to 32 characters
-    OS=$(printf "%-35s" "${OS}:")
-    echo -e "${OS} ${URL}"
+
+    if [ -n "${RESULT}" ]; then
+        # Pad the OS string for consistent output
+        OS=$(printf "%-35s" "${OS}")
+        echo -e "${RESULT}: ${OS} ${URL}"
+    else
+        OS=$(printf "%-36s" "${OS}:")
+        echo -e "${OS} ${URL}"
+    fi
 }
 
 function test_all() {
@@ -438,10 +429,10 @@ function test_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 if [ "${OPERATION}" == "show" ]; then
-                    show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
                     CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                    show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
                 fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
@@ -449,9 +440,9 @@ function test_all() {
             for LANG in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
                 if [ "${OPERATION}" == "show" ]; then
-                    show_url_result "${OS}" "${RELEASE}" "${LANG}" "SKIP"
+                    test_result "${OS}" "${RELEASE}" "${LANG}" ""
                 elif [ "${OPERATION}" == "test" ]; then
-                    show_test_result SKIP "${OS}" "${RELEASE}" "${LANG}" "${URL}"
+                    test_result "${OS}" "${RELEASE}" "${LANG}" "${URL}" "SKIP"
                 fi
             done
         elif [[ "${OS}" == "macos" ]]; then
@@ -467,10 +458,10 @@ function test_all() {
             validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut_1 | head -1)
             if [ "${OPERATION}" == "show" ]; then
-                show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
             fi
         fi
     done
@@ -1217,11 +1208,11 @@ function web_get() {
 
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
-        show_url_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
         CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        show_test_result "${CHECK}" "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         DIR="$(pwd)"
@@ -2057,11 +2048,11 @@ function get_macos() {
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
     if [ "${OPERATION}" == "show" ]; then
-        show_url_result "${OS}" "${RELEASE}" "" "${downloadLink}"
+        test_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
         local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
-        show_test_result "${CHECK}" "${OS}" "${RELEASE}" "" "${downloadLink}"
+        test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
