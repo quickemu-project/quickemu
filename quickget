@@ -789,11 +789,11 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 40 39
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -r)
 }
 
 function editions_fedora() {
-    echo Workstation Budgie Cinnamon i3 KDE LXDE LXQt Mate Xfce Silverblue Sericea Kinoite Sway Server Onyx
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(select(.arch=="x86_64" and .variant!="Labs" and .variant!="IoT" and .variant!="Container" and .variant!="Cloud" and .variant!="Everything"  and .subvariant!="Security" and .subvariant!="Server_KVM" and .subvariant!="SoaS")) | map(.subvariant) | unique | .[]' | sort)
 }
 
 function releases_freebsd(){
