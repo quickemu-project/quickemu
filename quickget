@@ -1119,7 +1119,7 @@ function releases_vanillaos() {
 }
 
 function releases_void() {
-    echo current
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru)
 }
 
 function editions_void() {
@@ -2604,16 +2604,15 @@ function get_void() {
     local DATE=""
     local HASH=""
     local ISO=""
-    local URL="https://repo-default.voidlinux.org/live/current"
-    DATE=$(web_pipe "${URL}/sha256sum.txt" | head -n1 | cut -d'.' -f1 | cut -d'-' -f4)
+    local URL="https://repo-default.voidlinux.org/live"
     case ${EDITION} in
-      glibc) ISO="void-live-x86_64-${DATE}-base.iso";;
-      musl) ISO="void-live-x86_64-musl-${DATE}-base.iso";;
-      xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
-      xfce-musl) ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
+      glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
+      musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
+      xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+      xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
     esac
     HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
-    echo "${URL}/${ISO} ${HASH}"
+    echo "${URL}/${RELEASE}/${ISO} ${HASH}"
 }
 
 function get_vxlinux() {
