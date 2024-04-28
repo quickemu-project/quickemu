@@ -3467,7 +3467,14 @@ case "${1}" in
   '--check-all'|'-ca')
     just="test"
     shift
-    list_check_all "${1}"
+    # if no OS is specified, check all URLs for all supported OSes
+    if [ -z "${1}" ]; then
+        for OS in $(os_support); do
+            (list_check_all "${OS}")
+        done
+    else
+        list_check_all "${1}"
+    fi
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
