@@ -3540,7 +3540,7 @@ case "${1}" in
     list_json
     ;;
   '--list'|'-l')
-    time list_supported
+    list_supported
     ;;
 esac
 
