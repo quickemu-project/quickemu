@@ -1128,7 +1128,7 @@ function editions_void() {
 }
 
 function releases_vxlinux() {
-    web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -n 1 | cut -d'/' -f 3
+    echo $(web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | sort -u | cut -d'/' -f 3)
 }
 
 function releases_windows() {
