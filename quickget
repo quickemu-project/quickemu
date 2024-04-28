@@ -3215,9 +3215,6 @@ function download_windows_workstation() {
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
         echo " - Microsoft blocked the automated download request based on your IP address."
-        if [ "${just}" == 'show' ] || [ "${just}" == 'test' ]; then
-            exit 1
-        fi
         failed=1
     fi
 
@@ -3238,14 +3235,6 @@ function download_windows_workstation() {
         # This should only happen if there's been some change to the download endpoint web address
         echo " - Microsoft servers gave us no download link to our request for an automated download. Please manually download this ISO in a web browser: $url"
         return 1
-    fi
-
-    if [ "${just}" == 'show' ]; then
-        echo -e "   Windows ${RELEASE} Download (valid for 24 hours):\n${iso_download_link}"
-        exit 0
-    elif [ "${just}" == 'test' ]; then
-        web_check "${iso_download_link}"
-        exit 0
     fi
 
     echo "Downloading Windows ${RELEASE} (${LANG}): $iso_download_link"
