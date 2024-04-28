@@ -1028,11 +1028,11 @@ function releases_slitaz() {
 }
 
 function releases_solus() {
-    echo 4.5
+    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'-' -f 2 | sort -ru)
 }
 
 function editions_solus() {
-    echo Budgie GNOME MATE Plasma
+    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'.' -f5 | cut -d'-' -f2- | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -2418,7 +2418,7 @@ function get_slitaz() {
 function get_solus() {
     local HASH=""
     local ISO="Solus-${RELEASE}-${EDITION}.iso"
-    local URL="https://mirrors.rit.edu/solus/images/${RELEASE}"
+    local URL="https://downloads.getsol.us/isos/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
