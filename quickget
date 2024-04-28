@@ -3451,7 +3451,14 @@ case "${1}" in
   '--url-all'|'-ua')
     just="show"
     shift
-    list_url_all "${1}"
+    # if no OS is specified, list all URLs for all supported OSes
+    if [ -z "${1}" ]; then
+        for OS in $(os_support); do
+            (list_url_all "${OS}")
+        done
+    else
+        list_url_all "${1}"
+    fi
     ;;
   '--check'|'-c')
     just="test"
