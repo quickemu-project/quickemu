@@ -774,7 +774,7 @@ function editions_endless() {
 }
 
 function releases_fedora() {
-    echo 39 38
+    echo 40 39
 }
 
 function editions_fedora() {
