@@ -1870,7 +1870,7 @@ function get_garuda() {
 function get_gentoo() {
     local HASH=""
     local ISO=""
-    local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds/"
+    local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds"
     case ${EDITION} in
         minimal) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep install | cut_1);;
         livegui) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep livegui | cut_1);;
