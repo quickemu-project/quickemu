@@ -545,7 +545,7 @@ function vm_boot() {
             if check_cpu_flag sse4_2; then
                 # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
                 # Warn on AMD:           +fma4,+pcid
-                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.2,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+                CPU="-cpu Haswell-noTSX-IBRS,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc"
             else
                 echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                 exit 1
