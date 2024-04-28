@@ -1106,49 +1106,24 @@ function releases_ubuntu() {
     local VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
     local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
     local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
-    local LTS_SUPPORT=()
-    local INTERIM_SUPPORT=()
-    for i in "${SUPPORTED_VERSIONS[@]}"; do
-        if [[ $(expr ${i%.*} % 2) == 0 && ${i#*.} == "04" ]]; then
-            LTS_SUPPORT+=($i)
-        else
-            INTERIM_SUPPORT+=($i)
-        fi
-    done
     case "${OS}" in
-      edubuntu|ubuntu-unity|ubuntucinnamon)
-        echo ${INTERIM_SUPPORT[@]} daily-live
-        ;;
-      kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
-        ## after 14.04
-        echo ${LTS_SUPPORT[@]:1} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
-        ;;
-      ubuntu-budgie)
-        #after 16.04
-        echo ${LTS_SUPPORT[@]:2} ${INTERIM_SUPPORT[@]} daily-live jammy-daily ${EOL_VERSIONS[@]/#/eol-}
-        ;;
-      ubuntu)
-        echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live ${EOL_VERSIONS[@]/#/eol-}
-        ;;
+        ubuntu)
+            echo ${SUPPORTED_VERSIONS[@]} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+        kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
+            # after 16.04
+            echo ${SUPPORTED_VERSIONS[@]:1} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+        ubuntu-budgie)
+            # after 18.04
+            echo ${SUPPORTED_VERSIONS[@]:2} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+        edubuntu|ubuntu-unity|ubuntucinnamon)
+            # after 23.10
+            echo ${SUPPORTED_VERSIONS[@]:5} daily-live ${EOL_VERSIONS[@]/#/eol-};;
     esac
 }
 
 function releases_ubuntu-server() {
-    local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version'))
-    local LTS_SUPPORT=()
-    local INTERIM_SUPPORT=()
-    for i in "${!ALL_VERSIONS[@]}"; do
-        if [[ $i == 0 || ${ALL_VERSIONS[$i]} > ${ALL_VERSIONS[$(expr $i - 1)]} ]]; then
-            if [[ $(expr ${ALL_VERSIONS[${i}]%.*} % 2) == 0 && ${ALL_VERSIONS[${i}]#*.} == "04" ]]; then
-                LTS_SUPPORT+=(${ALL_VERSIONS[$i]})
-            else
-                INTERIM_SUPPORT+=(${ALL_VERSIONS[$i]})
-            fi
-        else
-            break
-        fi
-    done
-    echo ${LTS_SUPPORT[@]} ${INTERIM_SUPPORT[@]} daily-live
+    local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
+    echo ${ALL_VERSIONS[@]}
 }
 
 function releases_vanillaos() {
