@@ -393,6 +393,22 @@ function list_supported() {
     exit 0
 }
 
+function show_test_result() {
+    local RESULT="${1}"
+    local OS="${2}"
+    local RELEASE="${3}"
+    local EDITION="${4:-}"
+    local URL="${5:-}"
+    if [ -n "${EDITION}" ]; then
+        OS="${OS}-${RELEASE}-${EDITION}"
+    else
+        OS="${OS}-${RELEASE}"
+    fi
+    # Pad the OS string to 32 characters
+    OS=$(printf "%-35s" "${OS}")
+    echo -e "${RESULT}: ${OS} ${URL}"
+}
+
 function list_url_all() {
     OS="${1}"
     os_supported
