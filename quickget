@@ -731,7 +731,7 @@ function editions_debian() {
 }
 
 function releases_deepin() {
-    web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r | tr '\n' ' '
+    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r | tr '\n' ' ')
 }
 
 function releases_devuan() {
@@ -1798,23 +1798,18 @@ function get_debian() {
 
 function get_deepin() {
     local HASH=""
-    local EDITION=""
-    local ISO="deepin-desktop-community-${RELEASE}-amd64.iso"
+    local REV=${RELEASE}
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
     # fix iso name
     if [[ "${RELEASE}" == *"20" ]] ; then
-        EDITION="1003"
-        ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+        REV="1003"
     elif [[ "${RELEASE}" == *"20.1" ]]; then
-        EDITION="1010"
-        ISO="deepin-desktop-community-${EDITION}-amd64.iso"
+        REV="1010"
     fi
+    local ISO="deepin-desktop-community-${REV}-amd64.iso"
     HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut_1)
-    #echo "${URL}/${ISO} ${HASH}"
-    web_get "${URL}/${ISO}" "${VM_PATH}"
-    check_hash "${ISO}" "${HASH}"
-    make_vm_config "${ISO}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_devuan() {
@@ -3587,10 +3582,6 @@ if [ -n "${2}" ]; then
         # Ubuntu doesn't use create_vm()
         validate_release releases_ubuntu
         get_ubuntu
-    elif [[ "${OS}" == *"deepin"* ]]; then
-        # deepin doesn't use create_vm()
-        validate_release releases_deepin
-        get_deepin
     elif [[ "${OS}" == "windows"* ]]; then
         LANG="English International"
         "languages_${OS}"
