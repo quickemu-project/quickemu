@@ -3242,9 +3242,14 @@ function get_windows() {
     fi
 }
 
-function open_url() {
-    local URL="$1";
-    xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL;
+function open_homepage() {
+    if [ -z "$(os_info "${1}")" ]; then
+        error_specify_os
+    else
+        URL="$(os_info "${1}" | cut -d'|' -f4)"
+        xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL
+        exit 0
+    fi
 }
 
 function create_vm() {
@@ -3369,12 +3374,8 @@ case "${1}" in
     create_config "${@}"
     ;;
   '--open-homepage'|'-o')
-    if [ -z "$(os_info "${2}")" ]; then
-        error_specify_os
-    else
-        open_url "$(os_info "${2}" | cut -d'|' -f4)"
-        exit 0
-    fi
+    shift
+    open_homepage
     ;;
   '--version'|'-v')
     WHERE=$(dirname "${BASH_SOURCE[0]}")
