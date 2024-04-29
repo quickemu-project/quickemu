@@ -1268,7 +1268,7 @@ function web_check() {
             shift
         fi
     done
-    curl --silent --location --head --output /dev/null --fail "${HEADERS[@]}" "${URL}"
+    curl --silent --location --head --output /dev/null --retry 1 --connect-timeout 1 "${HEADERS[@]}" "${URL}"
 }
 
 function zsync_get() {
