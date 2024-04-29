@@ -154,6 +154,7 @@ function show_os_info() {
 function pretty_name() {
     echo $(show_os_info -1 "${1}")
 }
+PRETTY_NAME=$(show_os_info -1 "${OS}")
 
 # Just in case quickget want use it
 function os_homepage(){
@@ -234,7 +235,7 @@ function error_not_supported_release() {
 
 function error_not_supported_edition() {
     if [[ ! " ${EDITIONS[*]} " =~ " ${EDITION} " ]]; then
-        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
+        echo -e "ERROR! ${EDITION} is not a supported ${PRETTY_NAME} edition\n"
         echo -n ' - Editions: '
         for EDITION in "${EDITIONS[@]}"; do
             echo -n "${EDITION} "
@@ -245,7 +246,7 @@ function error_not_supported_edition() {
 }
 
 function error_not_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
+    echo -e "ERROR! ${LANG} is not a supported ${PRETTY_NAME} language\n"
     echo -n ' - Editions: '
     for LANG in "${LANGS[@]}"; do
         echo -n "${LANG} "
@@ -1250,7 +1251,7 @@ function web_get() {
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION:+ $EDITION}
+        echo Downloading ${PRETTY_NAME} ${RELEASE} ${EDITION:+ $EDITION}
         echo "- URL: ${URL}"
     fi
 
@@ -1317,7 +1318,7 @@ function zsync_get() {
             echo "ERROR! Unable to create directory ${DIR}"
             exit 1
         fi
-        echo -e Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
+        echo -e Downloading ${PRETTY_NAME} ${RELEASE} ${EDITION+ ${EDITION}} from ${URL}'\n'
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
@@ -1513,7 +1514,7 @@ EOF
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
     fi
-    echo -e "\nTo start your $(pretty_name "${OS}") virtual machine run:"
+    echo -e "\nTo start your ${PRETTY_NAME} virtual machine run:"
     if [ ${OS} == "slint" ]; then
         echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
@@ -2574,7 +2575,7 @@ function get_ubuntu() {
         HASH=$(cut_1 <<<${DATA})
     fi
     if [ -z $ISO ] || [ -z $HASH ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        echo "${PRETTY_NAME} ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -3123,7 +3124,7 @@ function download_windows_server() {
     # Limit untrusted size for input validation
     iso_download_link="$(echo "$iso_download_link" | head -c 1024)"
 
-    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${LANG}): $iso_download_link"
+    echo "Downloading ${PRETTY_NAME} ${PRETTY_RELEASE} (${LANG}): $iso_download_link"
 
     # Use highest TLS version for endpoints that support it
     case "$iso_download_link" in
