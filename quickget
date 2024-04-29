@@ -226,7 +226,7 @@ function error_not_supported_os() {
 
 function error_not_supported_release() {
     if [[ ! " ${RELEASES[*]} " =~ " ${RELEASE} " ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release."
+        echo -e "ERROR! ${PRETTY_NAME} ${RELEASE} is not a supported release."
         echo -n 'Supported releases: '
         "releases_${OS}"
         exit 1
@@ -274,11 +274,9 @@ function handle_missing() {
 }
 
 function validate_release() {
-    local DISPLAY_NAME=""
+    local PRETTY_NAME=""
     local RELEASE_GENERATOR=""
     local RELEASES=""
-
-    DISPLAY_NAME="$(pretty_name "${OS}")"
     case ${OS} in
       *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
       *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
@@ -296,15 +294,12 @@ function list_json() {
 
 function list_csv() {
     CSV_DATA="$(csv_data)"
-
-    echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
-    sort -t',' -k2,2 <<<"${CSV_DATA}"
-
+    sort -f <<<"${CSV_DATA}"
     exit 0
 }
 
 function csv_data() {
-    local DISPLAY_NAME
+    local PRETTY_NAME
     local DL=""
     local DOWNLOADER
     local FUNC
@@ -322,8 +317,8 @@ function csv_data() {
 
     for OS in $(os_support); do
         local EDITIONS=""
-        DISPLAY_NAME="$(pretty_name "${OS}")"
-
+    echo "Pretty Name,OS,Release,Option,Downloader,PNG,SVG"
+    for OS in $(os_support); do
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
           *ubuntu*) FUNC="ubuntu";;
@@ -347,15 +342,15 @@ function csv_data() {
             # If the OS has an editions_() function, use it.
             if [[ ${EDITIONS} ]]; then
                 for OPTION in ${EDITIONS}; do
-                    echo "${DISPLAY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+                    echo "${PRETTY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for LANG in "${LANGS[@]}"; do
-                    echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
+                    echo "${PRETTY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
                 done
             else
-                echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
+                echo "${PRETTY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
             fi
         done &
     done
