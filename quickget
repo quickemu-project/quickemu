@@ -305,6 +305,7 @@ function csv_data() {
     local PNG
     local RELEASE
     local SVG
+    local INFO
     local HAS_ZSYNC=0
 
     # Check if zsync is available
@@ -313,9 +314,10 @@ function csv_data() {
     fi
 
     for OS in $(os_support); do
+        local INFO=""
         local EDITIONS=""
-    echo "Pretty Name,OS,Release,Option,Downloader,PNG,SVG"
-    for OS in $(os_support); do
+        INFO=$(os_info "$OS")
+        IFS='|' read -r PRETTY_NAME BASED_ON CREDENTIALS HOMEPAGE INFO_TEXT <<< "$INFO"
         case ${OS} in
           *ubuntu-server*) FUNC="ubuntu-server";;
           *ubuntu*) FUNC="ubuntu";;
@@ -339,15 +341,15 @@ function csv_data() {
             # If the OS has an editions_() function, use it.
             if [[ ${EDITIONS} ]]; then
                 for OPTION in ${EDITIONS}; do
-                    echo "${PRETTY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG}"
+                    echo "${PRETTY_NAME},${OS},${RELEASE},${OPTION},${DOWNLOADER},${PNG},${SVG},${BASED_ON},${CREDENTIALS},${HOMEPAGE},${INFO_TEXT}"
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
                 for LANG in "${LANGS[@]}"; do
-                    echo "${PRETTY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
+                    echo "${PRETTY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG},${BASED_ON},${CREDENTIALS},${HOMEPAGE},${INFO_TEXT}"
                 done
             else
-                echo "${PRETTY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
+                echo "${PRETTY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG},${BASED_ON},${CREDENTIALS},${HOMEPAGE},${INFO_TEXT}"
             fi
         done &
     done
@@ -3444,6 +3446,7 @@ case "${1}" in
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
+    echo "Pretty Name,OS,Release,Option,Downloader,PNG,SVG,Based on,Credentials,Homepage,Info"
     list_csv
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
