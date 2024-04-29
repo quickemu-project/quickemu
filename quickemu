@@ -1603,6 +1603,14 @@ readonly VERSION="4.9.3"
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
 QEMU_IMG=$(command -v qemu-img)
+case "${1}" in
+    -version|--version)
+        echo "${VERSION}"
+        exit;;
+    -h|--h|-help|--help)
+        usage;;
+esac
+
 if [ ! -e "${QEMU}" ] || [ ! -e "${QEMU_IMG}" ]; then
     echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
     exit 1
@@ -1767,11 +1775,6 @@ else
             SOUND_CARD="${2}"
             shift;
             shift;;
-        -version|--version)
-            echo "${VERSION}"
-            exit;;
-        -h|--h|-help|--help)
-            usage;;
           *)
             echo "ERROR! \"${1}\" is not a supported parameter."
             usage;;
