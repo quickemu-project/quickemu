@@ -146,7 +146,7 @@ function show_os_info() {
      while getopts ":12345" opt; do
         case $opt in
           1|2|3|4|5) os_info "${2}" | cut -d'|' -f${opt};;
-          *) echo "Wrong choice!" && exit 1;;
+          *) error_not_supported_argument;;
         esac
     done
 }
@@ -250,6 +250,13 @@ function error_not_supported_lang() {
     for LANG in "${LANGS[@]}"; do
         echo -n "${LANG} "
     done
+    exit 1
+}
+
+function error_not_supported_argument() {
+    echo "ERROR! Not supported argument"
+    echo "To see all possible arguments, use:"
+    echo "   quickget -h  or  quickget --help"
     exit 1
 }
 
@@ -3430,6 +3437,9 @@ case "${1}" in
     ;;
   '--list'|'-l')
     list_supported
+    ;;
+  -*)
+    error_not_supported_argument
     ;;
 esac
 
