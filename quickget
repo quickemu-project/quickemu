@@ -151,9 +151,6 @@ function show_os_info() {
     done
 }
 
-function pretty_name() {
-    echo $(show_os_info -1 "${1}")
-}
 PRETTY_NAME=$(show_os_info -1 "${OS}")
 
 # Just in case quickget want use it
