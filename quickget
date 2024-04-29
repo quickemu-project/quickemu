@@ -2132,8 +2132,8 @@ function get_macos() {
     CWD="$(dirname "${0}")"
     if [ -x "${CWD}/chunkcheck" ]; then
         CHUNKCHECK="${CWD}/chunkcheck"
-    elif [ -x /usr/bin/chunkcheck ]; then
-        CHUNKCHECK="/usr/bin/chunkcheck"
+     elif [ -x "$(command -v chunkcheck)" ]; then
+        CHUNKCHECK="$(command -v chunkcheck)"
     else
         web_get "https://raw.githubusercontent.com/quickemu-project/quickemu/master/chunkcheck" "${HOME}/.quickemu"
         CHUNKCHECK="${HOME}/.quickemu/chunkcheck"
