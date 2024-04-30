@@ -79,8 +79,10 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: supported
-          path: results/supported.txt
+          path: results
+          merge-multiple: true
+      - name: Display downloaded artifacts
+        run: ls -R results/
 
       - uses: actions/checkout@v4
       - name: List all supported systems download URLs
@@ -92,8 +94,7 @@ jobs:
           for os in ${distros}; do
             echo -e "\n\n      ${os}" && ./quickget -ua "${os}" | tee -a results/urls.txt
           done
-          echo -e "\n\nFounded URLs: $(cat results/urls.txt | grep 'http' | wc -l)"
-          echo -e "All: $(cat results/supported.txt | wc -l)"
+          echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
 
       - uses: actions/upload-artifact@v4
@@ -115,7 +116,7 @@ jobs:
           for os in ${distros}; do
             echo -e "\n\n      ${os}" && ./quickget -ca "${os}" | tee -a results/checks.txt
           done
-          TOGETHER=$(cat results/checks.txt | wc -l)
+          ALL=$(cat results/checks.txt | grep 'http' | wc -l)
           FAILED=$(grep -c 'FAIL:' results/checks.txt)
           SKIPED=$(grep -c 'SKIP:' results/checks.txt)
           PASSED=$(grep -c 'PASS:' results/checks.txt)
@@ -123,15 +124,17 @@ jobs:
           echo -e "\n\nFAILED: $FAILED"
           echo "SKIPED: $SKIPED"
           echo "PASSED: $PASSED"
-          echo "All/Checked: $TOGETHER/$CHECKED"
-          echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee results/failed.txt)"
+          echo "All/Checked: $ALL/$CHECKED"
+          echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
           echo -e "\n\n               Finished\n\n"
  
       - uses: actions/upload-artifact@v4
         with:
-          name:
-            checks
-            failed
-          path:
-            results/checks.txt
-            results/failed.txt
+          name: checks
+          path: results/checks.txt
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: failed
+          path: results/failed.txt
