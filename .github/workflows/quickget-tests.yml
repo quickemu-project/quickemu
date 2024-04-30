@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p results
           echo -e "\n\n               Supported:\n\n"
-          ./quickget -l | tee results/supported.txt
+          ./quickget -l | tee -a results/supported.txt
           echo -e "\n\nAll supported OS variants: $(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
 
@@ -45,6 +45,7 @@ jobs:
         with:
           name: supported
           path: results/supported.txt
+          retention-days: 1
 
   job2:
     name: All info
@@ -59,8 +60,8 @@ jobs:
           #neofetch
           #echo -e "\n\n"
           echo -e "\n\n               OSinfo:\n\n"
-          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
           mkdir -p results
+          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
           for os in ${distros}; do
             echo -e "\n\n      ${os}" && ./quickget -12345 "${os}" | tee -a results/infos.txt
           done
@@ -71,29 +72,29 @@ jobs:
         with:
           name: infos
           path: results/infos.txt
+          retention-days: 1
 
   job3:
     needs: [job1]
     name: All URLs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: results
-          merge-multiple: true
-      - name: Display downloaded artifacts
-        run: ls -R results/
-
       - uses: actions/checkout@v4
       - name: List all supported systems download URLs
         run: |
           export TERM=xterm-256color
-          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
           echo -e "\n\n               ISOs:\n\n"
           mkdir -p results
-          for os in ${distros}; do
-            echo -e "\n\n      ${os}" && ./quickget -u "${os}" | tee -a results/urls.txt
-          done
+          ./quickget -u | tee -a urls-ns.txt
+          cat urls-ns.txt | sort > results/urls.txt
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: results
+          merge-multiple: true
+      - name: Show Founded/All difference
+        run: |
+          ls -R results/
           echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
 
@@ -101,6 +102,7 @@ jobs:
         with:
           name: urls
           path: results/urls.txt
+          retention-days: 1
  
   job4:
     name: All checks
@@ -110,31 +112,49 @@ jobs:
       - name: Checking if all downloads for Operating Systems are available...
         run: |
           export TERM=xterm-256color
-          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
           echo -e "\n\n               ISOs availability:\n\n"
           mkdir -p results
-          for os in ${distros}; do
-            echo -e "\n\n      ${os}" && ./quickget -c "${os}" | tee -a results/checks.txt
-          done
-          ALL=$(cat results/checks.txt | grep 'http' | wc -l)
+          ./quickget -c | tee -a checks-ns.txt
+          cat checks-ns.txt | sort > results/checks.txt
+          GOOD=$(cat results/checks.txt | grep 'http' | wc -l)
+          WINDOWS=$(cat results/checks.txt | grep 'windows' | wc -l)
+          ALL=$((GOOD + WINDOWS))
           FAILED=$(grep -c 'FAIL:' results/checks.txt)
-          SKIPED=$(grep -c 'SKIP:' results/checks.txt)
+          SKIPPED=$(grep -c 'SKIP:' results/checks.txt)
           PASSED=$(grep -c 'PASS:' results/checks.txt)
-          CHECKED=$(($FAILED + $SKIPED + $PASSED))
+          CHECKED=$((FAILED + SKIPPED + PASSED))
           echo -e "\n\nFAILED: $FAILED"
-          echo "SKIPED: $SKIPED"
+          echo "SKIPPED: $SKIPPED"
           echo "PASSED: $PASSED"
-          echo "All/Checked: $ALL/$CHECKED"
+          echo "Checked/known URLs: $CHECKED/$ALL (counted with skipped Windows)
           echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
           echo -e "\n\n               Finished\n\n"
- 
+
       - uses: actions/upload-artifact@v4
         with:
           name: checks
           path: results/checks.txt
 
-
       - uses: actions/upload-artifact@v4
         with:
           name: failed
           path: results/failed.txt
+
+  job5:
+    needs: [job2, job3, job4]
+    name: Uploading artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: results
+          merge-multiple: true
+      - name: List results
+        run: |
+          ls -R results/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
+          name: results
+          path: results/
