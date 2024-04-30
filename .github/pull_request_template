@@ -1,0 +1,22 @@
+<!-- Uncomment relevant sections fill relevant and delete options which are not applicable -->
+
+#### Testing the changes
+- I tested the changes in this PR: **YES**|**briefly**|**NO**
+
+<!--
+#### Change current OS
+- This PR will change current OS: **YES**|**NO**
+- Enter changed OS name: **NAME**
+-->
+
+<!--
+#### Add new OS
+- This PR will add new OS: **YES**|**NO**
+- Enter new OS name: **NAME**
+-->
+
+<!--
+#### Change something else
+- This PR will change something else: **YES**|**NO**
+- Enter short description of changes: **DESCRIPTION**
+-->
