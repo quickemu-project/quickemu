@@ -544,7 +544,7 @@ function os_support() {
     trisquel \
     truenas-core \
     truenas-scale \
-    tuxedoos \
+    tuxedo-os \
     ubuntu \
     ubuntu-budgie \
     ubuntucinnamon \
@@ -1059,7 +1059,7 @@ function releases_truenas-scale() {
     echo 23
 }
 
-function releases_tuxedoos() {
+function releases_tuxedo-os() {
     echo current
 }
 
@@ -2458,7 +2458,7 @@ function get_truenas-core() {
     echo "${URL} ${HASH}"
 }
 
-function get_tuxedoos() {
+function get_tuxedo-os() {
     local ISO=""
     local URL=""
     local Current=
