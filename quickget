@@ -481,6 +481,7 @@ function test_all() {
             fi
         fi
     done
+    exit 0
 }
 
 function os_support() {
@@ -3430,7 +3431,6 @@ case "${1}" in
     elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
-    exit 0
     ;;
   '--check'|'-c')
     OPERATION="test"
@@ -3442,7 +3442,6 @@ case "${1}" in
     elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
-    exit 0
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
