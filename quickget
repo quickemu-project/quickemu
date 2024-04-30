@@ -124,11 +124,11 @@ function os_info() {
       tuxedo-os)        INFO="Tuxedo OS|Ubuntu|-|https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
       ubuntu)           INFO="Ubuntu|Debian|-|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
       ubuntu-budgie)    INFO="Ubuntu Budgie|Ubuntu|-|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
-      ubuntucinnamon)   INFO="Ubuntu Cinnamon|Ubuntu|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
-      ubuntukylin)      INFO="Ubuntu Kylin|Ubuntu|-|https://ubuntukylin.com/|Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world.";;
+      ubuntu-cinnamon)  INFO="Ubuntu Cinnamon|Ubuntu|-|https://ubuntucinnamon.org/|Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love.";;
+      ubuntu-kylin)     INFO="Ubuntu Kylin|Ubuntu|-|https://ubuntukylin.com/|Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world.";;
       ubuntu-mate)      INFO="Ubuntu MATE|Ubuntu|-|https://ubuntu-mate.org/|Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop.";;
       ubuntu-server)    INFO="Ubuntu Server|Ubuntu|-|https://ubuntu.com/server|Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available.";;
-      ubuntustudio)     INFO="Ubuntu Studio|Ubuntu|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
+      ubuntu-studio)    INFO="Ubuntu Studio|Ubuntu|-|https://ubuntustudio.org/|Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing.";;
       ubuntu-unity)     INFO="Ubuntu Unity|Ubuntu|-|https://ubuntuunity.org/|Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017).";;
       vanillaos)        INFO="Vanilla OS|Debian,Ubuntu|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
       void)             INFO="Void Linux|Independent|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
@@ -545,11 +545,11 @@ function os_support() {
     tuxedo-os \
     ubuntu \
     ubuntu-budgie \
-    ubuntucinnamon \
-    ubuntukylin \
+    ubuntu-cinnamon \
+    ubuntu-kylin \
     ubuntu-mate \
     ubuntu-server \
-    ubuntustudio \
+    ubuntu-studio \
     ubuntu-unity \
     vanillaos \
     void \
@@ -1072,13 +1072,13 @@ function releases_ubuntu() {
     case "${OS}" in
         ubuntu)
             echo ${SUPPORTED_VERSIONS[@]} daily-live ${EOL_VERSIONS[@]/#/eol-};;
-        kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
+        kubuntu|lubuntu|ubuntu-kylin|ubuntu-mate|ubuntu-studio|xubuntu)
             # after 16.04
             echo ${SUPPORTED_VERSIONS[@]:1} daily-live ${EOL_VERSIONS[@]/#/eol-};;
         ubuntu-budgie)
             # after 18.04
             echo ${SUPPORTED_VERSIONS[@]:2} daily-live ${EOL_VERSIONS[@]/#/eol-};;
-        edubuntu|ubuntu-unity|ubuntucinnamon)
+        edubuntu|ubuntu-unity|ubuntu-cinnamon)
             # after 23.10
             echo ${SUPPORTED_VERSIONS[@]:5} daily-live ${EOL_VERSIONS[@]/#/eol-};;
     esac
@@ -2506,6 +2506,11 @@ function get_ubuntu() {
     local HASH=""
     local URL=""
     local DATA=""
+    case ""${OS}"" in
+      ubuntu-cinnamon) OS="ubuntukylin";;
+      ubuntu-kylin) OS="ubuntukylin";;
+      ubuntu-studio) OS="ubuntustudio";;
+    esac
     [[ $RELEASE = daily ]] && RELEASE=daily-live
     if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
