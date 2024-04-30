@@ -458,6 +458,7 @@ function test_all() {
             fi
         fi
     done
+    exit 0
 }
 
 function os_support() {
@@ -3335,10 +3336,8 @@ Arguments:
  --version        (-v)                : Show version
  --help           (-h)                : Show this help message
 -------------- For testing & development ---------------------
- --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
- --url-all       (-ua) <os>           : Show all download URLs for an OS
- --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
- --check-all     (-ca) <os>           : Check all downloads for an OS are available
+ --url            (-u) [os] [re] [ed] : Show download URL for what specified or All
+ --check          (-c) [os] [re] [ed] : Check download for what specified or All
  --list           (-l)                : List all supported systems in plain text
  --list-csv      (-lc)                : List all supported systems in csv format
  --list-json     (-lj)                : List all supported systems in json format
@@ -3396,36 +3395,24 @@ case "${1}" in
   '--url'|'-u')
     OPERATION="show"
     shift
-    ;;
-  '--url-all'|'-ua')
-    OPERATION="show"
-    shift
-    # if no OS is specified, list all URLs for all supported OSes
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
             (test_all "${OS}")
         done
-    else
+    elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
-    exit 0
     ;;
   '--check'|'-c')
     OPERATION="test"
     shift
-    ;;
-  '--check-all'|'-ca')
-    OPERATION="test"
-    shift
-    # if no OS is specified, check all URLs for all supported OSes
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
             (test_all "${OS}")
         done
-    else
+    elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
-    exit 0
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
   '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
