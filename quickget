@@ -290,7 +290,7 @@ function list_csv() {
     CSV_DATA="$(csv_data)"
 
     echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
-    sort -f <<<"${CSV_DATA}"
+    sort -t',' -k2,2 <<<"${CSV_DATA}"
 
     exit 0
 }
