@@ -99,6 +99,7 @@ function os_info() {
       openindiana)      INFO="OpenIndiana|Solaris,OpenSolaris|-|https://www.openindiana.org/|Community supported illumos-based operating system.";;
       opensuse)         INFO="openSUSE|Independent|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
       oraclelinux)      INFO="Oracle Linux|RedHat|-|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
+      pantherx)         INFO="PantherX|guix|-|https://www.pantherx.org/|PantherX is designed to enable everyone without a PHD in computer science to enjoy a fast, flexible and private work & entertainment platform that runs for years, with little intervention.";;
       parrotsec)        INFO="Parrot Security|Debian|parrot:parrot|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.";;
       peppermint)       INFO="PeppermintOS|Debian,Devuan|-|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
       popos)            INFO="Pop!_OS|Ubuntu|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
@@ -523,6 +524,7 @@ function os_support() {
     openindiana \
     opensuse \
     oraclelinux \
+    pantherx \
     peppermint \
     parrotsec \
     popos \
@@ -910,6 +912,10 @@ function releases_opensuse(){
 
 function releases_oraclelinux() {
     echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
+}
+
+function releases_pantherx() {
+    echo latest
 }
 
 function releases_parrotsec() {
@@ -2226,6 +2232,18 @@ function get_oraclelinux() {
       *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
     esac
     HASH=$(web_pipe "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut_1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_pantherx() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local TEMP=""
+    URL="https://temp.pantherx.org"
+    TEMP="$(web_pipe "https://wiki.pantherx.org/" | grep --after-context 1 'iso')"
+    ISO="$(basename $(echo ${TEMP} | cut -d'"' -f2))"
+    HASH="$(echo "${TEMP}" | tail -1 | cut -d'>' -f3 | cut -d'<' -f1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
