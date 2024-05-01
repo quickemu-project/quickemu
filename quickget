@@ -1270,9 +1270,14 @@ function zsync_get() {
     if [ "${OPERATION}" == "show" ]; then
         echo "${URL}"
         exit 0
-    elif [ "${OPERATION}" == "test" ]; then
-        web_check "${URL}"
-        exit 0
+    elif [ "${OPERATION}" == "check" ]; then
+        if ! web_check "${URL}"; then
+            check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "FAIL"
+            exit 0
+        else
+            check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "PASS"
+            exit 0
+        fi
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
