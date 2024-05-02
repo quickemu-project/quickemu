@@ -3339,42 +3339,38 @@ function help_message() {
     #shellcheck disable=SC2016
     printf '                           _              _
          __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
-        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║
-       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_      MIT
-        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║   license
-           ║_║  version: %s ║___/ part of Quickemu project
---------------------------------------------------------------
-         > Quickly create and run optimised Linux, <
-       > Windows and macOS desktop virtual machines. <
+        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║            MIT
+       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_           license
+        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║       version: %s
+           ║_║                 ║___/            part of Quickemu project
+--------------------------------------------------------------------------------
+               > Quickly create and run optimised Linux, <
+             > Windows and macOS desktop virtual machines <
 
- Project - https://github.com/quickemu-project/quickemu
- Discord - https://wimpysworld.io/discord
---------------------------------------------------------------
+         Project - https://github.com/quickemu-project/quickemu
+                Discord - https://wimpysworld.io/discord
+--------------------------------------------------------------------------------
 
-Basic Usage:
- quickget <os> <release> [edition]
- quickget ubuntu 22.04
-
-Advanced Usage:
- quickget <arg> [path] <os> [re] [ed]
- quickget --download ubuntu 22.04
+Basic Usage:                          Advanced Usage:
+ quickget <os> <release> [edition]     quickget <arg> [path] <os> [re] [ed]
+ quickget ubuntu 22.04                 quickget --download ubuntu 22.04
 
 Arguments:
  -[12345]              <os>           : Show info* about OS
- --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
+ --download       (-d) <os> <re> [ed] : Download image; no VM configuration
  --create-config (-cc) <os> [path/url]: Create default VM config for image
  --open-homepage  (-o) <os>           : Open homepage for the OS
  --version        (-v)                : Show version
  --help           (-h)                : Show this help message
--------------- For testing & development ---------------------
- --url            (-u) [os] [re] [ed] : Show download URL for what specified or All
- --check          (-c) [os] [re] [ed] : Check download for what specified or All
- --list           (-l)                : List all supported systems in plain text
- --list-csv      (-lc)                : List all supported systems in csv format
- --list-json     (-lj)                : List all supported systems in json format
---------------------------------------------------------------
-   *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
-    Can be used in any combination like -13254 or -52
+--------------------- For testing & development --------------------------------
+ --url            (-u) [os] [re] [ed] : Show URL(s) for what specified or All
+ --check          (-c) [os] [re] [ed] : Check URL(s) for what specified or All
+ --list           (-l)                : List all supported systems
+ --list-csv      (-lc)                : List everything in csv format
+ --list-json     (-lj)                : List everything in json format
+--------------------------------------------------------------------------------
+      *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
+       Can be used in any combination like -13254 or -52
 
 supported Operating Systems:\n' "$(quickemu --version)"
     os_support | fold -s -w "$(tput cols)"
