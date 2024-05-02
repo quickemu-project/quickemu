@@ -210,7 +210,6 @@ requirements manually:
 -   [socat](http://www.dest-unreach.org/socat/)
 -   [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
 -   [swtpm](https://github.com/stefanberger/swtpm)
--   [Wget](https://www.gnu.org/software/wget/)
 -   [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 -   [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
 -   [zsync](http://zsync.moria.org.uk/)
@@ -231,13 +230,13 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` shell
-sudo apt install qemu bash coreutils curl ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 wget xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install qemu bash coreutils curl edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm wget xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
@@ -247,7 +246,7 @@ This is a **work in progress** (see [issue
 steps and changes that may enable running on MacOS)
 
 ``` shell
-brew install qemu bash coreutils curl grep jq python@3.10 cdrtools gnu-sed spice-gtk wget zsync
+brew install qemu bash coreutils curl grep jq python@3.10 cdrtools gnu-sed spice-gtk zsync
 ```
 
 ## [Alternative Frontends](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
