@@ -92,7 +92,7 @@ jobs:
           echo -e "\n\n               ISOs:\n\n"
           mkdir -p results
           for os in ${distros}; do
-            echo -e "\n\n      ${os}" && ./quickget -ua "${os}" | tee -a results/urls.txt
+            echo -e "\n\n      ${os}" && ./quickget -u "${os}" | tee -a results/urls.txt
           done
           echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
@@ -114,7 +114,7 @@ jobs:
           echo -e "\n\n               ISOs availability:\n\n"
           mkdir -p results
           for os in ${distros}; do
-            echo -e "\n\n      ${os}" && ./quickget -ca "${os}" | tee -a results/checks.txt
+            echo -e "\n\n      ${os}" && ./quickget -c "${os}" | tee -a results/checks.txt
           done
           ALL=$(cat results/checks.txt | grep 'http' | wc -l)
           FAILED=$(grep -c 'FAIL:' results/checks.txt)
