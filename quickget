@@ -1220,7 +1220,7 @@ function web_get() {
     fi
 
     if command -v wget2 &>/dev/null; then
-        if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" --user-agent "${USER_AGENT}" "${HEADERS[@]}"; then
+        if ! wget2 --quiet --continue --tries=3 --read-timeout=10 --chunk-size 500M --max-threads $(nproc) --force-progress --progress=bar:force:noscroll "${URL}" -O "${DIR}/${FILE}" --user-agent "${USER_AGENT}" "${HEADERS[@]}"; then
             echo "ERROR! Failed to download ${URL} with wget2."
             echo "       Will try again with wget."
             exit 1
