@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 22, 2024
+date: April 30, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -113,14 +113,12 @@ You can also use `quickget` with advanced options :
  --version        (-v)                : Show version
  --help           (-h)                : Show this help message
  --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
- --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
  --url-all       (-ua) <os>           : Show all download URLs for an OS
+ --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
  --check-all     (-ca) <os>           : Check all downloads for an OS are available
  --list           (-l)                : List all supported systems in plain text
  --list-csv      (-lc)                : List all supported systems in csv format
  --list-json     (-lj)                : List all supported systems in json format
- --list-urls     (-lu)                : List all supported systems download URLs
- --test-urls     (-tu)                : Check all downloads for all OSs are available
 ```
 
 Here are some typical uses
