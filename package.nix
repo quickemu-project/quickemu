@@ -7,6 +7,7 @@
 , gnugrep
 , gnused
 , lsb-release
+, ncurses
 , jq
 , procps
 , python3
@@ -34,6 +35,7 @@ let
     gnused
     jq
     lsb-release
+    ncurses
     procps
     python3
     cdrtools
