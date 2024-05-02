@@ -1,35 +1,34 @@
 { lib
 , fetchFromGitHub
-, stdenv
+, installShellFiles
 , makeWrapper
-, qemu
+, stdenv
+, testers
+, cdrtools
 , curl
 , gnugrep
 , gnused
+, jq
 , lsb-release
 , ncurses
-, jq
 , procps
 , python3
-, cdrtools
-, usbutils
-, util-linux
+, qemu
 , socat
 , spice-gtk
 , swtpm
 , unzip
+, usbutils
+, util-linux
 , xdg-user-dirs
 , xrandr
 , zsync
 , OVMF
 , OVMFFull
-, quickemu
-, testers
-, installShellFiles
 }:
 let
   runtimePaths = [
-    qemu
+    cdrtools
     curl
     gnugrep
     gnused
@@ -38,12 +37,12 @@ let
     ncurses
     procps
     python3
-    cdrtools
-    usbutils
-    util-linux
-    unzip
+    qemu
     socat
     swtpm
+    unzip
+    usbutils
+    util-linux
     xdg-user-dirs
     xrandr
     zsync
