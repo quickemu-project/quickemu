@@ -75,7 +75,7 @@ jobs:
           retention-days: 1
 
   job3:
-    needs: [job1]
+    needs: job1
     name: All URLs
     runs-on: ubuntu-latest
     steps:
@@ -85,14 +85,14 @@ jobs:
           export TERM=xterm-256color
           echo -e "\n\n               ISOs:\n\n"
           mkdir -p results
-          ./quickget -u | tee -a urls-ns.txt
-          cat urls-ns.txt | sort > results/urls.txt
+          ./quickget -u | tee -a url.txt
+          cat url.txt | sort > results/urls.txt
 
       - uses: actions/download-artifact@v4
         with:
           path: results
           merge-multiple: true
-      - name: Show Founded/All difference
+      - name: Show differences
         run: |
           ls -R results/
           echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
@@ -109,13 +109,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Checking if all downloads for Operating Systems are available...
+      - name: Checking if all downloads for Operating Systems are available
         run: |
           export TERM=xterm-256color
           echo -e "\n\n               ISOs availability:\n\n"
           mkdir -p results
-          ./quickget -c | tee -a checks-ns.txt
-          cat checks-ns.txt | sort > results/checks.txt
+          ./quickget -c | tee -a check.txt
+          cat check.txt | sort > results/checks.txt
           GOOD=$(cat results/checks.txt | grep 'http' | wc -l)
           WINDOWS=$(cat results/checks.txt | grep 'windows' | wc -l)
           ALL=$((GOOD + WINDOWS))
@@ -126,7 +126,7 @@ jobs:
           echo -e "\n\nFAILED: $FAILED"
           echo "SKIPPED: $SKIPPED"
           echo "PASSED: $PASSED"
-          echo "Checked/known URLs: $CHECKED/$ALL (counted with skipped Windows)
+          echo "Checked/known URLs: $CHECKED/$ALL with skipped Windows
           echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
           echo -e "\n\n               Finished\n\n"
 
@@ -149,9 +149,9 @@ jobs:
         with:
           path: results
           merge-multiple: true
-      - name: List results
-        run: |
-          ls -R results/
+          name: List results
+          run: |
+            ls -R results/
 
       - uses: actions/upload-artifact@v4
         with:
