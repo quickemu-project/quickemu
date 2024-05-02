@@ -3,6 +3,7 @@
   cdrtools,
   curl,
   lsb-release,
+  ncurses,
   git,
   gnugrep,
   gnused,
