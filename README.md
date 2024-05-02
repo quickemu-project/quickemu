@@ -13,7 +13,7 @@ We have a Discord for this project:
 [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/sNmz3uw)
 </div>
 
-## Introduction
+# Introduction
 
 **Quickemu** is a wrapper for the excellent
 [QEMU](https://www.qemu.org/) that attempts to automatically *"do the
@@ -56,7 +56,7 @@ virtual machines.
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
 -   Graphical user interfaces available
 
-## Quick start
+# Quick start
 
 [Once Quickemu is installed](https://github.com/quickemu-project/quickemu/wiki/01-Installation), there are two simple steps to create and run a virtual machine:
 
@@ -73,7 +73,7 @@ quickemu --vm nixos-unstable.conf
 ```
 - Execute `quickget` (with no arguments) to see a list of all the supported operating systems.
 
-## Documentation
+# Documentation
 
 The wiki describes how to get up and running with Quickemu and also covers more advanced configuration and usage.
 
@@ -86,7 +86,7 @@ The wiki describes how to get up and running with Quickemu and also covers more 
 - [**Alternative frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends) 🧑‍💻
 - [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References) 📚️
 
-## Contributing
+# Contributing
 
 We welcome contributions to Quickemu.
 
