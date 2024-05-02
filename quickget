@@ -1095,22 +1095,22 @@ function releases_ubuntu() {
     local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
     case "${OS}" in
         ubuntu)
-            echo ${SUPPORTED_VERSIONS[@]} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
             # after 16.04
-            echo ${SUPPORTED_VERSIONS[@]:1} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         ubuntu-budgie)
             # after 18.04
-            echo ${SUPPORTED_VERSIONS[@]:2} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
         edubuntu|ubuntu-unity|ubuntucinnamon)
             # after 23.10
-            echo ${SUPPORTED_VERSIONS[@]:5} daily-live ${EOL_VERSIONS[@]/#/eol-};;
+            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
     esac
 }
 
 function releases_ubuntu-server() {
     local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
-    echo ${ALL_VERSIONS[@]}
+    echo "${ALL_VERSIONS[@]}"
 }
 
 function releases_vanillaos() {
