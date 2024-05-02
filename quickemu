@@ -1831,7 +1831,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     fi
 
     # Set the default disk_format if not provided by user
-    if [ -z "${disk_format}" ]; then
+    if [ -z "${disk_format}" ] && [ -e "${disk_img}" ]; then
         disk_format=$(${QEMU_IMG} info "${disk_img}" | grep 'file format' | cut -d ':' -f 2 | tr -cd '[:graph:]')
     fi
 
