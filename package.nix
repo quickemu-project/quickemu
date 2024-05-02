@@ -49,6 +49,7 @@ let
 in
 
 stdenv.mkDerivation rec {
+  pname = "quickemu";
   src = lib.cleanSource ./.;
 
   postPatch = ''
