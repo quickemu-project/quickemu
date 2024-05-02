@@ -25,7 +25,6 @@ Depends:
  swtpm,
  usbutils,
  util-linux,
- wget,
  x11-xserver-utils,
  xdg-user-dirs,
  zsync,
