@@ -87,7 +87,7 @@ quickemu --vm nixos-unstable.conf
 
 ## Documentation
 
-The wiki describes how to quickly get up and running with `quickemu` and also covers more advanced configuration and usage.
+The wiki describes how to get up and running with Quickemu and also covers more advanced configuration and usage.
 
 - [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation) 💾
 - [**Create Linux virtual machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines) 🐧
