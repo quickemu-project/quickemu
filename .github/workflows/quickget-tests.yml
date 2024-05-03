@@ -24,8 +24,8 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  job1:
-    name: All supported
+  list-supported:
+    name: List supported OS
     runs-on: ubuntu-22.04
     # The type of runner that the job will run on
     #runs-on: ubuntu-latest
@@ -47,8 +47,8 @@ jobs:
           path: results/supported.txt
           retention-days: 1
 
-  job2:
-    name: All info
+  list-os-info:
+    name: List all OS info
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -70,9 +70,9 @@ jobs:
           path: results/infos.txt
           retention-days: 1
 
-  job3:
-    needs: job1
-    name: All URLs
+  list-all-urls:
+    needs: [list-supported]
+    name: List all URLs
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -100,8 +100,8 @@ jobs:
           path: results/urls.txt
           retention-days: 1
  
-  job4:
-    name: All checks
+  check-all-urls:
+    name: Check all URLs
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -137,7 +137,7 @@ jobs:
           path: results/failed.txt
 
   job5:
-    needs: [job2, job3, job4]
+    needs: [list-os-info, list-all-urls, check-all-urls]
     name: Uploading artifacts
     runs-on: ubuntu-22.04
     steps:
