@@ -1,4 +1,4 @@
-name: "Publish tags to FlakeHub"
+name: "Publish FlakeHub ❄️"
 on:
   push:
     tags:
