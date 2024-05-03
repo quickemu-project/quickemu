@@ -1385,11 +1385,21 @@ EOF
 }
 
 function usage() {
+    echo "             _      _"
+    echo "  __ _ _   _(_) ___| | _____ _ __ ___  _   _"
+    echo " / _' | | | | |/ __| |/ / _ \ '_ ' _ \| | | |"
+    echo "| (_| | |_| | | (__|   <  __/ | | | | | |_| |"
+    echo " \__, |\__,_|_|\___|_|\_\___|_| |_| |_|\__,_|"
+    echo "    |_| v${VERSION}, using qemu ${QEMU_VER_LONG}"
+    echo "--------------------------------------------------------------------------------"
+    echo " Project - https://github.com/quickemu-project/quickemu"
+    echo " Discord - https://wimpysworld.io/discord"
+    echo "--------------------------------------------------------------------------------"
     echo
     echo "Usage"
-    echo "  ${LAUNCHER} --vm ubuntu.conf [optional params]"
+    echo "  ${LAUNCHER} --vm ubuntu.conf <arguments>"
     echo
-    echo "List of optional parameters:"
+    echo "Arguments"
     echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
     echo "  --braille                         : Enable braille support. Requires SDL."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"

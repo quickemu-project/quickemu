@@ -3337,42 +3337,44 @@ function create_vm() {
 
 function help_message() {
     #shellcheck disable=SC2016
-    printf '                           _              _
-         __ _ _   _ _  ___║ ║ ____ _  ___║ ║_
-        / _` ║ ║ ║ ║ ║/ __║ ║/ / _` ║/ _ \ __║            MIT
-       ( (_║ ║ ║_║ ║ ║ (__║   < (_║ ║  __/ ║_           license
-        \__, ║\__,_║_║\___║_║\ \__, ║\___║\__║       version: %s
-           ║_║                 ║___/            part of Quickemu project
+    printf '
+             _      _              _
+  __ _ _   _(_) ___| | ____ _  ___| |_
+ / _` | | | | |/ __| |/ / _` |/ _ \ __|
+| (_| | |_| | | (__|   < (_| |  __/ |_
+ \__, |\__,_|_|\___|_|\_\__, |\___|\__|
+    |_|                 |___/ v%s, using curl %s
 --------------------------------------------------------------------------------
-               > Quickly create and run optimised Linux, <
-             > Windows and macOS desktop virtual machines <
-
-         Project - https://github.com/quickemu-project/quickemu
-                Discord - https://wimpysworld.io/discord
+ Project - https://github.com/quickemu-project/quickemu
+ Discord - https://wimpysworld.io/discord
 --------------------------------------------------------------------------------
 
-Basic Usage:                          Advanced Usage:
- quickget <os> <release> [edition]     quickget <arg> [path] <os> [re] [ed]
- quickget ubuntu 22.04                 quickget --download ubuntu 22.04
+Usage:
+  quickget <os> <release> [edition]
+  quickget ubuntu 22.04
+
+Advanced usage:
+  quickget <arg> [path] <os> [re] [ed]
+  quickget --download ubuntu 22.04
 
 Arguments:
- -[12345]              <os>           : Show info* about OS
- --download       (-d) <os> <re> [ed] : Download image; no VM configuration
- --create-config (-cc) <os> [path/url]: Create default VM config for image
- --open-homepage  (-o) <os>           : Open homepage for the OS
- --version        (-v)                : Show version
- --help           (-h)                : Show this help message
---------------------- For testing & development --------------------------------
- --url            (-u) [os] [re] [ed] : Show URL(s) for what specified or All
- --check          (-c) [os] [re] [ed] : Check URL(s) for what specified or All
- --list           (-l)                : List all supported systems
- --list-csv      (-lc)                : List everything in csv format
- --list-json     (-lj)                : List everything in json format
+  -[12345]              <os>           : Show info* about OS
+  --download       (-d) <os> <re> [ed] : Download image; no VM configuration
+  --create-config (-cc) <os> [path/url]: Create default VM config for image
+  --open-homepage  (-o) <os>           : Open homepage for the OS
+  --version        (-v)                : Show version
+  --help           (-h)                : Show this help message
+-------------------------- For testing & development ---------------------------
+  --url            (-u) [os] [re] [ed] : Show image URL(s)
+  --check          (-c) [os] [re] [ed] : Check image URL(s)
+  --list           (-l)                : List all supported systems
+  --list-csv      (-lc)                : List everything in csv format
+  --list-json     (-lj)                : List everything in json format
 --------------------------------------------------------------------------------
-      *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
-       Can be used in any combination like -13254 or -52
+ *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
+        Can be used in any combination like -13254 or -52
 
-supported Operating Systems:\n' "$(quickemu --version)"
+Supported Operating Systems:\n\n' "$(quickemu --version)" "${CURL_VERSION}"
     os_support | fold -s -w "$(tput cols)"
 }
 
