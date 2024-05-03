@@ -480,7 +480,8 @@ function test_all() {
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
             fi
         fi
-    done
+    done &
+    wait
 }
 
 function os_support() {
