@@ -134,7 +134,7 @@ jobs:
           name: failed
           path: results/failed.txt
 
-  job5:
+  upload-artifacts:
     needs: [list-os-info, list-all-urls, check-all-urls]
     name: Uploading artifacts
     runs-on: ubuntu-22.04
@@ -143,9 +143,9 @@ jobs:
         with:
           path: results
           merge-multiple: true
-          name: List results
-          run: |
-            ls -R results/
+      - name: List results
+        run: |
+          ls -R results/
 
       - uses: actions/upload-artifact@v4
         with:
