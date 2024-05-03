@@ -38,7 +38,6 @@ jobs:
           ./quickget --list | tee -a results/supported.txt
           echo -e "\n\nAll supported OS variants: $(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: supported
@@ -60,7 +59,6 @@ jobs:
           done
           echo -e "\n\nHomepages aka number of supported OS (os_info): $(cat results/infos.txt | grep 'http' | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: infos
@@ -79,7 +77,6 @@ jobs:
           mkdir -p results
           ./quickget -u | tee -a url.txt
           cat url.txt | sort > results/urls.txt
-
       - uses: actions/download-artifact@v4
         with:
           path: results
@@ -89,7 +86,6 @@ jobs:
           ls -R results/
           echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: urls
@@ -120,12 +116,10 @@ jobs:
           echo "Checked/known URLs: $CHECKED/$ALL with skipped Windows
           echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: checks
           path: results/checks.txt
-
       - uses: actions/upload-artifact@v4
         with:
           name: failed
@@ -143,7 +137,6 @@ jobs:
       - name: List results
         run: |
           ls -R results/
-
       - uses: actions/upload-artifact@v4
         with:
           overwrite: true
