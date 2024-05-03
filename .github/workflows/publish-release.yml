@@ -2,11 +2,18 @@ name: Publish Release 🏷️
 
 on:
   push:
-    tags: ['*']
+    tags:
+      - "v?[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The existing tag to publish"
+        type: "string"
+        required: true
 
 jobs:
-  create-release:
-    name: Create Release
+  draft-release:
+    name: "Draft Release 📥️"
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -17,8 +24,8 @@ jobs:
         gh release create "${{ github.ref }}" --draft --generate-notes
 
   build-release:
-    needs: [create-release]
-    name: Build Release
+    needs: [draft-release]
+    name: "Build Release 👨‍🔧"
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -36,7 +43,7 @@ jobs:
 
   publish-release:
     needs: [build-release]
-    name: Publish Release
+    name: "Publish Release 📤️"
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -48,3 +55,52 @@ jobs:
           exit 1
         fi
         gh release edit "${{ github.ref }}" --draft=false
+
+  publish-flakehub:
+    name: "Publish FlakeHub ❄️"
+    runs-on: "ubuntu-22.04"
+    permissions:
+      id-token: "write"
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@v4"
+        with:
+          ref: "${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '' }}"
+      - uses: "DeterminateSystems/nix-installer-action@main"
+      - uses: "DeterminateSystems/magic-nix-cache-action@main"
+      - uses: "DeterminateSystems/flakehub-push@main"
+        with:
+          visibility: "public"
+          name: "quickemu-project/quickemu"
+          tag: "${{ inputs.tag }}"
+
+  publish-ppa:
+    name: "Publish PPA 📦️"
+    runs-on: ubuntu-22.04
+    steps:
+    - name: "Checkout 🥡"
+      uses: actions/checkout@v4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: "Import gpg key 🔑"
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+    - name: "Install dependencies 💾"
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install debhelper-compat distro-info dput devscripts
+    - name: "Upload to PPA ⤴️"
+      env:
+        DEBEMAIL: ${{ secrets.DEBEMAIL }}
+        DEBFULLNAME: ${{ secrets.DEBFULLNAME }}
+      run: |
+        REL_VER=$(grep "^readonly VERSION" quickemu | cut -d'"' -f2)
+        STAMP=$(date +%y%j.%H%M)
+        for CODENAME in $(distro-info --supported); do
+          rm debian/changelog
+          dch --package quickemu --newversion="${REL_VER}-1~${CODENAME}${STAMP}" --distribution=${CODENAME} "New upstream release." --create
+          dpkg-buildpackage -d -S -sa
+          dput ppa:flexiondotorg/quickemu ../quickemu_${REL_VER}-1~${CODENAME}${STAMP}_source.changes
+        done
