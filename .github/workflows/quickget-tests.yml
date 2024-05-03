@@ -55,10 +55,6 @@ jobs:
       - name: Show info about all OS
         run: |
           export TERM=xterm-256color
-          #sudo apt install -y neofetch
-          #echo -e "\n\n"
-          #neofetch
-          #echo -e "\n\n"
           echo -e "\n\n               OSinfo:\n\n"
           mkdir -p results
           distros="$(./quickget | sed '/^$/q' | tail -n +3)"
