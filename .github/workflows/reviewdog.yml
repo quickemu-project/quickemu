@@ -1,5 +1,5 @@
 --- # reviewdog
-name: 'Run shellcheck with reviewdog'
+name: 'Lint Shellcheck 🐚'
 
 on:
   push:

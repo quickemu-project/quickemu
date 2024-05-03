@@ -1,6 +1,4 @@
---- # This is a basic workflow to help test quickget
-
-name: quickget tests
+name: "Test quickget 🧪"
 
 # Controls when the action will run.
 on:
