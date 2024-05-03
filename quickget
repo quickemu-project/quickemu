@@ -25,7 +25,7 @@ export LC_ALL=C
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
-        kill "$(jobs -p)"
+        kill "$(jobs -p)" 2>/dev/null
     fi
 }
 
