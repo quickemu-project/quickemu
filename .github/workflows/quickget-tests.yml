@@ -97,7 +97,7 @@ jobs:
           name: urls
           path: results/urls.txt
           retention-days: 1
- 
+
   check-all-urls:
     name: Check all URLs
     runs-on: ubuntu-22.04
