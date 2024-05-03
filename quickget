@@ -1296,7 +1296,7 @@ function zsync_get() {
     local URL="${1}"
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
-        echo "${URL}"
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
         if ! web_check "${URL}"; then
