@@ -12,7 +12,28 @@ on:
         required: true
 
 jobs:
+  version-check:
+    name: "Check versions ⚖️"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Compare App and Git versions 🟰"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APP_VERSION=$(grep "^readonly VERSION" quickemu | cut -d'"' -f2)
+          GIT_VERSION=$(git describe --tags | cut -d'-' -f1)
+          echo "App version: ${REL_VERSION}"
+          echo "Git version: ${GIT_VERSION}"
+          if [ "${APP_VERSION}" != "${GIT_VERSION}" ]; then
+              echo "ERROR! Version mismatch.";
+              exit 1
+          fi
+
   draft-release:
+    needs: [version-check]
     name: "Draft Release 📥️"
     runs-on: ubuntu-22.04
     steps:
@@ -57,6 +78,7 @@ jobs:
         gh release edit "${{ github.ref }}" --draft=false
 
   publish-flakehub:
+    needs: [version-check]
     name: "Publish FlakeHub ❄️"
     runs-on: "ubuntu-22.04"
     permissions:
@@ -75,6 +97,7 @@ jobs:
           tag: "${{ inputs.tag }}"
 
   publish-ppa:
+    needs: [version-check]
     name: "Publish PPA 📦️"
     runs-on: ubuntu-22.04
     steps:
