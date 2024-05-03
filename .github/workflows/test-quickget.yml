@@ -143,9 +143,9 @@ jobs:
         with:
           path: results
           merge-multiple: true
-          name: List results
-          run: |
-            ls -R results/
+      - name: List results
+        run: |
+          ls -R results/
 
       - uses: actions/upload-artifact@v4
         with:
