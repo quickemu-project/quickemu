@@ -135,7 +135,6 @@ jobs:
           mkdir -p results
           ./quickget -u | tee -a url.txt
           cat url.txt | sort > results/urls.txt
-
       - uses: actions/download-artifact@v4
         with:
           path: results
