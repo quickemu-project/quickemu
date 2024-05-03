@@ -481,7 +481,6 @@ function test_all() {
             fi
         fi
     done
-    exit 0
 }
 
 function os_support() {
@@ -3424,8 +3423,10 @@ case "${1}" in
     shift
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (test_all "${OS}")
+            (test_all "${OS}") &
         done
+        wait
+        exit 0
     elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
@@ -3435,8 +3436,10 @@ case "${1}" in
     shift
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (test_all "${OS}")
+            (test_all "${OS}") &
         done
+        wait
+        exit 0
     elif [ -z "${2}" ]; then
         test_all "${1}"
     fi
