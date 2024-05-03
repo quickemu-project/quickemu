@@ -9,27 +9,22 @@ on:
   #  - cron: "0 0 */12 * *"
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: '**' #'!master' # excludes master
-    paths: [ quickget ]
+    branches: '**' # '!master' excludes master
+    paths:
+      - quickget
   pull_request:
     branches: '**' # matches every branch
     paths:
       - quickget
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   list-supported:
     name: List supported OS
     runs-on: ubuntu-22.04
-    # The type of runner that the job will run on
-    #runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       - name: List all supported OS variants
         run: |
@@ -38,7 +33,6 @@ jobs:
           ./quickget --list | tee -a results/supported.txt
           echo -e "\n\nAll supported OS variants: $(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: supported
@@ -52,16 +46,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Show info about all OS
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           echo -e "\n\n               OSinfo:\n\n"
           mkdir -p results
           distros="$(./quickget | sed '/^$/q' | tail -n +3)"
           for os in ${distros}; do
             echo -e "\n\n      ${os}" && ./quickget -12345 "${os}" | tee -a results/infos.txt
           done
-          echo -e "\n\nHomepages aka number of supported OS (os_info): $(cat results/infos.txt | grep 'http' | wc -l)"
+          echo -e "\n\nsupported OS (os_info): $(cat results/infos.txt | grep 'http' | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: infos
@@ -76,27 +69,24 @@ jobs:
       - uses: actions/checkout@v4
       - name: List all supported systems download URLs
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           echo -e "\n\n               ISOs:\n\n"
           mkdir -p results
           ./quickget -u | tee -a url.txt
           cat url.txt | sort > results/urls.txt
-
       - uses: actions/download-artifact@v4
         with:
           path: results
           merge-multiple: true
-      - name: Show differences
+      - name: results
         run: |
           ls -R results/
           echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: urls
           path: results/urls.txt
-          retention-days: 1
 
   check-all-urls:
     name: Check all URLs
@@ -105,13 +95,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Checking if all downloads for Operating Systems are available
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           echo -e "\n\n               ISOs availability:\n\n"
           mkdir -p results
           ./quickget --check | tee -a check.txt
           cat check.txt | sort > results/checks.txt
-          GOOD=$(cat results/checks.txt | grep 'http' | wc -l)
-          WINDOWS=$(cat results/checks.txt | grep 'windows' | wc -l)
+          GOOD=$(grep -c 'http' results/checks.txt)
+          WINDOWS=$(grep -c 'windows' results/checks.txt)
           ALL=$((GOOD + WINDOWS))
           FAILED=$(grep -c 'FAIL:' results/checks.txt)
           SKIPPED=$(grep -c 'SKIP:' results/checks.txt)
@@ -120,15 +110,13 @@ jobs:
           echo -e "\n\nFAILED: $FAILED"
           echo "SKIPPED: $SKIPPED"
           echo "PASSED: $PASSED"
-          echo "Checked/known URLs: $CHECKED/$ALL with skipped Windows
+          echo "Checked/known URLs: $CHECKED/$ALL with skipped Windows"
           echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
           echo -e "\n\n               Finished\n\n"
-
       - uses: actions/upload-artifact@v4
         with:
           name: checks
           path: results/checks.txt
-
       - uses: actions/upload-artifact@v4
         with:
           name: failed
@@ -139,14 +127,22 @@ jobs:
     name: Uploading artifacts
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
+      - name: List all supported systems download URLs
+        run: |
+          export TERM=xterm
+          echo -e "\n\n               ISOs:\n\n"
+          mkdir -p results
+          ./quickget -u | tee -a url.txt
+          cat url.txt | sort > results/urls.txt
+
       - uses: actions/download-artifact@v4
         with:
           path: results
           merge-multiple: true
-      - name: List results
+      - name: results
         run: |
           ls -R results/
-
       - uses: actions/upload-artifact@v4
         with:
           overwrite: true
