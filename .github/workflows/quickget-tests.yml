@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p results
           echo -e "\n\n               Supported:\n\n"
-          ./quickget -l | tee -a results/supported.txt
+          ./quickget --list | tee -a results/supported.txt
           echo -e "\n\nAll supported OS variants: $(cat results/supported.txt | wc -l)"
           echo -e "\n\n               Finished\n\n"
 
@@ -108,7 +108,7 @@ jobs:
           export TERM=xterm-256color
           echo -e "\n\n               ISOs availability:\n\n"
           mkdir -p results
-          ./quickget -c | tee -a check.txt
+          ./quickget --check | tee -a check.txt
           cat check.txt | sort > results/checks.txt
           GOOD=$(cat results/checks.txt | grep 'http' | wc -l)
           WINDOWS=$(cat results/checks.txt | grep 'windows' | wc -l)
