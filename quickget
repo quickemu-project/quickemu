@@ -1290,6 +1290,7 @@ function web_check() {
 }
 
 function zsync_get() {
+    local CHECK=""
     local DIR="${2}"
     local FILE="${1##*/}"
     local OUT=""
@@ -1299,13 +1300,9 @@ function zsync_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        if ! web_check "${URL}"; then
-            test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "FAIL"
-            exit 0
-        else
-            test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "PASS"
-            exit 0
-        fi
+        CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+        exit 0
     elif command -v zsync &>/dev/null; then
         if [ -n "${3}" ]; then
             OUT="${3}"
