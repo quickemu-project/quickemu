@@ -4,45 +4,41 @@ on:
   workflow_dispatch:
   push:
     branches: '**'
-    paths: [ quickget ]
+    paths:
+      - quickget
   pull_request:
     branches: '**'
-    paths: [ quickget ]
-
+    paths:
+      - quickget
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   list-all-supported:
-    name: "List all supported OS 📝"
+    name: Supported OS 📝
     runs-on: ubuntu-22.04
-    # The type of runner that the job will run on
-    #runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - name: "List all supported OS variants"
+      - name: Supported OS variants
         run: |
           mkdir -p results
-          ./quickget --list | tee results/supported.txt
-          echo -e "\nResults:"
-          echo "- All supported OS variants: $(wc -l results/supported.txt | cut -d' ' -f 1)"
+          ./quickget --list | tee -a results/supported.txt
+          echo -e "\nSupported OS variants: $(wc -l results/supported.txt)"
       - uses: actions/upload-artifact@v4
         with:
           name: supported
           path: results/supported.txt
+          retention-days: 1
 
   list-all-info:
-    name: "List all OS info ℹ️"
+    name: OS info ℹ️
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Show info about all OS
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           mkdir -p results
           for os in $(./quickget | sed '/^$/q' | tail -n +3); do
             ./quickget -12345 "${os}" | tee -a results/infos.txt
@@ -53,40 +49,43 @@ jobs:
         with:
           name: infos
           path: results/infos.txt
+          retention-days: 1
 
   list-all-urls:
     needs: [list-all-supported]
-    name: "List all URLs 🔗"
+    name: URLs 🔗
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: "quickget --url"
+      - name: quickget --url
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           mkdir -p results
-          ./quickget --url | tee results/urls.txt
+          ./quickget -u | tee -a url.txt
+           sort < url.txt > results/urls.txt
       - uses: actions/download-artifact@v4
         with:
           path: results
           merge-multiple: true
-      - name: "Show differences ⚖️"
+      - name: Differences ⚖️
         run: |
-          echo -e "\nResults:"
-          echo -e "List All URLs:\t$(grep -c http results/urls.txt)"
-          echo -e "OS Info URLs:\t$(wc -l results/supported.txt | cut -d' ' -f 1)"
+          ls -R results/
+          FOUND=$(grep -c 'http' < results/urls.txt)
+          ALL=$(wc -l < results/supported.txt)
+          echo -e "$FOUND/$ALL"
       - uses: actions/upload-artifact@v4
         with:
           name: urls
           path: results/urls.txt
 
   check-all-urls:
-    name: "Check all image URLs 💿️"
+    name: Check URLs 💿️
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: "quickget --check"
+      - name: quickget --check
         run: |
-          export TERM=xterm-256color
+          export TERM=xterm
           mkdir -p results
           ./quickget --check | tee results/checks.txt
           WINDOWS=$(grep -c "windows-" results/checks.txt)
@@ -110,14 +109,14 @@ jobs:
 
   upload-artifacts:
     needs: [list-all-info, list-all-urls, check-all-urls]
-    name: "Uploading artifacts"
+    name: Uploading
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: results
           merge-multiple: true
-      - name: "List results"
+      - name: Results
         run: |
           ls -R results/
       - uses: actions/upload-artifact@v4
