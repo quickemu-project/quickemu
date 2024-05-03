@@ -1,0 +1,150 @@
+name: "Test quickget 🧪"
+
+# Controls when the action will run.
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # Build at 00:00 on every 12th day-of-month.
+  #schedule:
+  #  - cron: "0 0 */12 * *"
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: '**' # '!master' excludes master
+    paths:
+      - quickget
+  pull_request:
+    branches: '**' # matches every branch
+    paths:
+      - quickget
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  list-supported:
+    name: List supported OS
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: List all supported OS variants
+        run: |
+          mkdir -p results
+          echo -e "\n\n               Supported:\n\n"
+          ./quickget --list | tee -a results/supported.txt
+          echo -e "\n\nAll supported OS variants: $(cat results/supported.txt | wc -l)"
+          echo -e "\n\n               Finished\n\n"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supported
+          path: results/supported.txt
+          retention-days: 1
+
+  list-os-info:
+    name: List all OS info
+    runs-on: ubuntu-22.04
+    steps:
+
+      - uses: actions/checkout@v4
+      - name: Show info about all OS
+        run: |
+          export TERM=xterm
+          echo -e "\n\n               OSinfo:\n\n"
+          mkdir -p results
+          distros="$(./quickget | sed '/^$/q' | tail -n +3)"
+          for os in ${distros}; do
+            echo -e "\n\n      ${os}" && ./quickget -12345 "${os}" | tee -a results/infos.txt
+          done
+          echo -e "\n\nsupported OS (os_info): $(cat results/infos.txt | grep 'http' | wc -l)"
+          echo -e "\n\n               Finished\n\n"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: infos
+          path: results/infos.txt
+          retention-days: 1
+
+  list-all-urls:
+    needs: [list-supported]
+    name: List all URLs
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: List all supported systems download URLs
+        run: |
+          export TERM=xterm
+          echo -e "\n\n               ISOs:\n\n"
+          mkdir -p results
+          ./quickget -u | tee -a url.txt
+          cat url.txt | sort > results/urls.txt
+      - uses: actions/download-artifact@v4
+        with:
+          path: results
+          merge-multiple: true
+      - name: results
+        run: |
+          ls -R results/
+          echo -e "\n\nFounded/All URLs: $(cat results/urls.txt | grep 'http' | wc -l)/$(cat results/supported.txt | wc -l)"
+          echo -e "\n\n               Finished\n\n"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: urls
+          path: results/urls.txt
+
+  check-all-urls:
+    name: Check all URLs
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checking if all downloads for Operating Systems are available
+        run: |
+          export TERM=xterm
+          echo -e "\n\n               ISOs availability:\n\n"
+          mkdir -p results
+          ./quickget --check | tee -a check.txt
+          cat check.txt | sort > results/checks.txt
+          GOOD=$(grep -c 'http' results/checks.txt)
+          WINDOWS=$(grep -c 'windows' results/checks.txt)
+          ALL=$((GOOD + WINDOWS))
+          FAILED=$(grep -c 'FAIL:' results/checks.txt)
+          SKIPPED=$(grep -c 'SKIP:' results/checks.txt)
+          PASSED=$(grep -c 'PASS:' results/checks.txt)
+          CHECKED=$((FAILED + SKIPPED + PASSED))
+          echo -e "\n\nFAILED: $FAILED"
+          echo "SKIPPED: $SKIPPED"
+          echo "PASSED: $PASSED"
+          echo "Checked/known URLs: $CHECKED/$ALL with skipped Windows"
+          echo -e "Failed:\n$(grep 'FAIL:' results/checks.txt | tee -a results/failed.txt)"
+          echo -e "\n\n               Finished\n\n"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checks
+          path: results/checks.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: failed
+          path: results/failed.txt
+
+  upload-artifacts:
+    needs: [list-os-info, list-all-urls, check-all-urls]
+    name: Uploading artifacts
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: List all supported systems download URLs
+        run: |
+          export TERM=xterm
+          echo -e "\n\n               ISOs:\n\n"
+          mkdir -p results
+          ./quickget -u | tee -a url.txt
+          cat url.txt | sort > results/urls.txt
+      - uses: actions/download-artifact@v4
+        with:
+          path: results
+          merge-multiple: true
+      - name: results
+        run: |
+          ls -R results/
+      - uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
+          name: results
+          path: results/
