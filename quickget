@@ -406,7 +406,7 @@ function list_supported() {
     exit 0
 }
 
-function test_result() {
+function check_result() {
     local OS="${1}"
     local RELEASE="${2}"
     local EDITION="${3:-}"
@@ -428,7 +428,7 @@ function test_result() {
     fi
 }
 
-function test_all() {
+function check_all() {
     OS="${1}"
     os_supported
 
@@ -445,10 +445,10 @@ function test_all() {
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut_1 | head -1)
                 if [ "${OPERATION}" == "show" ]; then
-                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
-                elif [ "${OPERATION}" == "test" ]; then
+                    check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+                elif [ "${OPERATION}" == "check" ]; then
                     CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                    test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+                    check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
                 fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
@@ -456,9 +456,9 @@ function test_all() {
             for LANG in "${LANGS[@]}"; do
                 validate_release releases_"${OS}"
                 if [ "${OPERATION}" == "show" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" ""
-                elif [ "${OPERATION}" == "test" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" "${URL}" "SKIP"
+                    check_result "${OS}" "${RELEASE}" "${LANG}" ""
+                elif [ "${OPERATION}" == "check" ]; then
+                    check_result "${OS}" "${RELEASE}" "${LANG}" "${URL}" "SKIP"
                 fi
             done
         elif [[ "${OS}" == "macos" ]]; then
@@ -474,10 +474,10 @@ function test_all() {
             validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut_1 | head -1)
             if [ "${OPERATION}" == "show" ]; then
-                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
-            elif [ "${OPERATION}" == "test" ]; then
+                check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+            elif [ "${OPERATION}" == "check" ]; then
                 CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-                test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+                check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
             fi
         fi
     done &
@@ -1230,11 +1230,11 @@ function web_get() {
 
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
-        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+        check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
-    elif [ "${OPERATION}" == "test" ]; then
+    elif [ "${OPERATION}" == "check" ]; then
         CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
-        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+        check_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         DIR="$(pwd)"
@@ -2063,11 +2063,11 @@ function get_macos() {
     local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
     if [ "${OPERATION}" == "show" ]; then
-        test_result "${OS}" "${RELEASE}" "" "${downloadLink}"
+        check_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
-    elif [ "${OPERATION}" == "test" ]; then
+    elif [ "${OPERATION}" == "check" ]; then
         local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
-        test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
+        check_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
         echo "Downloading macOS ${RELEASE} from ${downloadLink}"
@@ -3424,25 +3424,25 @@ case "${1}" in
     shift
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (test_all "${OS}") &
+            (check_all "${OS}") &
         done
         wait
         exit 0
     elif [ -z "${2}" ]; then
-        test_all "${1}"
+        check_all "${1}"
     fi
     ;;
   '--check'|'-c')
-    OPERATION="test"
+    OPERATION="check"
     shift
     if [ -z "${1}" ]; then
         for OS in $(os_support); do
-            (test_all "${OS}") &
+            (check_all "${OS}") &
         done
         wait
         exit 0
     elif [ -z "${2}" ]; then
-        test_all "${1}"
+        check_all "${1}"
     fi
     ;;
     #TODO: Argument without dashes should be DEPRECATED!
