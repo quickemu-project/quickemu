@@ -4,6 +4,7 @@
 # Quickemu
 
 **Quickly create and run optimised Windows, macOS and Linux virtual machines:**
+
 <img src=".github/screenshot.png" alt="Quickemu Screenshot" />
 
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/>**
@@ -22,15 +23,19 @@ decide what operating system you want to run, and Quickemu will figure
 out the best way to do it for you.
 
 The original objective of the project was to [enable quick testing of
-Linux distributions](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines) where the virtual machine
-configurations can be stored anywhere (such as external USB storage or
-your home directory) and no elevated permissions are required to run the
-virtual machines.
+Linux
+distributions](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+where the virtual machine configurations can be stored anywhere (such as
+external USB storage or your home directory) and no elevated permissions
+are required to run the virtual machines.
 
-**Today, Quickemu includes comprehensive support for [macOS](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines),
-[Windows](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)**, most of the BSDs, novel non-Linux operating systems such as FreeDOS, Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
+**Today, Quickemu includes comprehensive support for
+[macOS](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines),
+[Windows](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)**,
+most of the BSDs, novel non-Linux operating systems such as FreeDOS,
+Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 
-## Features
+# Features
 
 -   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
     High Sierra
@@ -58,40 +63,70 @@ virtual machines.
 
 # Quick start
 
-[Once Quickemu is installed](https://github.com/quickemu-project/quickemu/wiki/01-Installation), there are two simple steps to create and run a virtual machine:
+[Once Quickemu is
+installed](https://github.com/quickemu-project/quickemu/wiki/01-Installation),
+there are two simple steps to create and run a virtual machine:
 
-- `quickget` automatically downloads the ISO image for the operating system you want to run and creates a configuration file for the virtual machine.
+-   `quickget` automatically downloads the ISO image for the operating
+    system you want to run and creates a configuration file for the
+    virtual machine.
 
-```shell
+``` shell
 quickget nixos unstable
 ```
 
-- `quickemu` starts the virtual machine using the configuration file created by `quickget`.
+-   `quickemu` starts the virtual machine using the configuration file
+    created by `quickget`.
 
-```shell
+``` shell
 quickemu --vm nixos-unstable.conf
 ```
-- Execute `quickget` (with no arguments) to see a list of all the supported operating systems.
+
+-   Execute `quickget` (with no arguments) to see a list of all the
+    supported operating systems.
 
 # Documentation
 
-The wiki describes how to get up and running with Quickemu and also covers more advanced configuration and usage.
+The wiki describes how to get up and running with Quickemu and also
+covers more advanced configuration and usage.
 
-- [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation) 💾
-- [**Create Linux virtual machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines) 🐧
-- [**Create macOS virtual machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines) 🍏
-- [**Create Windows virtual machines**](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
-- [**Advanced quickemu configuration**](https://github.com/quickemu-project/quickemu/wiki/05-Advanced-quickemu-configuration) 🔧
-- [**Advanced quickget features**](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features) 🤓
-- [**Alternative frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends) 🧑‍💻
-- [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References) 📚️
+-   [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
+    💾
+-   [**Create Linux virtual
+    machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+    🐧
+-   [**Create macOS virtual
+    machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines)
+    🍏
+-   [**Create Windows virtual
+    machines**](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)
+    🪟
+-   [**Advanced quickemu
+    configuration**](https://github.com/quickemu-project/quickemu/wiki/05-Advanced-quickemu-configuration)
+    🔧
+-   [**Advanced quickget
+    features**](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features)
+    🤓
+-   [**Alternative
+    frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
+    🧑‍💻
+-   [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References)
+    📚️
 
 # Contributing
 
 We welcome contributions to Quickemu.
 
-- Help other Quickemu users by answering questions in the [Quickemu Discussions](https://github.com/quickemu-project/quickemu/discussions) 🛟
-- Improve the documentation in [this README](https://github.com/quickemu-project/quickemu/edit/master/README.md) and the [Quickemu Wiki](https://github.com/quickemu-project/quickemu/wiki) 📖
-- File bug reports and feature requests in the [Quickemu Issues](https://github.com/quickemu-project/quickemu/issues) 📁
-- Submit [Quickemu Pull requests](https://github.com/quickemu-project/quickemu/pulls) to fix bugs 🐞 or add new features ✨
-- [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
+-   Help other Quickemu users by answering questions in the [Quickemu
+    Discussions](https://github.com/quickemu-project/quickemu/discussions)
+    🛟
+-   Improve the documentation in [this
+    README](https://github.com/quickemu-project/quickemu/edit/master/README.md)
+    and the [Quickemu
+    Wiki](https://github.com/quickemu-project/quickemu/wiki) 📖
+-   File bug reports and feature requests in the [Quickemu
+    Issues](https://github.com/quickemu-project/quickemu/issues) 📁
+-   Submit [Quickemu Pull
+    requests](https://github.com/quickemu-project/quickemu/pulls) to fix
+    bugs 🐞 or add new features ✨
+-   [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
