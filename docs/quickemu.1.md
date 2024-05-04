@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: April 30, 2024
+date: May 4, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -144,7 +144,7 @@ You can also pass optional parameters
 **quickemu --vm ubuntu-mate-22.04.conf**
 :   Launches the VM specified in the file *ubuntu-mate-22.04.conf*
 
-## Introduction
+# Introduction
 
 **Quickemu** is a wrapper for the excellent
 [QEMU](https://www.qemu.org/) that attempts to automatically *"do the
@@ -152,24 +152,27 @@ right thing"*, rather than expose exhaustive configuration options. You
 decide what operating system you want to run, and Quickemu will figure
 out the best way to do it for you.
 
-The original objective of the project was to enable [quick testing of
-Linux distributions](#creating-linux-guests-) where the virtual machine
-configurations can be stored anywhere (such as external USB storage or
-your home directory) and no elevated permissions are required to run the
-virtual machines.
+The original objective of the project was to [enable quick testing of
+Linux
+distributions](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+where the virtual machine configurations can be stored anywhere (such as
+external USB storage or your home directory) and no elevated permissions
+are required to run the virtual machines.
 
-**Quickemu now also includes comprehensive support for
-[macOS](#creating-macos-guests-) and
-[Windows](#creating-windows-guests-)**.
+**Today, Quickemu includes comprehensive support for
+[macOS](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines),
+[Windows](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)**,
+most of the BSDs, novel non-Linux operating systems such as FreeDOS,
+Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 
-## Features
+# Features
 
 -   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
     High Sierra
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
--   **Over 360 operating system editions are supported!**
+-   **Nearly 1000 operating system editions are supported!**
 -   Full SPICE support including host/guest clipboard sharing
 -   VirtIO-webdavd file sharing for Linux and Windows guests
 -   VirtIO-9p file sharing for Linux and macOS guests
@@ -345,19 +348,17 @@ may have further information.
 You can also use `quickget` with advanced options :
 
 ``` text
- -[12345]              <os>           : Show info* about OS
- --download       (-d) <os> <re> [ed] : Download the ISO only; no VM configuration
- --create-config (-cc) <os> [path/url]: Create default VM config for image
- --open-homepage  (-o) <os>           : Open homepage for the OS
- --version        (-v)                : Show version
- --help           (-h)                : Show this help message
- --url            (-u) <os> <re> [ed] : Show download URL for an OS release/edition
- --url-all       (-ua) <os>           : Show all download URLs for an OS
- --check          (-c) <os> [re] [ed] : Check download an OS release/edition is available
- --check-all     (-ca) <os>           : Check all downloads for an OS are available
- --list           (-l)                : List all supported systems in plain text
- --list-csv      (-lc)                : List all supported systems in csv format
- --list-json     (-lj)                : List all supported systems in json format
+  -[12345]              <os>           : Show info* about OS
+  --download       (-d) <os> <re> [ed] : Download image; no VM configuration
+  --create-config (-cc) <os> [path/url]: Create default VM config for image
+  --open-homepage  (-o) <os>           : Open homepage for the OS
+  --version        (-v)                : Show version
+  --help           (-h)                : Show this help message
+  --url            (-u) [os] [re] [ed] : Show image URL(s)
+  --check          (-c) [os] [re] [ed] : Check image URL(s)
+  --list           (-l)                : List all supported systems
+  --list-csv      (-lc)                : List everything in csv format
+  --list-json     (-lj)                : List everything in json format
 ```
 
 Here are some typical uses
@@ -433,6 +434,7 @@ Further information is available from the project
 -   `netbsd` (NetBSD)
 -   `nitrux` (Nitrux)
 -   `nixos` (NixOS)
+-   `nwg-shell` (nwg-shell)
 -   `openbsd` (OpenBSD)
 -   `openindiana` (OpenIndiana)
 -   `opensuse` (openSUSE)
@@ -587,64 +589,9 @@ macos_release="catalina"
     -   And VirtIO Block Media (disks) are supported/stable in Catalina
         and newer.
 
-### macOS compatibility
-
-There are some considerations when running macOS via Quickemu.
-
--   Supported macOS releases:
-    -   High Sierra
-    -   Mojave
-    -   Catalina **(Recommended)**
-    -   Big Sur
-    -   Monterey
-    -   Ventura
-    -   Sonoma
--   `quickemu` will automatically download the required
-    [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
-    and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
--   Optimised by default, but no GPU acceleration is available.
-    -   Host CPU vendor is detected and guest CPU is optimised
-        accordingly.
-    -   [VirtIO Block
-        Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is
-        used for the system disk where supported.
-    -   [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used
-        for the mouse.
-    -   VirtIO Network (`virtio-net`) is supported and enabled on macOS
-        Big Sur and newer but previous releases use `vmxnet3`.
-    -   VirtIO Memory Ballooning is supported and enabled on macOS Big
-        Sur and newer but disabled for other support macOS releases.
--   USB host and SPICE pass-through is:
-    -   UHCI (USB 2.0) on macOS Catalina and earlier.
-    -   XHCI (USB 3.0) on macOS Big Sur and newer.
--   Display resolution can only be changed via macOS System Preferences.
--   **Full Duplex audio requires [VoodooHDA
-    OC](https://github.com/chris1111/VoodooHDA-OC) or pass-through a USB
-    audio-device to the macOS guest VM**.
--   NOTE! [Gatekeeper](https://disable-gatekeeper.github.io/) and
-    [System Integrity Protection
-    (SIP)](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)
-    need to be disabled to install VoodooHDA OC
--   File sharing between guest and host is available via
-    [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE
-    webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
--   Copy/paste via SPICE agent is **not available on macOS**.
-
-### macOS App Store
-
-If you see *"Your device or computer could not be verified"* when you
-try to login to the App Store, make sure that your wired ethernet device
-is `en0`. Use `ifconfig` in a terminal to verify this.
-
-If the wired ethernet device is not `en0`, then then go to *System
-Preferences* -\> *Network*, delete all the network devices and apply the
-changes. Next, open a terminal and run the following:
-
-``` shell
-sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
-```
-
-Now reboot, and the App Store should work.
+There is further advice and information about macOS guests in the
+project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests).
 
 ## [Creating Windows guests](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
 
@@ -680,42 +627,18 @@ quickemu --vm windows-11.conf
     -   Username: `Quickemu`
     -   Password: `quickemu`
 
-### Regional versions
-
-By default `quickget` will download the *"English International"*
-release (*"English (United States)"* for server releases), but you can
-optionally specify one of the supported languages: For example:
-
-``` shell
-quickget windows 11 "Chinese (Traditional)"
-```
-
-The default Windows 11 configuration looks like this:
-
-``` shell
-guest_os="windows"
-disk_img="windows-11/disk.qcow2"
-iso="windows-11/windows-11.iso"
-fixed_iso="windows-11/virtio-win.iso"
-tpm="on"
-secureboot="off"
-```
-
--   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
--   `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
--   `tpm="on"` instructs `quickemu` to create a software emulated TPM
-    device using `swtpm`.
+Further information is available from the project
+[wiki](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)
 
 ## Configuration
 
 Here are the usage instructions:
 
 ``` text
-
 Usage
-  quickemu --vm ubuntu.conf [optional params]
+  quickemu --vm ubuntu.conf <arguments>
 
-List of optional parameters:
+Arguments
   --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'
   --braille                         : Enable braille support. Requires SDL.
   --delete-disk                     : Delete the disk image and EFI variables
