@@ -84,7 +84,7 @@ stdenv.mkDerivation rec {
   passthru.tests = testers.testVersion { package = quickemu; };
 
   meta = with lib; {
-    description = "Quickly create and run optimised Windows, macOS and Linux desktop virtual machines";
+    description = "Quickly create and run optimised Windows, macOS and Linux virtual machines";
     homepage = "https://github.com/quickemu-project/quickemu";
     license = licenses.mit;
     maintainers = with maintainers; [ fedx-sudo flexiondotorg ];
