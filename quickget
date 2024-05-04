@@ -3429,10 +3429,11 @@ case "${1}" in
         for OS in $(os_support); do
             (test_all "${OS}")
         done
+        exit 0
     elif [ -z "${2}" ]; then
         test_all "${1}"
+        exit 0
     fi
-    exit 0
     ;;
   '--check'|'-c')
     OPERATION="test"
