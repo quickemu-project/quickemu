@@ -245,9 +245,7 @@ function vm_boot() {
     KERNEL_NODE="($(uname --nodename))"
     KERNEL_VER=$(uname --kernel-release | cut -d'.' -f1-2)
 
-    if command -v lsb_release &>/dev/null; then
-        LSB_DESCRIPTION=$(lsb_release --description --short)
-    elif [ -e /etc/os-release ]; then
+    if [ -e /etc/os-release ]; then
         LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
     fi
     # Strip quotes from LSB_DESCRIPTION
