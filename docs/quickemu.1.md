@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 4, 2024
+date: May 5, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -232,13 +232,13 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` shell
-sudo apt install qemu bash coreutils curl ovmf grep jq lsb-base procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install qemu bash coreutils curl edk2-tools grep jq lsb procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2-tools grep jq procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
