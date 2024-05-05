@@ -129,5 +129,6 @@ We welcome contributions to Quickemu.
 -   Submit [Quickemu Pull
     requests](https://github.com/quickemu-project/quickemu/pulls) to fix
     bugs 🐞 or add new features ✨
-  - Commits messages must [conform to the Conventional Commits spcification](https://www.conventionalcommits.org/).
+-   Commit messages must [conform to the Conventional Commits
+    specification](https://www.conventionalcommits.org/).
 -   [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
