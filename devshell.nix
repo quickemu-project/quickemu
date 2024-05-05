@@ -6,7 +6,6 @@
   gnugrep,
   gnused,
   jq,
-  lsb-release,
   ncurses,
   nixpkgs-fmt,
   procps,
@@ -32,7 +31,6 @@ mkShell {
     gnugrep
     gnused
     jq
-    lsb-release
     ncurses
     nixpkgs-fmt
     procps
