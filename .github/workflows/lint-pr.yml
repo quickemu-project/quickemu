@@ -8,7 +8,7 @@ on:
       - synchronize
 
 permissions:
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   main:
@@ -19,10 +19,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Opt-in to using the special "[WIP]" state
-          # This will prevent the PR title from being validated, and pull
-          # request checks will remain pending.
-          wip: true
           # If the PR only contains a single commit, the action will validate that
           # it matches the configured pattern.
           validateSingleCommit: true
