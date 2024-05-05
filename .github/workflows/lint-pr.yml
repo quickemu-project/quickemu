@@ -1,0 +1,31 @@
+name: "Lint Pull Request 🐙"
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+permissions:
+  pull-requests: write
+
+jobs:
+  main:
+    name: Validate pull request title
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Opt-in to using the special "[WIP]" state
+          # This will prevent the PR title from being validated, and pull
+          # request checks will remain pending.
+          wip: true
+          # If the PR only contains a single commit, the action will validate that
+          # it matches the configured pattern.
+          validateSingleCommit: true
+          # Related to `validateSingleCommit` you can opt-in to validate that the PR
+          # title matches a single commit to avoid confusion.
+          validateSingleCommitMatchesPrTitle: true
