@@ -202,7 +202,6 @@ requirements manually:
 -   [EDK II](https://github.com/tianocore/edk2)
 -   [grep](https://www.gnu.org/software/grep/)
 -   [jq](https://stedolan.github.io/jq/)
--   [LSB](https://wiki.linuxfoundation.org/lsb/start)
 -   [procps](https://gitlab.com/procps-ng/procps)
 -   [python3](https://www.python.org/)
 -   [chunkcheck](https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7)
