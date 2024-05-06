@@ -3395,9 +3395,7 @@ function create_vm() {
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
     fi
-    #if [ ${OS} == "guix" ] && [[ $ISO =~ ".qcow2" ]]; then
-        #cp ${VM_PATH}/${ISO} ${VM_PATH}/disc.qcow2
-    #fi
+
     if [[ ${OS} == "batocera" ]] && [[ ${ISO} =~ ".gz" ]]; then
         gzip -d "${VM_PATH}/${ISO}"
         ISO="${ISO/.gz/}"
