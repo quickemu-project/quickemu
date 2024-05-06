@@ -2640,7 +2640,7 @@ function get_ubuntu() {
         ISO=$(cut -d'*' -f2 <<<${DATA})
         HASH=$(cut_1 <<<${DATA})
     fi
-    if [ -z $ISO ] || [ -z $HASH ]; then
+    if [ -z "${ISO}" ] || [ -z "${HASH}" ]; then
         echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
@@ -3391,7 +3391,7 @@ function create_vm() {
       check_hash "${ISO}" "${HASH}"
     fi
 
-    if [ ${OS} == "freedos" ] && [[ $ISO =~ ".zip" ]]; then
+    if [ ${OS} == "freedos" ] && [[ ${ISO} =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso')
     fi
@@ -3414,7 +3414,7 @@ function create_vm() {
         ISO="${ISO/.img/}"
     fi
 
-    if [ ${OS} == "reactos" ] && [[ $ISO =~ ".zip" ]]; then
+    if [ ${OS} == "reactos" ] && [[ ${ISO} =~ ".zip" ]]; then
         unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
         ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
     fi
