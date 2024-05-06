@@ -1151,8 +1151,9 @@ function releases_ubuntu() {
 }
 
 function releases_ubuntu-server() {
-    local ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
-    echo "${ALL_VERSIONS[@]}"
+    local ALL_VERSIONS=()
+    ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
+    echo daily-live "${ALL_VERSIONS[@]}"
 }
 
 function releases_vanillaos() {
