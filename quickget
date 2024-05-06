@@ -3364,11 +3364,14 @@ function get_windows() {
 }
 
 function open_homepage() {
+    local URL=""
+    local XDG_OPEN=""
     if [ -z "$(os_info "${1}")" ]; then
         error_specify_os
     else
-        URL="$(os_info "${1}" | cut -d'|' -f4)"
-        xdg-open $URL || sensible-browser $URL || x-www-browser $URL || gnome-open $URL
+        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
+        unset XDG_OPEN
         exit 0
     fi
 }
@@ -3492,7 +3495,7 @@ case "${1}" in
     ;;
   '--open-homepage'|'-o')
     shift
-    open_homepage
+    open_homepage "${1}"
     ;;
   '--version'|'-v')
     WHERE=$(dirname "${BASH_SOURCE[0]}")
