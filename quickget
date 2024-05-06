@@ -1376,7 +1376,6 @@ function make_vm_config() {
     local ISO_FILE=""
     local IMAGE_TYPE=""
     local GUEST=""
-    local SEC_BOOT=""
     if [ "${OPERATION}" == "download" ]; then
         exit 0
     fi
