@@ -2542,6 +2542,7 @@ function get_trisquel() {
 }
 
 function get_truenas-scale() {
+    local HASH=""
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-scale/"
