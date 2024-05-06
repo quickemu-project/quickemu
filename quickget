@@ -2560,13 +2560,12 @@ function get_truenas-core() {
 }
 
 function get_tuxedo-os() {
+    local HASH=""
     local ISO=""
-    local URL=""
-    local Current=
-    Current="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
-    URL="https://os.tuxedocomputers.com/${Current}"
-    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${Current}.sha256" | cut -d ' ' -f 1)"
-    echo "${URL} ${HASH}"
+    local URL="https://os.tuxedocomputers.com"
+    ISO="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
+    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${ISO}.sha256" | cut -d ' ' -f 1)"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_ubuntu-server() {
