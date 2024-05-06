@@ -1,28 +1,6 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
-# Here the quick 'n dirty guide to adding a new OS to quickget
-#
-# 1. Update os_support() - add new OS, all lowercase
-# 2. Update os_info() - Fill all posible fields for new OS (leave empty if no login, but | must stay same)
-#    Here is whats should be there...
-#    <OS name>)     INFO="<OS nice name>|<OS based on>|<OS default login:pass if any>|<OS homepage>|<ABOUT>";;
-# 4. Create a releases_newos() generator (required) outputs the current supported release versions (from newest)
-# 5. Create a editions_newos() generator (optional) outputs the editions if new OS has multiple flavours/editions
-# 6. Update make_vm_config() - add any *required* new OS tweaks
-# 7. Create a get_newos() function - that does something like this: (Look at other OS)
-#    For cutting first field with hash you can use function `cut_1` instead of `cut -d' ' -f1``
-#
-#function get_newos() {
-#    local EDITION="${1:-}"
-#    local HASH=""
-#    local ISO="newos-${RELEASE}-${EDITION}-amd64.iso"
-#    local URL="https://www.newos.org/download/${RELEASE}/${EDITION}"
-#
-#    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut_1)
-#    echo "${URL}/${ISO} ${HASH}"
-#}
-
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
