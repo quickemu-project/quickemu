@@ -156,7 +156,7 @@ function pretty_name() {
 }
 
 # Just in case quickget want use it
-function os_homepage(){
+function os_homepage() {
     show_os_info -4 "${1}"
 }
 
@@ -795,12 +795,12 @@ function editions_fedora() {
     echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(select(.arch=="x86_64" and .variant!="Labs" and .variant!="IoT" and .variant!="Container" and .variant!="Cloud" and .variant!="Everything"  and .subvariant!="Security" and .subvariant!="Server_KVM" and .subvariant!="SoaS")) | map(.subvariant) | unique | .[]')
 }
 
-function releases_freebsd(){
+function releases_freebsd() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/" |grep -e 'class="link"' |grep -v '\.\.'|cut -d\" -f4|tr -d '/' | sort -r)
 }
 
-function editions_freebsd(){
+function editions_freebsd() {
     echo disc1 dvd1
 }
 
@@ -870,19 +870,19 @@ function releases_linuxlite() {
     echo 6.6 6.4 6.2 6.0
 }
 
-function releases_linuxmint(){
+function releases_linuxmint() {
     echo 21.2 21.1 21 20.3 20.2
 }
 
-function editions_linuxmint(){
+function editions_linuxmint() {
     echo cinnamon mate xfce
 }
 
-function editions_lmde(){
+function editions_lmde() {
     echo cinnamon
 }
 
-function releases_lmde(){
+function releases_lmde() {
     echo 6
 }
 
@@ -890,15 +890,15 @@ function releases_macos() {
     echo high-sierra mojave catalina big-sur monterey ventura sonoma
 }
 
-function releases_mageia(){
+function releases_mageia() {
     echo 9 8
 }
 
-function editions_mageia(){
+function editions_mageia() {
     echo Plasma GNOME Xfce
 }
 
-function editions_manjaro(){
+function editions_manjaro() {
     echo full minimal
 }
 
@@ -906,11 +906,11 @@ function releases_manjaro() {
     echo xfce gnome plasma cinnamon i3 sway
 }
 
-function releases_mxlinux(){
+function releases_mxlinux() {
     echo 23.2
 }
 
-function editions_mxlinux(){
+function editions_mxlinux() {
     echo Xfce KDE Fluxbox
 }
 
@@ -928,11 +928,11 @@ function releases_nitrux() {
     echo latest
 }
 
-function releases_nixos(){
+function releases_nixos() {
     echo unstable 23.11 23.05 22.11 22.05 21.11 21.05
 }
 
-function editions_nixos(){
+function editions_nixos() {
     echo minimal plasma5 gnome
 }
 
@@ -941,21 +941,21 @@ function releases_nwg-shell() {
     echo $(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep 'url=' | grep '64.iso' | cut -d'/' -f12 | cut -d'-' -f3)
 }
 
-function releases_openbsd(){
+function releases_openbsd() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r)
 }
 
-function releases_openindiana(){
+function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5)
 }
 
-function editions_openindiana(){
+function editions_openindiana() {
     echo gui text minimal
 }
 
-function releases_opensuse(){
+function releases_opensuse() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
 }
@@ -2269,7 +2269,7 @@ function get_openbsd() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
-function get_openindiana(){
+function get_openindiana() {
     local HASH=""
     local ISO=""
     local URL=""
