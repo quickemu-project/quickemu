@@ -598,7 +598,8 @@ function editions_alma() {
 
 function releases_alpine() {
     local REL=""
-    local RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    local RELS=""
+    RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
     for REL in ${RELS}; do
         if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
             echo -n "${REL} "
@@ -771,7 +772,8 @@ function releases_elementary() {
 }
 
 function releases_endeavouros() {
-    local ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
+    local ENDEAVOUR_RELEASES=""
+    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | LC_ALL="en_US.UTF-8" sort -Mr | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64' | cut -c 13- | head -n 5 | tr '\n' ' ')"
     echo "${ENDEAVOUR_RELEASES,,}"
 }
 
@@ -1127,9 +1129,12 @@ function releases_tuxedo-os() {
 }
 
 function releases_ubuntu() {
-    local VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
-    local SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
-    local EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    local VERSION_DATA=""
+    local SUPPORTED_VERSIONS=()
+    local EOL_VERSIONS=()
+    VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
+    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
     case "${OS}" in
         ubuntu)
             echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
@@ -1298,10 +1303,11 @@ function web_get() {
 
 # checks if a URL needs to be redirected and returns the final URL
 function web_redirect() {
+    local REDIRECT_URL=""
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    local REDIRECT_URL=$(curl --silent --location --fail --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --silent --location --fail --write-out %{url_effective} --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1663,8 +1669,9 @@ function get_athenaos() {
 
 function get_batocera() {
     local HASH=""
+    local ISO=""
     local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
-    local ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
+    ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1713,39 +1720,46 @@ function get_bunsenlabs() {
 }
 
 function get_cachyos() {
+    local HASH=""
+    local REL=""
     local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    local REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
+    REL=$(web_pipe "${URL}" | grep -Po '(?<=">)[0-9]+(?=/</a>)' | sort -ru | tail -n 1)
     local ISO="cachyos-${EDITION}-linux-${REL}.iso"
-    local HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut_1)
+    HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut_1)
     echo "${URL}/${REL}/${ISO} ${HASH}"
 }
 
 function get_centos-stream() {
+    local HASH=""
     local ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
     local URL="https://linuxsoft.cern.ch/centos-stream/${RELEASE}-stream/BaseOS/x86_64/iso"
-    local HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+    HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_chimeralinux() {
+    local DATE=""
+    local HASH=""
     local URL="https://repo.chimera-linux.org/live/${RELEASE}"
-    local DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
+    DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
     local ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
-    local HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut_1)
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_crunchbang++() {
     local HASH=""
-    local ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
     echo "${ISO} ${HASH}"
 }
 
 function get_debian() {
+    local DEBCURRENT=""
     local HASH=""
     local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
     local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid"
-    local DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
+    DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     case "${RELEASE}" in
       "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
     esac
@@ -1824,11 +1838,13 @@ function get_elementary() {
 }
 
 function get_endeavouros() {
+    local ENDEAVOUR_RELEASES=""
     local HASH=""
+    local ISO=""
     local URL="https://mirror.alpix.eu/endeavouros/iso"
     # Find EndeavourOS releases from mirror, pick one matching release
-    local ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
-    local ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
+    ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o -P '(?<=<a href=").*(?=.iso">)' | grep -v 'x86_64')"
+    ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut_1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1960,7 +1976,8 @@ function get_haiku() {
 
 function get_holoiso() {
     local HASH=""
-    local URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
+    local URL=""
+    URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq ".[] | select(.tag_name==\"${RELEASE}\") | .body" | grep -Po "https://\S+holoiso.ru.eu.org/\S+.iso" | head -n 1)
     echo "${URL} ${HASH}"
 }
 
@@ -2024,8 +2041,15 @@ function generate_id() {
 }
 
 function get_macos() {
+    local appleSession=""
+    local info=""
+    local downloadLink=""
+    local downloadSession=""
+    local chunkListLink=""
+    local chunkListSession=""
     local BOARD_ID=""
     local CWD=""
+    local CHECK=""
     local CHUNKCHECK=""
     local MLB="00000000000000000"
     local OS_TYPE="default"
@@ -2089,20 +2113,26 @@ function get_macos() {
     OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
     OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
 
-    local appleSession=$(curl -v -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
-    local info=$(curl -s -X POST -H "Host: osrecovery.apple.com" -H "Connection: close" -A "InternetRecovery/1.0" -b "session=\"${appleSession}\"" -H "Content-Type: text/plain"\
-    -d $'cid='$(generate_id 16)$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${OS_TYPE} \
-    http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
-    local downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
-    local downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
-    local chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
-    local chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
+    appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+    info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" \
+                           -b "session=\"${appleSession}\"" \
+                           -H "Content-Type: text/plain" \
+                           -d $'cid='$(generate_id 16)$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${OS_TYPE} \
+                           http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+    downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
+    downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
+    chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
+    chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
 
     if [ "${OPERATION}" == "show" ]; then
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        local CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
@@ -2145,8 +2175,10 @@ function get_macos() {
 }
 
 function get_mageia() {
-    local ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
-    local HASH=$(web_pipe "${ISO}.sha512" | cut_1)
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe https://www.mageia.org/en/downloads/get/?q="Mageia-${RELEASE}-Live-${EDITION}-x86_64.iso" | grep 'click here'| grep -o 'href=.*\.iso'|cut -d\" -f2)
+    HASH=$(web_pipe "${ISO}.sha512" | cut_1)
     echo "${ISO} ${HASH}"
 }
 
@@ -2369,8 +2401,10 @@ function get_reactos() {
 }
 
 function get_rebornos() {
-    local ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    local HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
     echo "${ISO} ${HASH}"
 }
 
@@ -2623,9 +2657,12 @@ function get_ubuntu() {
 }
 
 function get_vanillaos() {
-    local ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
-    local HASH_URL=$(echo "${ISO}" | sed s'|\.iso|\.sha256\.txt|g')
-    local HASH=$(web_pipe "${HASH_URL}" | cut_1)
+    local HASH=""
+    local HASH_URL=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
+    HASH_URL=$(echo "${ISO}" | sed s'|\.iso|\.sha256\.txt|g')
+    HASH=$(web_pipe "${HASH_URL}" | cut_1)
     echo "${ISO} ${HASH}"
 }
 
@@ -3056,6 +3093,7 @@ function curl_windows() {
 }
 
 function download_windows_server() {
+    local iso_download_page_html=""
     # Copyright (C) 2024 Elliot Killick <contact@elliotkillick.com>
     # This function is adapted from the Mido project:
     # https://github.com/ElliotKillick/Mido
@@ -3066,7 +3104,7 @@ function download_windows_server() {
 
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
-    local iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -3170,6 +3208,14 @@ function download_windows_server() {
 }
 
 function download_windows_workstation() {
+    local HASH=""
+    local session_id=""
+    local iso_download_page_html=""
+    local product_edition_id=""
+    local language_skuid_table_html=""
+    local sku_id=""
+    local iso_download_link_html=""
+    local iso_download_link=""
     # This function is adapted from the Mido project:
     # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
@@ -3184,21 +3230,21 @@ function download_windows_workstation() {
 
     local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
     # uuidgen: For MacOS (installed by default) and other systems (e.g. with no /proc) that don't have a kernel interface for generating random UUIDs
-    local session_id="$(cat /proc/sys/kernel/random/uuid 2> /dev/null || uuidgen --random)"
+    session_id="$(cat /proc/sys/kernel/random/uuid 2> /dev/null || uuidgen --random)"
 
     # Get product edition ID for latest release of given Windows version
     # Product edition ID: This specifies both the Windows release (e.g. 22H2) and edition ("multi-edition" is default, either Home/Pro/Edu/etc., we select "Pro" in the answer files) in one number
     # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
-    local iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
 
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
-    local product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
+    product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
     # echo " - Product edition ID: $product_edition_id"
 
     # Permit Session ID
@@ -3216,7 +3262,7 @@ function download_windows_workstation() {
     # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
     # We must make this request so our next one will be allowed
     # --data "" is required otherwise no "Content-Length" header will be sent causing HTTP response "411 Length Required"
-    local language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
+    language_skuid_table_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --header "Accept:" --max-filesize 10K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=a8f8f489-4c7f-463a-9ca6-5cff94d8d041&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=getskuinformationbyproductedition&sessionId=$session_id&productEditionId=$product_edition_id&sdVersion=2")" || {
         handle_curl_error $?
         return $?
     }
@@ -3225,13 +3271,13 @@ function download_windows_workstation() {
     language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
 
     # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
-    local sku_id="$(echo "$language_skuid_table_html" | grep "${LANG}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    sku_id="$(echo "$language_skuid_table_html" | grep "${LANG}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
     # echo " - SKU ID: $sku_id"
 
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    local iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
+    iso_download_link_html="$(curl --silent --request POST --user-agent "$user_agent" --data "" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://www.microsoft.com/en-US/api/controls/contentinclude/html?pageId=6e2a1789-ef16-4f27-a296-74ef7ef5d96b&host=www.microsoft.com&segments=software-download,$url_segment_parameter&query=&action=GetProductDownloadLinksBySku&sessionId=$session_id&skuId=$sku_id&language=English&sdVersion=2")"
 
     local failed=0
 
@@ -3257,7 +3303,7 @@ function download_windows_workstation() {
     # Filter for 64-bit ISO download URL
     # sed: HTML decode "&" character
     # tr: Filter for only alphanumerics or punctuation
-    local iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]')"
+    iso_download_link="$(echo "$iso_download_link_html" | grep -o "https://software.download.prss.microsoft.com.*IsoX64" | cut -d '"' -f 1 | sed 's/&amp;/\&/g' | tr -cd '[:alnum:][:punct:]')"
 
     if ! [ "$iso_download_link" ]; then
         # This should only happen if there's been some change to the download endpoint web address
@@ -3276,7 +3322,7 @@ function download_windows_workstation() {
         if [ "${LANG}" == "English (United States)" ]; then
             HASH_LANG="English"
         fi
-        local HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$HASH_LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
+        HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$HASH_LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
         check_hash "${VM_PATH}/${FILE_NAME}" "${HASH}"
     fi
 }
