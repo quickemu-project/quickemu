@@ -152,12 +152,12 @@ function show_os_info() {
 }
 
 function pretty_name() {
-    echo $(show_os_info -1 "${1}")
+    show_os_info -1 "${1}"
 }
 
 # Just in case quickget want use it
 function os_homepage(){
-    echo $(show_os_info -4 "${1}")
+    show_os_info -4 "${1}"
 }
 
 function error_specify_os() {
