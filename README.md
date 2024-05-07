@@ -133,6 +133,7 @@ We welcome contributions to Quickemu.
 -   Submit [Quickemu Pull
     requests](https://github.com/quickemu-project/quickemu/pulls) to fix
     bugs 🐞 or add new features ✨
+    -   Follow our [guide to adding a new OS to quickget](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features#adding-a-new-os-to-quickget)
     -   Commit messages must [conform to the Conventional Commits
-    specification](https://www.conventionalcommits.org/).
+    specification](https://www.conventionalcommits.org/)
 -   [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
