@@ -400,6 +400,7 @@ function vm_boot() {
         if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             case ${secureboot} in
             on)
+                # shellcheck disable=SC2054,SC2140
                 ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.secboot.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
                     "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
                     "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd","/usr/share/OVMF/x64/OVMF_VARS.fd" \
@@ -410,6 +411,7 @@ function vm_boot() {
                 )
                 ;;
             *)
+                # shellcheck disable=SC2054,SC2140
                 ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
                     "/usr/share/edk2/ovmf/OVMF_CODE.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
                     "/usr/share/OVMF/OVMF_CODE.fd","/usr/share/OVMF/OVMF_VARS.fd" \
@@ -992,6 +994,7 @@ function vm_boot() {
 
     # Only enable SPICE is using SPICE display
     if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+        # shellcheck disable=SC2054
         args+=(-spice ${SPICE}
             -device virtio-serial-pci
             -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
@@ -1002,6 +1005,7 @@ function vm_boot() {
             -device virtserialport,chardev=webdav0,name=org.spice-space.webdav.0)
     fi
 
+    # shellcheck disable=SC2054
     args+=(-device virtio-rng-pci,rng=rng0
         -object rng-random,id=rng0,filename=/dev/urandom
         -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
@@ -1016,6 +1020,7 @@ function vm_boot() {
     )
 
     if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then
+        # shellcheck disable=SC2054
         args+=(-chardev spicevmc,id=ccid,name=smartcard
                -device ccid-card-passthru,chardev=ccid)
     else
@@ -1025,8 +1030,10 @@ function vm_boot() {
     # setup usb-controller
     [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
     if [ "${USB_CONTROLLER}" == "ehci" ]; then
+        # shellcheck disable=SC2054
         args+=(-device usb-ehci,id=input)
     elif [ "${USB_CONTROLLER}" == "xhci" ]; then
+        # shellcheck disable=SC2054
         args+=(-device qemu-xhci,id=input)
     elif [ -z "${USB_CONTROLLER}" ] || [ "${USB_CONTROLLER}" == "none" ]; then
         # add nothing
@@ -1039,8 +1046,10 @@ function vm_boot() {
     # @INFO: must be set after usb-controller
     [ -z "${KEYBOARD}" ] && KEYBOARD="$keyboard"
     if [ "${KEYBOARD}" == "usb" ]; then
+        # shellcheck disable=SC2054
         args+=(-device usb-kbd,bus=input.0)
     elif [ "${KEYBOARD}" == "virtio" ]; then
+        # shellcheck disable=SC2054
         args+=(-device virtio-keyboard)
     elif [ "${KEYBOARD}" == "ps2" ] || [ -z "${KEYBOARD}" ]; then
         # add nothing, default is ps/2 keyboard
@@ -1067,10 +1076,13 @@ function vm_boot() {
     # @INFO: must be set after usb-controller
     [ -z "${MOUSE}" ] && MOUSE="$mouse"
     if [ "${MOUSE}" == "usb" ]; then
+        # shellcheck disable=SC2054
         args+=(-device usb-mouse,bus=input.0)
     elif [ "${MOUSE}" == "tablet" ]; then
+        # shellcheck disable=SC2054
         args+=(-device usb-tablet,bus=input.0)
     elif [ "${MOUSE}" == "virtio" ]; then
+        # shellcheck disable=SC2054
         args+=(-device virtio-mouse)
     elif [ "${MOUSE}" == "ps2" ] || [ -z "${MOUSE}" ]; then
         # add nothing, default is ps/2 mouse
@@ -1189,6 +1201,7 @@ function vm_boot() {
         args+=(-drive if=ide,index=0,media=disk,file="${disk_img}")
 
     elif [ "${guest_os}" == "windows-server" ]; then
+        # shellcheck disable=SC2054,SC2206
         args+=(-device ide-hd,drive=SystemDisk
             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
 
@@ -1244,11 +1257,13 @@ function vm_boot() {
             echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
         else
             MONITOR_TELNET_PORT="${temp_port}"
+            # shellcheck disable=SC2054
             args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
             echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
             echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
         fi
     elif [ "${MONITOR}" == "socket" ]; then
+        # shellcheck disable=SC2054,SC2206
         args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
         echo " - Monitor:  On host:  nc -U \"${VM_MONITOR_SOCKETPATH}\""
         echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_MONITOR_SOCKETPATH}"
@@ -1281,11 +1296,13 @@ function vm_boot() {
             echo " - Serial:   All Serial-Telnet ports have been exhausted."
         else
             SERIAL_TELNET_PORT="${temp_port}"
+            # shellcheck disable=SC2054,SC2206
             args+=(-serial telnet:${SERIAL_TELNET_HOST}:${SERIAL_TELNET_PORT},server,nowait)
             echo " - Serial:   On host:  telnet ${SERIAL_TELNET_HOST} ${SERIAL_TELNET_PORT}"
             echo "serial-telnet,${SERIAL_TELNET_PORT},${SERIAL_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
         fi
     elif [ "${SERIAL}" == "socket" ]; then
+        # shellcheck disable=SC2054,SC2206
         args+=(-serial unix:${VM_SERIAL_SOCKETPATH},server,nowait)
         echo " - Serial:   On host:  nc -U \"${VM_SERIAL_SOCKETPATH}\""
         echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_SERIAL_SOCKETPATH}"
