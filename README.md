@@ -5,8 +5,6 @@
 
 **Quickly create and run optimised Windows, macOS and Linux virtual machines:**
 
-<img src=".github/screenshot.png" alt="Quickemu Screenshot" />
-
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/>**
 
 We have a Discord for this project:
@@ -84,6 +82,10 @@ quickemu --vm nixos-unstable.conf
 
 -   Execute `quickget` (with no arguments) to see a list of all the
     supported operating systems.
+
+## Demo
+
+<div align="center"><a href="https://asciinema.org/a/658148?autoplay=1" target="_blank"><img src="https://asciinema.org/a/658148.svg" /></a></div>
 
 # Documentation
 
