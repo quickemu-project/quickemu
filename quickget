@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# SC2317: Command appears to be unreachable. Check usage (or ignore if invoked indirectly).
+#  - https://www.shellcheck.net/wiki/SC2317
+#  - Disable globally because many functions are called indirectly
+# shellcheck disable=SC2317
 export LC_ALL=C
 
-# shellcheck disable=SC2317
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
