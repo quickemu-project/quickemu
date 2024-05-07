@@ -1108,8 +1108,10 @@ function releases_ubuntu() {
     local SUPPORTED_VERSIONS=()
     local EOL_VERSIONS=()
     VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
-    SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<${VERSION_DATA} | sort))
-    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<${VERSION_DATA} | sort))
+    # shellcheck disable=SC2207
+    SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
+    # shellcheck disable=SC2207
+    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<"${VERSION_DATA}" | sort))
     case "${OS}" in
         ubuntu)
             echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
@@ -1127,6 +1129,7 @@ function releases_ubuntu() {
 
 function releases_ubuntu-server() {
     local ALL_VERSIONS=()
+    # shellcheck disable=SC2207
     ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
     echo daily-live "${ALL_VERSIONS[@]}"
 }
