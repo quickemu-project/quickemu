@@ -2171,18 +2171,26 @@ function get_manjaro() {
     local ISO=""
     local MANIFEST=""
     local URL=""
-    local TYPE=""
-    case ${RELEASE} in
-      sway) MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)";;
-      gnome|xfce|plasma) TYPE="official";;
-      *) TYPE="community";;
+    local TYPE="official"
+    MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    case "${RELEASE}" in
+      sway)
+        MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)"
+        TYPE="sway"
+        ;;
+      cinnamon|i3) TYPE="community";;
     esac
-    [[ ${RELEASE} != "sway" ]] && MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
-    [[ ${EDITION} == "minimal" && ${TYPE} != "sway" ]] && EDITION=".minimal" || EDITION=""
-    if [[ ${RELEASE} != "sway" ]]; then
-        URL="$(echo ${MANIFEST} | jq -r .${TYPE}.${RELEASE}${EDITION}.image)"
+
+    if [ "${EDITION}" == "minimal" ] && [ "${TYPE}" != "sway" ]; then
+        EDITION=".minimal"
     else
-        URL=$(echo ${MANIFEST} | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | select(.name|contains("unstable")|not) | .url')
+        EDITION=""
+    fi
+
+    if [ "${RELEASE}" == "sway" ]; then
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | .url')
+    else
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}.${RELEASE}${EDITION}".image)"
     fi
     HASH=$(web_pipe "${URL}.sha512" | cut_1)
     echo "${URL} ${HASH}"
