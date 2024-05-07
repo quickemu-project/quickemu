@@ -148,7 +148,9 @@ function error_specify_os() {
 
 function os_supported() {
     if [[ ! "$(os_support)" =~ ${OS} ]]; then
-        error_not_supported_os
+        echo -e "ERROR! ${OS} is not a supported OS.\n"
+        os_support | fold -s -w "$(tput cols)"
+        exit 1
     fi
 }
 
@@ -192,12 +194,6 @@ function error_specify_edition() {
 function error_specify_path() {
     echo 'ERROR! You must specify path.'
     error_specify_os
-    exit 1
-}
-
-function error_not_supported_os() {
-    echo -e "ERROR! ${OS} is not a supported OS.\n"
-    os_support | fold -s -w "$(tput cols)"
     exit 1
 }
 
