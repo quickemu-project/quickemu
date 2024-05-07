@@ -1487,9 +1487,12 @@ function parse_ports_from_file {
     local FILE="${VMDIR}/${VMNAME}.ports"
 
     # parse ports
-    local port_name=( $(cat "$FILE" | cut -d, -f1) )
-    local port_number=( $(cat "$FILE" | cut -d, -f2) )
-    local host_name=( $(cat "$FILE" | gawk 'FS="," {print $3,"."}') )
+    # shellcheck disable=SC2207
+    local port_name=( $(cat "${FILE}" | cut -d',' -f 1) )
+    # shellcheck disable=SC2207
+    local port_number=( $(cat "${FILE}" | cut -d',' -f 2) )
+    # shellcheck disable=SC2207
+    local host_name=( $(cat "${FILE}" | gawk 'FS="," {print $3,"."}') )
 
     for ((i=0; i<${#port_name[@]}; i++)); do
         if [ "${port_name[$i]}" == "ssh" ]; then
