@@ -446,7 +446,7 @@ function vm_boot() {
             echo "       Please install OVMF firmware."
             exit 1
         fi
-        if [ ! -z "${EFI_EXTRA_VARS}" ]; then
+        if [ -n "${EFI_EXTRA_VARS}" ]; then
             if [ ! -e "${EFI_EXTRA_VARS}" ]; then
                 echo " - EFI:      ERROR! EFI_EXTRA_VARS file ${EFI_EXTRA_VARS} does not exist."
                 exit 1
@@ -1694,7 +1694,7 @@ else
             shift
             shift;;
         -screenpct|--screenpct)
-            if [ ! -z "${2##*[!0-9]*}" ] ; then
+            if [ -n "${2##*[!0-9]*}" ] ; then
                 if [[ ${2} -ge 25 && ${2} -lt 100 ]] ; then
                     SCREENPCT=${2}
                 else
