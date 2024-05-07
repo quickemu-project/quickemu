@@ -3456,34 +3456,35 @@ if [ ! -e "${CURL}" ]; then
 fi
 CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
 
+#TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
 case "${1}" in
   -1*|-2*|-3*|-4*|-5*)
     show_os_info "${1}" "${2}"
     exit 0
     ;;
-  '--download'|'-d')
+  --download|-download)
     OPERATION="download"
     shift
     ;;
-  '--create-config'|'-cc')
+  --create-config|-create-config)
     OPERATION="config"
     shift
     create_config "${@}"
     ;;
-  '--open-homepage'|'-o')
+  --open-homepage|-open-homepage)
     shift
     open_homepage "${1}"
     ;;
-  '--version'|'-v')
+  --version|-version)
     WHERE=$(dirname "${BASH_SOURCE[0]}")
     "${WHERE}/quickemu" --version
     exit 0
     ;;
-  '--help'|'-h')
+  --help|-help|--h|-h)
     help_message
     exit 0
     ;;
-  '--url'|'-u')
+  --url|-url)
     OPERATION="show"
     shift
     if [ -z "${1}" ]; then
@@ -3496,7 +3497,7 @@ case "${1}" in
         exit 0
     fi
     ;;
-  '--check'|'-c')
+  --check|-check)
     OPERATION="test"
     shift
     if [ -z "${1}" ]; then
@@ -3508,17 +3509,9 @@ case "${1}" in
     fi
     exit 0
     ;;
-    #TODO: Argument without dashes should be DEPRECATED!
-  '--list-csv'|'-lc'|'list'|'list_csv'|'lc')
-    list_csv
-    ;;
-    #TODO: Argument without dashes should be DEPRECATED!
-  '--list-json'|'-lj'|'list_json')
-    list_json
-    ;;
-  '--list'|'-l')
-    list_supported
-    ;;
+  --list-csv|-list-csv|list|list_csv) list_csv;;
+  --list-json|-list-json|list_json) list_json;;
+  --list|-list) list_supported;;
   -*)
     error_not_supported_argument
     ;;
