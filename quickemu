@@ -996,7 +996,7 @@ function vm_boot() {
     # Only enable SPICE is using SPICE display
     if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
         # shellcheck disable=SC2054
-        args+=(-spice ${SPICE}
+        args+=(-spice "${SPICE}"
             -device virtio-serial-pci
             -chardev socket,id=agent0,path="${VMDIR}/${VMNAME}-agent.sock",server=on,wait=off
             -device virtserialport,chardev=agent0,name=org.qemu.guest_agent.0
@@ -1009,7 +1009,7 @@ function vm_boot() {
     # shellcheck disable=SC2054
     args+=(-device virtio-rng-pci,rng=rng0
         -object rng-random,id=rng0,filename=/dev/urandom
-        -device ${USB_HOST_PASSTHROUGH_CONTROLLER},id=spicepass
+        -device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
         -chardev spicevmc,id=usbredirchardev1,name=usbredir
         -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
         -chardev spicevmc,id=usbredirchardev2,name=usbredir
@@ -1063,7 +1063,7 @@ function vm_boot() {
     # @INFO: When using the VNC display, you must use the -k parameter to set the keyboard layout if you are not using en-us.
     [ -z "${KEYBOARD_LAYOUT}" ] && KEYBOARD_LAYOUT="$keyboard_layout"
     if [ -n "${KEYBOARD_LAYOUT}" ]; then
-        args+=(-k ${KEYBOARD_LAYOUT})
+        args+=(-k "${KEYBOARD_LAYOUT}")
     fi
 
     # FIXME: Check for device availability. qemu will fail to start otherwise
@@ -1259,7 +1259,7 @@ function vm_boot() {
         else
             MONITOR_TELNET_PORT="${TEMP_PORT}"
             # shellcheck disable=SC2054
-            args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
+            args+=(-monitor telnet:"${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT}",server,nowait)
             echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
             echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
         fi
@@ -1316,6 +1316,7 @@ function vm_boot() {
         EXTRA_ARGS="${extra_args}"
     fi
     if [ -n "${EXTRA_ARGS}" ]; then
+        # shellcheck disable=SC2206
         args+=(${EXTRA_ARGS})
     fi
 
