@@ -2018,7 +2018,7 @@ function generate_id() {
     local macRecoveryID=""
     local TYPE="${1}"
     local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
-    for ((i=0; i<$TYPE; i++)); do
+    for ((i=0; i<TYPE; i++)); do
         macRecoveryID+="${valid_chars[$((RANDOM % 16))]}"
     done
     echo "${macRecoveryID}"
