@@ -237,6 +237,7 @@ function vm_boot() {
     local OSK=""
     local SOUND=""
     local SMM="${SMM:-off}"
+    local TEMP_PORT=""
     local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
     local VGA=""
     local VIDEO=""
@@ -1252,11 +1253,11 @@ function vm_boot() {
         echo " - Monitor:  (off)"
     elif [ "${MONITOR}" == "telnet" ]; then
         # Find a free port to expose monitor-telnet to the guest
-        local temp_port="$(get_port ${MONITOR_TELNET_PORT} 9)"
-        if [ -z "${temp_port}" ]; then
+        TEMP_PORT="$(get_port ${MONITOR_TELNET_PORT} 9)"
+        if [ -z "${TEMP_PORT}" ]; then
             echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
         else
-            MONITOR_TELNET_PORT="${temp_port}"
+            MONITOR_TELNET_PORT="${TEMP_PORT}"
             # shellcheck disable=SC2054
             args+=(-monitor telnet:${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT},server,nowait)
             echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
@@ -1291,11 +1292,11 @@ function vm_boot() {
         args+=(-serial none)
     elif [ "${SERIAL}" == "telnet" ]; then
         # Find a free port to expose serial-telnet to the guest
-        local temp_port="$(get_port ${SERIAL_TELNET_PORT} 9)"
-        if [ -z "${temp_port}" ]; then
+        TEMP_PORT="$(get_port ${SERIAL_TELNET_PORT} 9)"
+        if [ -z "${TEMP_PORT}" ]; then
             echo " - Serial:   All Serial-Telnet ports have been exhausted."
         else
-            SERIAL_TELNET_PORT="${temp_port}"
+            SERIAL_TELNET_PORT="${TEMP_PORT}"
             # shellcheck disable=SC2054,SC2206
             args+=(-serial telnet:${SERIAL_TELNET_HOST}:${SERIAL_TELNET_PORT},server,nowait)
             echo " - Serial:   On host:  telnet ${SERIAL_TELNET_HOST} ${SERIAL_TELNET_PORT}"
