@@ -59,7 +59,7 @@ function os_info() {
       gnomeos)          INFO="GNOME OS|Independent|-|https://os.gnome.org/|Alpha nightly bleeding edge distro of GNOME";;
       guix)             INFO="Guix|Independent|-|https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
       haiku)            INFO="Haiku|Independent|-|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
-      holoiso)          INFO="SteamOS HoloISO|Arch,SteamOS|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
+      holoiso)          INFO="HoloISO|Arch,SteamOS|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
       kali)             INFO="Kali|Debian|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
       kdeneon)          INFO="KDE Neon|Debian,Ubuntu|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
       kolibrios)        INFO="KolibriOS|Independent|-|http://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
