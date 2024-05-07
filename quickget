@@ -115,7 +115,6 @@ function os_info() {
       vanillaos)        INFO="Vanilla OS|Debian,Ubuntu|-|https://vanillaos.org/|Designed to be a reliable and productive operating system for your daily work.";;
       void)             INFO="Void Linux|Independent|anon:voidlinux|https://voidlinux.org/|General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources.";;
       vxlinux)          INFO="VX Linux|Void|-|https://vxlinux.org/|Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux.";;
-      whonix)           INFO="Whonix|Debian|-|https://www.whonix.org/|Superior Internet Privacy with Whonix™ As handy as an app - delivering maximum anonymity and security.";;
       windows)          INFO="Windows|proprietary|-|https://www.microsoft.com/en-us/windows/|Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done.";;
       windows-server)   INFO="Windows Server|proprietary|-|https://www.microsoft.com/en-us/windows-server/|Platform for building an infrastructure of connected applications, networks, and web services.";;
       xubuntu)          INFO="Xubuntu|Ubuntu|-|https://xubuntu.org/|Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment.";;
