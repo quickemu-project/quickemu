@@ -124,7 +124,7 @@ function os_info() {
 function show_os_info() {
      while getopts ":12345" opt; do
         case $opt in
-          1|2|3|4|5) os_info "${2}" | cut -d'|' -f${opt};;
+          1|2|3|4|5) os_info "${2}" | cut -d'|' -f "${opt}";;
           *) error_not_supported_argument;;
         esac
     done
