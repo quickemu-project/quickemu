@@ -3532,7 +3532,8 @@ if [ -n "${2}" ]; then
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
-        EDITIONS=($(editions_${OS}))
+        EDITIONS=("$(editions_${OS})")
+        # Default to the first edition if none is specified.
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
