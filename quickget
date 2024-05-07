@@ -139,8 +139,8 @@ function os_homepage() {
 }
 
 function error_specify_os() {
-    echo 'ERROR! You must specify an operating system.'
-    echo '- Supported Operating Systems:'
+    echo "ERROR! You must specify an operating system."
+    echo "- Supported Operating Systems:"
     os_support | fold -s -w "$(tput cols)"
     echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
@@ -155,7 +155,7 @@ function os_supported() {
 }
 
 function error_specify_release() {
-    echo 'ERROR! You must specify a release.'
+    echo "ERROR! You must specify a release."
     case ${OS} in
       *ubuntu-server*)
         echo -n ' - Releases: '
@@ -192,7 +192,7 @@ function error_specify_edition() {
 
 #TODO: Not yet used!
 function error_specify_path() {
-    echo 'ERROR! You must specify path.'
+    echo "ERROR! You must specify path."
     error_specify_os
     exit 1
 }
@@ -426,7 +426,7 @@ function test_all() {
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
-                    CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                    CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
                 fi
             done
@@ -455,7 +455,7 @@ function test_all() {
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
-                CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+                CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
             fi
         fi
@@ -1253,7 +1253,7 @@ function web_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
@@ -1317,7 +1317,7 @@ function zsync_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        CHECK=$(web_check "${URL}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif command -v zsync &>/dev/null; then
@@ -2081,7 +2081,7 @@ function get_macos() {
         if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
             exit 1
         fi
-        echo 'Skipping verification' && skipVerification="true"
+        echo "Skipping verification" && skipVerification="true"
     fi
 
     OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
@@ -2107,7 +2107,7 @@ function get_macos() {
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
-        CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo 'PASS' || echo 'FAIL')
+        CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
