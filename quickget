@@ -40,7 +40,7 @@ function os_info() {
       cachyos)          INFO="CachyOS|Arch|-|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
       centos-stream)    INFO="CentOS Stream|Fedora,RedHat|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
       chimeralinux)     INFO="Chimera Linux|Independent|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
-      crunchbang++)     INFO="#!++|Debian|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
+      crunchbang++)     INFO="Crunchbangplusplus|Debian|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
       debian)           INFO="Debian|Independent|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
       deepin)           INFO="Deepin|Debian|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
       devuan)           INFO="Devuan|Debian|-|https://www.devuan.org/|Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.";;
