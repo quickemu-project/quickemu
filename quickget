@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 export LC_ALL=C
 
+# shellcheck disable=SC2317
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
