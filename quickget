@@ -3521,10 +3521,11 @@ case "${1}" in
         for OS in $(os_support); do
             (test_all "${OS}")
         done
+        exit 0
     elif [ -z "${2}" ]; then
         test_all "${1}"
+        exit 0
     fi
-    exit 0
     ;;
   --list-csv|-list-csv|list|list_csv) list_csv;;
   --list-json|-list-json|list_json) list_json;;
