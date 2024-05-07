@@ -3416,22 +3416,22 @@ Usage:
   quickget ubuntu 22.04
 
 Advanced usage:
-  quickget <arg> [path] <os> [re] [ed]
+  quickget <arg> [path] <os> [release] [edition]
   quickget --download ubuntu 22.04
 
 Arguments:
-  -[12345]              <os>           : Show info* about OS
-  --download       (-d) <os> <re> [ed] : Download image; no VM configuration
-  --create-config (-cc) <os> [path/url]: Create default VM config for image
-  --open-homepage  (-o) <os>           : Open homepage for the OS
-  --version        (-v)                : Show version
-  --help           (-h)                : Show this help message
+  -[12345]        <os>                     : Show info* about OS
+  --download      <os> <release> [edition] : Download image; no VM configuration
+  --create-config <os> [path/url]          : Create VM config for a OS image
+  --open-homepage <os>                     : Open homepage for the OS
+  --version                                : Show version
+  --help                                   : Show this help message
 -------------------------- For testing & development ---------------------------
-  --url            (-u) [os] [re] [ed] : Show image URL(s)
-  --check          (-c) [os] [re] [ed] : Check image URL(s)
-  --list           (-l)                : List all supported systems
-  --list-csv      (-lc)                : List everything in csv format
-  --list-json     (-lj)                : List everything in json format
+  --url           [os] [release] [edition] : Show image URL(s)
+  --check         [os] [release] [edition] : Check image URL(s)
+  --list                                   : List all supported systems
+  --list-csv                               : List everything in csv format
+  --list-json                              : List everything in json format
 --------------------------------------------------------------------------------
  *info: 1=Logo 2=Based of 3=Credentials 4=Homepage 5=Short info
         Can be used in any combination like -13254 or -52
