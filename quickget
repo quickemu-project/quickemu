@@ -3349,8 +3349,8 @@ function open_homepage() {
         error_specify_os
     else
         URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        # shellcheck disable=SC2034
         XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
-        unset XDG_OPEN
         exit 0
     fi
 }
