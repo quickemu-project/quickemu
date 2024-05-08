@@ -2104,7 +2104,7 @@ function get_macos() {
                            -A "InternetRecovery/1.0" \
                            -b "session=\"${appleSession}\"" \
                            -H "Content-Type: text/plain" \
-                           -d $'cid='$(generate_id 16)$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='$(generate_id 64)$'\nfg='$(generate_id 64)$'\nos='${OS_TYPE} \
+                           -d $'cid='"$(generate_id 16)"$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='"$(generate_id 64)"$'\nfg='"$(generate_id 64)"$'\nos='${OS_TYPE} \
                            http://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
     downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
     downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
