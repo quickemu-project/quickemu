@@ -526,6 +526,7 @@ function vm_boot() {
     macos)
         # https://www.nicksherlock.com/2020/04/installing-macos-catalina-on-proxmox-with-opencore/
         # https://www.nicksherlock.com/2022/10/installing-macos-13-ventura-on-proxmox/
+        # noTSX stops cpuid errors https://duckduckgo.com/?t=ffab&q=CPUID.07H%3AEBX.rtm+%5Bbit+11%5D&ia=web also cited by NickSherlock for Ventura install
         # Penryn  https://github.com/search?q=repo%3Akholia%2FOSX-KVM%20%20GenuineIntel&type=code
         # https://en.wikipedia.org/wiki/MacOS_version_history#Releases
         # quickget current list: high-sierra mojave catalina big-sur monterey ventura sonoma
@@ -535,8 +536,7 @@ function vm_boot() {
         case ${macos_release} in
         ventura|sonoma)
             if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                # noTSX stops cpuid errors https://duckduckgo.com/?t=ffab&q=CPUID.07H%3AEBX.rtm+%5Bbit+11%5D&ia=web also cited by NickSherlock for Ventura install
-                CPU="-cpu Haswell-noTSX-IBRS,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc"
+                CPU="-cpu Haswell-v4,kvm=on,vendor=GenuineIntel,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
             else
                 echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
                 exit 1
@@ -544,9 +544,7 @@ function vm_boot() {
             ;;
         catalina|big-sur|monterey)
             if check_cpu_flag sse4_2; then
-                # Used in past versions: +movbe,+smep,+xgetbv1,+xsavec,+avx2
-                # Warn on AMD:           +fma4,+pcid
-                CPU="-cpu Haswell-noTSX-IBRS,kvm=on,vendor=GenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc"
+                CPU="-cpu Haswell-v4,kvm=on,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
             else
                 echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                 exit 1
@@ -554,14 +552,26 @@ function vm_boot() {
             ;;
         *)
             if check_cpu_flag sse4_1; then
-                # as above but 4.1 (for older hosts)
-                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+aes,+avx,+bmi1,+bmi2,+fma,+hypervisor,+invtsc,+kvm_pv_eoi,+kvm_pv_unhalt,+popcnt,+ssse3,+sse4.1,vmware-cpuid-freq=on,+xsave,+xsaveopt,check"
+                CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
             else
                 echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
                 exit 1
             fi
             ;;
         esac
+
+        # https://www.techpowerup.com/cpu-specs/xeon-w-2140b.c2953  8 cores 16 threads # skylake server
+        # https://en.wikipedia.org/wiki/IMac_Pro#Technical_specifications Orig: High Sierra  Max: Sonoma
+        # https://en.wikipedia.org/wiki/MacOS#Hardware_compatibility needs 8GB RAM
+        # https://qemu.readthedocs.io/en/v9.0.0/system/qemu-cpu-models.html#important-cpu-features-for-amd-x86-hosts
+        # https://www.reddit.com/r/hackintosh/comments/141wnjk/state_of_macos_14_sonoma_on_x86/
+        for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist ept f16c fma invtsc \
+                    mmx movbe mpx pdpe1gb smep vaes vbmi2 vpclmulqdq \
+                    xgetbv1 xsave xsaveopt; do
+            if check_cpu_flag "${FLAG}"; then
+                CPU+=",+${FLAG}"
+            fi
+        done
 
         OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
         # Disable S3 support in the VM to prevent macOS suspending during install
