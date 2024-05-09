@@ -271,6 +271,11 @@ jq
 .UE \c
 .IP \[bu] 2
 \c
+.UR https://github.com/pciutils/pciutils
+pciutils
+.UE \c
+.IP \[bu] 2
+\c
 .UR https://gitlab.com/procps-ng/procps
 procps
 .UE \c
@@ -361,12 +366,12 @@ These examples may save a little typing:
 This also applies to derivatives:
 .IP
 .EX
-sudo apt install qemu bash coreutils curl ovmf grep jq procps python3 genisoimage usbutils util\-linux sed socat spice\-client\-gtk libtss2\-tcti\-swtpm0 xdg\-user\-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq pciutils procps python3 genisoimage usbutils util\-linux sed socat spice\-client\-gtk libtss2\-tcti\-swtpm0 xdg\-user\-dirs zsync unzip
 .EE
 .SS Install requirements on Fedora hosts
 .IP
 .EX
-sudo dnf install qemu bash coreutils curl edk2\-tools grep jq procps python3 genisoimage usbutils util\-linux sed socat spice\-gtk\-tools swtpm xdg\-user\-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2\-tools grep jq pciutils procps python3 genisoimage usbutils util\-linux sed socat spice\-gtk\-tools swtpm xdg\-user\-dirs xrandr unzip
 .EE
 .SS Install requirements on macOS hosts
 This is a \f[B]work in progress\f[R] (see \c
@@ -376,7 +381,7 @@ issue 248
 \ for other steps and changes that may enable running on MacOS)
 .IP
 .EX
-brew install qemu bash coreutils curl grep jq python\[at]3.10 cdrtools gnu\-sed spice\-gtk zsync
+brew install qemu bash coreutils curl grep jq pciutils python\[at]3.10 cdrtools gnu\-sed spice\-gtk zsync
 .EE
 .SS \c
 .UR https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends
@@ -690,8 +695,6 @@ wiki
 \f[CR]slackware\f[R] (Slackware)
 .IP \[bu] 2
 \f[CR]slax\f[R] (Slax)
-.IP \[bu] 2
-\f[CR]slint\f[R] (Slint)
 .IP \[bu] 2
 \f[CR]slitaz\f[R] (SliTaz)
 .IP \[bu] 2

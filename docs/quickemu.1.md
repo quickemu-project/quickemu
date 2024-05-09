@@ -206,6 +206,7 @@ requirements manually:
 -   [EDK II](https://github.com/tianocore/edk2)
 -   [grep](https://www.gnu.org/software/grep/)
 -   [jq](https://stedolan.github.io/jq/)
+-   [pciutils](https://github.com/pciutils/pciutils)
 -   [procps](https://gitlab.com/procps-ng/procps)
 -   [python3](https://www.python.org/)
 -   [chunkcheck](https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7)
@@ -236,13 +237,13 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` shell
-sudo apt install qemu bash coreutils curl ovmf grep jq procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils curl ovmf grep jq pciutils procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install qemu bash coreutils curl edk2-tools grep jq procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils curl edk2-tools grep jq pciutils procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
 ```
 
 #### Install requirements on macOS hosts
@@ -252,7 +253,7 @@ This is a **work in progress** (see [issue
 steps and changes that may enable running on MacOS)
 
 ``` shell
-brew install qemu bash coreutils curl grep jq python@3.10 cdrtools gnu-sed spice-gtk zsync
+brew install qemu bash coreutils curl grep jq pciutils python@3.10 cdrtools gnu-sed spice-gtk zsync
 ```
 
 ## [Alternative Frontends](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
@@ -454,7 +455,6 @@ Further information is available from the project
 -   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `slax` (Slax)
--   `slint` (Slint)
 -   `slitaz` (SliTaz)
 -   `solus` (Solus)
 -   `sparkylinux` (SparkyLinux)

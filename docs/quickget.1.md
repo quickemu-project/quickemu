@@ -209,7 +209,6 @@ Further information is available from the project
 -   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `slax` (Slax)
--   `slint` (Slint)
 -   `slitaz` (SliTaz)
 -   `solus` (Solus)
 -   `sparkylinux` (SparkyLinux)
