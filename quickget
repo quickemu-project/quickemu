@@ -119,11 +119,11 @@ function os_info() {
 }
 
 function show_os_info() {
+    echo
     echo -e "$(os_info "${1}" | cut -d'|' -f 1)"
     echo -e " - Credentials:\t$(os_info "${1}" | cut -d'|' -f 2)"
     echo -e " - Website:\t$(os_info "${1}" | cut -d'|' -f 3)"
     echo -e " - Description:\t$(os_info "${1}" | cut -d'|' -f 4)"
-    echo
 }
 
 function pretty_name() {
@@ -152,45 +152,40 @@ function os_supported() {
 }
 
 function error_specify_release() {
-    echo "ERROR! You must specify a release."
+    show_os_info "${OS}"
     case ${OS} in
         *ubuntu-server*)
-            echo -n ' - Releases: '
+            echo -en " - Releases:\t"
             releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
             ;;
         *ubuntu*)
-            echo -n ' - Releases: '
+            echo -en " - Releases:\t"
             releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
             ;;
         *windows*)
-            echo -n ' - Releases: '
+            echo -en " - Releases:\t"
             "releases_${OS}"
-            echo -n ' - Languages: '
-            "languages_${OS}" && echo "${LANGS[@]}"
+            echo -en " - Languages:\t"
+            "languages_${OS}"
+            echo "${LANGS[@]}"
             ;;
         *)
-            echo -n ' - Releases: '
+            echo -en " - Releases:\t"
             "releases_${OS}" | fold -s -w "$(tput cols)"
             if [[ $(type -t "editions_${OS}") == function ]]; then
-                echo -n ' - Editions: '
+                echo -en " - Editions:\t"
                 "editions_${OS}" | fold -s -w "$(tput cols)"
             fi
             ;;
     esac
+    echo -e "\nERROR! You must specify a release."
     exit 1
 }
 
 function error_specify_edition() {
-    echo -en "ERROR! You must specify an edition.\n - Editions: "
-    #TODO ERROR here
-    "editions_${OS}"
-    exit 1
-}
-
-#TODO: Not yet used!
-function error_specify_path() {
-    echo "ERROR! You must specify path."
-    error_specify_os
+    show_os_info "${OS}"
+    echo -e " - Editions:\t$("editions_${OS}" | fold -s -w "$(tput cols)")"
+    echo -e "\nERROR! You must specify an edition."
     exit 1
 }
 
@@ -3418,7 +3413,7 @@ Arguments:
   --download      <os> <release> [edition] : Download image; no VM configuration
   --create-config <os> [path/url]          : Create VM config for a OS image
   --open-homepage <os>                     : Open homepage for the OS
-  --show          [os]                     : Show one, or all, OS information
+  --show          [os]                     : Show OS information
   --version                                : Show version
   --help                                   : Show this help message
 -------------------------- For testing & development ---------------------------
