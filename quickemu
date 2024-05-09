@@ -419,7 +419,8 @@ function vm_boot() {
             _IFS=$IFS
             IFS=","
             for f in "${ovmfs[@]}"; do
-                set -- "${f}";
+                # shellcheck disable=SC2086
+                set -- ${f};
                 if [ -e "${1}" ]; then
                     EFI_CODE="${1}"
                     EFI_EXTRA_VARS="${2}"
