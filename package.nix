@@ -10,6 +10,7 @@
 , gnused
 , jq
 , ncurses
+, pciutils
 , procps
 , python3
 , qemu
@@ -33,6 +34,7 @@ let
     gnused
     jq
     ncurses
+    pciutils
     procps
     python3
     qemu

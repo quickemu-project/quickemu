@@ -17,6 +17,7 @@ Depends:
  curl,
  genisoimage,
  jq,
+ pciutils
  procps,
  python3-minimal,
  qemu-system (>= 6.0),
