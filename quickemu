@@ -421,7 +421,7 @@ function vm_boot() {
             _IFS=$IFS
             IFS=","
             for f in "${ovmfs[@]}"; do
-                set -- $f;
+                set -- "${f}";
                 if [ -e "${1}" ]; then
                     EFI_CODE="${1}"
                     EFI_EXTRA_VARS="${2}"
@@ -1241,7 +1241,7 @@ function vm_boot() {
         echo " - Monitor:  (off)"
     elif [ "${MONITOR}" == "telnet" ]; then
         # Find a free port to expose monitor-telnet to the guest
-        TEMP_PORT="$(get_port ${MONITOR_TELNET_PORT} 9)"
+        TEMP_PORT="$(get_port "${MONITOR_TELNET_PORT}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
             echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
         else
@@ -1280,7 +1280,7 @@ function vm_boot() {
         args+=(-serial none)
     elif [ "${SERIAL}" == "telnet" ]; then
         # Find a free port to expose serial-telnet to the guest
-        TEMP_PORT="$(get_port ${SERIAL_TELNET_PORT} 9)"
+        TEMP_PORT="$(get_port "${SERIAL_TELNET_PORT}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
             echo " - Serial:   All Serial-Telnet ports have been exhausted."
         else
