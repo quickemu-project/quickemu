@@ -35,25 +35,6 @@ jobs:
           name: supported
           path: results/supported.txt
 
-  list-all-info:
-    name: "List all OS info ℹ️"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Show info about all OS
-        run: |
-          export TERM=xterm-256color
-          mkdir -p results
-          for os in $(./quickget | sed '/^$/q' | tail -n +3); do
-            ./quickget -12345 "${os}" | tee -a results/infos.txt
-          done
-          echo -e "\nResults:"
-          echo -e "- OS Info URLs: $(grep -c http results/infos.txt)"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: infos
-          path: results/infos.txt
-
   list-all-urls:
     needs: [list-all-supported]
     name: "List all URLs 🔗"
@@ -109,7 +90,7 @@ jobs:
           path: results/failed.txt
 
   upload-artifacts:
-    needs: [list-all-info, list-all-urls, check-all-urls]
+    needs: [list-all-urls, check-all-urls]
     name: "Uploading artifacts"
     runs-on: ubuntu-22.04
     steps:
