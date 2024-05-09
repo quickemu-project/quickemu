@@ -262,8 +262,7 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
-`ventura` and `sonoma` are supported.
+macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and `sonoma` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**

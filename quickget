@@ -865,7 +865,7 @@ function releases_lmde() {
 }
 
 function releases_macos() {
-    echo high-sierra mojave catalina big-sur monterey ventura sonoma
+    echo mojave catalina big-sur monterey ventura sonoma
 }
 
 function releases_mageia() {
