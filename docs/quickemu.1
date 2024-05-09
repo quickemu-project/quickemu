@@ -147,18 +147,26 @@ Launches the VM specified in the file \f[I]ubuntu\-mate\-22.04.conf\f[R]
 .UR https://www.qemu.org/
 QEMU
 .UE \c
-\ that attempts to automatically \f[I]\[lq]do the right thing\[rq]\f[R],
-rather than expose exhaustive configuration options.
-You decide what operating system you want to run, and Quickemu will
-figure out the best way to do it for you.
+\ that automatically \f[I]\[lq]does the right thing\[rq]\f[R] when
+creating virtual machines.
+No requirement for exhaustive configuration options.
+You decide what operating system you want to run and Quickemu takes care
+of the rest 🤖
+.IP \[bu] 2
+\f[CR]quickget\f[R] \f[B]automatically downloads the upstream OS\f[R]
+and creates the configuration 📀
+.IP \[bu] 2
+\f[CR]quickemu\f[R] enumerates your hardware and launches the virtual
+machine with the \f[B]optimum configuration best suited to your
+computer\f[R] ⚡️
 .PP
 The original objective of the project was to \c
 .UR https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines
 enable quick testing of Linux distributions
 .UE \c
-\ where the virtual machine configurations can be stored anywhere (such
-as external USB storage or your home directory) and no elevated
-permissions are required to run the virtual machines.
+\ where the virtual machines and their configuration can be stored
+anywhere (such as external USB storage or your home directory) and no
+elevated permissions are required to run the virtual machines.
 .PP
 \f[B]Today, Quickemu includes comprehensive support for \c
 .UR https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines
@@ -175,6 +183,8 @@ FreeDOS, Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 \f[B]macOS\f[R] Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
 .IP \[bu] 2
 \f[B]Windows\f[R] 10 and 11 including TPM 2.0
+.IP \[bu] 2
+\f[B]Windows Server\f[R] 2022 2019 2016 2012\-r2
 .IP \[bu] 2
 \c
 .UR https://ubuntu.com/desktop
@@ -218,8 +228,6 @@ Full duplex audio
 Braille support
 .IP \[bu] 2
 EFI (with or without SecureBoot) and Legacy BIOS boot
-.IP \[bu] 2
-Graphical user interfaces available
 .PP
 When installing from source, you will need to install the following
 requirements manually:

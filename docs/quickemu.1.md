@@ -147,17 +147,22 @@ You can also pass optional parameters
 # Introduction
 
 **Quickemu** is a wrapper for the excellent
-[QEMU](https://www.qemu.org/) that attempts to automatically *"do the
-right thing"*, rather than expose exhaustive configuration options. You
-decide what operating system you want to run, and Quickemu will figure
-out the best way to do it for you.
+[QEMU](https://www.qemu.org/) that automatically *"does the right
+thing"* when creating virtual machines. No requirement for exhaustive
+configuration options. You decide what operating system you want to run
+and Quickemu takes care of the rest 🤖
+
+-   `quickget` **automatically downloads the upstream OS** and creates
+    the configuration 📀
+-   `quickemu` enumerates your hardware and launches the virtual machine
+    with the **optimum configuration best suited to your computer** ⚡️
 
 The original objective of the project was to [enable quick testing of
 Linux
 distributions](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
-where the virtual machine configurations can be stored anywhere (such as
-external USB storage or your home directory) and no elevated permissions
-are required to run the virtual machines.
+where the virtual machines and their configuration can be stored
+anywhere (such as external USB storage or your home directory) and no
+elevated permissions are required to run the virtual machines.
 
 **Today, Quickemu includes comprehensive support for
 [macOS](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines),
@@ -169,6 +174,7 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 
 -   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
 -   **Windows** 10 and 11 including TPM 2.0
+-   **Windows Server** 2022 2019 2016 2012-r2
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
 -   **Nearly 1000 operating system editions are supported!**
@@ -188,7 +194,6 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 -   Full duplex audio
 -   Braille support
 -   EFI (with or without SecureBoot) and Legacy BIOS boot
--   Graphical user interfaces available
 
 When installing from source, you will need to install the following
 requirements manually:
