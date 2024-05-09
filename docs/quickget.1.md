@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 5, 2024
+date: May 9, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -106,17 +106,17 @@ may have further information.
 You can also use `quickget` with advanced options :
 
 ``` text
-  -[12345]              <os>           : Show info* about OS
-  --download       (-d) <os> <re> [ed] : Download image; no VM configuration
-  --create-config (-cc) <os> [path/url]: Create default VM config for image
-  --open-homepage  (-o) <os>           : Open homepage for the OS
-  --version        (-v)                : Show version
-  --help           (-h)                : Show this help message
-  --url            (-u) [os] [re] [ed] : Show image URL(s)
-  --check          (-c) [os] [re] [ed] : Check image URL(s)
-  --list           (-l)                : List all supported systems
-  --list-csv      (-lc)                : List everything in csv format
-  --list-json     (-lj)                : List everything in json format
+  --download      <os> <release> [edition] : Download image; no VM configuration
+  --create-config <os> [path/url]          : Create VM config for a OS image
+  --open-homepage <os>                     : Open homepage for the OS
+  --show          [os]                     : Show OS information
+  --version                                : Show version
+  --help                                   : Show this help message
+  --url           [os] [release] [edition] : Show image URL(s)
+  --check         [os] [release] [edition] : Check image URL(s)
+  --list                                   : List all supported systems
+  --list-csv                               : List everything in csv format
+  --list-json                              : List everything in json format
 ```
 
 Here are some typical uses
@@ -142,7 +142,7 @@ Further information is available from the project
 
 `quickget` also supports:
 
--   `alma` (Alma Linux)
+-   `alma` (AlmaLinux)
 -   `alpine` (Alpine Linux)
 -   `android` (Android x86)
 -   `antix` (Antix)
@@ -160,7 +160,7 @@ Further information is available from the project
 -   `cachyos` (CachyOS)
 -   `centos-stream` (CentOS Stream)
 -   `chimeralinux` (Chimera Linux)
--   `crunchbang++` (#!++)
+-   `crunchbang++` (Crunchbangplusplus)
 -   `debian` (Debian)
 -   `deepin` (Deepin)
 -   `devuan` (Devuan)
@@ -178,7 +178,7 @@ Further information is available from the project
 -   `gnomeos` (GNOME OS)
 -   `guix` (Guix)
 -   `haiku` (Haiku)
--   `holoiso` (SteamOS HoloISO)
+-   `holoiso` (HoloISO)
 -   `kali` (Kali)
 -   `kdeneon` (KDE Neon)
 -   `kolibrios` (KolibriOS)
@@ -216,7 +216,7 @@ Further information is available from the project
 -   `spirallinux` (SpiralLinux)
 -   `tails` (Tails)
 -   `tinycore` (Tiny Core Linux)
--   `trisquel` (Trisquel)
+-   `trisquel` (Trisquel-)
 -   `truenas-core` (TrueNAS Core)
 -   `truenas-scale` (TrueNAS Scale)
 -   `tuxedo-os` (Tuxedo OS)
@@ -262,7 +262,8 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and `sonoma` are supported.
+macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and
+`sonoma` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**
