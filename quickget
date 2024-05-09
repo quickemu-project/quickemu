@@ -2635,7 +2635,7 @@ function get_vanillaos() {
     local HASH_URL=""
     local ISO=""
     ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
-    HASH_URL=$(echo "${ISO}" | sed s'|\.iso|\.sha256\.txt|g')
+    HASH_URL="${ISO//.iso/.sha256.txt}"
     HASH=$(web_pipe "${HASH_URL}" | cut_1)
     echo "${ISO} ${HASH}"
 }
