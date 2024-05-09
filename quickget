@@ -2080,14 +2080,6 @@ function get_macos() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
-    if [ -z "${CHUNKCHECK}" ]; then
-        read -p "ERROR! Can not find chunkcheck. Will not be able to verify image. Proceed anyway?" skipVerification
-        if [ "${skipVerification,,}" != "y" ] && [ "${skipVerification,,}" != "yes" ]; then
-            exit 1
-        fi
-        echo "Skipping verification" && skipVerification="true"
-    fi
-
     OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
     OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
     OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
@@ -2134,14 +2126,10 @@ function get_macos() {
         fi
     fi
 
-    if [ "${skipVerification}" != "true" ]; then
-        if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
-            echo "Verification failed."
-        else
-            echo "Verified macOS ${RELEASE} image using chunklist."
-        fi
+    if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+        echo "Verification failed."
     else
-        echo "Skipping verification of image."
+        echo "Verified macOS ${RELEASE} image using chunklist."
     fi
 
     if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
