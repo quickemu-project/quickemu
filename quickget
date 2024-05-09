@@ -3292,7 +3292,7 @@ function download_windows_workstation() {
 
 function get_windows() {
     if [ "${RELEASE}" == "10-ltsc" ]; then
-        download_windows_workstation windows-10-enterprise ltsc
+        download_windows_server windows-10-enterprise ltsc
     elif [ "${OS}" == "windows-server" ]; then
         download_windows_server "windows-server-${RELEASE}"
     else
