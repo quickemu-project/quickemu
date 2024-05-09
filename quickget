@@ -1077,7 +1077,7 @@ function editions_trisquel() {
 }
 
 function releases_truenas() {
-    if [[ $OS == truenas ]] ; then
+    if [[ ${OS} == truenas ]] ; then
         echo "ERROR! The supported TrueNAS OS values are truenas-core or truenas-scale"
         exit 1;
     fi
@@ -2253,7 +2253,7 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
-    elif [ "$RELEASE" == 15.0 ] || [ "$RELEASE" == 15.1 ]; then
+    elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
     else
@@ -3082,13 +3082,13 @@ function download_windows_server() {
     local COUNTRY=""
     local PRETTY_RELEASE=""
 
-    case "$RELEASE" in
+    case "${RELEASE}" in
         "10-ltsc") PRETTY_RELEASE="10 LTSC";;
         "2012-r2") PRETTY_RELEASE="2012 R2";;
-        *) PRETTY_RELEASE="$RELEASE";;
+        *) PRETTY_RELEASE="${RELEASE}";;
     esac
 
-    case "$LANG" in
+    case "${LANG}" in
         "English (Great Britain)")
             CULTURE="en-gb"
             COUNTRY="GB";;
@@ -3127,7 +3127,7 @@ function download_windows_server() {
             COUNTRY="US";;
     esac
 
-    iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=$CULTURE&country=$COUNTRY")" || {
+    iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=${CULTURE}&country=${COUNTRY}")" || {
         # This should only happen if there's been some change to the download endpoint web address
         echo "- Windows server download page gave us no download link"
         return 1
