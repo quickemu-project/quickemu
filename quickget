@@ -1001,7 +1001,8 @@ function releases_siduction() {
 }
 
 function editions_siduction() {
-    echo kde lxqt nox xfce xorg
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/Standing_on_the_Shoulders_of_Giants/" | grep folder | cut -d'"' -f8 | tr -d '/' | sort -u)
 }
 
 function releases_slackware() {
