@@ -2531,7 +2531,7 @@ function get_truenas-scale() {
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-scale/"
-    URL=$(web_pipe ${DLINFO} | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
     HASH=$(web_pipe "${URL}.sha256" | cut_1)
     echo "${URL} ${HASH}"
 }
@@ -2540,7 +2540,7 @@ function get_truenas-core() {
     local ISO=""
     local URL=""
     local DLINFO="https://www.truenas.com/download-truenas-core/"
-    URL=$(web_pipe ${DLINFO} | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
     HASH=$(web_pipe "${URL}".sha256 | cut_1)
     echo "${URL} ${HASH}"
 }
@@ -2572,12 +2572,12 @@ function get_ubuntu-server() {
 
     if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     else
         DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
-        ISO=$(cut -d' ' -f3 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d' ' -f3 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
@@ -2618,15 +2618,15 @@ function get_ubuntu() {
     fi
     if web_check "${URL}/SHA256SUMS"; then
         DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA} | sed '1q;d')
-        HASH=$(cut_1 <<<${DATA} | sed '1q;d')
+        ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
+        HASH=$(cut_1 <<<"${DATA}" | sed '1q;d')
     else
         DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
-        ISO=$(cut -d'*' -f2 <<<${DATA})
-        HASH=$(cut_1 <<<${DATA})
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut_1 <<<"${DATA}")
     fi
     if [ -z "${ISO}" ] || [ -z "${HASH}" ]; then
-        echo "$(pretty_name $OS) ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        echo "$(pretty_name "${OS}") ${RELEASE} is currently unavailable. Please select other OS/Release combination"
         exit 1
     fi
     if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
@@ -3539,7 +3539,7 @@ if [ -n "${2}" ]; then
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
-        EDITIONS=("$(editions_${OS})")
+        EDITIONS=("$(editions_"${OS}")")
         # Default to the first edition if none is specified.
         EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
