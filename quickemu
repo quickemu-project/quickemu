@@ -1647,7 +1647,6 @@ fi
 # Take command line arguments
 if [ $# -lt 1 ]; then
     usage
-    exit 0
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
@@ -1687,12 +1686,10 @@ else
                     else
                         echo "screenpct invalid must be 25 <= pct < 100"
                         usage
-                        exit 1
                     fi
                 else
                     echo "screenpct needs to be an integer in range 25 <= pct < 100"
                     usage
-                    exit 1
                 fi
                 shift
                 shift;;
