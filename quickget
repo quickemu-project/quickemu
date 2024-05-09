@@ -3395,13 +3395,15 @@ function create_vm() {
             fi;;
         freedos)
             if [[ ${ISO} = *".zip"* ]]; then
-                unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-                ISO=$(ls ${VM_PATH} | grep -i '.iso')
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                rm -f "${VM_PATH}/${ISO}"
+                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
-                unzip ${VM_PATH}/${ISO} -d ${VM_PATH}
-                ISO=$(ls ${VM_PATH} | grep -i '.iso' | grep -v '.zip')
+                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+                rm -f "${VM_PATH}/${ISO}"
+                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
             fi;;
     esac
     make_vm_config "${ISO}"
