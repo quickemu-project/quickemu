@@ -514,15 +514,18 @@ function vm_boot() {
             esac
             ;;
         macos)
-            # https://www.nicksherlock.com/2020/04/installing-macos-catalina-on-proxmox-with-opencore/
-            # https://www.nicksherlock.com/2022/10/installing-macos-13-ventura-on-proxmox/
-            # noTSX stops cpuid errors https://duckduckgo.com/?t=ffab&q=CPUID.07H%3AEBX.rtm+%5Bbit+11%5D&ia=web also cited by NickSherlock for Ventura install
-            # Penryn  https://github.com/search?q=repo%3Akholia%2FOSX-KVM%20%20GenuineIntel&type=code
-            # https://en.wikipedia.org/wiki/MacOS_version_history#Releases
             # quickget current list: mojave catalina big-sur monterey ventura sonoma
+            # A CPU with fma is required for Metal support
+            # A CPU with invtsc is required for macOS to boot
             # A CPU with SSE4.1 support is required for >= macOS Sierra
             # A CPU with SSE4.2 support is required for >= macOS Catalina
             # A CPU with AVX2 support is required for >= macOS Ventura
+            if ! check_cpu_flag fma && ! check_cpu_flag invtsc; then
+                echo "ERROR! macOS requires a CPU with FMA and INV TSC support."
+                exit 1
+            fi
+
+            # TODO: Investigate if hosts with an Intel CPU can just use `-cpu host`
             case ${macos_release} in
                 ventura|sonoma)
                     if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
