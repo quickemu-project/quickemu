@@ -1469,28 +1469,30 @@ function viewer_param_check() {
 
 function parse_ports_from_file {
     local FILE="${VMDIR}/${VMNAME}.ports"
+    local host_name=""
+    local port_name=""
+    local port_number=""
 
-    # parse ports
-    # shellcheck disable=SC2207
-    local port_name=( $(cat "${FILE}" | cut -d',' -f 1) )
-    # shellcheck disable=SC2207
-    local port_number=( $(cat "${FILE}" | cut -d',' -f 2) )
-    # shellcheck disable=SC2207
-    local host_name=( $(cat "${FILE}" | gawk 'FS="," {print $3,"."}') )
+    # Loop over each line in the file
+    while IFS= read -r CONF || [ -n "${CONF}" ]; do
+        echo "Processing line: ${CONF}"
+        # parse ports
+        port_name=$(echo "${CONF}" | cut -d',' -f 1)
+        port_number=$(echo "${CONF}" | cut -d',' -f 2)
+        host_name=$(echo "${CONF}" | awk 'FS="," {print $3,"."}')
 
-    for ((i=0; i<${#port_name[@]}; i++)); do
-        if [ "${port_name[$i]}" == "ssh" ]; then
-            SSH_PORT="${port_number[$i]}"
-        elif [ "${port_name[$i]}" == "spice" ]; then
-            SPICE_PORT="${port_number[$i]}"
-        elif [ "${port_name[$i]}" == "monitor-telnet" ]; then
-            MONITOR_TELNET_PORT="${port_number[$i]}"
-            MONITOR_TELNET_HOST="${host_name[$i]}"
-        elif [ "${port_name[$i]}" == "serial-telnet" ]; then
-            SERIAL_TELNET_PORT="${port_number[$i]}"
-            SERIAL_TELNET_HOST="${host_name[$i]}"
+        if [ "${port_name}" == "ssh" ]; then
+            SSH_PORT="${port_number}"
+        elif [ "${port_name}" == "spice" ]; then
+            SPICE_PORT="${port_number}"
+        elif [ "${port_name}" == "monitor-telnet" ]; then
+            MONITOR_TELNET_PORT="${port_number}"
+            MONITOR_TELNET_HOST="${host_name}"
+        elif [ "${port_name}" == "serial-telnet" ]; then
+            SERIAL_TELNET_PORT="${port_number}"
+            SERIAL_TELNET_HOST="${host_name}"
         fi
-    done
+    done < "${FILE}"
 }
 
 function is_numeric {
