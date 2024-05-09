@@ -2383,7 +2383,8 @@ function get_pureos() {
 
 function get_reactos() {
     local HASH=""
-    local URL="https://sourceforge.net/projects/reactos/files/latest/download"
+    local URL=""
+    URL="$(web_redirect "https://sourceforge.net/projects/reactos/files/latest/download")"
     echo "${URL} ${HASH}"
 }
 
