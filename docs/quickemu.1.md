@@ -167,8 +167,7 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 
 # Features
 
--   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina, Mojave &
-    High Sierra
+-   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
 -   **Windows** 10 and 11 including TPM 2.0
 -   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
     flavours](https://ubuntu.com/download/flavours)**
@@ -503,8 +502,7 @@ quickget macos catalina
 quickemu --vm macos-catalina.conf
 ```
 
-macOS `high-sierra`, `mojave`, `catalina`, `big-sur`, `monterey`,
-`ventura` and `sonoma` are supported.
+macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and `sonoma` are supported.
 
 -   Use cursor keys and enter key to select the **macOS Base System**
 -   From **macOS Utilities**

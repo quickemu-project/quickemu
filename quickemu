@@ -529,7 +529,7 @@ function vm_boot() {
         # noTSX stops cpuid errors https://duckduckgo.com/?t=ffab&q=CPUID.07H%3AEBX.rtm+%5Bbit+11%5D&ia=web also cited by NickSherlock for Ventura install
         # Penryn  https://github.com/search?q=repo%3Akholia%2FOSX-KVM%20%20GenuineIntel&type=code
         # https://en.wikipedia.org/wiki/MacOS_version_history#Releases
-        # quickget current list: high-sierra mojave catalina big-sur monterey ventura sonoma
+        # quickget current list: mojave catalina big-sur monterey ventura sonoma
         # A CPU with SSE4.1 support is required for >= macOS Sierra
         # A CPU with SSE4.2 support is required for >= macOS Catalina
         # A CPU with AVX2 support is required for >= macOS Ventura
