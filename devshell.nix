@@ -8,6 +8,7 @@
   jq,
   ncurses,
   nixpkgs-fmt,
+  pciutils,
   procps,
   python3,
   qemu,
@@ -34,6 +35,7 @@ mkShell {
     ncurses
     nixpkgs-fmt
     procps
+    pciutils
     python3
     qemu
     socat
