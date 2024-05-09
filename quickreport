@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+quick_report() {
+    local GPUS
+    local PRETTY_NAME
+    local VERSION
+    if [ -e /etc/os-release ]; then
+        PRETTY_NAME="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)"
+    else
+        PRETTY_NAME="Unknown OS"
+    fi
+
+    if command -v quickemu &> /dev/null; then
+        VERSION=$(quickemu --version)
+        echo \
+"----------------------------------
+        Quickemu ${VERSION}
+----------------------------------"
+        echo -e "Distro:\t${PRETTY_NAME}"
+        echo -e "Kernel:\t$(uname -s -r -m)"
+        echo -e "Memory:\t$(free --si -h | awk '/Mem:/{print $2}')"
+        # Break IFS on new line
+        IFS=$'\n'
+        GPUS=$(lspci | grep -i vga | cut -d':' -f3)
+
+        if [ "$(echo "${GPUS}" | wc -l)" -eq 1 ]; then
+            echo "GPU:"
+        else
+            echo "GPUs:"
+        fi
+        for GPU in ${GPUS}; do
+            echo " -${GPU}"
+        done
+    else
+        echo \
+"----------------------------------
+        Quickemu missing!
+----------------------------------"
+        exit 1
+    fi
+
+    if command -v curl &> /dev/null; then
+        VERSION=$(curl --version)
+        echo \
+"----------------------------------
+            curl $(echo "${VERSION}" | head -1 | cut -d' ' -f2)
+----------------------------------"
+        echo -e "Libraries:$(echo "${VERSION}" | head -1 | cut -d')' -f2-)"
+        echo -e "Protocols:$(echo "${VERSION}" | tail +3 | head -1 | cut -d':' -f2-)"
+        echo -e "Features: $(echo "${VERSION}" | tail +4 | head -1 | cut -d':' -f2-)"
+    else
+        echo \
+"----------------------------------
+            curl missing
+----------------------------------"
+    fi
+
+    if command -v qemu-system-"$(uname -m)" &> /dev/null; then
+        VERSION=$(qemu-system-"$(uname -m)" -version | head -1 | cut -d' ' -f4)
+        echo \
+"----------------------------------
+            QEMU ${VERSION}
+----------------------------------"
+        qemu-system-"$(uname -m)" -cpu help
+    else
+        echo \
+"----------------------------------
+            QEMU missing
+----------------------------------"
+    fi
+
+    echo \
+"----------------------------------
+               CPU
+----------------------------------"
+    lscpu
+}
+
+clear
+quick_report | tee quickreport.txt
