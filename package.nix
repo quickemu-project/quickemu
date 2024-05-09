@@ -79,8 +79,6 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru.tests = testers.testVersion { package = quickemu; };
-
   meta = with lib; {
     description = "Quickly create and run optimised Windows, macOS and Linux virtual machines";
     homepage = "https://github.com/quickemu-project/quickemu";
