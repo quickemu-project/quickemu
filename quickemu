@@ -1831,7 +1831,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
     VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
     if [ ! -f "${disk_img}" ]; then
-        cd "${VMPATH}"
+        pushd "${VMPATH}" || exit
     fi
 
     # Backwards compatibility for ${driver_iso}
