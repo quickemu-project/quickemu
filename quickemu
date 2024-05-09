@@ -1524,10 +1524,10 @@ function monitor_send_cmd {
     case "${monitor_channel}" in
         socket)
             echo -e " - Sending:  ${MSG}"
-            echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" 2>&1 > /dev/null;;
+            echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" > /dev/null 2>&1;;
         telnet)
             echo -e " - Sending:  ${MSG}"
-            echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" 2>&1 > /dev/null;;
+            echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" > /dev/null 2>&1;;
         *)
             echo "ERROR! This should never happen!"
             exit 1;;
