@@ -1925,8 +1925,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VM_UP=0
     if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
         VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
-        kill -0 ${VM_PID} > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
+        if kill -0 "${VM_PID}" > /dev/null 2>&1; then
             echo "VM already started!"
             VM_UP=1
         fi
