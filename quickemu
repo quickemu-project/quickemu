@@ -1420,6 +1420,7 @@ function usage() {
     echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
     echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
     echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
+    echo "  --kill                            : Kill the VM process if it is running"
     echo "  --screen <screen>                 : Use specified screen to determine the window size."
     echo "  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified."
     echo "  --shortcut                        : Create a desktop shortcut"
@@ -1598,6 +1599,7 @@ DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
+KILL_VM=0
 OUTPUT=""
 PUBLIC=""
 PUBLIC_PERMS=""
@@ -1685,6 +1687,9 @@ else
             -ignore-msrs-always|--ignore-msrs-always)
                 ignore_msrs_always
                 exit;;
+            -kill|--kill)
+                KILL_VM=1
+                shift;;
             -screen|--screen)
                 SCREEN="${2}"
                 shift
@@ -1818,25 +1823,44 @@ fi
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # shellcheck source=/dev/null
     source "${VM}"
-    if [ -z "${disk_img}" ]; then
-        echo "ERROR! No disk_img defined."
-        exit 1
-    fi
-
-    if [ -e "${disk_img}" ]; then
-    DiskChkMsg="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
-    if [[ $DiskChkMsg ]]; then
-        echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
-        echo; echo "$DiskChkMsg" ; echo
-        exit 1
-    fi
-  fi
 
     VMDIR=$(dirname "${disk_img}")
     VMNAME=$(basename "${VM}" .conf)
     VMPATH=$(realpath "$(dirname "${VM}")")
     VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
     VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
+
+    if [ ${KILL_VM} -eq 1 ]; then
+        echo "Killing ${VMNAME}"
+        if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+            VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
+            if kill -9 "${VM_PID}" > /dev/null 2>&1; then
+                echo " - ${VMNAME} (${VM_PID}) killed."
+                exit 0
+            else
+                echo " - ERROR! ${VMNAME} with PID ${VM_PID} was not killed."
+                exit 1
+            fi
+        else
+            echo " - ERROR! Could not find a PID for ${VMNAME}."
+            exit 1
+        fi
+    fi
+
+    if [ -z "${disk_img}" ]; then
+        echo "ERROR! No disk_img defined."
+        exit 1
+    fi
+
+    if [ -e "${disk_img}" ]; then
+        DiskChkMsg="$("$QEMU_IMG" check -q "${disk_img}" 2>&1)"
+        if [[ $DiskChkMsg ]]; then
+            echo; echo "ERROR! disk.qcow2 has problems. Try qemu-img check --help."
+            echo; echo "$DiskChkMsg" ; echo
+            exit 1
+        fi
+    fi
+
     if [ ! -f "${disk_img}" ]; then
         pushd "${VMPATH}" || exit
     fi
