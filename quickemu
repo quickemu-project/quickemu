@@ -720,7 +720,12 @@ function vm_boot() {
     if [ "${guest_os}" == "linux" ]; then
         local X_RES=1152
         local Y_RES=648
-        if [ "${XDG_SESSION_TYPE}" == "x11" ] || [ "${XDG_SESSION_TYPE}" == "wayland" ]; then
+
+        # If the user has specified a resolution, use that via config or command line.
+        if [ -n "${WIDTH}" ] && [ -n "${HEIGHT}" ]; then
+            X_RES="${WIDTH}"
+            Y_RES="${HEIGHT}"
+        elif [ "${XDG_SESSION_TYPE}" == "x11" ] || [ "${XDG_SESSION_TYPE}" == "wayland" ]; then
             if [ -z "${SCREEN}" ]; then
                 X_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f1 | sort | head -n1)
                 Y_RES=$(xrandr --listmonitors | grep -v Monitors | cut -d' ' -f4 | cut -d'/' -f2 | cut -d'x' -f2 | sort | head -n1)
@@ -793,9 +798,9 @@ function vm_boot() {
         else
             DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
         fi
-        echo " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+        echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
     else
-        echo " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
+        echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
     fi
 
     # Build the video configuration
@@ -803,11 +808,10 @@ function vm_boot() {
 
     # Try and coerce the display resolution for Linux guests only.
     if [ "${guest_os}" == "linux" ]; then
-        if [ -n "${WIDTH}" ] && [ -n "${HEIGHT}" ]; then
-            VIDEO="${VIDEO},xres=${WIDTH},yres=${HEIGHT}"
-        else
-            VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
-        fi
+        VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
+        echo " @ (${X_RES} x ${Y_RES})"
+    else
+        echo " "
     fi
 
     # Allocate VRAM to VGA devices
