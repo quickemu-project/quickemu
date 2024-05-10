@@ -6,6 +6,7 @@
 , testers
 , cdrtools
 , curl
+, gawk
 , glxinfo
 , gnugrep
 , gnused
@@ -31,6 +32,7 @@ let
   runtimePaths = [
     cdrtools
     curl
+    gawk
     glxinfo
     gnugrep
     gnused
