@@ -2,6 +2,7 @@
   mkShell,
   cdrtools,
   curl,
+  gawk,
   git,
   glxinfo
   gnugrep,
@@ -22,6 +23,8 @@
   xdg-user-dirs,
   xrandr,
   zsync,
+  OVMF,
+  OVMFFull,
 }:
 mkShell {
   strictDeps = true;
@@ -29,6 +32,7 @@ mkShell {
   nativeBuildInputs = [
     cdrtools
     curl
+    gawk
     git
     glxinfo
     gnugrep
@@ -49,6 +53,8 @@ mkShell {
     xdg-user-dirs
     xrandr
     zsync
+    OVMF
+    OVMFFull
   ];
 
   buildInputs = [];
