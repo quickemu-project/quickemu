@@ -1872,7 +1872,11 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
 
     # Set the default 3D acceleration.
     if [ -z "${gl}" ]; then
-        gl="on"
+        GLSL_VER=$(glxinfo | grep "OpenGL ES GLSL" | awk '{print $NF}')
+        case ${GLSL_VER} in
+            1*|2*) gl="off";;
+            *) gl="on";;
+        esac
     fi
 
     if [ -z "${PUBLIC}" ]; then

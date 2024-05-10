@@ -3,6 +3,7 @@
   cdrtools,
   curl,
   git,
+  glxinfo
   gnugrep,
   gnused,
   jq,
@@ -29,6 +30,7 @@ mkShell {
     cdrtools
     curl
     git
+    glxinfo
     gnugrep
     gnused
     jq
