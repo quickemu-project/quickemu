@@ -17,6 +17,7 @@ Depends:
  curl,
  genisoimage,
  jq,
+ mesa-utils,
  pciutils
  procps,
  python3-minimal,
