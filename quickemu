@@ -1324,7 +1324,7 @@ function vm_boot() {
     SHELL_ARGS="${SHELL_ARGS//)/\\)}"
     SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
-    if [ ${VM_UP} -eq 0 ]; then
+    if [ -z "${VM_PID}" ]; then
         # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
         case "${OUTPUT}" in
             sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
@@ -1938,13 +1938,13 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     sound_card_param_check
 
     # Check if vm is already run
-    VM_PID=0
-    VM_UP=0
+    VM_PID=""
     if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
-        VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
-        if kill -0 "${VM_PID}" > /dev/null 2>&1; then
-            echo "VM already started!"
-            VM_UP=1
+        VM_PID=$(head -1 "${VMDIR}/${VMNAME}.pid")
+        if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
+            # VM is not running, cleaning up.
+            VM_PID=""
+            rm -f "${VMDIR}/${VMNAME}.pid"
         fi
     fi
 
@@ -2017,7 +2017,7 @@ if [ ${SHORTCUT} -eq 1 ]; then
     exit
 fi
 
-if [ ${VM_UP} -eq 0 ]; then
+if [ -z "${VM_PID}" ]; then
     #TODO: double quote the args array to prevent word splitting and this can be removed
     # Fix failing to start VM with spaces in the path
     # https://github.com/quickemu-project/quickemu/pull/875
