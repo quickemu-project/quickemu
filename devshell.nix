@@ -4,7 +4,7 @@
   curl,
   gawk,
   git,
-  glxinfo
+  glxinfo,
   gnugrep,
   gnused,
   jq,
