@@ -662,7 +662,7 @@ function vm_boot() {
         fi
         echo "             Just created, booting from ${iso}${img}"
         DISK_USED="no"
-    elif [ -e "${disk_img}" ]; then
+    elif [ -e "${disk_img}" ] && [ -z "${VM_PID}" ]; then
         # Check there isn't already a process attached to the disk image.
         if ! ${QEMU_IMG} info "${disk_img}" >/dev/null; then
             echo "             Failed to get \"write\" lock. Is another process using the disk?"
