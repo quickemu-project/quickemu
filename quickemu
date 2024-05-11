@@ -1835,10 +1835,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         exit 1
     fi
 
-    if [ ! -f "${disk_img}" ]; then
-        pushd "${VMPATH}" || exit
-    fi
-
     # Backwards compatibility for ${driver_iso}
     if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
         fixed_iso="${driver_iso}"
@@ -2015,6 +2011,13 @@ if [ ${SHORTCUT} -eq 1 ]; then
 fi
 
 if [ ${VM_UP} -eq 0 ]; then
+    #TODO: double quote the args array to prevent word splitting and this can be removed
+    # Fix failing to start VM with spaces in the path
+    # https://github.com/quickemu-project/quickemu/pull/875
+    if [ ! -f "${disk_img}" ]; then
+        pushd "${VMPATH}" || exit
+    fi
+
     vm_boot
     # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
     if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
