@@ -1421,6 +1421,7 @@ function usage() {
     echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
     echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
     echo "  --kill                            : Kill the VM process if it is running"
+    echo "  --offline                         : Override all network settings and start the VM offline"
     echo "  --screen <screen>                 : Use specified screen to determine the window size."
     echo "  --screenpct <percent>             : Percent of fullscreen for VM if --fullscreen is not specified."
     echo "  --shortcut                        : Create a desktop shortcut"
@@ -1689,6 +1690,9 @@ else
                 exit;;
             -kill|--kill)
                 KILL_VM=1
+                shift;;
+            -offline|--offline)
+                network="none"
                 shift;;
             -screen|--screen)
                 SCREEN="${2}"
