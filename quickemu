@@ -1489,7 +1489,6 @@ function parse_ports_from_file {
 
     # Loop over each line in the file
     while IFS= read -r CONF || [ -n "${CONF}" ]; do
-        echo "Processing line: ${CONF}"
         # parse ports
         port_name=$(echo "${CONF}" | cut -d',' -f 1)
         port_number=$(echo "${CONF}" | cut -d',' -f 2)
