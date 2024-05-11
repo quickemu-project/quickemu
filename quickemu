@@ -1333,9 +1333,8 @@ function vm_boot() {
         sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
         ${QEMU} "${args[@]}" &> "${VMDIR}/${VMNAME}.log" &
         sleep 0.25
+        echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
     fi
-
-    echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
 }
 
 function start_viewer {
@@ -2036,6 +2035,8 @@ if [ -z "${VM_PID}" ]; then
     fi
     start_viewer
 else
+    echo "${VMNAME}"
+    echo " - Process:  Already running ${VM} as ${VMNAME} (${VM_PID})"
     parse_ports_from_file
     start_viewer
 fi
