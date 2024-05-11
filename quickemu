@@ -1830,23 +1830,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
     VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
 
-    if [ ${KILL_VM} -eq 1 ]; then
-        echo "Killing ${VMNAME}"
-        if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
-            VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
-            if kill -9 "${VM_PID}" > /dev/null 2>&1; then
-                echo " - ${VMNAME} (${VM_PID}) killed."
-                exit 0
-            else
-                echo " - ERROR! ${VMNAME} with PID ${VM_PID} was not killed."
-                exit 1
-            fi
-        else
-            echo " - ERROR! Could not find a PID for ${VMNAME}."
-            exit 1
-        fi
-    fi
-
     if [ -z "${disk_img}" ]; then
         echo "ERROR! No disk_img defined."
         exit 1
@@ -1972,6 +1955,25 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
 else
     echo "ERROR! Virtual machine configuration not found."
     usage
+fi
+
+if [ ${KILL_VM} -eq 1 ]; then
+    echo "Killing ${VMNAME}"
+    if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+        VM_PID=$(head -c50 "${VMDIR}/${VMNAME}.pid")
+        if kill -9 "${VM_PID}" > /dev/null 2>&1; then
+            echo " - ${VMNAME} (${VM_PID}) killed."
+            rm -f "${VMDIR}/${VMNAME}.pid"
+            exit
+        else
+            echo " - ERROR! ${VMNAME} with PID ${VM_PID} was not killed."
+            rm -f "${VMDIR}/${VMNAME}.pid"
+            exit 1
+        fi
+    else
+        echo " - ERROR! Could not read ${VMDIR}/${VMNAME}.pid."
+        exit 1
+    fi
 fi
 
 if [ ${DELETE_DISK} -eq 1 ]; then
