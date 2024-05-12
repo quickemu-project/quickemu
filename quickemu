@@ -1311,8 +1311,9 @@ function vm_boot() {
         echo "${QEMU}" "${SHELL_ARGS}" "2>/dev/null" >> "${VMDIR}/${VMNAME}.sh"
         sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
         ${QEMU} "${args[@]}" &> "${VMDIR}/${VMNAME}.log" &
+        local VM_PID=$!
         sleep 0.25
-        echo " - Process:  Starting ${VM} as ${VMNAME} ($(cat "${VMDIR}/${VMNAME}.pid"))"
+        echo " - Process:  Starting ${VM} as ${VMNAME} (${VM_PID})"
     fi
 }
 
