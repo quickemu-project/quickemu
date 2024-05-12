@@ -1310,7 +1310,14 @@ function vm_boot() {
         ${QEMU} "${args[@]}" &> "${VMDIR}/${VMNAME}.log" &
         local VM_PID=$!
         sleep 0.25
-        echo " - Process:  Starting ${VM} as ${VMNAME} (${VM_PID})"
+        if kill -0 "${VM_PID}" 2>/dev/null; then
+            echo " - Process:  Started ${VM} as ${VMNAME} (${VM_PID})"
+        else
+            echo " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
+            rm -f "${VMDIR}/${VMNAME}.pid"
+            echo && cat "${VMDIR}/${VMNAME}.log"
+            exit 1
+        fi
     fi
 }
 
