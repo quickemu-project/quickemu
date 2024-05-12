@@ -494,13 +494,13 @@ function vm_boot() {
             if [ "${guest_os}" == "freedos" ] ; then
                 # fix for #382
                 SMM="on"
-                SOUND_CARD="sb16"
+                sound_card="sb16"
             fi
 
             if [[ "${guest_os}" == *"solaris" ]]; then
                 MACHINE_TYPE="pc"
                 USB_CONTROLLER="xhci"
-                SOUND_CARD="ac97"
+                sound_card="ac97"
             fi
 
             if [ -z "${disk_size}" ]; then
@@ -813,14 +813,14 @@ function vm_boot() {
     VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
 
     # Build the sound hardware configuration
-    if [ "${SOUND_CARD}" == "intel-hda" ]; then
+    if [ "${sound_card}" == "intel-hda" ]; then
         SOUND="-device intel-hda -device hda-duplex,audiodev=audio0"
-    elif [ "${SOUND_CARD}" == "ac97" ] || [ "${SOUND_CARD}" == "es1370" ] || [ "${SOUND_CARD}" == "sb16" ]; then
-        SOUND="-device ${SOUND_CARD},audiodev=audio0"
-    elif [ "${SOUND_CARD}" == "none" ]; then
+    elif [ "${sound_card}" == "ac97" ] || [ "${sound_card}" == "es1370" ] || [ "${sound_card}" == "sb16" ]; then
+        SOUND="-device ${sound_card},audiodev=audio0"
+    elif [ "${sound_card}" == "none" ]; then
         SOUND=""
     fi
-    echo " - Sound:    ${SOUND_CARD}"
+    echo " - Sound:    ${sound_card}"
 
     # Set the hostname of the VM
     local NET="user,hostname=${VMNAME}"
@@ -1438,8 +1438,8 @@ function display_param_check() {
 }
 
 function sound_card_param_check() {
-    if [ "${SOUND_CARD}" != "intel-hda" ] && [ "${SOUND_CARD}" != "ac97" ] && [ "${SOUND_CARD}" != "es1370" ] && [ "${SOUND_CARD}" != "sb16" ] && [ "${SOUND_CARD}" != "none" ]; then
-        echo "ERROR! Requested sound card '${SOUND_CARD}' is not recognised."
+    if [ "${sound_card}" != "intel-hda" ] && [ "${sound_card}" != "ac97" ] && [ "${sound_card}" != "es1370" ] && [ "${sound_card}" != "sb16" ] && [ "${sound_card}" != "none" ]; then
+        echo "ERROR! Requested sound card '${sound_card}' is not recognised."
         exit 1
     fi
 }
@@ -1568,7 +1568,7 @@ keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
 mouse="${mouse:-tablet}"
 # options: intel-hda, ac97, es1370, sb16, none
-sound_card="intel-hda"
+sound_card="${sound_card:-intel-hda}"
 
 ACCESS=""
 BRAILLE=""
@@ -1605,7 +1605,6 @@ SERIAL_TELNET_HOST=""
 KEYBOARD=""
 KEYBOARD_LAYOUT=""
 USB_CONTROLLER=""
-SOUND_CARD=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1760,9 +1759,8 @@ else
                 shift;
                 shift;;
             -sound-card|--sound-card)
-                SOUND_CARD="${2}"
-                shift;
-                shift;;
+                sound_card="${2}"
+                shift 2;;
             -version|--version)
                 echo "${VERSION}"
                 exit;;
@@ -1874,9 +1872,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         exit 1
     fi
 
-    if [ -z "${SOUND_CARD}" ]; then
-        SOUND_CARD="${sound_card}"
-    fi
     sound_card_param_check
 
     # Check if vm is already run
