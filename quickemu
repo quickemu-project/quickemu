@@ -795,7 +795,7 @@ function vm_boot() {
     case ${DISPLAY_DEVICE} in
         bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
         qxl|qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
-        ati-vga|cirrus-vga|VGA|vmware-svga) VIDEO="${VIDEO},vgamem_mb=64";;
+        ati-vga|cirrus-vga|VGA|vmware-svga) VIDEO="${VIDEO},vgamem_mb=256";;
     esac
 
     # Configure multiscreen if max_outputs was provided in the .conf file
