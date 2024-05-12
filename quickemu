@@ -485,7 +485,7 @@ function vm_boot() {
             fi
 
             if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
-                MOUSE="usb"
+                mouse="usb"
             elif [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
                 MACHINE_TYPE="pc"
                 NET_DEVICE="rtl8139"
@@ -1047,21 +1047,20 @@ function vm_boot() {
 
     # setup mouse
     # @INFO: must be set after usb-controller
-    [ -z "${MOUSE}" ] && MOUSE="$mouse"
-    if [ "${MOUSE}" == "usb" ]; then
+    if [ "${mouse}" == "usb" ]; then
         # shellcheck disable=SC2054
         args+=(-device usb-mouse,bus=input.0)
-    elif [ "${MOUSE}" == "tablet" ]; then
+    elif [ "${mouse}" == "tablet" ]; then
         # shellcheck disable=SC2054
         args+=(-device usb-tablet,bus=input.0)
-    elif [ "${MOUSE}" == "virtio" ]; then
+    elif [ "${mouse}" == "virtio" ]; then
         # shellcheck disable=SC2054
         args+=(-device virtio-mouse)
-    elif [ "${MOUSE}" == "ps2" ] || [ -z "${MOUSE}" ]; then
+    elif [ "${mouse}" == "ps2" ]; then
         # add nothing, default is ps/2 mouse
         :
     else
-        echo "WARNING! Unknown mouse value: '${MOUSE}; Fallback to ps2'"
+        echo "WARNING! Unknown mouse value: '${mouse}; Fallback to ps2'"
     fi
 
     # $bridge backwards compatibility for Quickemu <= 4.0
@@ -1567,7 +1566,7 @@ usb_controller="ehci"
 keyboard="usb"
 keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
-mouse="tablet"
+mouse="${mouse:-tablet}"
 # options: intel-hda, ac97, es1370, sb16, none
 sound_card="intel-hda"
 
@@ -1605,7 +1604,6 @@ SERIAL_TELNET_PORT=""
 SERIAL_TELNET_HOST=""
 KEYBOARD=""
 KEYBOARD_LAYOUT=""
-MOUSE=""
 USB_CONTROLLER=""
 SOUND_CARD=""
 
@@ -1751,9 +1749,8 @@ else
                 shift;
                 shift;;
             -mouse|--mouse)
-                MOUSE="${2}"
-                shift;
-                shift;;
+                mouse="${2}"
+                shift 2;;
             -usb-controller|--usb-controller)
                 USB_CONTROLLER="${2}"
                 shift;
