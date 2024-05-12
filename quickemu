@@ -651,8 +651,8 @@ function vm_boot() {
         esac
 
         # https://blog.programster.org/qcow2-performance
-        if ! ${QEMU_IMG} create -q -f qcow2 -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk_size}"; then
-            echo "ERROR! Failed to create ${disk_img}"
+        if ! ${QEMU_IMG} create -q -f "${disk_format}" -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk_size}"; then
+            echo "ERROR! Failed to create ${disk_img} using ${disk_format} format."
             exit 1
         fi
 
@@ -1215,7 +1215,7 @@ function vm_boot() {
     else
         # shellcheck disable=SC2054,SC2206
         args+=(-device virtio-blk-pci,drive=SystemDisk
-            -drive id=SystemDisk,if=none,format=${disk_format:-qcow2},file="${disk_img}" ${STATUS_QUO})
+            -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
     fi
 
     # https://wiki.qemu.org/Documentation/9psetup
@@ -1562,7 +1562,7 @@ function monitor_send_cmd {
 boot="efi"
 cpu_cores=""
 disk_img=""
-disk_format=""
+disk_format="${disk_format:-qcow2}"
 disk_size=""
 display=""
 extra_args=""
@@ -1855,11 +1855,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # Backwards compatibility for ${disk} (size)
     if [ -n "${disk}" ]; then
         disk_size="${disk}"
-    fi
-
-    # Set the default disk_format if not provided by user
-    if [ -z "${disk_format}" ] && [ -e "${disk_img}" ]; then
-        disk_format="qcow2"
     fi
 
     if [ -n "${display}" ]; then
