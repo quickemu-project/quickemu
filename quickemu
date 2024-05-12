@@ -1316,38 +1316,36 @@ function vm_boot() {
 
 function start_viewer {
     errno=0
-    if [ "${VIEWER}" != "none" ]; then
+    if [ "${viewer}" != "none" ]; then
 
         # If output is 'none' then SPICE was requested.
         if [ "${display}" == "spice" ]; then
-            if [ "${VIEWER}" == "remote-viewer" ]; then
+            if [ "${viewer}" == "remote-viewer" ]; then
                 # show via viewer: remote-viewer
-
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${VIEWER} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${VIEWER} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
                     errno=$?
                 fi
 
-            elif [ "${VIEWER}" == "spicy" ]; then
+            elif [ "${viewer}" == "spicy" ]; then
                 # show via viewer: spicy
-
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
-                    ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${VIEWER} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
-                    ${VIEWER} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
                     errno=$?
                 fi
             fi
-            if [ $errno -ne 0 ]; then
-                echo "WARNING! Could not start viewer(${VIEWER}) Err: $errno"
+            if [ ${errno} -ne 0 ]; then
+                echo "WARNING! Could not start viewer (${viewer}) Err: ${errno}"
             fi
         fi
     fi
@@ -1442,14 +1440,14 @@ function sound_card_param_check() {
 }
 
 function viewer_param_check() {
-    if [ "${VIEWER}" != "none" ] && [ "${VIEWER}" != "spicy" ] && [ "${VIEWER}" != "remote-viewer" ]; then
-        echo "ERROR! Requested viewer '${VIEWER}' is not recognised."
+    if [ "${viewer}" != "none" ] && [ "${viewer}" != "spicy" ] && [ "${viewer}" != "remote-viewer" ]; then
+        echo "ERROR! Requested viewer '${viewer}' is not recognised."
         exit 1
     fi
-    if [ "${VIEWER}" == "spicy" ] && ! command -v spicy &>/dev/null; then
+    if [ "${viewer}" == "spicy" ] && ! command -v spicy &>/dev/null; then
         echo "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
         exit 1
-    elif [ "${VIEWER}" == "remote-viewer" ] && ! command -v remote-viewer &>/dev/null; then
+    elif [ "${viewer}" == "remote-viewer" ] && ! command -v remote-viewer &>/dev/null; then
         echo "ERROR! Requested 'remote-viewer' as viewer, but 'remote-viewer' is not installed."
         exit 1
     fi
@@ -1545,7 +1543,7 @@ ram=""
 secureboot="off"
 tpm="off"
 usb_devices=()
-viewer="spicy"
+viewer="${viewer:-spicy}"
 width="${width:-}"
 height="${height:-}"
 ssh_port=""
@@ -1586,7 +1584,6 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
-VIEWER=""
 SSH_PORT=""
 SPICE_PORT=""
 MONITOR=""
@@ -1677,7 +1674,7 @@ else
                 VM="${2}"
                 shift 2;;
             -viewer|--viewer)
-                VIEWER="${2}"
+                viewer="${2}"
                 shift 2;;
             -width|--width)
                 width="${2}"
@@ -1775,10 +1772,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         display="sdl"
     fi
     display_param_check
-
-    if [ -z "${VIEWER}" ]; then
-        VIEWER="${viewer}"
-    fi
     viewer_param_check
 
     # Set the default 3D acceleration.
