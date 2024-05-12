@@ -499,7 +499,7 @@ function vm_boot() {
 
             if [[ "${guest_os}" == *"solaris" ]]; then
                 MACHINE_TYPE="pc"
-                USB_CONTROLLER="xhci"
+                usb_controller="xhci"
                 sound_card="ac97"
             fi
 
@@ -593,7 +593,7 @@ function vm_boot() {
                     NET_DEVICE="virtio-net"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
                     GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
-                    USB_CONTROLLER="xhci";;
+                    usb_controller="xhci";;
                 *)
                     # Backwards compatibility if no macos_release is specified.
                     # Also safe catch all for High Sierra and Mojave
@@ -1001,18 +1001,17 @@ function vm_boot() {
     fi
 
     # setup usb-controller
-    [ -z "${USB_CONTROLLER}" ] && USB_CONTROLLER="$usb_controller"
-    if [ "${USB_CONTROLLER}" == "ehci" ]; then
+    if [ "${usb_controller}" == "ehci" ]; then
         # shellcheck disable=SC2054
         args+=(-device usb-ehci,id=input)
-    elif [ "${USB_CONTROLLER}" == "xhci" ]; then
+    elif [ "${usb_controller}" == "xhci" ]; then
         # shellcheck disable=SC2054
         args+=(-device qemu-xhci,id=input)
-    elif [ -z "${USB_CONTROLLER}" ] || [ "${USB_CONTROLLER}" == "none" ]; then
+    elif [ "${usb_controller}" == "none" ]; then
         # add nothing
         :
     else
-        echo "WARNING! Unknown usb-controller value: '${USB_CONTROLLER}'"
+        echo "WARNING! Unknown usb-controller value: '${usb_controller}'"
     fi
 
     # setup keyboard
@@ -1561,7 +1560,7 @@ serial="socket"
 serial_telnet_port="6660"
 serial_telnet_host="localhost"
 # options: ehci(USB2.0), xhci(USB3.0)
-usb_controller="ehci"
+usb_controller="${usb_controller:-ehci}"
 # options: ps2, usb, virtio
 keyboard="usb"
 keyboard_layout="en-us"
@@ -1604,7 +1603,6 @@ SERIAL_TELNET_PORT=""
 SERIAL_TELNET_HOST=""
 KEYBOARD=""
 KEYBOARD_LAYOUT=""
-USB_CONTROLLER=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1751,9 +1749,8 @@ else
                 mouse="${2}"
                 shift 2;;
             -usb-controller|--usb-controller)
-                USB_CONTROLLER="${2}"
-                shift;
-                shift;;
+                usb_controller="${2}"
+                shift 2;;
             -extra_args|--extra_args)
                 extra_args+="${2}"
                 shift;
