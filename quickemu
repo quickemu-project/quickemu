@@ -860,9 +860,9 @@ function vm_boot() {
         fi
 
         # TODO: Don't use ports so local-only connections can be used with gl=on
-        if [ -z "${SPICE_PORT}" ]; then
+        if [ -z "${spice_port}" ]; then
             # Find a free port for spice
-            SPICE_PORT=$(get_port 5930 9)
+            spice_port=$(get_port 5930 9)
         fi
 
         # ALLOW REMOTE ACCESS TO SPICE OVER LAN RATHER THAN JUST LOCALHOST
@@ -878,7 +878,7 @@ function vm_boot() {
             fi
         fi
 
-        if [ -z "${SPICE_PORT}" ]; then
+        if [ -z "${spice_port}" ]; then
             echo " - SPICE:    All SPICE ports have been exhausted."
             if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
                 echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
@@ -888,13 +888,13 @@ function vm_boot() {
             if [ "${display}" == "spice-app" ]; then
                 echo " - SPICE:    Enabled"
             else
-                echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
-                echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${SPICE_PORT}"
+                echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
+                echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
                 if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
                     echo -n " --spice-shared-dir ${PUBLIC}"
                 fi
                 echo "${FULLSCREEN}"
-                SPICE="${SPICE},port=${SPICE_PORT},addr=${SPICE_ADDR}"
+                SPICE="${SPICE},port=${spice_port},addr=${SPICE_ADDR}"
             fi
         fi
     fi
@@ -1323,24 +1323,24 @@ function start_viewer {
             if [ "${viewer}" == "remote-viewer" ]; then
                 # show via viewer: remote-viewer
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSCREEN} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
                     errno=$?
                 fi
 
             elif [ "${viewer}" == "spicy" ]; then
                 # show via viewer: spicy
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSCREEN}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${spice_port}" --spice-shared-dir "${PUBLIC}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSCREEN}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${spice_port}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 fi
             fi
@@ -1469,7 +1469,7 @@ function parse_ports_from_file {
         if [ "${port_name}" == "ssh" ]; then
             SSH_PORT="${port_number}"
         elif [ "${port_name}" == "spice" ]; then
-            SPICE_PORT="${port_number}"
+            spice_port="${port_number}"
         elif [ "${port_name}" == "monitor-telnet" ]; then
             MONITOR_TELNET_PORT="${port_number}"
             MONITOR_TELNET_HOST="${host_name}"
@@ -1547,7 +1547,7 @@ viewer="${viewer:-spicy}"
 width="${width:-}"
 height="${height:-}"
 ssh_port=""
-spice_port=""
+spice_port="${spice_port:-}"
 public_dir=""
 monitor="socket"
 monitor_telnet_port="4440"
@@ -1584,7 +1584,6 @@ VMDIR=""
 VMNAME=""
 VMPATH=""
 SSH_PORT=""
-SPICE_PORT=""
 MONITOR=""
 MONITOR_TELNET_PORT=""
 MONITOR_TELNET_HOST=""
@@ -1684,7 +1683,7 @@ else
                 SSH_PORT="${2}"
                 shift 2;;
             -spice-port|--spice-port)
-                SPICE_PORT="${2}"
+                spice_port="${2}"
                 shift 2;;
             -public-dir|--public-dir)
                 PUBLIC="${2}"
@@ -1818,11 +1817,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         exit 1
     fi
 
-    if [ -z "${SPICE_PORT}" ]; then
-        SPICE_PORT=${spice_port}
-    fi
-    if [ -n "${SPICE_PORT}" ] && ! is_numeric "${SPICE_PORT}"; then
-        echo "ERROR: spice-port must be a number!"
+    if [ -n "${spice_port}" ] && ! is_numeric "${spice_port}"; then
+        echo "ERROR: spice_port must be a number!"
         exit 1
     fi
 
