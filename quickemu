@@ -1628,8 +1628,7 @@ else
         case "${1}" in
             -access|--access)
                 ACCESS="${2}"
-                shift
-                shift;;
+                shift 2;;
             -braille|--braille)
                 BRAILLE="on"
                 shift;;
@@ -1642,8 +1641,7 @@ else
             -display|--display)
                 OUTPUT="${2}"
                 display_param_check
-                shift
-                shift;;
+                shift 2;;
             -fullscreen|--fullscreen|-full-screen|--full-screen)
                 FULLSCREEN="-full-screen"
                 FULLSPICY="--full-screen"
@@ -1669,8 +1667,7 @@ else
                     echo "ERROR! No snapshot tag provided."
                     exit 1
                 fi
-                shift
-                shift;;
+                shift 2;;
             -status-quo|--status-quo)
                 STATUS_QUO="-snapshot"
                 shift;;
@@ -1679,60 +1676,46 @@ else
                 shift;;
             -vm|--vm)
                 VM="${2}"
-                shift
-                shift;;
+                shift 2;;
             -viewer|--viewer)
                 VIEWER="${2}"
-                shift
-                shift;;
+                shift 2;;
             -width|--width)
                 width="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -height|--height)
                 height="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -ssh-port|--ssh-port)
                 SSH_PORT="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -spice-port|--spice-port)
                 SPICE_PORT="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -public-dir|--public-dir)
                 PUBLIC="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -monitor|--monitor)
                 MONITOR="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -monitor-cmd|--monitor-cmd)
                 MONITOR_CMD="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -monitor-telnet-host|--monitor-telnet-host)
                 MONITOR_TELNET_HOST="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -monitor-telnet-port|--monitor-telnet-port)
                 MONITOR_TELNET_PORT="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -serial|--serial)
                 SERIAL="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -serial-telnet-host|--serial-telnet-host)
                 SERIAL_TELNET_HOST="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -serial-telnet-port|--serial-telnet-port)
                 SERIAL_TELNET_PORT="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -keyboard|--keyboard)
                 keyboard="${2}"
                 shift 2;;
@@ -1747,8 +1730,7 @@ else
                 shift 2;;
             -extra_args|--extra_args)
                 extra_args+="${2}"
-                shift;
-                shift;;
+                shift 2;;
             -sound-card|--sound-card)
                 sound_card="${2}"
                 shift 2;;
