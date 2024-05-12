@@ -6,6 +6,7 @@
 **Quickly create and run optimised Windows, macOS and Linux virtual machines:**
 
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/>**
+
 </div>
 <p align="center">
   &nbsp;<a href="https://wimpysworld.io/discord" target="_blank"><img alt="Discord" src="https://img.shields.io/discord/712850672223125565?style=for-the-badge&logo=discord&logoColor=%23ffffff&label=Discord&labelColor=%234253e8&color=%23e4e2e2"></a>&nbsp;
@@ -17,7 +18,7 @@
 # Introduction
 
 **Quickemu** is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
-automatically *"does the right thing"* when creating virtual machines. No
+automatically _"does the right thing"_ when creating virtual machines. No
 requirement for exhaustive configuration options. You decide what operating
 system you want to run and Quickemu takes care of the rest 🤖
 
@@ -38,28 +39,28 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 
 # Features
 
--   **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
--   **Windows** 10 and 11 including TPM 2.0
--   **Windows Server** 2022 2019 2016 2012-r2
--   [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
-    flavours](https://ubuntu.com/download/flavours)**
--   **Nearly 1000 operating system editions are supported!**
--   Full SPICE support including host/guest clipboard sharing
--   VirtIO-webdavd file sharing for Linux and Windows guests
--   VirtIO-9p file sharing for Linux and macOS guests
--   [QEMU Guest Agent
-    support](https://wiki.qemu.org/Features/GuestAgent); provides access
-    to a system-level agent via standard QMP commands
--   Samba file sharing for Linux, macOS and Windows guests (*if `smbd`
-    is installed on the host*)
--   VirGL acceleration
--   USB device pass-through
--   Smartcard pass-through
--   Automatic SSH port forwarding to guests
--   Network port forwarding
--   Full duplex audio
--   Braille support
--   EFI (with or without SecureBoot) and Legacy BIOS boot
+- **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
+- **Windows** 10 and 11 including TPM 2.0
+- **Windows Server** 2022 2019 2016 2012-r2
+- [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
+  flavours](https://ubuntu.com/download/flavours)**
+- **Nearly 1000 operating system editions are supported!**
+- Full SPICE support including host/guest clipboard sharing
+- VirtIO-webdavd file sharing for Linux and Windows guests
+- VirtIO-9p file sharing for Linux and macOS guests
+- [QEMU Guest Agent
+  support](https://wiki.qemu.org/Features/GuestAgent); provides access
+  to a system-level agent via standard QMP commands
+- Samba file sharing for Linux, macOS and Windows guests (_if `smbd`
+  is installed on the host_)
+- VirGL acceleration
+- USB device pass-through
+- Smartcard pass-through
+- Automatic SSH port forwarding to guests
+- Network port forwarding
+- Full duplex audio
+- Braille support
+- EFI (with or without SecureBoot) and Legacy BIOS boot
 
 # Quick start
 
@@ -67,23 +68,23 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 installed](https://github.com/quickemu-project/quickemu/wiki/01-Installation),
 there are two simple steps to create and run a virtual machine:
 
--   `quickget` automatically downloads the ISO image for the operating
-    system you want to run and creates a configuration file for the
-    virtual machine.
+- `quickget` automatically downloads the ISO image for the operating
+  system you want to run and creates a configuration file for the
+  virtual machine.
 
-``` shell
-quickget nixos unstable
+```shell
+quickget nixos 23.11
 ```
 
--   `quickemu` starts the virtual machine using the configuration file
-    created by `quickget`.
+- `quickemu` starts the virtual machine using the configuration file
+  created by `quickget`.
 
-``` shell
-quickemu --vm nixos-unstable.conf
+```shell
+quickemu --vm nixos-23.11-gnome.conf
 ```
 
--   Execute `quickget` (with no arguments) to see a list of all the
-    supported operating systems.
+- Execute `quickget` (with no arguments) to see a list of all the
+  supported operating systems.
 
 ## Demo
 
@@ -94,46 +95,46 @@ quickemu --vm nixos-unstable.conf
 The wiki describes how to get up and running with Quickemu and also
 covers more advanced configuration and usage.
 
--   [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
-    💾
--   [**Create Linux virtual
-    machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
-    🐧
--   [**Create macOS virtual
-    machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines)
-    🍏
--   [**Create Windows virtual
-    machines**](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)
-    🪟
--   [**Advanced quickemu
-    configuration**](https://github.com/quickemu-project/quickemu/wiki/05-Advanced-quickemu-configuration)
-    🔧
--   [**Advanced quickget
-    features**](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features)
-    🤓
--   [**Alternative
-    frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
-    🧑‍💻
--   [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References)
-    📚️
+- [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation)
+  💾
+- [**Create Linux virtual
+  machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines)
+  🐧
+- [**Create macOS virtual
+  machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines)
+  🍏
+- [**Create Windows virtual
+  machines**](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines)
+  🪟
+- [**Advanced quickemu
+  configuration**](https://github.com/quickemu-project/quickemu/wiki/05-Advanced-quickemu-configuration)
+  🔧
+- [**Advanced quickget
+  features**](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features)
+  🤓
+- [**Alternative
+  frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends)
+  🧑‍💻
+- [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References)
+  📚️
 
 # Contributing
 
 We welcome contributions to Quickemu.
 
--   Help other Quickemu users by answering questions in the [Quickemu
-    Discussions](https://github.com/quickemu-project/quickemu/discussions)
-    🛟
--   Improve the documentation in [this
-    README](https://github.com/quickemu-project/quickemu/edit/master/README.md)
-    and the [Quickemu
-    Wiki](https://github.com/quickemu-project/quickemu/wiki) 📖
--   File bug reports and feature requests in the [Quickemu
-    Issues](https://github.com/quickemu-project/quickemu/issues) 📁
--   Submit [Quickemu Pull
-    requests](https://github.com/quickemu-project/quickemu/pulls) to fix
-    bugs 🐞 or add new features ✨
-    -   Follow our [guide to adding a new OS to quickget](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features#adding-a-new-os-to-quickget)
-    -   Commit messages must [conform to the Conventional Commits
+- Help other Quickemu users by answering questions in the [Quickemu
+  Discussions](https://github.com/quickemu-project/quickemu/discussions)
+  🛟
+- Improve the documentation in [this
+  README](https://github.com/quickemu-project/quickemu/edit/master/README.md)
+  and the [Quickemu
+  Wiki](https://github.com/quickemu-project/quickemu/wiki) 📖
+- File bug reports and feature requests in the [Quickemu
+  Issues](https://github.com/quickemu-project/quickemu/issues) 📁
+- Submit [Quickemu Pull
+  requests](https://github.com/quickemu-project/quickemu/pulls) to fix
+  bugs 🐞 or add new features ✨
+  - Follow our [guide to adding a new OS to quickget](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features#adding-a-new-os-to-quickget)
+  - Commit messages must [conform to the Conventional Commits
     specification](https://www.conventionalcommits.org/)
--   [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
+- [Sponsor the project](https://github.com/sponsors/flexiondotorg) 💖
