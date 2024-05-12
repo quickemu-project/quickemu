@@ -827,15 +827,15 @@ function vm_boot() {
 
     echo -n "" > "${VMDIR}/${VMNAME}.ports"
 
-    if [ -z "${SSH_PORT}" ]; then
+    if [ -z "${ssh_port}" ]; then
         # Find a free port to expose ssh to the guest
-        SSH_PORT=$(get_port 22220 9)
+        ssh_port=$(get_port 22220 9)
     fi
 
-    if [ -n "${SSH_PORT}" ]; then
-        echo "ssh,${SSH_PORT}" >> "${VMDIR}/${VMNAME}.ports"
-        NET="${NET},hostfwd=tcp::${SSH_PORT}-:22"
-        echo " - ssh:      On host:  ssh user@localhost -p ${SSH_PORT}"
+    if [ -n "${ssh_port}" ]; then
+        echo "ssh,${ssh_port}" >> "${VMDIR}/${VMNAME}.ports"
+        NET="${NET},hostfwd=tcp::${ssh_port}-:22"
+        echo " - ssh:      On host:  ssh user@localhost -p ${ssh_port}"
     else
         echo " - ssh:      All ssh ports have been exhausted."
     fi
@@ -1405,8 +1405,8 @@ function usage() {
     echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
     echo "  --width <width>                   : Set VM screen width; requires '--height'"
     echo "  --height <height>                 : Set VM screen height; requires '--width'"
-    echo "  --ssh-port <port>                 : Set ssh-port manually"
-    echo "  --spice-port <port>               : Set spice-port manually"
+    echo "  --ssh-port <port>                 : Set SSH port manually"
+    echo "  --spice-port <port>               : Set SPICE port manually"
     echo "  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
     echo "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
     echo "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
@@ -1467,7 +1467,7 @@ function parse_ports_from_file {
         host_name=$(echo "${CONF}" | awk 'FS="," {print $3,"."}')
 
         if [ "${port_name}" == "ssh" ]; then
-            SSH_PORT="${port_number}"
+            ssh_port="${port_number}"
         elif [ "${port_name}" == "spice" ]; then
             spice_port="${port_number}"
         elif [ "${port_name}" == "monitor-telnet" ]; then
@@ -1546,7 +1546,7 @@ usb_devices=()
 viewer="${viewer:-spicy}"
 width="${width:-}"
 height="${height:-}"
-ssh_port=""
+ssh_port="${ssh_port:-}"
 spice_port="${spice_port:-}"
 public_dir=""
 monitor="socket"
@@ -1583,7 +1583,6 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
-SSH_PORT=""
 MONITOR=""
 MONITOR_TELNET_PORT=""
 MONITOR_TELNET_HOST=""
@@ -1680,7 +1679,7 @@ else
                 height="${2}"
                 shift 2;;
             -ssh-port|--ssh-port)
-                SSH_PORT="${2}"
+                ssh_port="${2}"
                 shift 2;;
             -spice-port|--spice-port)
                 spice_port="${2}"
@@ -1809,11 +1808,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
     fi
 
-    if [ -z "${SSH_PORT}" ]; then
-        SSH_PORT=${ssh_port}
-    fi
-    if [ -n "${SSH_PORT}" ] &&  ! is_numeric "${SSH_PORT}"; then
-        echo "ERROR: ssh-port must be a number!"
+    if [ -n "${ssh_port}" ] && ! is_numeric "${ssh_port}"; then
+        echo "ERROR: ssh_port must be a number!"
         exit 1
     fi
 
