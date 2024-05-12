@@ -516,7 +516,7 @@ function vm_boot() {
             case ${guest_os} in
                 kolibrios) NET_DEVICE="rtl8139";;
                 reactos)   NET_DEVICE="e1000"
-                           KEYBOARD="ps2";;
+                           keyboard="ps2";;
             esac
             ;;
         macos)
@@ -1016,18 +1016,17 @@ function vm_boot() {
 
     # setup keyboard
     # @INFO: must be set after usb-controller
-    [ -z "${KEYBOARD}" ] && KEYBOARD="$keyboard"
-    if [ "${KEYBOARD}" == "usb" ]; then
+    if [ "${keyboard}" == "usb" ]; then
         # shellcheck disable=SC2054
         args+=(-device usb-kbd,bus=input.0)
-    elif [ "${KEYBOARD}" == "virtio" ]; then
+    elif [ "${keyboard}" == "virtio" ]; then
         # shellcheck disable=SC2054
         args+=(-device virtio-keyboard)
-    elif [ "${KEYBOARD}" == "ps2" ] || [ -z "${KEYBOARD}" ]; then
+    elif [ "${keyboard}" == "ps2" ]; then
         # add nothing, default is ps/2 keyboard
         :
     else
-        echo "WARNING! Unknown keyboard value: '${KEYBOARD}'; Fallback to ps2"
+        echo "WARNING! Unknown keyboard value: '${keyboard}'; Fallback to ps2"
     fi
 
     # setup keyboard_layout
@@ -1562,7 +1561,7 @@ serial_telnet_host="localhost"
 # options: ehci(USB2.0), xhci(USB3.0)
 usb_controller="${usb_controller:-ehci}"
 # options: ps2, usb, virtio
-keyboard="usb"
+keyboard="${keyboard:-usb}"
 keyboard_layout="en-us"
 # options: ps2, usb, tablet, virtio
 mouse="${mouse:-tablet}"
@@ -1601,7 +1600,6 @@ VM_SERIAL_SOCKETPATH=""
 SERIAL=""
 SERIAL_TELNET_PORT=""
 SERIAL_TELNET_HOST=""
-KEYBOARD=""
 KEYBOARD_LAYOUT=""
 
 # shellcheck disable=SC2155
@@ -1738,9 +1736,8 @@ else
                 shift;
                 shift;;
             -keyboard|--keyboard)
-                KEYBOARD="${2}"
-                shift;
-                shift;;
+                keyboard="${2}"
+                shift 2;;
             -keyboard_layout|--keyboard_layout)
                 KEYBOARD_LAYOUT="${2}"
                 shift;
