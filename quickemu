@@ -727,14 +727,12 @@ function vm_boot() {
     esac
 
     # Determine a sane resolution for Linux guests.
-    #if [ "${guest_os}" == "linux" ]; then
-        local X_RES="1280"
-        local Y_RES="800"
-        if [ -n "${width}" ] && [ -n "${height}" ]; then
-            local X_RES="${width}"
-            local Y_RES="${height}"
-        fi
-    #fi
+    local X_RES="1280"
+    local Y_RES="800"
+    if [ -n "${width}" ] && [ -n "${height}" ]; then
+        local X_RES="${width}"
+        local Y_RES="${height}"
+    fi
 
     # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
     if [ "${guest_os}" == "linux_old" ]; then
@@ -786,7 +784,7 @@ function vm_boot() {
     VIDEO="-device ${DISPLAY_DEVICE}"
 
     # Try and coerce the display resolution for Linux guests only.
-    if [ "${guest_os}" == "linux" ]; then
+    if [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
     else
