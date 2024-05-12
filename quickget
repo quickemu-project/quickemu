@@ -1406,9 +1406,8 @@ function make_vm_config() {
             GUEST="linux"
             IMAGE_TYPE="iso"
             # If there is a point in the release, check if it is less than 16.04
-            if [[ "${RELEASE}" == "*.*" ]]; then
-                local SHORT_RELEASE=${RELEASE//./}
-                if [ "${SHORT_RELEASE}" -lt 1604 ]; then
+            if [[ "${RELEASE}" != *"daily"* ]]; then
+                if [ "${RELEASE//./}" -lt 1604 ]; then
                     GUEST="linux_old"
                 fi
             fi
