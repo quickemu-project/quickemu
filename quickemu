@@ -893,7 +893,7 @@ function vm_boot() {
                 if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
                     echo -n " --spice-shared-dir ${PUBLIC}"
                 fi
-                echo "${FULLSPICY}"
+                echo "${FULLSCREEN}"
                 SPICE="${SPICE},port=${SPICE_PORT},addr=${SPICE_ADDR}"
             fi
         fi
@@ -1323,24 +1323,24 @@ function start_viewer {
             if [ "${viewer}" == "remote-viewer" ]; then
                 # show via viewer: remote-viewer
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSCREEN} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSPICY} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" ${FULLSPICY} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${SPICE_PORT}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${SPICE_PORT}" >/dev/null 2>&1 &
                     errno=$?
                 fi
 
             elif [ "${viewer}" == "spicy" ]; then
                 # show via viewer: spicy
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSPICY}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" --spice-shared-dir "${PUBLIC}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSPICY}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSPICY}" >/dev/null 2>&1 &
+                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${SPICE_PORT}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    ${viewer} --title "${VMNAME}" --port "${SPICE_PORT}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 fi
             fi
@@ -1570,7 +1570,6 @@ BRAILLE=""
 DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
-FULLSPICY=""
 KILL_VM=0
 PUBLIC=""
 PUBLIC_PERMS=""
@@ -1639,8 +1638,7 @@ else
                 display_param_check
                 shift 2;;
             -fullscreen|--fullscreen|-full-screen|--full-screen)
-                FULLSCREEN="-full-screen"
-                FULLSPICY="--full-screen"
+                FULLSCREEN="--full-screen"
                 shift;;
             -ignore-msrs-always|--ignore-msrs-always)
                 ignore_msrs_always
