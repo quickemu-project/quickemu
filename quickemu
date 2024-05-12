@@ -1031,9 +1031,8 @@ function vm_boot() {
 
     # setup keyboard_layout
     # @INFO: When using the VNC display, you must use the -k parameter to set the keyboard layout if you are not using en-us.
-    [ -z "${KEYBOARD_LAYOUT}" ] && KEYBOARD_LAYOUT="$keyboard_layout"
-    if [ -n "${KEYBOARD_LAYOUT}" ]; then
-        args+=(-k "${KEYBOARD_LAYOUT}")
+    if [ -n "${keyboard_layout}" ]; then
+        args+=(-k "${keyboard_layout}")
     fi
 
     # FIXME: Check for device availability. qemu will fail to start otherwise
@@ -1419,7 +1418,7 @@ function usage() {
     echo "  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')"
     echo "  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')"
     echo "  --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'"
-    echo "  --keyboard_layout <layout>        : Set keyboard layout."
+    echo "  --keyboard_layout <layout>        : Set keyboard layout: 'en-us' (default)"
     echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
     echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
     echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'"
@@ -1562,7 +1561,7 @@ serial_telnet_host="localhost"
 usb_controller="${usb_controller:-ehci}"
 # options: ps2, usb, virtio
 keyboard="${keyboard:-usb}"
-keyboard_layout="en-us"
+keyboard_layout="${keyboard_layout:-en-us}"
 # options: ps2, usb, tablet, virtio
 mouse="${mouse:-tablet}"
 # options: intel-hda, ac97, es1370, sb16, none
@@ -1600,7 +1599,6 @@ VM_SERIAL_SOCKETPATH=""
 SERIAL=""
 SERIAL_TELNET_PORT=""
 SERIAL_TELNET_HOST=""
-KEYBOARD_LAYOUT=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1739,9 +1737,8 @@ else
                 keyboard="${2}"
                 shift 2;;
             -keyboard_layout|--keyboard_layout)
-                KEYBOARD_LAYOUT="${2}"
-                shift;
-                shift;;
+                keyboard_layout="${2}"
+                shift 2;;
             -mouse|--mouse)
                 mouse="${2}"
                 shift 2;;
