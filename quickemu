@@ -735,29 +735,28 @@ function vm_boot() {
     fi
 
     # https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
-    if [ "${guest_os}" == "linux_old" ]; then
-        DISPLAY_DEVICE="vmware-svga"
-    elif [ "${guest_os}" == "linux" ]; then
-        case ${OUTPUT} in
-            none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
-            *) DISPLAY_DEVICE="virtio-vga";;
-        esac
-    elif [ "${guest_os}" == "macos" ]; then
-        # qxl-vga supports seamless mouse and sane resolutions if only one scanout
-        # is used. Which is whay '-vga none' is added to the QEMU command line.
-        DISPLAY_DEVICE="qxl-vga"
-    elif [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-        case ${OUTPUT} in
-            # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues.
+    case ${guest_os} in
+        *bsd) DISPLAY_DEVICE="VGA";;
+        linux_old|solaris) DISPLAY_DEVICE="vmware-svga";;
+        linux)
+            case ${OUTPUT} in
+                none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
+                *) DISPLAY_DEVICE="virtio-vga";;
+            esac;;
+        macos)
+            # qxl-vga and VGA supports seamless mouse and sane resolutions if only
+            # one scanout is used. '-vga none' is added to the QEMU command line
+            # to avoid having two scanouts.
+            DISPLAY_DEVICE="VGA";;
+        windows|windows-server)
+            # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues
             # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
-            gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
-            sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
-        esac
-    elif [ "${guest_os}" == "solaris" ]; then
-        DISPLAY_DEVICE="vmware-svga"
-    else
-        DISPLAY_DEVICE="qxl-vga"
-    fi
+            case ${OUTPUT} in
+                gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
+                sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
+            esac;;
+        *) DISPLAY_DEVICE="qxl-vga";;
+    esac
 
     # Map Quickemu OUTPUT to QEMU -display
     case ${OUTPUT} in
