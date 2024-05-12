@@ -721,7 +721,7 @@ function vm_boot() {
 
     # Setup the appropriate audio device based on the display output
     # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
-    case ${OUTPUT} in
+    case ${display} in
         none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
         *) AUDIO_DEV="pa,id=audio0";;
     esac
@@ -739,7 +739,7 @@ function vm_boot() {
         *bsd) DISPLAY_DEVICE="VGA";;
         linux_old|solaris) DISPLAY_DEVICE="vmware-svga";;
         linux)
-            case ${OUTPUT} in
+            case ${display} in
                 none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
                 *) DISPLAY_DEVICE="virtio-vga";;
             esac;;
@@ -751,20 +751,20 @@ function vm_boot() {
         windows|windows-server)
             # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues
             # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
-            case ${OUTPUT} in
+            case ${display} in
                 gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
                 sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
             esac;;
         *) DISPLAY_DEVICE="qxl-vga";;
     esac
 
-    # Map Quickemu OUTPUT to QEMU -display
-    case ${OUTPUT} in
-        gtk)        DISPLAY_RENDER="${OUTPUT},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
+    # Map Quickemu $display to QEMU -display
+    case ${display} in
+        gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
         none|spice) DISPLAY_RENDER="none";;
-        sdl)        DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
-        spice-app)  DISPLAY_RENDER="${OUTPUT},gl=${gl}";;
-        *)          DISPLAY_RENDER="${OUTPUT}";;
+        sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
+        spice-app)  DISPLAY_RENDER="${display},gl=${gl}";;
+        *)          DISPLAY_RENDER="${display}";;
     esac
 
     # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
@@ -774,9 +774,9 @@ function vm_boot() {
         else
             DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
         fi
-        echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
     else
-        echo -n " - Display:  ${OUTPUT^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
+        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
     fi
 
     # Build the video configuration
@@ -852,10 +852,10 @@ function vm_boot() {
         done
     fi
 
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
         local SPICE="disable-ticketing=on"
         # gl=on can be use with 'spice' too, but only over local connections (not tcp ports)
-        if [ "${OUTPUT}" == "spice-app" ]; then
+        if [ "${display}" == "spice-app" ]; then
             SPICE+=",gl=${gl}"
         fi
 
@@ -880,12 +880,12 @@ function vm_boot() {
 
         if [ -z "${SPICE_PORT}" ]; then
             echo " - SPICE:    All SPICE ports have been exhausted."
-            if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+            if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
                 echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
                 exit 1
             fi
         else
-            if [ "${OUTPUT}" == "spice-app" ]; then
+            if [ "${display}" == "spice-app" ]; then
                 echo " - SPICE:    Enabled"
             else
                 echo "spice,${SPICE_PORT}" >> "${VMDIR}/${VMNAME}.ports"
@@ -902,7 +902,7 @@ function vm_boot() {
     if [ -n "${PUBLIC}" ]; then
         case ${guest_os} in
             macos)
-                if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+                if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
                     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
                     echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
                     echo " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
@@ -966,7 +966,7 @@ function vm_boot() {
         -rtc base=localtime,clock=host,driftfix=slew)
 
     # Only enable SPICE is using SPICE display
-    if [ "${OUTPUT}" == "none" ] || [ "${OUTPUT}" == "spice" ] || [ "${OUTPUT}" == "spice-app" ]; then
+    if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
         # shellcheck disable=SC2054
         args+=(-spice "${SPICE}"
             -device virtio-serial-pci
@@ -1295,7 +1295,7 @@ function vm_boot() {
 
     if [ -z "${VM_PID}" ]; then
         # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
-        case "${OUTPUT}" in
+        case "${display}" in
             sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
         esac
         echo "${QEMU}" "${SHELL_ARGS}" "2>/dev/null" >> "${VMDIR}/${VMNAME}.sh"
@@ -1319,7 +1319,7 @@ function start_viewer {
     if [ "${VIEWER}" != "none" ]; then
 
         # If output is 'none' then SPICE was requested.
-        if [ "${OUTPUT}" == "spice" ]; then
+        if [ "${display}" == "spice" ]; then
             if [ "${VIEWER}" == "remote-viewer" ]; then
                 # show via viewer: remote-viewer
 
@@ -1428,8 +1428,8 @@ function usage() {
 }
 
 function display_param_check() {
-    if [ "${OUTPUT}" != "gtk" ] && [ "${OUTPUT}" != "none" ] && [ "${OUTPUT}" != "sdl" ] && [ "${OUTPUT}" != "spice" ] && [ "${OUTPUT}" != "spice-app" ]; then
-        echo "ERROR! Requested output '${OUTPUT}' is not recognised."
+    if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
+        echo "ERROR! Requested output '${display}' is not recognised."
         exit 1
     fi
 }
@@ -1529,7 +1529,7 @@ cpu_cores=""
 disk_img=""
 disk_format="${disk_format:-qcow2}"
 disk_size=""
-display=""
+display="${display:-sdl}"
 extra_args="${extra_args:-}"
 fixed_iso=""
 floppy=""
@@ -1574,7 +1574,6 @@ DELETE_VM=0
 FULLSCREEN=""
 FULLSPICY=""
 KILL_VM=0
-OUTPUT=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
@@ -1639,7 +1638,7 @@ else
                 DELETE_VM=1
                 shift;;
             -display|--display)
-                OUTPUT="${2}"
+                display="${2}"
                 display_param_check
                 shift 2;;
             -fullscreen|--fullscreen|-full-screen|--full-screen)
@@ -1771,18 +1770,9 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         disk_size="${disk}"
     fi
 
-    if [ -n "${display}" ]; then
-        OUTPUT="${display}"
-    fi
-
-    # Set the default OUTPUT if not provided by user
-    if [ -z "${OUTPUT}" ]; then
-        OUTPUT="sdl"
-    fi
-
-    # Braille support requires SDL. Override OUTPUT if braille was requested.
+    # Braille support requires SDL. Override $display if braille was requested.
     if [ -n "${BRAILLE}" ]; then
-        OUTPUT="sdl"
+        display="sdl"
     fi
     display_param_check
 
