@@ -1284,12 +1284,9 @@ function vm_boot() {
         exit 1
     fi
 
-    if [ -z "${EXTRA_ARGS}" ]; then
-        EXTRA_ARGS="${extra_args}"
-    fi
-    if [ -n "${EXTRA_ARGS}" ]; then
+    if [ -n "${extra_args}" ]; then
         # shellcheck disable=SC2206
-        args+=(${EXTRA_ARGS})
+        args+=(${extra_args})
     fi
 
     # The OSK parameter contains parenthesis, they need to be escaped in the shell
@@ -1537,7 +1534,7 @@ disk_img=""
 disk_format="${disk_format:-qcow2}"
 disk_size=""
 display=""
-extra_args=""
+extra_args="${extra_args:-}"
 fixed_iso=""
 floppy=""
 guest_os="linux"
@@ -1610,7 +1607,6 @@ KEYBOARD=""
 KEYBOARD_LAYOUT=""
 MOUSE=""
 USB_CONTROLLER=""
-EXTRA_ARGS=""
 SOUND_CARD=""
 
 # shellcheck disable=SC2155
@@ -1763,7 +1759,7 @@ else
                 shift;
                 shift;;
             -extra_args|--extra_args)
-                EXTRA_ARGS="${2}"
+                extra_args+="${2}"
                 shift;
                 shift;;
             -sound-card|--sound-card)
