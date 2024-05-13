@@ -1885,4 +1885,4 @@ if [ -n "${MONITOR_CMD}" ]; then
     monitor_send_cmd "${MONITOR_CMD}"
 fi
 
-# vim:tabstop=2:shiftwidth=2:expandtab
+# vim:tabstop=4:shiftwidth=4:expandtab
