@@ -3388,7 +3388,7 @@ I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
 if [ ! -e "${CURL}" ]; then
-    echo "ERROR! curl not found. Please make install curl"
+    echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
