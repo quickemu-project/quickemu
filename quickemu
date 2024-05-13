@@ -1812,85 +1812,47 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
                 usage;;
         esac
     fi
-
-    # Braille support requires SDL. Override $display if braille was requested.
-    if [ -n "${BRAILLE}" ]; then
-        display="sdl"
-    fi
-
-    display_param_check
-    sound_card_param_check
-    viewer_param_check
-
-    # Set the default 3D acceleration.
-    if [ -z "${gl}" ]; then
-        if command -v glxinfo &>/dev/null; then
-            GLSL_VER=$(glxinfo | grep "OpenGL ES GLSL" | awk '{print $NF}')
-            case ${GLSL_VER} in
-                1*|2*) gl="off";;
-                *) gl="on";;
-            esac
-        else
-            gl="on"
-        fi
-    fi
-
-    if [ -z "${PUBLIC}" ]; then
-        PUBLIC="${public_dir}"
-    fi
-
-    if [ "${PUBLIC}" == "none" ]; then
-        PUBLIC=""
-    else
-        # PUBLICSHARE is the only directory exposed to guest VMs for file
-        # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-        if [ -z "${PUBLIC}" ]; then
-            if command -v xdg-user-dir &>/dev/null; then
-                PUBLIC=$(xdg-user-dir PUBLICSHARE)
-            fi
-        fi
-
-        if [ ! -d "${PUBLIC}" ]; then
-            echo "ERROR! Public directory: '${PUBLIC}' doesn't exist!"
-            exit 1
-        fi
-
-        PUBLIC_TAG="Public-${USER,,}"
-        # shellcheck disable=SC2012
-        PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-    fi
-
-    if [ -n "${ssh_port}" ] && ! is_numeric "${ssh_port}"; then
-        echo "ERROR: ssh_port must be a number!"
-        exit 1
-    fi
-
-    if [ -n "${spice_port}" ] && ! is_numeric "${spice_port}"; then
-        echo "ERROR: spice_port must be a number!"
-        exit 1
-    fi
-
-    # Check if vm is already run
-    VM_PID=""
-    if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
-        VM_PID=$(head -1 "${VMDIR}/${VMNAME}.pid")
-        if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
-            # VM is not running, cleaning up.
-            VM_PID=""
-            rm -f "${VMDIR}/${VMNAME}.pid"
-        fi
-    fi
-
-    if [ "${tpm}" == "on" ]; then
-        SWTPM=$(command -v swtpm)
-        if [ ! -e "${SWTPM}" ]; then
-            echo "ERROR! TPM is enabled, but swtpm was not found."
-            exit 1
-        fi
-    fi
 else
     echo "ERROR! Virtual machine configuration not found."
     usage
+fi
+
+display_param_check
+ports_param_check
+sound_card_param_check
+tpm_param_check
+viewer_param_check
+
+if [ "${PUBLIC}" == "none" ]; then
+    PUBLIC=""
+else
+    # PUBLICSHARE is the only directory exposed to guest VMs for file
+    # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
+    if [ -z "${PUBLIC}" ]; then
+        if command -v xdg-user-dir &>/dev/null; then
+            PUBLIC=$(xdg-user-dir PUBLICSHARE)
+        fi
+    fi
+
+    if [ ! -d "${PUBLIC}" ]; then
+        echo "ERROR! Public directory: '${PUBLIC}' doesn't exist!"
+        exit 1
+    fi
+
+    PUBLIC_TAG="Public-${USER,,}"
+    # shellcheck disable=SC2012
+    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+fi
+
+# Check if vm is already run
+VM_PID=""
+if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+    VM_PID=$(head -1 "${VMDIR}/${VMNAME}.pid")
+    if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
+        # VM is not running, cleaning up.
+        VM_PID=""
+        rm -f "${VMDIR}/${VMNAME}.pid"
+    fi
 fi
 
 if [ -z "${VM_PID}" ]; then
