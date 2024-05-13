@@ -90,60 +90,64 @@ function kill_vm() {
 }
 
 function snapshot_apply() {
+    echo "Snapshot apply to ${disk_img}"
     local TAG="${1}"
     if [ -z "${TAG}" ]; then
-        echo "ERROR! No snapshot tag provided."
+        echo " - ERROR! No snapshot tag provided."
         exit
     fi
 
     if [ -e "${disk_img}" ]; then
         if ${QEMU_IMG} snapshot -q -a "${TAG}" "${disk_img}"; then
-            echo "SUCCESS! Applied snapshot ${TAG} to ${disk_img}"
+            echo " - Applied snapshot '${TAG}' to ${disk_img}"
         else
-            echo "ERROR! Failed to apply snapshot ${TAG} to ${disk_img}"
+            echo " - ERROR! Failed to apply snapshot '${TAG}' to ${disk_img}"
         fi
     else
-        echo "NOTE! ${disk_img} not found. Doing nothing."
+        echo " - NOTE! ${disk_img} not found. Doing nothing."
     fi
 }
 
 function snapshot_create() {
+    echo "Snapshotting ${disk_img}"
     local TAG="${1}"
     if [ -z "${TAG}" ]; then
-        echo "ERROR! No snapshot tag provided."
+        echo "- ERROR! No snapshot tag provided."
         exit
     fi
 
     if [ -e "${disk_img}" ]; then
         if ${QEMU_IMG} snapshot -q -c "${TAG}" "${disk_img}"; then
-            echo "SUCCESS! Created snapshot ${TAG} of ${disk_img}"
+            echo " - Created snapshot '${TAG}' for ${disk_img}"
         else
-            echo "ERROR! Failed to create snapshot ${TAG} of ${disk_img}"
+            echo " - ERROR! Failed to create snapshot '${TAG}' for ${disk_img}"
         fi
     else
-        echo "NOTE! ${disk_img} not found. Doing nothing."
+        echo " - NOTE! ${disk_img} not found. Doing nothing."
     fi
 }
 
 function snapshot_delete() {
+    echo "Snapshot removal ${disk_img}"
     local TAG="${1}"
     if [ -z "${TAG}" ]; then
-        echo "ERROR! No snapshot tag provided."
+        echo " - ERROR! No snapshot tag provided."
         exit
     fi
 
     if [ -e "${disk_img}" ]; then
         if ${QEMU_IMG} snapshot -q -d "${TAG}" "${disk_img}"; then
-            echo "SUCCESS! Deleted snapshot ${TAG} of ${disk_img}"
+            echo " - Deleted snapshot '${TAG}' from ${disk_img}"
         else
-            echo "ERROR! Failed to delete snapshot ${TAG} of ${disk_img}"
+            echo " - ERROR! Failed to delete snapshot '${TAG}' from ${disk_img}"
         fi
     else
-        echo "NOTE! ${disk_img} not found. Doing nothing."
+        echo " - NOTE! ${disk_img} not found. Doing nothing."
     fi
 }
 
 function snapshot_info() {
+    echo
     if [ -e "${disk_img}" ]; then
         ${QEMU_IMG} info "${disk_img}"
     fi
@@ -1628,18 +1632,21 @@ else
                 network="none"
                 shift;;
             -snapshot|--snapshot)
+                if [ -z "${2}" ]; then
+                    echo "ERROR! '--snapshot' needs an action to perform."
+                    exit 1
+                fi
                 SNAPSHOT_ACTION="${2}"
-                if [ -z "${SNAPSHOT_ACTION}" ]; then
-                    echo "ERROR! No snapshot action provided."
+                if [ -z "${3}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
+                    echo "ERROR! '--snapshot ${SNAPSHOT_ACTION}' needs a tag."
                     exit 1
                 fi
-                shift
-                SNAPSHOT_TAG="${2}"
-                if [ -z "${SNAPSHOT_TAG}" ] && [ "${SNAPSHOT_ACTION}" != "info" ]; then
-                    echo "ERROR! No snapshot tag provided."
-                    exit 1
-                fi
-                shift 2;;
+                SNAPSHOT_TAG="${3}"
+                if [ "${SNAPSHOT_ACTION}" == "info" ]; then
+                    shift 2
+                else
+                    shift 3
+                fi;;
             -status-quo|--status-quo)
                 STATUS_QUO="-snapshot"
                 shift;;
@@ -1741,6 +1748,30 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         exit
     fi
 
+    if [ -n "${SNAPSHOT_ACTION}" ]; then
+        case ${SNAPSHOT_ACTION} in
+            apply)
+                snapshot_apply "${SNAPSHOT_TAG}"
+                snapshot_info
+                exit;;
+            create)
+                snapshot_create "${SNAPSHOT_TAG}"
+                snapshot_info
+                exit;;
+            delete)
+                snapshot_delete "${SNAPSHOT_TAG}"
+                snapshot_info
+                exit;;
+            info)
+                echo "Snapshot information ${disk_img}"
+                snapshot_info
+                exit;;
+            *)
+                echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
+                usage;;
+        esac
+    fi
+
     # Backwards compatibility for ${driver_iso}
     if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
         fixed_iso="${driver_iso}"
@@ -1829,29 +1860,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
 else
     echo "ERROR! Virtual machine configuration not found."
     usage
-fi
-
-if [ -n "${SNAPSHOT_ACTION}" ]; then
-    case ${SNAPSHOT_ACTION} in
-        apply)
-            snapshot_apply "${SNAPSHOT_TAG}"
-            snapshot_info
-            exit;;
-        create)
-            snapshot_create "${SNAPSHOT_TAG}"
-            snapshot_info
-            exit;;
-        delete)
-            snapshot_delete "${SNAPSHOT_TAG}"
-            snapshot_info
-            exit;;
-        info)
-            snapshot_info
-            exit;;
-        *)
-            echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
-            usage;;
-    esac
 fi
 
 if [ -z "${VM_PID}" ]; then
