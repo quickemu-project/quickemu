@@ -1001,7 +1001,7 @@ function vm_boot() {
         args+=(-chardev spicevmc,id=ccid,name=smartcard
                -device ccid-card-passthru,chardev=ccid)
     else
-        echo "WARNING! ${QEMU} was not compiled with support for smartcard devices"
+        echo " - WARNING!  ${QEMU} was not compiled with support for smartcard devices"
     fi
 
     # setup usb-controller
@@ -1015,7 +1015,7 @@ function vm_boot() {
         # add nothing
         :
     else
-        echo "WARNING! Unknown usb-controller value: '${usb_controller}'"
+        echo " - WARNING!  Unknown usb-controller value: '${usb_controller}'"
     fi
 
     # setup keyboard
@@ -1030,7 +1030,7 @@ function vm_boot() {
         # add nothing, default is ps/2 keyboard
         :
     else
-        echo "WARNING! Unknown keyboard value: '${keyboard}'; Fallback to ps2"
+        echo " - WARNING!  Unknown keyboard value: '${keyboard}'; Fallback to ps2"
     fi
 
     # setup keyboard_layout
@@ -1065,7 +1065,7 @@ function vm_boot() {
         # add nothing, default is ps/2 mouse
         :
     else
-        echo "WARNING! Unknown mouse value: '${mouse}; Fallback to ps2'"
+        echo " - WARNING!  Unknown mouse value: '${mouse}'; Falling back to ps2"
     fi
 
     # setup audio
