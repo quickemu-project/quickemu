@@ -11,26 +11,44 @@ quickget \- download and prepare materials for building a quickemu VM
 configuration for \f[CR]quickemu\f[R] to use to build and run
 .SH OPTIONS
 .TP
-\f[B]version | \-version | \[en]version\f[R]
-show version (from Quickemu)
-.TP
-\f[B]list | list_csv | list_json\f[R]
-provide a csv list of all supported guest OSes, versions and variants.
-.TP
-\f[B]\f[CB]\-\-show\-iso\-url\f[B] | \-s\f[R] {\f[B]os\f[R]} {\f[B]release\f[R]} [\f[B]edition\f[R]]
-show ISO download URL
-.TP
-\f[B]\f[CB]\-\-test\-iso\-url\f[B] | \-t\f[R] {\f[B]os\f[R]} {\f[B]release\f[R]} [\f[B]edition\f[R]]
-test if ISO is available
-.TP
-\f[B]\f[CB]\-\-open\-distro\-homepage\f[B] | \-o\f[R] {\f[B]os\f[R]}
-open OS homepage in browser
-.TP
 \f[B][OS] [Release] [Edition]\f[R]
 specify the OS and release (and optional edition) if insufficient input
 is provided a list of missing options will be reported and the script
 will exit.
 Editions may not apply and will be defaulted if not provided.
+.TP
+\f[B]\-\-download\f[R]   [edition]
+Download image; no VM configuration
+.TP
+\f[B]\-\-create\-config\f[R]  [path/url]
+Create VM config for a OS image
+.TP
+\f[B]\-\-open\-homepage\f[R] 
+Open homepage for the OS
+.TP
+\f[B]\-\-show\f[R] [os]
+Show OS information
+.TP
+\f[B]\-\-url\f[R] [os] [release] [edition]
+Show image URL(s)
+.TP
+\f[B]\-\-check\f[R] [os] [release] [edition]
+Check image URL(s)
+.TP
+\f[B]\-\-list\f[R]
+List all supported systems
+.TP
+\f[B]\-\-list\-csv\f[R]
+List everything in csv format
+.TP
+\f[B]\-\-list\-json\f[R]
+List everything in json format
+.TP
+\f[B]\-\-version\f[R]
+Show version
+.TP
+\f[B]\-\-help\f[R]
+Show this help message
 .SH NOTES
 .SS Creating Linux guests 🐧
 .SS Ubuntu
