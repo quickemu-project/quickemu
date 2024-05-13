@@ -2946,7 +2946,7 @@ function unattended_windows() {
 EOF
 }
 
-handle_curl_error() {
+function handle_curl_error() {
     local error_code="$1"
     local fatal_error_action=2
     case "$error_code" in
@@ -3064,9 +3064,19 @@ function download_windows_server() {
     # Download enterprise evaluation Windows versions
     local windows_version="$1"
     local enterprise_type="$2"
+    local PRETTY_RELEASE=""
+
+    case "${RELEASE}" in
+        "10-ltsc") PRETTY_RELEASE="10 LTSC";;
+        "2012-r2") PRETTY_RELEASE="2012 R2";;
+        *) PRETTY_RELEASE="${RELEASE}";;
+    esac
+
+    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${I18N})"
 
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
+    echo " - Parsing download page: ${url}"
     iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
@@ -3080,14 +3090,6 @@ function download_windows_server() {
 
     local CULTURE=""
     local COUNTRY=""
-    local PRETTY_RELEASE=""
-
-    case "${RELEASE}" in
-        "10-ltsc") PRETTY_RELEASE="10 LTSC";;
-        "2012-r2") PRETTY_RELEASE="2012 R2";;
-        *) PRETTY_RELEASE="${RELEASE}";;
-    esac
-
     case "${I18N}" in
         "English (Great Britain)")
             CULTURE="en-gb"
@@ -3127,9 +3129,10 @@ function download_windows_server() {
             COUNTRY="US";;
     esac
 
+    echo " - Getting download link.."
     iso_download_links="$(echo "$iso_download_page_html" | grep -o "https://go.microsoft.com/fwlink/p/?LinkID=[0-9]\+&clcid=0x[0-9a-z]\+&culture=${CULTURE}&country=${COUNTRY}")" || {
         # This should only happen if there's been some change to the download endpoint web address
-        echo "- Windows server download page gave us no download link"
+        echo " - Windows server download page gave us no download link"
         return 1
     }
 
@@ -3156,7 +3159,7 @@ function download_windows_server() {
     # Limit untrusted size for input validation
     iso_download_link="$(echo "$iso_download_link" | head -c 1024)"
 
-    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${I18N}): $iso_download_link"
+    echo " - URL: $iso_download_link"
 
     # Use highest TLS version for endpoints that support it
     case "$iso_download_link" in
@@ -3179,6 +3182,8 @@ function download_windows_workstation() {
     local sku_id=""
     local iso_download_link_html=""
     local iso_download_link=""
+
+    echo "Downloading Windows ${RELEASE} (${I18N})"
     # This function is adapted from the Mido project:
     # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
@@ -3200,16 +3205,19 @@ function download_windows_workstation() {
     # This is the *only* request we make that Fido doesn't. Fido manually maintains a list of all the Windows release/edition product edition IDs in its script (see: $WindowsVersions array). This is helpful for downloading older releases (e.g. Windows 10 1909, 21H1, etc.) but we always want to get the newest release which is why we get this value dynamically
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
+    echo " - Parsing download page: ${url}"
     iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
 
+    echo -n " - Getting Product edition ID: "
     # tr: Filter for only numerics to prevent HTTP parameter injection
     # head -c was recently added to POSIX: https://austingroupbugs.net/view.php?id=407
     product_edition_id="$(echo "$iso_download_page_html" | grep -Eo '<option value="[0-9]+">Windows' | cut -d '"' -f 2 | head -n 1 | tr -cd '0-9' | head -c 16)"
-    # echo " - Product edition ID: $product_edition_id"
+    echo "$product_edition_id"
 
+    echo " - Permit Session ID: $session_id"
     # Permit Session ID
     # "org_id" is always the same value
     curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
@@ -3221,6 +3229,7 @@ function download_windows_workstation() {
     # Extract everything after the last slash
     local url_segment_parameter="${url##*/}"
 
+    echo -n " - Getting language SKU ID: "
     # Get language -> skuID association table
     # SKU ID: This specifies the language of the ISO. We always use "English (United States)", however, the SKU for this changes with each Windows release
     # We must make this request so our next one will be allowed
@@ -3235,8 +3244,9 @@ function download_windows_workstation() {
 
     # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
     sku_id="$(echo "$language_skuid_table_html" | grep "${I18N}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
-    # echo " - SKU ID: $sku_id"
+    echo "$sku_id"
 
+    echo " - Getting ISO download link..."
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
@@ -3251,15 +3261,15 @@ function download_windows_workstation() {
     fi
 
     if echo "$iso_download_link_html" | grep -q "We are unable to complete your request at this time."; then
-        echo " - Microsoft blocked the automated download request based on your IP address."
+        echo " - WARNING! Microsoft blocked the automated download request based on your IP address."
         failed=1
     fi
 
     if [ ${failed} -eq 1 ]; then
-        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
-        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
-        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
-        echo " - Continuing with the VM creation process..."
+        echo "   Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
+        echo "   Save the downloaded ISO to: $(realpath "${VM_PATH}")"
+        echo "   Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
+        echo "   Continuing with the VM creation process..."
         return 1
     fi
 
@@ -3274,7 +3284,7 @@ function download_windows_workstation() {
         return 1
     fi
 
-    echo "Downloading Windows ${RELEASE} (${I18N}): $iso_download_link"
+    echo " - URL: ${iso_download_link%%\?*}"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
@@ -3309,11 +3319,11 @@ function get_windows() {
     rm -f "${VM_PATH}/unattended.iso"
     case ${RELEASE} in
         10|11)
-            echo "Making unattended.iso"
             mkdir -p "${VM_PATH}/unattended" 2>/dev/null
             web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
             web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
             web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+            echo "Making unattended.iso"
             unattended_windows "${VM_PATH}/unattended/autounattend.xml"
             mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
             ;;
