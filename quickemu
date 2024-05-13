@@ -1399,7 +1399,7 @@ function usage() {
     echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
     echo "  --braille                         : Enable braille support. Requires SDL."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"
-    echo "  --delete-vm                       : Delete the entire VM and it's configuration"
+    echo "  --delete-vm                       : Delete the entire VM and its configuration"
     echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
     echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
     echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
