@@ -1433,7 +1433,7 @@ guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        echo "Setting ${CONF_FILE} executable"
+        echo " - Setting ${CONF_FILE} executable"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
@@ -2069,10 +2069,6 @@ function get_macos() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
-    OpenCore_qcow2="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
-    OVMF_CODE="https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd"
-    OVMF_VARS="https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd"
-
     appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" http://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
@@ -2096,37 +2092,37 @@ function get_macos() {
         test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
-        echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+        echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+        echo " - URL: ${downloadLink}"
         web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
         web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
         VM_PATH="$(pwd)"
     else
-        echo "Downloading macOS firmware"
-        web_get "${OpenCore_qcow2}" "${VM_PATH}"
-        web_get "${OVMF_CODE}" "${VM_PATH}"
-        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-            web_get "${OVMF_VARS}" "${VM_PATH}"
-        fi
-
         if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
-            echo "Downloading macOS ${RELEASE} from ${downloadLink}"
+            echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+            echo " - URL: ${downloadLink}"
             web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
             web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+            if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+                echo " - WARNING! Verification failed, continuing anyway"
+            else
+                echo " - Verification passed"
+            fi
+
+            if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+                echo " - Converting RecoveryImage.dmg"
+                qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
+            fi
+            rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
+            echo " - RecoveryImage.img is ready."
+        fi
+        echo "Downloading OpenCore & UEFI firmware"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
+            web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
         fi
     fi
-
-    if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
-        echo "Verification failed."
-    else
-        echo "Verified macOS ${RELEASE} image using chunklist."
-    fi
-
-    if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
-        echo "Converting RecoveryImage..."
-        qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
-    fi
-
-    rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
     make_vm_config RecoveryImage.img
 }
 
