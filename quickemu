@@ -1284,10 +1284,6 @@ function vm_boot() {
     SHELL_ARGS="${SHELL_ARGS//Quickemu Project/\"Quickemu Project\"}"
 
     if [ -z "${VM_PID}" ]; then
-        # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
-        case "${display}" in
-            sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
-        esac
         echo "${QEMU}" "${SHELL_ARGS}" "2>/dev/null" >> "${VMDIR}/${VMNAME}.sh"
         sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
         ${QEMU} "${args[@]}" &> "${VMDIR}/${VMNAME}.log" &
@@ -1418,15 +1414,20 @@ function usage() {
 }
 
 function display_param_check() {
+    # Braille support requires SDL. Override $display if braille was requested.
+    if [ -n "${BRAILLE}" ]; then
+        display="sdl"
+    fi
+
     if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
         echo "ERROR! Requested output '${display}' is not recognised."
         exit 1
     fi
 
-    # Braille support requires SDL. Override $display if braille was requested.
-    if [ -n "${BRAILLE}" ]; then
-        display="sdl"
-    fi
+    # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
+    case "${display}" in
+      sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
+    esac
 
     # Set the default 3D acceleration.
     if [ -z "${gl}" ]; then
