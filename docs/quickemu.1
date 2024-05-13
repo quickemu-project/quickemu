@@ -27,7 +27,7 @@ Requires SDL.
 Delete the disk image and EFI variables
 .TP
 \f[B]\-\-delete\-vm\f[R]
-Delete the entire VM and it\[cq]s configuration
+Delete the entire VM and its configuration
 .TP
 \f[B]\-\-display\f[R]
 Select display backend.
@@ -70,10 +70,10 @@ Choose an alternative viewer.
 \[oq]none\[cq]
 .TP
 \f[B]\-\-width <width>\f[R]
-Set VM screen width; requires \[oq]\[en]height\[cq]
+Set VM screen width; requires \[oq]\-\-height\[cq]
 .TP
 \f[B]\-\-height <height>\f[R]
-Set VM screen height; requires \[oq]\[en]width\[cq]
+Set VM screen height; requires \[oq]\-\-width\[cq]
 .TP
 \f[B]\-\-ssh\-port <port>\f[R]
 Set SSH port manually
@@ -1164,7 +1164,8 @@ Arguments
   \-\-keyboard_layout <layout>        : Set keyboard layout: \[aq]en\-us\[aq] (default)
   \-\-mouse <type>                    : Set mouse. \[at]Options: \[aq]tablet\[aq] (default), \[aq]ps2\[aq], \[aq]usb\[aq], \[aq]virtio\[aq]
   \-\-usb\-controller <type>           : Set usb\-controller. \[at]Options: \[aq]ehci\[aq] (default), \[aq]xhci\[aq], \[aq]none\[aq]
-  \-\-sound\-card <type>               : Set sound card. \[at]Options: \[aq]intel\-hda\[aq] (default), \[aq]ac97\[aq], \[aq]es1370\[aq], \[aq]sb16\[aq], \[aq]none\[aq]
+  \-\-sound\-card <type>               : Set sound card. \[at]Options: \[aq]intel\-hda\[aq] (default), \[aq]ac97\[aq], \[aq]es1370\[aq], \[aq]sb16\[aq], \[aq]usb\-audio\[aq], \[aq]none\[aq]
+  \-\-sound\-duplex <type>             : Set sound card duplex. \[at]Options: \[aq]hda\-micro\[aq] (default: speaker/mic), \[aq]hda\-duplex\[aq] (line\-in/line\-out), \[aq]hda\-output\[aq] (output\-only)
   \-\-extra_args <arguments>          : Pass additional arguments to qemu
   \-\-version                         : Print version
 .EE
@@ -1176,59 +1177,6 @@ Here is an example of how to create a shortcut.
 .EX
 quickemu \-\-vm ubuntu\-22.04\-desktop.conf \-\-shortcut
 .EE
-.SS Screen and window size (Linux guests only)
-\f[CR]qemu\f[R] will always default to the primary monitor to display
-the VM\[cq]s window.
-.PP
-Without the \f[CR]\-\-screen\f[R] option, \f[CR]quickemu\f[R] will look
-for the size of the smallest monitor, and use a size that fits on said
-monitor.
-.PP
-The \f[CR]\-\-screen\f[R] option forces \f[CR]quickemu\f[R] to use the
-size of the given monitor to compute the size of the window.
-\f[B]It won\[cq]t use that monitor to display the VM\[cq]s window if
-it\[cq]s not the primary monitor\f[R].
-This is useful if the primary monitor if not the smallest one, and if
-the VM\[cq]s window doesn\[cq]t need to be moved around.
-.PP
-The \f[CR]\-\-screen\f[R] option is also useful with the
-\f[CR]\-\-fullscreen\f[R] option, again because \f[CR]qemu\f[R] will
-always use the primary monitor.
-In order for the fullscreen mode to work properly, the resolution of the
-VM\[cq]s window must match the resolution of the screen.
-.PP
-To know which screen to use, type:
-.IP
-.EX
-xrandr \-\-listmonitors | grep \-v Monitors
-.EE
-.PP
-The command will output something like this:
-.IP
-.EX
- 0: +*HDMI\-0 2560/597x1440/336+1920+0  HDMI\-0
- 1: +DVI\-D\-0 1920/527x1080/296+0+0  DVI\-D\-0
-.EE
-.PP
-The first number is what needs to be passed to the \f[CR]\-\-screen\f[R]
-option.
-.PP
-For example:
-.IP
-.EX
-quickemu \-\-vm vm.conf \-\-screen 0
-.EE
-.PP
-The above uses the 2560x1440 screen to compute the size of the window,
-which Quickemu sizes to 2048x1152.
-Without the \f[CR]\-\-screen\f[R] option, Quickemu would have used the
-1920x1080 monitor which results in a window size of 1664x936.
-.PP
-The \[oq]\[en]screenpct\[cq] is an optional integer value between 25 <=
-pct < 100 which will override system default screen sizes.
-The VM size will be \[oq]pct\[cq] of the chosen screen.
-\f[B]If \[en]fullscreen is chosen screen will be fullsize instead of
-being scaled down by \[en]screenpct value.\f[R]
 .SS References
 Useful reference that assisted the development of Quickemu.
 .IP \[bu] 2
