@@ -257,7 +257,6 @@ function vm_boot() {
     local MAC_MISSING=""
     local MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
     local NET_DEVICE="${NET_DEVICE:-virtio-net}"
-    local OSK=""
     local SOUND=""
     local SMM="${SMM:-off}"
     local TEMP_PORT=""
@@ -583,9 +582,8 @@ function vm_boot() {
                 fi
             done
 
-            OSK=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')
             # Disable S3 support in the VM to prevent macOS suspending during install
-            GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=${OSK}"
+            GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
