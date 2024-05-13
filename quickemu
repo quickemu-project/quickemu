@@ -605,11 +605,6 @@ function vm_boot() {
             #   * VirtIO Memory Balloning is supported since Big Sur (https://pmhahn.github.io/virtio-balloon/)
             #   * VirtIO RNG is supported since Big Sur, but exposed to all guests by default.
             case ${macos_release} in
-                catalina)
-                    BALLOON=""
-                    MAC_DISK_DEV="virtio-blk-pci"
-                    NET_DEVICE="vmxnet3"
-                    USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci";;
                 big-sur|monterey|ventura|sonoma)
                     BALLOON="-device virtio-balloon"
                     MAC_DISK_DEV="virtio-blk-pci"
@@ -621,7 +616,11 @@ function vm_boot() {
                     # Backwards compatibility if no macos_release is specified.
                     # Also safe catch all for High Sierra and Mojave
                     BALLOON=""
-                    MAC_DISK_DEV="ide-hd,bus=ahci.2"
+                    if [ "${macos_release}" == "catalina" ]; then
+                        MAC_DISK_DEV="virtio-blk-pci"
+                    else
+                        MAC_DISK_DEV="ide-hd,bus=ahci.2"
+                    fi
                     NET_DEVICE="vmxnet3"
                     USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci";;
             esac
