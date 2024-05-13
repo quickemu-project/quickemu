@@ -3009,52 +3009,6 @@ function handle_curl_error() {
     return 1
 }
 
-function curl_windows() {
-    local part_ext=".PART"
-    local vm_path="$1"
-    local out_file="$2"
-    local tls_version="$3"
-    local url="$4"
-
-    mkdir -p "${vm_path}"
-
-    real_file="${vm_path}/${out_file}"
-    part_file="${vm_path}/${out_file}${part_ext}"
-
-    # --location: Microsoft likes to change which endpoint these downloads are stored on but is usually kind enough to add redirects
-    # --fail: Return an error on server errors where the HTTP response code is 400 or greater
-    curl --progress-bar --location --output "${part_file}" --continue-at - --max-filesize 10G --fail --proto =https "--tlsv$tls_version" --http1.1 -- "$url" || {
-        error_code=$?
-        handle_curl_error "$error_code"
-        error_action=$?
-
-        # Clean up and make sure a future resume doesn't happen from a bad download resume file
-        if [ -f "${part_file}" ]; then
-            # If file is empty, bad HTTP code, or bad download resume file
-            if [ ! -s "${part_file}" ] || [ "$error_code" = 22 ] || [ "$error_code" = 36 ]; then
-                echo "- Deleting failed download..."
-                rm -f "${part_file}"
-            fi
-        fi
-
-        local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
-        case "$windows_version" in
-            8 | 10) url="${url}ISO";;
-        esac
-
-        echo
-        echo " - Manually download the Windows ${windows_version} ISO using a web browser from: ${url}"
-        echo " - Save the downloaded ISO to: $(realpath "${VM_PATH}")"
-        echo " - Update the config file to reference the downloaded ISO: ./${VM_PATH}.conf"
-        echo " - Continuing with the VM creation process..."
-
-        return "$error_action"
-    }
-
-    # Full downloaded succeeded
-    mv "${part_file}" "${real_file}"
-}
-
 function download_windows_server() {
     local iso_download_page_html=""
     # Copyright (C) 2024 Elliot Killick <contact@elliotkillick.com>
@@ -3161,15 +3115,9 @@ function download_windows_server() {
 
     echo " - URL: $iso_download_link"
 
-    # Use highest TLS version for endpoints that support it
-    case "$iso_download_link" in
-        "https://download.microsoft.com"*) tls_version="1.2" ;;
-        *) tls_version="1.3" ;;
-    esac
-
     # Download ISO
     FILE_NAME="${iso_download_link##*/}"
-    curl_windows "${VM_PATH}" "${FILE_NAME}" "$tls_version" "$iso_download_link"
+    web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
     OS="windows-server"
 }
 
@@ -3288,7 +3236,7 @@ function download_windows_workstation() {
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
-    curl_windows "${VM_PATH}" "${FILE_NAME}" "1.3" "$iso_download_link"
+    web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
     # Only Windows 11 hashes can be found directly from Microsoft's page.
     if [ "${windows_version}" == 11 ]; then
         local HASH_I18N="${I18N}"
