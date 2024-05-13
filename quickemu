@@ -1722,9 +1722,9 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # shellcheck source=/dev/null
     source "${VM}"
 
-    VMDIR=$(dirname "${disk_img}")
-    VMNAME=$(basename "${VM}" .conf)
-    VMPATH=$(realpath "$(dirname "${VM}")")
+    VMDIR=$(dirname "${disk_img}")          # directory the VM disk and state files are stored
+    VMNAME=$(basename "${VM}" .conf)        # name of the VM
+    VMPATH=$(realpath "$(dirname "${VM}")") # path to the top-level VM directory
     SOCKET_MONITOR="${VMDIR}/${VMNAME}-monitor.socket"
     SOCKET_SERIAL="${VMDIR}/${VMNAME}-serial.socket"
 
