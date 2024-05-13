@@ -1201,43 +1201,33 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
     fi
 
-    if [ -z "${MONITOR}" ]; then
-        MONITOR="${monitor:-none}"
-    fi
-
-    if [ -z "${MONITOR_TELNET_HOST}" ]; then
-        MONITOR_TELNET_HOST="${monitor_telnet_host:-localhost}"
-    fi
-    if [ -z "${MONITOR_TELNET_PORT}" ]; then
-        MONITOR_TELNET_PORT="${monitor_telnet_port}"
-    fi
-    if [ -n "${MONITOR_TELNET_PORT}" ] &&  ! is_numeric "${MONITOR_TELNET_PORT}"; then
-        echo "ERROR: telnet-port must be a number!"
+    if [ -n "${monitor_telnet_port}" ] && ! is_numeric "${monitor_telnet_port}"; then
+        echo "ERROR: telnet port must be a number!"
         exit 1
     fi
 
-    if [ "${MONITOR}" == "none" ]; then
+    if [ "${monitor}" == "none" ]; then
         args+=(-monitor none)
         echo " - Monitor:  (off)"
-    elif [ "${MONITOR}" == "telnet" ]; then
+    elif [ "${monitor}" == "telnet" ]; then
         # Find a free port to expose monitor-telnet to the guest
-        TEMP_PORT="$(get_port "${MONITOR_TELNET_PORT}" 9)"
+        TEMP_PORT="$(get_port "${monitor_telnet_port}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
             echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
         else
-            MONITOR_TELNET_PORT="${TEMP_PORT}"
+            monitor_telnet_port="${TEMP_PORT}"
             # shellcheck disable=SC2054
-            args+=(-monitor telnet:"${MONITOR_TELNET_HOST}:${MONITOR_TELNET_PORT}",server,nowait)
-            echo " - Monitor:  On host:  telnet ${MONITOR_TELNET_HOST} ${MONITOR_TELNET_PORT}"
-            echo "monitor-telnet,${MONITOR_TELNET_PORT},${MONITOR_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+            args+=(-monitor telnet:"${monitor_telnet_host}:${monitor_telnet_port}",server,nowait)
+            echo " - Monitor:  On host:  telnet ${monitor_telnet_host} ${monitor_telnet_port}"
+            echo "monitor-telnet,${monitor_telnet_port},${monitor_telnet_host}" >> "${VMDIR}/${VMNAME}.ports"
         fi
-    elif [ "${MONITOR}" == "socket" ]; then
+    elif [ "${monitor}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
         echo " - Monitor:  On host:  nc -U \"${VM_MONITOR_SOCKETPATH}\""
         echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_MONITOR_SOCKETPATH}"
     else
-        echo "ERROR! \"${MONITOR}\" is an unknown monitor option."
+        echo "ERROR! \"${monitor}\" is an unknown monitor option."
         exit 1
     fi
 
@@ -1471,8 +1461,8 @@ function parse_ports_from_file {
         elif [ "${port_name}" == "spice" ]; then
             spice_port="${port_number}"
         elif [ "${port_name}" == "monitor-telnet" ]; then
-            MONITOR_TELNET_PORT="${port_number}"
-            MONITOR_TELNET_HOST="${host_name}"
+            monitor_telnet_port="${port_number}"
+            monitor_telnet_host="${host_name}"
         elif [ "${port_name}" == "serial-telnet" ]; then
             SERIAL_TELNET_PORT="${port_number}"
             SERIAL_TELNET_HOST="${host_name}"
@@ -1492,28 +1482,16 @@ function monitor_send_cmd {
         return 1
     fi
 
-    # Determine monitor channel
-    local monitor_channel=""
-
-    if [ -S "${VMDIR}/${VMNAME}-monitor.socket" ]; then
-        monitor_channel="socket"
-    elif [ -n "${MONITOR_TELNET_PORT}" ] && [ -n "${MONITOR_TELNET_HOST}" ]; then
-        monitor_channel="telnet"
-    else
-        echo "WARNING! No qemu-monitor channel available - Couldn't send message to monitor!"
-        return
-    fi
-
-    case "${monitor_channel}" in
+    case "${monitor}" in
         socket)
-            echo -e " - Sending:  ${MSG}"
+            echo -e " - Sending:  via socket ${MSG}"
             echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" > /dev/null 2>&1;;
         telnet)
-            echo -e " - Sending:  ${MSG}"
-            echo -e "${MSG}" | socat - tcp:"${MONITOR_TELNET_HOST}":"${MONITOR_TELNET_PORT}" > /dev/null 2>&1;;
+            echo -e " - Sending:  via telnet ${MSG}"
+            echo -e "${MSG}" | socat - tcp:"${monitor_telnet_host}":"${monitor_telnet_port}" > /dev/null 2>&1;;
         *)
-            echo "ERROR! This should never happen!"
-            exit 1;;
+            echo "WARNING! No qemu-monitor channel available - Couldn't send message to monitor!"
+            return 1;;
     esac
 
     return 0
@@ -1549,9 +1527,9 @@ height="${height:-}"
 ssh_port="${ssh_port:-}"
 spice_port="${spice_port:-}"
 public_dir=""
-monitor="socket"
-monitor_telnet_port="4440"
-monitor_telnet_host="localhost"
+monitor="${monitor:-socket}"
+monitor_telnet_port="${monitor_telnet_port:-4440}"
+monitor_telnet_host="${monitor_telnet_host:-localhost}"
 serial="socket"
 serial_telnet_port="6660"
 serial_telnet_host="localhost"
@@ -1583,9 +1561,6 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
-MONITOR=""
-MONITOR_TELNET_PORT=""
-MONITOR_TELNET_HOST=""
 MONITOR_CMD=""
 VM_MONITOR_SOCKETPATH=""
 VM_SERIAL_SOCKETPATH=""
@@ -1688,16 +1663,16 @@ else
                 PUBLIC="${2}"
                 shift 2;;
             -monitor|--monitor)
-                MONITOR="${2}"
+                monitor="${2}"
                 shift 2;;
             -monitor-cmd|--monitor-cmd)
                 MONITOR_CMD="${2}"
                 shift 2;;
             -monitor-telnet-host|--monitor-telnet-host)
-                MONITOR_TELNET_HOST="${2}"
+                monitor_telnet_host="${2}"
                 shift 2;;
             -monitor-telnet-port|--monitor-telnet-port)
-                MONITOR_TELNET_PORT="${2}"
+                monitor_telnet_port="${2}"
                 shift 2;;
             -serial|--serial)
                 SERIAL="${2}"
