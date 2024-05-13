@@ -1231,42 +1231,33 @@ function vm_boot() {
         exit 1
     fi
 
-    if [ -z "${SERIAL}" ]; then
-        SERIAL="${serial:-none}"
-    fi
-
-    if [ -z "${SERIAL_TELNET_HOST}" ]; then
-        SERIAL_TELNET_HOST="${serial_telnet_host:-localhost}"
-    fi
-    if [ -z "${SERIAL_TELNET_PORT}" ]; then
-        SERIAL_TELNET_PORT="${serial_telnet_port}"
-    fi
-    if [ -n "${SERIAL_TELNET_PORT}" ] &&  ! is_numeric "${SERIAL_TELNET_PORT}"; then
-        echo "ERROR: serial-port must be a number!"
+    if [ -n "${serial_telnet_port}" ] && ! is_numeric "${serial_telnet_port}"; then
+        echo "ERROR: serial port must be a number!"
         exit 1
     fi
 
-    if [ "${SERIAL}" == "none" ]; then
+    if [ "${serial}" == "none" ]; then
         args+=(-serial none)
-    elif [ "${SERIAL}" == "telnet" ]; then
+        echo " - Serial:   (off)"
+    elif [ "${serial}" == "telnet" ]; then
         # Find a free port to expose serial-telnet to the guest
-        TEMP_PORT="$(get_port "${SERIAL_TELNET_PORT}" 9)"
+        TEMP_PORT="$(get_port "${serial_telnet_port}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
-            echo " - Serial:   All Serial-Telnet ports have been exhausted."
+            echo " - Serial:   All Serial Telnet ports have been exhausted."
         else
-            SERIAL_TELNET_PORT="${TEMP_PORT}"
+            serial_telnet_port="${TEMP_PORT}"
             # shellcheck disable=SC2054,SC2206
-            args+=(-serial telnet:${SERIAL_TELNET_HOST}:${SERIAL_TELNET_PORT},server,nowait)
-            echo " - Serial:   On host:  telnet ${SERIAL_TELNET_HOST} ${SERIAL_TELNET_PORT}"
-            echo "serial-telnet,${SERIAL_TELNET_PORT},${SERIAL_TELNET_HOST}" >> "${VMDIR}/${VMNAME}.ports"
+            args+=(-serial telnet:${serial_telnet_host}:${serial_telnet_port},server,nowait)
+            echo " - Serial:   On host:  telnet ${serial_telnet_host} ${serial_telnet_port}"
+            echo "serial-telnet,${serial_telnet_port},${serial_telnet_host}" >> "${VMDIR}/${VMNAME}.ports"
         fi
-    elif [ "${SERIAL}" == "socket" ]; then
+    elif [ "${serial}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-serial unix:${VM_SERIAL_SOCKETPATH},server,nowait)
         echo " - Serial:   On host:  nc -U \"${VM_SERIAL_SOCKETPATH}\""
         echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_SERIAL_SOCKETPATH}"
     else
-        echo "ERROR! \"${SERIAL}\" is an unknown serial option."
+        echo "ERROR! \"${serial}\" is an unknown serial option."
         exit 1
     fi
 
@@ -1464,8 +1455,8 @@ function parse_ports_from_file {
             monitor_telnet_port="${port_number}"
             monitor_telnet_host="${host_name}"
         elif [ "${port_name}" == "serial-telnet" ]; then
-            SERIAL_TELNET_PORT="${port_number}"
-            SERIAL_TELNET_HOST="${host_name}"
+            serial_telnet_port="${port_number}"
+            serial_telnet_host="${host_name}"
         fi
     done < "${FILE}"
 }
@@ -1530,9 +1521,9 @@ public_dir=""
 monitor="${monitor:-socket}"
 monitor_telnet_port="${monitor_telnet_port:-4440}"
 monitor_telnet_host="${monitor_telnet_host:-localhost}"
-serial="socket"
-serial_telnet_port="6660"
-serial_telnet_host="localhost"
+serial="${serial:-socket}"
+serial_telnet_port="${serial_telnet_port:-6660}"
+serial_telnet_host="${serial_telnet_host:-localhost}"
 # options: ehci(USB2.0), xhci(USB3.0)
 usb_controller="${usb_controller:-ehci}"
 # options: ps2, usb, virtio
@@ -1564,9 +1555,6 @@ VMPATH=""
 MONITOR_CMD=""
 VM_MONITOR_SOCKETPATH=""
 VM_SERIAL_SOCKETPATH=""
-SERIAL=""
-SERIAL_TELNET_PORT=""
-SERIAL_TELNET_HOST=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1675,13 +1663,13 @@ else
                 monitor_telnet_port="${2}"
                 shift 2;;
             -serial|--serial)
-                SERIAL="${2}"
+                serial="${2}"
                 shift 2;;
             -serial-telnet-host|--serial-telnet-host)
-                SERIAL_TELNET_HOST="${2}"
+                serial_telnet_host="${2}"
                 shift 2;;
             -serial-telnet-port|--serial-telnet-port)
-                SERIAL_TELNET_PORT="${2}"
+                serial_telnet_port="${2}"
                 shift 2;;
             -keyboard|--keyboard)
                 keyboard="${2}"
