@@ -82,13 +82,13 @@ disk_img="macos-catalina/disk.qcow2"
 macos_release="catalina"
 ```
 
--   `guest_os="macos"` instructs Quickemu to optimise for macOS.
--   `macos_release="catalina"` instructs Quickemu to optimise for a
-    particular macOS release.
-    -   For example VirtIO Network and Memory Ballooning are available
-        in Big Sur and newer, but not previous releases.
-    -   And VirtIO Block Media (disks) are supported/stable in Catalina
-        and newer.
+- `guest_os="macos"` instructs Quickemu to optimise for macOS.
+- `macos_release="catalina"` instructs Quickemu to optimise for a
+  particular macOS release.
+  - For example VirtIO Network and Memory Ballooning are available in
+    Big Sur and newer, but not previous releases.
+  - And VirtIO Block Media (disks) are supported/stable in Catalina and
+    newer.
 
 The default Windows 11 configuration looks like this:
 
@@ -101,10 +101,10 @@ tpm="on"
 secureboot="on"
 ```
 
--   `guest_os="windows"` instructs `quickemu` to optimise for Windows.
--   `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
--   `tpm="on"` instructs `quickemu` to create a software emulated TPM
-    device using `swtpm`.
+- `guest_os="windows"` instructs `quickemu` to optimise for Windows.
+- `fixed_iso=` specifies the ISO image that provides VirtIO drivers.
+- `tpm="on"` instructs `quickemu` to create a software emulated TPM
+  device using `swtpm`.
 
 ### BIOS and EFI
 
@@ -112,7 +112,7 @@ Since Quickemu 2.1.0 `efi` is the default boot option. If you want to
 override this behaviour then add the following line to you VM
 configuration to enable legacy BIOS.
 
--   `boot="legacy"` - Enable Legacy BIOS boot
+- `boot="legacy"` - Enable Legacy BIOS boot
 
 ### Tuning CPU cores, RAM & disks
 
@@ -123,11 +123,10 @@ your liking.
 
 Add additional lines to your virtual machine configuration:
 
--   `cpu_cores="4"` - Specify the number of CPU cores allocated to the
-    VM
--   `ram="4G"` - Specify the amount of RAM to allocate to the VM
--   `disk_size="16G"` - Specify the size of the virtual disk allocated
-    to the VM
+- `cpu_cores="4"` - Specify the number of CPU cores allocated to the VM
+- `ram="4G"` - Specify the amount of RAM to allocate to the VM
+- `disk_size="16G"` - Specify the size of the virtual disk allocated to
+  the VM
 
 ### Disk preallocation
 
@@ -139,22 +138,22 @@ Specify what disk preallocation should be used, if any, when creating
 the system disk image by adding a line like this to your VM
 configuration.
 
--   `preallocation="metadata"`
+- `preallocation="metadata"`
 
 ### CD-ROM disks
 
 If you want to expose an ISO image from the host to guest add the
 following line to the VM configuration:
 
--   `fixed_iso="/path/to/image.iso"`
+- `fixed_iso="/path/to/image.iso"`
 
 ### Floppy disks
 
-If you're like [Alan Pope](https://popey.com) you'll probably want to
+If you’re like [Alan Pope](https://popey.com) you’ll probably want to
 mount a floppy disk image in the guest. To do so add the following line
 to the VM configuration:
 
--   `floppy="/path/to/floppy.img"`
+- `floppy="/path/to/floppy.img"`
 
 ### File Sharing
 
@@ -178,17 +177,17 @@ when the virtual machine is started. For example:
 
      - smbd:     On guest: smb://10.0.2.4/qemu
 
-If using a Windows guest, right-click on "This PC", click "Add a network
-location", and paste this address, removing `smb:` and replacing forward
+If using a Windows guest, right-click on “This PC”, click “Add a network
+location”, and paste this address, removing `smb:` and replacing forward
 slashes with backslashes (in this example `\\10.0.2.4\qemu`).
 
 #### SPICE WebDAV 🐧 🪟
 
--   TBD
+- TBD
 
 #### VirtIO-9P 🐧 🍏
 
--   TBD
+- TBD
 
 ### Networking
 
@@ -197,19 +196,19 @@ slashes with backslashes (in this example `\\10.0.2.4\qemu`).
 Add an additional line to your virtual machine configuration. For
 example:
 
--   `port_forwards=("8123:8123" "8888:80")`
+- `port_forwards=("8123:8123" "8888:80")`
 
 In the example above:
 
--   Port 8123 on the host is forwarded to port 8123 on the guest.
--   Port 8888 on the host is forwarded to port 80 on the guest.
+- Port 8123 on the host is forwarded to port 8123 on the guest.
+- Port 8888 on the host is forwarded to port 80 on the guest.
 
 #### Disable networking
 
 To completely disable all network interfaces in a guest VM add this
 additional line to your virtual machine configuration:
 
--   `network="none"`
+- `network="none"`
 
 #### Restricted networking
 
@@ -221,14 +220,14 @@ This can be used to prevent software running inside the guest from
 phoning home while still providing a network inside the guest. Add this
 additional line to your virtual machine configuration:
 
--   `network="restrict"`
+- `network="restrict"`
 
 #### Bridged networking
 
 Connect your virtual machine to a preconfigured network bridge. Add an
 additional line to your virtual machine configuration:
 
--   `network="br0"`
+- `network="br0"`
 
 If you want to have a persistent MAC address for your bridged network
 interface in the guest VM you can add `macaddr` to the virtual machine
@@ -237,7 +236,7 @@ configuration. QEMU requires that the MAC address is in the range:
 
 So you can generate your own MAC addresses with:
 
--   `macaddr="52:54:00:AB:51:AE"`
+- `macaddr="52:54:00:AB:51:AE"`
 
 ### USB redirection
 
@@ -246,12 +245,12 @@ pass-through.
 
 #### SPICE redirection (recommended)
 
-Using SPICE for USB pass-through is easiest as it doesn't require any
+Using SPICE for USB pass-through is easiest as it doesn’t require any
 elevated permission:
 
--   Start Quickemu with `--display spice` and then
--   select `Input` -\> `Select USB Device for redirection` from the menu
-    to choose which device(s) you want to attach to the guest.
+- Start Quickemu with `--display spice` and then
+- select `Input` -\> `Select USB Device for redirection` from the menu
+  to choose which device(s) you want to attach to the guest.
 
 ##### Enabling SPICE redirection on NixOS
 
@@ -275,14 +274,14 @@ preferred, see above.
 Add an additional line to your virtual machine configuration. For
 example:
 
--   `usb_devices=("046d:082d" "046d:085e")`
+- `usb_devices=("046d:082d" "046d:085e")`
 
 In the example above:
 
--   The USB device with vendor_id 046d and product_id 082d will be
-    exposed to the guest.
--   The USB device with vendor_id 046d and product_id 085e will be
-    exposed to the guest.
+- The USB device with vendor_id 046d and product_id 082d will be exposed
+  to the guest.
+- The USB device with vendor_id 046d and product_id 085e will be exposed
+  to the guest.
 
 If the USB devices are not writable, `quickemu` will display the
 appropriate commands to modify the USB device(s) access permissions,
