@@ -1422,6 +1422,24 @@ function display_param_check() {
         echo "ERROR! Requested output '${display}' is not recognised."
         exit 1
     fi
+
+    # Braille support requires SDL. Override $display if braille was requested.
+    if [ -n "${BRAILLE}" ]; then
+        display="sdl"
+    fi
+
+    # Set the default 3D acceleration.
+    if [ -z "${gl}" ]; then
+        if command -v glxinfo &>/dev/null; then
+            GLSL_VER=$(glxinfo | grep "OpenGL ES GLSL" | awk '{print $NF}')
+            case ${GLSL_VER} in
+                1*|2*) gl="off";;
+                *) gl="on";;
+            esac
+        else
+            gl="on"
+        fi
+    fi
 }
 
 function sound_card_param_check() {
