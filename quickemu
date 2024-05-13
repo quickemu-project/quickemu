@@ -839,7 +839,7 @@ function vm_boot() {
     elif [ "${sound_card}" == "none" ]; then
         SOUND=""
     fi
-    echo " - Sound:    ${sound_card}"
+    echo " - Sound:    ${sound_card} (${sound_duplex})"
 
     # Set the hostname of the VM
     local NET="user,hostname=${VMNAME}"
@@ -1421,6 +1421,7 @@ function usage() {
     echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
     echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
     echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'"
+    echo "  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)"
     echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
     echo "  --version                         : Print version"
     exit 1
@@ -1436,6 +1437,13 @@ function display_param_check() {
 function sound_card_param_check() {
     if [ "${sound_card}" != "intel-hda" ] && [ "${sound_card}" != "ac97" ] && [ "${sound_card}" != "es1370" ] && [ "${sound_card}" != "sb16" ] && [ "${sound_card}" != "none" ]; then
         echo "ERROR! Requested sound card '${sound_card}' is not recognised."
+        exit 1
+    fi
+    #name "hda-duplex", bus HDA, desc "HDA Audio Codec, duplex (line-out, line-in)"
+    #name "hda-micro", bus HDA, desc "HDA Audio Codec, duplex (speaker, microphone)"
+    #name "hda-output", bus HDA, desc "HDA Audio Codec, output-only (line-out)"
+    if [ "${sound_duplex}" != "hda-duplex" ] && [ "${sound_duplex}" != "hda-micro" ] && [ "${sound_duplex}" != "hda-output" ]; then
+        echo "ERROR! Requested sound duplex '${sound_duplex}' is not recognised."
         exit 1
     fi
 }
@@ -1553,6 +1561,7 @@ keyboard_layout="${keyboard_layout:-en-us}"
 mouse="${mouse:-tablet}"
 # options: intel-hda, ac97, es1370, sb16, none
 sound_card="${sound_card:-intel-hda}"
+sound_duplex="${sound_duplex:-hda-micro}"
 
 ACCESS=""
 ACTIONS=()
@@ -1709,6 +1718,9 @@ else
             -sound-card|--sound-card)
                 sound_card="${2}"
                 shift 2;;
+            -sound-duplex|--sound-duplex)
+                sound_duplex="${2}"
+                shift 2;;
             -version|--version)
                 echo "${VERSION}"
                 exit;;
@@ -1782,7 +1794,9 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     if [ -n "${BRAILLE}" ]; then
         display="sdl"
     fi
+
     display_param_check
+    sound_card_param_check
     viewer_param_check
 
     # Set the default 3D acceleration.
@@ -1832,8 +1846,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         echo "ERROR: spice_port must be a number!"
         exit 1
     fi
-
-    sound_card_param_check
 
     # Check if vm is already run
     VM_PID=""
