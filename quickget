@@ -1502,6 +1502,7 @@ EOF
                 echo "ram=\"2048M\"" >> "${CONF_FILE}"
                 ;;
             macos)
+                echo "disk_size=\"128G\"" >> "${CONF_FILE}"
                 echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
                 # https://github.com/quickemu-project/quickemu/issues/438
                 if [ "${RELEASE}" == "monterey" ]; then
@@ -1514,6 +1515,11 @@ EOF
             # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
             echo "disk_size=\"32G\"" >> "${CONF_FILE}"
         fi
+
+        if [[ "${OS}" == "windows"* ]]; then
+            echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+        fi
+
         # Enable TPM for Windows 11
         if [ "${OS}" == "windows" ] && [ "${RELEASE}" == 11 ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"

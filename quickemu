@@ -525,10 +525,6 @@ function vm_boot() {
                 usb_controller="xhci"
                 sound_card="ac97"
             fi
-
-            if [ -z "${disk_size}" ]; then
-                disk_size="16G"
-            fi
             ;;
         kolibrios|reactos)
             CPU="-cpu qemu32,kvm=on"
@@ -625,7 +621,6 @@ function vm_boot() {
                     NET_DEVICE="vmxnet3"
                     USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci";;
             esac
-            disk_size="${disk_size:-128G}"
             ;;
         windows|windows-server)
             if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
@@ -646,17 +641,10 @@ function vm_boot() {
             else
               GUEST_TWEAKS+=" -no-hpet"
             fi
-
-            if [ -z "${disk_size}" ]; then
-                disk_size="64G"
-            fi
             SMM="on"
             ;;
         *) CPU="-cpu host,kvm=on"
            NET_DEVICE="rtl8139"
-           if [ -z "${disk_size}" ]; then
-               disk_size="32G"
-           fi
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
 
@@ -1533,7 +1521,7 @@ boot="efi"
 cpu_cores=""
 disk_format="${disk_format:-qcow2}"
 disk_img="${disk_img:-}"
-disk_size=""
+disk_size="${disk_size:-16G}"
 display="${display:-sdl}"
 extra_args="${extra_args:-}"
 fixed_iso=""
