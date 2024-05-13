@@ -1562,14 +1562,11 @@ monitor_telnet_host="${monitor_telnet_host:-localhost}"
 serial="${serial:-socket}"
 serial_telnet_port="${serial_telnet_port:-6660}"
 serial_telnet_host="${serial_telnet_host:-localhost}"
-# options: ehci(USB2.0), xhci(USB3.0)
+# options: ehci (USB2.0), xhci (USB3.0)
 usb_controller="${usb_controller:-ehci}"
-# options: ps2, usb, virtio
 keyboard="${keyboard:-usb}"
 keyboard_layout="${keyboard_layout:-en-us}"
-# options: ps2, usb, tablet, virtio
 mouse="${mouse:-tablet}"
-# options: intel-hda, ac97, es1370, sb16, none
 sound_card="${sound_card:-intel-hda}"
 sound_duplex="${sound_duplex:-hda-micro}"
 
