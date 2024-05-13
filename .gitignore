@@ -5,6 +5,7 @@
 *.fixed
 *.img
 *.iso
+*.ISO
 *.lock
 !flake.lock
 *.log
