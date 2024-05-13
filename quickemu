@@ -40,33 +40,52 @@ function delete_shortcut() {
     local SHORTCUT_DIR="${HOME}/.local/share/applications/"
     if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
         rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
-        echo "Deleted ${VM} desktop shortcut"
+        echo " - Deleted ${SHORTCUT_DIR}/${VMNAME}.desktop"
     fi
 }
 
 function delete_disk() {
+    echo "Deleting ${VMNAME} virtual hard disk"
     if [ -e "${disk_img}" ]; then
-        rm "${disk_img}"
+        rm "${disk_img}" >/dev/null 2>&1
         # Remove any EFI vars, but not for macOS
         rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
         rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
         rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
         rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
-        echo "SUCCESS! Deleted ${disk_img}"
+        echo " - Deleted ${disk_img}"
         delete_shortcut
     else
-        echo "NOTE! ${disk_img} not found. Doing nothing."
+        echo " - ${disk_img} not found. Doing nothing."
     fi
 }
 
 function delete_vm() {
+    echo "Deleting ${VMNAME} completely"
     if [ -d "${VMDIR}" ]; then
         rm -rf "${VMDIR}"
         rm "${VM}"
-        echo "SUCCESS! Deleted ${VM} and ${VMDIR}"
+        echo " - Deleted ${VM} and ${VMDIR}/"
         delete_shortcut
     else
-        echo "NOTE! ${VMDIR} not found. Doing nothing."
+        echo " - ${VMDIR} not found. Doing nothing."
+    fi
+}
+
+function kill_vm() {
+    echo "Killing ${VMNAME}"
+    if [ -z "${VM_PID}" ]; then
+        echo " - ${VMNAME} is not running."
+        rm -f "${VMDIR}/${VMNAME}.pid"
+    elif [ -n "${VM_PID}" ]; then
+        if kill -9 "${VM_PID}" > /dev/null 2>&1; then
+            echo " - ${VMNAME} (${VM_PID}) killed."
+            rm -f "${VMDIR}/${VMNAME}.pid"
+        else
+            echo " - ${VMNAME} (${VM_PID}) was not killed."
+        fi
+    elif [ ! -r "${VMDIR}/${VMNAME}.pid" ]; then
+        echo " - ${VMNAME} has no ${VMDIR}/${VMNAME}.pid"
     fi
 }
 
@@ -1335,6 +1354,7 @@ function start_viewer {
 function shortcut_create {
     local dirname="${HOME}/.local/share/applications"
     local filename="${HOME}/.local/share/applications/${VMNAME}.desktop"
+    echo "Creating ${VMNAME} desktop shortcut file"
 
     if [ ! -d "${dirname}" ]; then
         mkdir -p "${dirname}"
@@ -1349,7 +1369,7 @@ Path=${VMPATH}
 Name=${VMNAME}
 Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
 EOF
-    echo "Created ${VMNAME}.desktop file"
+    echo " - ${filename} created."
 }
 
 function usage() {
@@ -1535,16 +1555,13 @@ mouse="${mouse:-tablet}"
 sound_card="${sound_card:-intel-hda}"
 
 ACCESS=""
+ACTIONS=()
 BRAILLE=""
-DELETE_DISK=0
-DELETE_VM=0
 FULLSCREEN=""
-KILL_VM=0
 MONITOR_CMD=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
-SHORTCUT=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 SOCKET_MONITOR=""
@@ -1589,10 +1606,10 @@ else
                 BRAILLE="on"
                 shift;;
             -delete|--delete|-delete-disk|--delete-disk)
-                DELETE_DISK=1
+                ACTIONS+=(delete_disk)
                 shift;;
             -delete-vm|--delete-vm)
-                DELETE_VM=1
+                ACTIONS+=(delete_vm)
                 shift;;
             -display|--display)
                 display="${2}"
@@ -1605,7 +1622,7 @@ else
                 ignore_msrs_always
                 exit;;
             -kill|--kill)
-                KILL_VM=1
+                ACTIONS+=(kill_vm)
                 shift;;
             -offline|--offline)
                 network="none"
@@ -1627,7 +1644,7 @@ else
                 STATUS_QUO="-snapshot"
                 shift;;
             -shortcut|--shortcut)
-                SHORTCUT=1
+                ACTIONS+=(shortcut_create)
                 shift;;
             -vm|--vm)
                 VM="${2}"
@@ -1714,6 +1731,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     if [ -z "${disk_img}" ]; then
         echo "ERROR! No disk_img defined."
         exit 1
+    fi
+
+    # Iterate over any actions and exit.
+    if [ ${#ACTIONS[@]} -ge 1 ]; then
+        for ACTION in "${ACTIONS[@]}"; do
+            ${ACTION}
+        done
+        exit
     fi
 
     # Backwards compatibility for ${driver_iso}
@@ -1806,34 +1831,6 @@ else
     usage
 fi
 
-if [ ${KILL_VM} -eq 1 ]; then
-    echo "Killing ${VMNAME}"
-    if [ -z "${VM_PID}" ]; then
-        echo " - ${VMNAME} is not running."
-        rm -f "${VMDIR}/${VMNAME}.pid"
-    elif [ -n "${VM_PID}" ]; then
-        if kill -9 "${VM_PID}" > /dev/null 2>&1; then
-            echo " - ${VMNAME} (${VM_PID}) killed."
-            rm -f "${VMDIR}/${VMNAME}.pid"
-        else
-            echo " - ${VMNAME} (${VM_PID}) was not killed."
-        fi
-    elif [ ! -r "${VMDIR}/${VMNAME}.pid" ]; then
-        echo " - ${VMNAME} has no ${VMDIR}/${VMNAME}.pid"
-    fi
-    exit
-fi
-
-if [ ${DELETE_DISK} -eq 1 ]; then
-    delete_disk
-    exit
-fi
-
-if [ ${DELETE_VM} -eq 1 ]; then
-    delete_vm
-    exit
-fi
-
 if [ -n "${SNAPSHOT_ACTION}" ]; then
     case ${SNAPSHOT_ACTION} in
         apply)
@@ -1855,11 +1852,6 @@ if [ -n "${SNAPSHOT_ACTION}" ]; then
             echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
             usage;;
     esac
-fi
-
-if [ ${SHORTCUT} -eq 1 ]; then
-    shortcut_create
-    exit
 fi
 
 if [ -z "${VM_PID}" ]; then
