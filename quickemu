@@ -1787,16 +1787,6 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         esac
     fi
 
-    # Backwards compatibility for ${driver_iso}
-    if [ -n "${driver_iso}" ] && [ -z "${fixed_iso}" ]; then
-        fixed_iso="${driver_iso}"
-    fi
-
-    # Backwards compatibility for ${disk} (size)
-    if [ -n "${disk}" ]; then
-        disk_size="${disk}"
-    fi
-
     # Braille support requires SDL. Override $display if braille was requested.
     if [ -n "${BRAILLE}" ]; then
         display="sdl"
