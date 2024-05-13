@@ -3237,15 +3237,6 @@ function download_windows_workstation() {
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
     web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
-    # Only Windows 11 hashes can be found directly from Microsoft's page.
-    if [ "${windows_version}" == 11 ]; then
-        local HASH_I18N="${I18N}"
-        if [ "${I18N}" == "English (United States)" ]; then
-            HASH_I18N="English"
-        fi
-        HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "${HASH_I18N}  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
-        check_hash "${VM_PATH}/${FILE_NAME}" "${HASH}"
-    fi
 }
 
 function get_windows() {
