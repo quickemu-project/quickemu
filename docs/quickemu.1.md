@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 13, 2024
+date: May 14, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -13,7 +13,7 @@ quickemu - A quick VM builder and manager
 
 # SYNOPSIS
 
-**quickemu** \[*OPTION*\]…
+**quickemu** \[*OPTION*\]...
 
 # DESCRIPTION
 
@@ -28,8 +28,8 @@ machines for Linux, macOS and Windows
 You can also pass optional parameters
 
 **--access**
-:   Enable remote spice access support. ‘local’ (default), ‘remote’,
-    ‘clientipaddress’
+:   Enable remote spice access support. 'local' (default), 'remote',
+    'clientipaddress'
 
 **--braille**
 :   Enable braille support. Requires SDL.
@@ -38,11 +38,11 @@ You can also pass optional parameters
 :   Delete the disk image and EFI variables
 
 **--delete-vm**
-:   Delete the entire VM and it’s configuration
+:   Delete the entire VM and its configuration
 
 **--display**
-:   Select display backend. ‘sdl’ (default), ‘gtk’, ‘none’, ‘spice’ or
-    ‘spice-app’
+:   Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or
+    'spice-app'
 
 **--fullscreen**
 :   Starts VM in full screen mode (Ctl+Alt+f to exit)
@@ -75,14 +75,14 @@ You can also pass optional parameters
 :   Do not commit any changes to disk/snapshot.
 
 **--viewer \<viewer\>**
-:   Choose an alternative viewer. @Options: ‘spicy’ (default),
-    ‘remote-viewer’, ‘none’
+:   Choose an alternative viewer. @Options: 'spicy' (default),
+    'remote-viewer', 'none'
 
 **--width \<width\>**
-:   Set VM screen width; requires ‘–height’
+:   Set VM screen width; requires '--height'
 
 **--height \<height\>**
-:   Set VM screen height; requires ‘–width’
+:   Set VM screen height; requires '--width'
 
 **--ssh-port \<port\>**
 :   Set SSH port manually
@@ -91,47 +91,47 @@ You can also pass optional parameters
 :   Set SPICE port manually
 
 **--public-dir \<path\>**
-:   Expose share directory. @Options: ’’ (default: xdg-user-dir
-    PUBLICSHARE), ‘<directory>’, ‘none’
+:   Expose share directory. @Options: '' (default: xdg-user-dir
+    PUBLICSHARE), '<directory>', 'none'
 
 **--monitor \<type\>**
-:   Set monitor connection type. @Options: ‘socket’ (default), ‘telnet’,
-    ‘none’
+:   Set monitor connection type. @Options: 'socket' (default), 'telnet',
+    'none'
 
 **--monitor-telnet-host \<ip/host\>**
-:   Set telnet host for monitor. (default: ‘localhost’)
+:   Set telnet host for monitor. (default: 'localhost')
 
 **--monitor-telnet-port \<port\>**
-:   Set telnet port for monitor. (default: ‘4440’)
+:   Set telnet port for monitor. (default: '4440')
 
 **--monitor-cmd \<cmd\>**
 :   Send command to monitor if available. (Example: system_powerdown)
 
 **--serial \<type\>**
-:   Set serial connection type. @Options: ‘socket’ (default), ‘telnet’,
-    ‘none’
+:   Set serial connection type. @Options: 'socket' (default), 'telnet',
+    'none'
 
 **--serial-telnet-host \<ip/host\>**
-:   Set telnet host for serial. (default: ‘localhost’)
+:   Set telnet host for serial. (default: 'localhost')
 
 **--serial-telnet-port \<port\>**
-:   Set telnet port for serial. (default: ‘6660’)
+:   Set telnet port for serial. (default: '6660')
 
 **--keyboard \<type\>**
-:   Set keyboard. @Options: ‘usb’ (default), ‘ps2’, ‘virtio’
+:   Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'
 
 **--keyboard_layout \<layout\>**
-:   Set keyboard layout: ‘en-us’ (default)
+:   Set keyboard layout: 'en-us' (default)
 
 **--mouse \<type\>**
-:   Set mouse. @Options: ‘tablet’ (default), ‘ps2’, ‘usb’, ‘virtio’
+:   Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
 
 **--usb-controller \<type\>**
-:   Set usb-controller. @Options: ‘ehci’ (default), ‘xhci’, ‘none’
+:   Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
 
 **--sound-card \<type\>**
-:   Set sound card. @Options: ‘intel-hda’ (default), ‘ac97’, ‘es1370’,
-    ‘sb16’, ‘none’
+:   Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370',
+    'sb16', 'none'
 
 **--extra_args \<arguments\>**
 :   Pass additional arguments to qemu
@@ -141,14 +141,14 @@ You can also pass optional parameters
 
 # EXAMPLES
 
-**quickemu –vm ubuntu-mate-22.04.conf**
+**quickemu --vm ubuntu-mate-22.04.conf**
 :   Launches the VM specified in the file *ubuntu-mate-22.04.conf*
 
 # Introduction
 
 **Quickemu** is a wrapper for the excellent
-[QEMU](https://www.qemu.org/) that automatically *“does the right
-thing”* when creating virtual machines. No requirement for exhaustive
+[QEMU](https://www.qemu.org/) that automatically *"does the right
+thing"* when creating virtual machines. No requirement for exhaustive
 configuration options. You decide what operating system you want to run
 and Quickemu takes care of the rest 🤖
 
@@ -597,21 +597,21 @@ macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and
 sudo trimforce enable
 ```
 
-You will be prompted to enter your account’s password to gain the
-privilege needed. Once you’ve entered your password and pressed
+You will be prompted to enter your account's password to gain the
+privilege needed. Once you've entered your password and pressed
 <kbd>enter</kbd> the command will request confirmation in the form of
-two questions that require you to type <kbd>y</kbd> (for a “yes”
+two questions that require you to type <kbd>y</kbd> (for a "yes"
 response) followed by <kbd>enter</kbd> to confirm.
 
 If you press <kbd>enter</kbd> without first typing <kbd>y</kbd> the
-system will consider that a negative response as though you said “no”:
+system will consider that a negative response as though you said "no":
 
 ``` plain
 IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
 Are you sure you with to proceed (y/N)?
 ```
 
-And a second confirmation once you’ve confirmed the previous one:
+And a second confirmation once you've confirmed the previous one:
 
 ``` plain
 Your system will immediately reboot when this is complete.
@@ -682,7 +682,7 @@ There are some considerations when running macOS via Quickemu.
 
 # macOS App Store
 
-If you see *“Your device or computer could not be verified”* when you
+If you see *"Your device or computer could not be verified"* when you
 try to login to the App Store, make sure that your wired ethernet device
 is `en0`. Use `ifconfig` in a terminal to verify this.
 
@@ -709,7 +709,7 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-**Windows 8.1** is also supported but doesn’t feature any automated
+**Windows 8.1** is also supported but doesn't feature any automated
 installation or driver optimisation.
 
 `quickget` can also download [Windows 10
@@ -778,7 +778,8 @@ Arguments
   --keyboard_layout <layout>        : Set keyboard layout: 'en-us' (default)
   --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'
   --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'
-  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'
+  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'usb-audio', 'none'
+  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)
   --extra_args <arguments>          : Pass additional arguments to qemu
   --version                         : Print version
 ```
@@ -793,62 +794,12 @@ shortcut.
 quickemu --vm ubuntu-22.04-desktop.conf --shortcut
 ```
 
-## Screen and window size (Linux guests only)
-
-`qemu` will always default to the primary monitor to display the VM’s
-window.
-
-Without the `--screen` option, `quickemu` will look for the size of the
-smallest monitor, and use a size that fits on said monitor.
-
-The `--screen` option forces `quickemu` to use the size of the given
-monitor to compute the size of the window. **It won’t use that monitor
-to display the VM’s window if it’s not the primary monitor**. This is
-useful if the primary monitor if not the smallest one, and if the VM’s
-window doesn’t need to be moved around.
-
-The `--screen` option is also useful with the `--fullscreen` option,
-again because `qemu` will always use the primary monitor. In order for
-the fullscreen mode to work properly, the resolution of the VM’s window
-must match the resolution of the screen.
-
-To know which screen to use, type:
-
-``` shell
-xrandr --listmonitors | grep -v Monitors
-```
-
-The command will output something like this:
-
-``` shell
- 0: +*HDMI-0 2560/597x1440/336+1920+0  HDMI-0
- 1: +DVI-D-0 1920/527x1080/296+0+0  DVI-D-0
-```
-
-The first number is what needs to be passed to the `--screen` option.
-
-For example:
-
-``` shell
-quickemu --vm vm.conf --screen 0
-```
-
-The above uses the 2560x1440 screen to compute the size of the window,
-which Quickemu sizes to 2048x1152. Without the `--screen` option,
-Quickemu would have used the 1920x1080 monitor which results in a window
-size of 1664x936.
-
-The ‘–screenpct’ is an optional integer value between 25 \<= pct \< 100
-which will override system default screen sizes. The VM size will be
-‘pct’ of the chosen screen. **If –fullscreen is chosen screen will be
-fullsize instead of being scaled down by –screenpct value.**
-
 ## References
 
 Useful reference that assisted the development of Quickemu.
 
 - General
-  - [QEMU’s documentation!](https://qemu.readthedocs.io/en/latest/)
+  - [QEMU's documentation!](https://qemu.readthedocs.io/en/latest/)
   - <https://pve.proxmox.com/wiki/Qemu/KVM_Virtual_Machines>
   - <https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/>
 - macOS
