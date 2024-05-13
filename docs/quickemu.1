@@ -10,133 +10,137 @@ quickemu \- A quick VM builder and manager
 machines for Linux, macOS and Windows
 .SH OPTIONS
 .TP
-\f[B]\[en]vm\f[R]
+\f[B]\-\-vm\f[R]
 vm configuration file
 .PP
 You can also pass optional parameters
 .TP
-\f[B]\[en]access\f[R]
+\f[B]\-\-access\f[R]
 Enable remote spice access support.
-`local' (default), `remote', `clientipaddress'
+\[oq]local\[cq] (default), \[oq]remote\[cq], \[oq]clientipaddress\[cq]
 .TP
-\f[B]\[en]braille\f[R]
+\f[B]\-\-braille\f[R]
 Enable braille support.
 Requires SDL.
 .TP
-\f[B]\[en]delete\-disk\f[R]
+\f[B]\-\-delete\-disk\f[R]
 Delete the disk image and EFI variables
 .TP
-\f[B]\[en]delete\-vm\f[R]
+\f[B]\-\-delete\-vm\f[R]
 Delete the entire VM and it\[cq]s configuration
 .TP
-\f[B]\[en]display\f[R]
+\f[B]\-\-display\f[R]
 Select display backend.
-`sdl' (default), `gtk', `none', `spice' or `spice\-app'
+\[oq]sdl\[cq] (default), \[oq]gtk\[cq], \[oq]none\[cq], \[oq]spice\[cq]
+or \[oq]spice\-app\[cq]
 .TP
-\f[B]\[en]fullscreen\f[R]
+\f[B]\-\-fullscreen\f[R]
 Starts VM in full screen mode (Ctl+Alt+f to exit)
 .TP
-\f[B]\[en]ignore\-msrs\-always\f[R]
+\f[B]\-\-ignore\-msrs\-always\f[R]
 Configure KVM to always ignore unhandled machine\-specific registers
 .TP
-\f[B]\[en]screen <screen>\f[R]
-Use specified screen to determine the window size.
+\f[B]\-\-kill\f[R]
+Kill the VM process if it is running
 .TP
-\f[B]\[en]screenpct <percent>\f[R]
-Percent of fullscreen for VM if \[en]fullscreen is not specified.
+\f[B]\-\-offline\f[R]
+Override all network settings and start the VM offline
 .TP
-\f[B]\[en]shortcut\f[R]
+\f[B]\-\-shortcut\f[R]
 Create a desktop shortcut
 .TP
-\f[B]\[en]snapshot apply <tag>\f[R]
+\f[B]\-\-snapshot apply <tag>\f[R]
 Apply/restore a snapshot.
 .TP
-\f[B]\[en]snapshot create <tag>\f[R]
+\f[B]\-\-snapshot create <tag>\f[R]
 Create a snapshot.
 .TP
-\f[B]\[en]snapshot delete <tag>\f[R]
+\f[B]\-\-snapshot delete <tag>\f[R]
 Delete a snapshot.
 .TP
-\f[B]\[en]snapshot info\f[R]
+\f[B]\-\-snapshot info\f[R]
 Show disk/snapshot info.
 .TP
-\f[B]\[en]status\-quo\f[R]
+\f[B]\-\-status\-quo\f[R]
 Do not commit any changes to disk/snapshot.
 .TP
-\f[B]\[en]viewer <viewer>\f[R]
+\f[B]\-\-viewer <viewer>\f[R]
 Choose an alternative viewer.
-\[at]Options: `spicy' (default), `remote\-viewer', `none'
+\[at]Options: \[oq]spicy\[cq] (default), \[oq]remote\-viewer\[cq],
+\[oq]none\[cq]
 .TP
-\f[B]\[en]width <width>\f[R]
-Set VM screen width.
-Does nothing without \[en]height
+\f[B]\-\-width <width>\f[R]
+Set VM screen width; requires \[oq]\[en]height\[cq]
 .TP
-\f[B]\[en]height <height>\f[R]
-Set VM screen height.
-Does nothing without \[en]width
+\f[B]\-\-height <height>\f[R]
+Set VM screen height; requires \[oq]\[en]width\[cq]
 .TP
-\f[B]\[en]ssh\-port <port>\f[R]
-Set ssh\-port manually
+\f[B]\-\-ssh\-port <port>\f[R]
+Set SSH port manually
 .TP
-\f[B]\[en]spice\-port <port>\f[R]
-Set spice\-port manually
+\f[B]\-\-spice\-port <port>\f[R]
+Set SPICE port manually
 .TP
-\f[B]\[en]public\-dir <path>\f[R]
+\f[B]\-\-public\-dir <path>\f[R]
 Expose share directory.
-\[at]Options: \[cq]\[cq] (default: xdg\-user\-dir PUBLICSHARE), `',
-`none'
+\[at]Options: \[cq]\[cq] (default: xdg\-user\-dir PUBLICSHARE),
+\[oq]\[cq], \[oq]none\[cq]
 .TP
-\f[B]\[en]monitor <type>\f[R]
+\f[B]\-\-monitor <type>\f[R]
 Set monitor connection type.
-\[at]Options: `socket' (default), `telnet', `none'
+\[at]Options: \[oq]socket\[cq] (default), \[oq]telnet\[cq],
+\[oq]none\[cq]
 .TP
-\f[B]\[en]monitor\-telnet\-host <ip/host>\f[R]
+\f[B]\-\-monitor\-telnet\-host <ip/host>\f[R]
 Set telnet host for monitor.
-(default: `localhost')
+(default: \[oq]localhost\[cq])
 .TP
-\f[B]\[en]monitor\-telnet\-port <port>\f[R]
+\f[B]\-\-monitor\-telnet\-port <port>\f[R]
 Set telnet port for monitor.
-(default: `4440')
+(default: \[oq]4440\[cq])
 .TP
-\f[B]\[en]monitor\-cmd <cmd>\f[R]
+\f[B]\-\-monitor\-cmd <cmd>\f[R]
 Send command to monitor if available.
 (Example: system_powerdown)
 .TP
-\f[B]\[en]serial <type>\f[R]
+\f[B]\-\-serial <type>\f[R]
 Set serial connection type.
-\[at]Options: `socket' (default), `telnet', `none'
+\[at]Options: \[oq]socket\[cq] (default), \[oq]telnet\[cq],
+\[oq]none\[cq]
 .TP
-\f[B]\[en]serial\-telnet\-host <ip/host>\f[R]
+\f[B]\-\-serial\-telnet\-host <ip/host>\f[R]
 Set telnet host for serial.
-(default: `localhost')
+(default: \[oq]localhost\[cq])
 .TP
-\f[B]\[en]serial\-telnet\-port <port>\f[R]
+\f[B]\-\-serial\-telnet\-port <port>\f[R]
 Set telnet port for serial.
-(default: `6660')
+(default: \[oq]6660\[cq])
 .TP
-\f[B]\[en]keyboard <type>\f[R]
+\f[B]\-\-keyboard <type>\f[R]
 Set keyboard.
-\[at]Options: `usb' (default), `ps2', `virtio'
+\[at]Options: \[oq]usb\[cq] (default), \[oq]ps2\[cq], \[oq]virtio\[cq]
 .TP
-\f[B]\[en]keyboard_layout <layout>\f[R]
-Set keyboard layout.
+\f[B]\-\-keyboard_layout <layout>\f[R]
+Set keyboard layout: \[oq]en\-us\[cq] (default)
 .TP
-\f[B]\[en]mouse <type>\f[R]
+\f[B]\-\-mouse <type>\f[R]
 Set mouse.
-\[at]Options: `tablet' (default), `ps2', `usb', `virtio'
+\[at]Options: \[oq]tablet\[cq] (default), \[oq]ps2\[cq], \[oq]usb\[cq],
+\[oq]virtio\[cq]
 .TP
-\f[B]\[en]usb\-controller <type>\f[R]
+\f[B]\-\-usb\-controller <type>\f[R]
 Set usb\-controller.
-\[at]Options: `ehci' (default), `xhci', `none'
+\[at]Options: \[oq]ehci\[cq] (default), \[oq]xhci\[cq], \[oq]none\[cq]
 .TP
-\f[B]\[en]sound\-card <type>\f[R]
+\f[B]\-\-sound\-card <type>\f[R]
 Set sound card.
-\[at]Options: `intel\-hda' (default), `ac97', `es1370', `sb16', `none'
+\[at]Options: \[oq]intel\-hda\[cq] (default), \[oq]ac97\[cq],
+\[oq]es1370\[cq], \[oq]sb16\[cq], \[oq]none\[cq]
 .TP
-\f[B]\[en]extra_args <arguments>\f[R]
+\f[B]\-\-extra_args <arguments>\f[R]
 Pass additional arguments to qemu
 .TP
-\f[B]\[en]version\f[R]
+\f[B]\-\-version\f[R]
 Print version
 .SH EXAMPLES
 .TP
@@ -431,7 +435,7 @@ While \f[CR]quickemu\f[R] and \f[CR]quickget\f[R] are designed for the
 terminal, a graphical user interface is also available:
 .IP \[bu] 2
 \f[B]\c
-.UR https://github.com/quickgui/quickgui
+.UR https://github.com/quickemu-project/quickgui
 Quickgui
 .UE \c
 \f[R] by \c
@@ -480,12 +484,6 @@ qqX
 Alex Genovese
 .UE \c
 \ (see the github pages)
-[IMAGE: \c
-.UR https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf
-qqX\-vmm
-.UE \c
-]
-qqX\-vmm
 .SS Creating Linux guests 🐧
 .SS Ubuntu
 \f[CR]quickget\f[R] will automatically download an Ubuntu release and
@@ -1226,9 +1224,9 @@ which Quickemu sizes to 2048x1152.
 Without the \f[CR]\-\-screen\f[R] option, Quickemu would have used the
 1920x1080 monitor which results in a window size of 1664x936.
 .PP
-The `\[en]screenpct' is an optional integer value between 25 <= pct <
-100 which will override system default screen sizes.
-The VM size will be `pct' of the chosen screen.
+The \[oq]\[en]screenpct\[cq] is an optional integer value between 25 <=
+pct < 100 which will override system default screen sizes.
+The VM size will be \[oq]pct\[cq] of the chosen screen.
 \f[B]If \[en]fullscreen is chosen screen will be fullsize instead of
 being scaled down by \[en]screenpct value.\f[R]
 .SS References
