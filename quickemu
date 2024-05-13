@@ -1039,11 +1039,15 @@ function vm_boot() {
         args+=(-k "${keyboard_layout}")
     fi
 
-    # FIXME: Check for device availability. qemu will fail to start otherwise
     if [ -n "${BRAILLE}" ]; then
-        # shellcheck disable=SC2054
-        args+=(-chardev braille,id=brltty
-            -device usb-braille,id=usbbrl,chardev=brltty)
+        if ${QEMU} -chardev help | grep -q braille; then
+            # shellcheck disable=SC2054
+            #args+=(-chardev braille,id=brltty
+            #       -device usb-braille,id=usbbrl,chardev=brltty)
+            args+=(-usbdevice braille)
+        else
+            echo " - WARNING!  ${QEMU} does not support -chardev braille "
+        fi
     fi
 
     # setup mouse
