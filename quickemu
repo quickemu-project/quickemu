@@ -1474,6 +1474,16 @@ function sound_card_param_check() {
     fi
 }
 
+function tpm_param_check() {
+    if [ "${tpm}" == "on" ]; then
+        SWTPM=$(command -v swtpm)
+        if [ ! -e "${SWTPM}" ]; then
+            echo "ERROR! TPM is enabled, but swtpm was not found."
+            exit 1
+        fi
+    fi
+}
+
 function viewer_param_check() {
     if [ "${viewer}" != "none" ] && [ "${viewer}" != "spicy" ] && [ "${viewer}" != "remote-viewer" ]; then
         echo "ERROR! Requested viewer '${viewer}' is not recognised."
