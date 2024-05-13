@@ -832,13 +832,13 @@ function vm_boot() {
     VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
 
     # Build the sound hardware configuration
-    if [ "${sound_card}" == "intel-hda" ]; then
-        SOUND="-device intel-hda -device hda-duplex,audiodev=audio0"
-    elif [ "${sound_card}" == "ac97" ] || [ "${sound_card}" == "es1370" ] || [ "${sound_card}" == "sb16" ]; then
-        SOUND="-device ${sound_card},audiodev=audio0"
-    elif [ "${sound_card}" == "none" ]; then
-        SOUND=""
-    fi
+    case ${sound_card} in
+        ich9-intel-hda|intel-hda) SOUND="-device ${sound_card} -device ${sound_duplex},audiodev=audio0";;
+        usb-audio) SOUND="-device ${sound_card},audiodev=audio0";;
+        ac97|es1370|sb16) SOUND="-device ${sound_card},audiodev=audio0";;
+        none) SOUND="";;
+    esac
+
     echo " - Sound:    ${sound_card} (${sound_duplex})"
 
     # Set the hostname of the VM
@@ -980,8 +980,6 @@ function vm_boot() {
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
         ${VIDEO} -display ${DISPLAY_RENDER}
-        -audiodev ${AUDIO_DEV}
-        ${SOUND}
         -rtc base=localtime,clock=host,driftfix=slew)
 
     # Only enable SPICE is using SPICE display
@@ -1078,6 +1076,11 @@ function vm_boot() {
     else
         echo "WARNING! Unknown mouse value: '${mouse}; Fallback to ps2'"
     fi
+
+    # setup audio
+    # @INFO: must be set after usb-controller; in case usb-audio is used
+    # shellcheck disable=SC2206
+    args+=(-audiodev ${AUDIO_DEV} ${SOUND})
 
     # $bridge backwards compatibility for Quickemu <= 4.0
     if [ -n "${bridge}" ]; then
@@ -1420,7 +1423,7 @@ function usage() {
     echo "  --keyboard_layout <layout>        : Set keyboard layout: 'en-us' (default)"
     echo "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
     echo "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
-    echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'none'"
+    echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'usb-audio', 'none'"
     echo "  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)"
     echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
     echo "  --version                         : Print version"
@@ -1435,10 +1438,16 @@ function display_param_check() {
 }
 
 function sound_card_param_check() {
-    if [ "${sound_card}" != "intel-hda" ] && [ "${sound_card}" != "ac97" ] && [ "${sound_card}" != "es1370" ] && [ "${sound_card}" != "sb16" ] && [ "${sound_card}" != "none" ]; then
+    if [ "${sound_card}" != "ac97" ] && [ "${sound_card}" != "es1370" ] && [ "${sound_card}" != "ich9-intel-hda" ] && [ "${sound_card}" != "intel-hda" ] && [ "${sound_card}" != "sb16" ] && [ "${sound_card}" != "usb-audio" ] && [ "${sound_card}" != "none" ]; then
         echo "ERROR! Requested sound card '${sound_card}' is not recognised."
         exit 1
     fi
+
+    # USB audio requires xhci controller
+    if [ "${sound_card}" == "usb-audio" ]; then
+        usb_controller="xhci";
+    fi
+
     #name "hda-duplex", bus HDA, desc "HDA Audio Codec, duplex (line-out, line-in)"
     #name "hda-micro", bus HDA, desc "HDA Audio Codec, duplex (speaker, microphone)"
     #name "hda-output", bus HDA, desc "HDA Audio Codec, output-only (line-out)"
