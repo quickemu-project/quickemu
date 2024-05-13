@@ -167,7 +167,7 @@ function error_specify_release() {
             "releases_${OS}"
             echo -en " - Languages:\t"
             "languages_${OS}"
-            echo "${LANGS[@]}"
+            echo "${I18NS[@]}"
             ;;
         *)
             echo -en " - Releases:\t"
@@ -211,10 +211,10 @@ function error_not_supported_edition() {
 }
 
 function error_not_supported_lang() {
-    echo -e "ERROR! ${LANG} is not a supported $(pretty_name "${OS}") language\n"
+    echo -e "ERROR! ${I18N} is not a supported $(pretty_name "${OS}") language\n"
     echo -n ' - Editions: '
-    for LANG in "${LANGS[@]}"; do
-        echo -n "${LANG} "
+    for I18N in "${I18NS[@]}"; do
+        echo -n "${I18N} "
     done
     exit 1
 }
@@ -316,8 +316,8 @@ function csv_data() {
                 done
             elif [[ "${OS}" == "windows"* ]]; then
                 "languages_${OS}"
-                for LANG in "${LANGS[@]}"; do
-                    echo "${DISPLAY_NAME},${OS},${RELEASE},${LANG},${DOWNLOADER},${PNG},${SVG}"
+                for I18N in "${I18NS[@]}"; do
+                    echo "${DISPLAY_NAME},${OS},${RELEASE},${I18N},${DOWNLOADER},${PNG},${SVG}"
                 done
             else
                 echo "${DISPLAY_NAME},${OS},${RELEASE},,${DOWNLOADER},${PNG},${SVG}"
@@ -424,12 +424,12 @@ function test_all() {
             done
         elif [[ "${OS}" == "windows"* ]]; then
             "languages_${OS}"
-            for LANG in "${LANGS[@]}"; do
+            for I18N in "${I18NS[@]}"; do
                 validate_release releases_"${OS}"
                 if [ "${OPERATION}" == "show" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" ""
+                    test_result "${OS}" "${RELEASE}" "${I18N}" ""
                 elif [ "${OPERATION}" == "test" ]; then
-                    test_result "${OS}" "${RELEASE}" "${LANG}" "${URL}" "SKIP"
+                    test_result "${OS}" "${RELEASE}" "${I18N}" "${URL}" "SKIP"
                 fi
             done
         elif [[ "${OS}" == "macos" ]]; then
@@ -1152,15 +1152,15 @@ function releases_windows() {
 
 function languages_windows() {
     if [ "${RELEASE}" == 8 ]; then
-        LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
+        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
         "Croatian" "Czech" "Danish" "Dutch" "English (United States)" "English International" "Estonian" "Finnish" "French" "German" "Greek" \
         "Hebrew" "Hungarian" "Italian" "Japanese" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" \
         "Slovak" "Slovenian" "Spanish" "Swedish" "Thai" "Turkish" "Ukrainian")
     elif [ "${RELEASE}" == "10-ltsc" ]; then
-        LANGS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
+        I18NS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
         "French" "German" "Italian" "Japanese" "Korean" "Portuguese (Brazil)" "Spanish")
     else
-        LANGS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
         "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
         "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
         "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
@@ -1172,7 +1172,7 @@ function releases_windows-server() {
 }
 
 function languages_windows-server() {
-    LANGS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
+    I18NS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
 }
 
 function releases_zorin() {
@@ -3088,7 +3088,7 @@ function download_windows_server() {
         *) PRETTY_RELEASE="${RELEASE}";;
     esac
 
-    case "${LANG}" in
+    case "${I18N}" in
         "English (Great Britain)")
             CULTURE="en-gb"
             COUNTRY="GB";;
@@ -3156,7 +3156,7 @@ function download_windows_server() {
     # Limit untrusted size for input validation
     iso_download_link="$(echo "$iso_download_link" | head -c 1024)"
 
-    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${LANG}): $iso_download_link"
+    echo "Downloading $(pretty_name "${OS}") ${PRETTY_RELEASE} (${I18N}): $iso_download_link"
 
     # Use highest TLS version for endpoints that support it
     case "$iso_download_link" in
@@ -3234,7 +3234,7 @@ function download_windows_workstation() {
     language_skuid_table_html="$(echo "$language_skuid_table_html" | head -c 10240)"
 
     # tr: Filter for only alphanumerics or "-" to prevent HTTP parameter injection
-    sku_id="$(echo "$language_skuid_table_html" | grep "${LANG}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
+    sku_id="$(echo "$language_skuid_table_html" | grep "${I18N}" | sed 's/&quot;//g' | cut -d ',' -f 1  | cut -d ':' -f 2 | tr -cd '[:alnum:]-' | head -c 16)"
     # echo " - SKU ID: $sku_id"
 
     # Get ISO download link
@@ -3274,18 +3274,18 @@ function download_windows_workstation() {
         return 1
     fi
 
-    echo "Downloading Windows ${RELEASE} (${LANG}): $iso_download_link"
+    echo "Downloading Windows ${RELEASE} (${I18N}): $iso_download_link"
 
     # Download ISO
     FILE_NAME="$(echo "$iso_download_link" | cut -d'?' -f1 | cut -d'/' -f5)"
     curl_windows "${VM_PATH}" "${FILE_NAME}" "1.3" "$iso_download_link"
     # Only Windows 11 hashes can be found directly from Microsoft's page.
     if [ "${windows_version}" == 11 ]; then
-        local HASH_LANG="${LANG}"
-        if [ "${LANG}" == "English (United States)" ]; then
-            HASH_LANG="English"
+        local HASH_I18N="${I18N}"
+        if [ "${I18N}" == "English (United States)" ]; then
+            HASH_I18N="English"
         fi
-        HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "$HASH_LANG  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
+        HASH=$(echo "$iso_download_link_html" | sed 's/<tr><td>/\n<tr><td>/g' | grep "${HASH_I18N}  64-bit" | grep -o -P '(?<=</td><td>).*(?=</td></tr>)')
         check_hash "${VM_PATH}/${FILE_NAME}" "${HASH}"
     fi
 }
@@ -3435,7 +3435,7 @@ if ((BASH_VERSINFO[0] < 4)); then
     exit 1
 fi
 
-LANGS=()
+I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
 if [ ! -e "${CURL}" ]; then
@@ -3546,14 +3546,14 @@ if [ -n "${2}" ]; then
         validate_release releases_ubuntu
         get_ubuntu
     elif [[ "${OS}" == "windows"* ]]; then
-        LANG="English International"
+        I18N="English International"
         "languages_${OS}"
         if [ -n "${3}" ]; then
-            LANG="${3}"
-            if [[ ! "${LANGS[*]}" =~ ${LANG} ]]; then
+            I18N="${3}"
+            if [[ ! "${I18NS[*]}" =~ ${I18N} ]]; then
                 error_not_supported_lang
             fi
-            VM_PATH="$(echo "${OS}-${RELEASE}-${LANG// /-}" | tr -d '()')"
+            VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
         fi
         validate_release "releases_${OS}"
         get_windows
