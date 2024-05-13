@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 9, 2024
+date: May 13, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -204,12 +204,14 @@ requirements manually:
 -   [Coreutils](https://www.gnu.org/software/coreutils/)
 -   [curl](https://curl.se/)
 -   [EDK II](https://github.com/tianocore/edk2)
+-   [gawk](https://www.gnu.org/software/gawk/)
 -   [grep](https://www.gnu.org/software/grep/)
+-   [glxinfo](https://gitlab.freedesktop.org/mesa/demos)
 -   [jq](https://stedolan.github.io/jq/)
+-   [LSB](https://wiki.linuxfoundation.org/lsb/start)
 -   [pciutils](https://github.com/pciutils/pciutils)
 -   [procps](https://gitlab.com/procps-ng/procps)
 -   [python3](https://www.python.org/)
--   [chunkcheck](https://gist.github.com/MCJack123/943eaca762730ca4b7ae460b731b68e7)
 -   [mkisofs](http://cdrtools.sourceforge.net/private/cdrecord.html)
 -   [usbutils](https://github.com/gregkh/usbutils)
 -   [util-linux](https://github.com/karelzak/util-linux)
@@ -237,19 +239,50 @@ These examples may save a little typing:
 This also applies to derivatives:
 
 ``` shell
-sudo apt install qemu bash coreutils curl ovmf grep jq pciutils procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
+sudo apt install qemu bash coreutils ovmf grep jq mesa-utils pciutils procps python3 genisoimage usbutils util-linux sed socat spice-client-gtk libtss2-tcti-swtpm0 xdg-user-dirs zsync unzip
 ```
 
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install qemu bash coreutils curl edk2-tools grep jq pciutils procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
+sudo dnf install qemu bash coreutils edk2-tools grep jq mesa-demos pciutils procps python3 genisoimage usbutils util-linux sed socat spice-gtk-tools swtpm xdg-user-dirs xrandr unzip
+```
+
+### Install requirements on Gentoo
+
+Please note that you may have to use `sys-firmware/edk2-ovmf` instead of
+`sys-firmware/edk2-ovmf-bin` - depending on how your system is
+configured.
+
+``` shell
+sudo emerge --ask --noreplace app-emulation/qemu \
+ app-shells/bash \
+ sys-apps/coreutils \
+ net-misc/curl \
+ sys-firmware/edk2-ovmf-bin \
+ sys-apps/gawk \
+ sys-apps/grep \
+ x11-apps/mesa-progs \
+ app-misc/jq \
+ sys-apps/pciutils \
+ sys-process/procps \
+ app-cdr/cdrtools \
+ sys-apps/usbutils \
+ sys-apps/util-linux \
+ sys-apps/sed \
+ net-misc/socat \
+ app-emulation/spice \
+ app-crypt/swtpm \
+ x11-misc/xdg-user-dirs \
+ x11-apps/xrandr \
+ net-misc/zsync \
+ app-arch/unzip
 ```
 
 #### Install requirements on macOS hosts
 
 This is a **work in progress** (see [issue
-248](https://github.com/quickemu-project/quickemu/issues/248) for other
+447](https://github.com/quickemu-project/quickemu/issues/447) for other
 steps and changes that may enable running on MacOS)
 
 ``` shell
@@ -455,6 +488,7 @@ Further information is available from the project
 -   `siduction` (Siduction)
 -   `slackware` (Slackware)
 -   `slax` (Slax)
+-   `slint` (Slint)
 -   `slitaz` (SliTaz)
 -   `solus` (Solus)
 -   `sparkylinux` (SparkyLinux)
@@ -497,7 +531,18 @@ quickemu --vm debian-bullseye.conf
     -   Install the SPICE WebDAV agent (`spice-webdavd`) in the guest to
         enable file sharing.
 
+## Supporting old Linux distros
+
+If you want to run an old Linux , from 2016 or earlier, change the
+`guest_os` to `linux_old`. This will enable the `vmware-svga` graphics
+driver which is better supported on older distros.
+
 ## [Creating macOS Guests](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests) 🍏
+
+**Installing macOS in a VM can be a bit finicky, if you encounter
+problems, [check the
+Discussions](https://github.com/quickemu-project/quickemu/discussions)
+for solutions or ask for help there** 🛟
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
@@ -592,7 +637,66 @@ macos_release="catalina"
     -   And VirtIO Block Media (disks) are supported/stable in Catalina
         and newer.
 
-There is further advice and information about macOS guests in the
+# macOS compatibility
+
+There are some considerations when running macOS via Quickemu.
+
+-   Supported macOS releases:
+    -   High Sierra
+    -   Mojave
+    -   Catalina **(Recommended)**
+    -   Big Sur
+    -   Monterey
+    -   Ventura
+    -   Sonoma
+-   `quickemu` will automatically download the required
+    [OpenCore](https://github.com/acidanthera/OpenCorePkg) bootloader
+    and OVMF firmware from [OSX-KVM](https://github.com/kholia/OSX-KVM).
+-   Optimised by default, but no GPU acceleration is available.
+    -   Host CPU vendor is detected and guest CPU is optimised
+        accordingly.
+    -   [VirtIO Block
+        Media](https://www.kraxel.org/blog/2019/06/macos-qemu-guest/) is
+        used for the system disk where supported.
+    -   [VirtIO `usb-tablet`](http://philjordan.eu/osx-virt/) is used
+        for the mouse.
+    -   VirtIO Network (`virtio-net`) is supported and enabled on macOS
+        Big Sur and newer, but earlier releases use `vmxnet3`.
+    -   VirtIO Memory Ballooning is supported and enabled on macOS Big
+        Sur and newer but disabled for other support macOS releases.
+-   USB host and SPICE pass-through is:
+    -   UHCI (USB 2.0) on macOS Catalina and earlier.
+    -   XHCI (USB 3.0) on macOS Big Sur and newer.
+-   Display resolution can only be changed via macOS System Preferences.
+-   **Full Duplex audio requires [VoodooHDA
+    OC](https://github.com/chris1111/VoodooHDA-OC) or pass-through a USB
+    audio-device to the macOS guest VM**.
+    -   NOTE! [Gatekeeper](https://disable-gatekeeper.github.io/) and
+        [System Integrity Protection
+        (SIP)](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)
+        need to be disabled to install VoodooHDA OC
+-   File sharing between guest and host is available via
+    [virtio-9p](https://wiki.qemu.org/Documentation/9psetup) and [SPICE
+    webdavd](https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24).
+-   Copy/paste via SPICE agent is **not available on macOS**.
+
+# macOS App Store
+
+If you see *"Your device or computer could not be verified"* when you
+try to login to the App Store, make sure that your wired ethernet device
+is `en0`. Use `ifconfig` in a terminal to verify this.
+
+If the wired ethernet device is not `en0`, then then go to *System
+Preferences* -\> *Network*, delete all the network devices and apply the
+changes. Next, open a terminal and run the following:
+
+``` shell
+sudo rm /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
+```
+
+Now reboot, and the App Store should work.
+
+There may be further advice and information about macOS guests in the
 project
 [wiki](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines#automatically-create-macos-guests).
 
