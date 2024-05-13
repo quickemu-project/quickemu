@@ -167,7 +167,7 @@ function get_port() {
     done
 }
 
-function enable_usb_passthrough() {
+function configure_usb() {
     local DEVICE=""
     local USB_BUS=""
     local USB_DEV=""
@@ -230,51 +230,7 @@ function efi_vars() {
     fi
 }
 
-function vm_boot() {
-    local AUDIO_DEV=""
-    local BALLOON="-device virtio-balloon"
-    local BOOT_STATUS=""
-    local CPU=""
-    local DISK_USED=""
-    local DISPLAY_DEVICE=""
-    local DISPLAY_RENDER=""
-    local EFI_CODE="${EFI_CODE}"
-    local EFI_VARS=""
-    local GUEST_CPU_CORES=""
-    local GUEST_CPU_LOGICAL_CORES=""
-    local GUEST_CPU_THREADS=""
-    local HOST_CPU_CORES=""
-    local HOST_CPU_SMT=""
-    local HOST_CPU_SOCKETS=""
-    local HOST_CPU_VENDOR=""
-    local GUEST_TWEAKS=""
-    local KERNEL_NAME="Unknown"
-    local KERNEL_NODE=""
-    local KERNEL_VER="?"
-    local LSB_DESCRIPTION="Unknown OS"
-    local MACHINE_TYPE="${MACHINE_TYPE:-q35}"
-    local MAC_BOOTLOADER=""
-    local MAC_MISSING=""
-    local MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
-    local NET_DEVICE="${NET_DEVICE:-virtio-net}"
-    local SOUND=""
-    local SMM="${SMM:-off}"
-    local TEMP_PORT=""
-    local USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
-    local VGA=""
-    local VIDEO=""
-
-    KERNEL_NAME=$(uname --kernel-name)
-    KERNEL_NODE="($(uname --nodename))"
-    KERNEL_VER=$(uname --kernel-release | cut -d'.' -f1-2)
-
-    if [ -e /etc/os-release ]; then
-        LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
-    fi
-
-    echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
-    echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
-
+function configure_cpu() {
     HOST_CPU_CORES=$(nproc)
     HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
     HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
@@ -329,11 +285,18 @@ function vm_boot() {
         GUEST_CPU_LOGICAL_CORES=${GUEST_CPU_CORES}
     fi
 
-    local SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
+    SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
     echo " - CPU:      ${HOST_CPU_MODEL}"
     echo -n " - CPU VM:   ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
 
-    local RAM_VM="2G"
+    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
+        # Display MSRs alert if the guest is macOS or windows
+        ignore_msrs_alert
+    fi
+}
+
+configure_ram() {
+    RAM_VM="2G"
     if [ -z "${ram}" ]; then
         local RAM_HOST=""
         # Determine the number of gigabytes of RAM in the host by extracting the first numerical value from the output.
@@ -365,16 +328,9 @@ function vm_boot() {
             exit 1
         fi
     fi
+}
 
-    # Force to lowercase.
-    boot=${boot,,}
-    guest_os=${guest_os,,}
-
-    if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-        # Display MSRs alert if the guest is macOS or windows
-        ignore_msrs_alert
-    fi
-
+function configure_bios() {
     # Always Boot macOS using EFI
     if [ "${guest_os}" == "macos" ]; then
         boot="efi"
@@ -458,7 +414,7 @@ function vm_boot() {
             IFS=$_IFS
         fi
         if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
-            if [ "$secureboot" == "on" ]; then
+            if [ "${secureboot}" == "on" ]; then
                 echo "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
             else
                 echo "ERROR! EFI boot requested but no EFI firmware found."
@@ -497,7 +453,9 @@ function vm_boot() {
     fi
 
     echo " - BOOT:     ${BOOT_STATUS}"
+}
 
+function configure_os_quirks() {
     # Make any OS specific adjustments
     case ${guest_os} in
         batocera|*bsd|freedos|haiku|linux*|*solaris)
@@ -645,7 +603,9 @@ function vm_boot() {
            NET_DEVICE="rtl8139"
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
+}
 
+function configure_storage() {
     echo " - Disk:     ${disk_img} (${disk_size})"
     if [ ! -f "${disk_img}" ]; then
         # If there is no disk image, create a new image.
@@ -724,7 +684,9 @@ function vm_boot() {
     if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
         echo " - CD-ROM:   ${fixed_iso}"
     fi
+}
 
+function configure_display() {
     # Setup the appropriate audio device based on the display output
     # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
     case ${display} in
@@ -817,7 +779,9 @@ function vm_boot() {
 
     # Add fullscreen options
     VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
+}
 
+function configure_audio() {
     # Build the sound hardware configuration
     case ${sound_card} in
         ich9-intel-hda|intel-hda) SOUND="-device ${sound_card} -device ${sound_duplex},audiodev=audio0";;
@@ -825,12 +789,10 @@ function vm_boot() {
         ac97|es1370|sb16) SOUND="-device ${sound_card},audiodev=audio0";;
         none) SOUND="";;
     esac
-
     echo " - Sound:    ${sound_card} (${sound_duplex})"
+}
 
-    # Set the hostname of the VM
-    local NET="user,hostname=${VMNAME}"
-
+function configure_ports() {
     echo -n "" > "${VMDIR}/${VMNAME}.ports"
 
     if [ -z "${ssh_port}" ]; then
@@ -904,7 +866,9 @@ function vm_boot() {
             fi
         fi
     fi
+}
 
+function configure_file_sharing() {
     if [ -n "${PUBLIC}" ]; then
         case ${guest_os} in
             macos)
@@ -935,14 +899,12 @@ function vm_boot() {
 
     # If smbd is available and ~/Public is present export it to the guest via samba
     if [[ -x "$(command -v smbd)" && -n ${PUBLIC} ]]; then
-        NET="${NET},smb=${PUBLIC}"
+        NET+=",smb=${PUBLIC}"
         echo " - smbd:     On guest: smb://10.0.2.4/qemu"
     fi
+}
 
-    enable_usb_passthrough
-
-    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
-
+function configure_tpm() {
     # Start TPM
     if [ "${tpm}" == "on" ]; then
         local tpm_args=()
@@ -957,18 +919,84 @@ function vm_boot() {
         echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
         sleep 0.25
     fi
+}
 
-    # Boot the VM
-    local args=()
+function vm_boot() {
+    AUDIO_DEV=""
+    BALLOON="-device virtio-balloon"
+    BOOT_STATUS=""
+    CPU=""
+    DISK_USED=""
+    DISPLAY_DEVICE=""
+    DISPLAY_RENDER=""
+    #EFI_CODE="${EFI_CODE}"
+    EFI_CODE=""
+    EFI_VARS=""
+    GUEST_CPU_CORES=""
+    GUEST_CPU_LOGICAL_CORES=""
+    GUEST_CPU_THREADS=""
+    HOST_CPU_CORES=""
+    HOST_CPU_SMT=""
+    HOST_CPU_SOCKETS=""
+    HOST_CPU_VENDOR=""
+    GUEST_TWEAKS=""
+    KERNEL_NAME="Unknown"
+    KERNEL_NODE=""
+    KERNEL_VER="?"
+    LSB_DESCRIPTION="Unknown OS"
+    MACHINE_TYPE="${MACHINE_TYPE:-q35}"
+    MAC_BOOTLOADER=""
+    MAC_MISSING=""
+    MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
+    NET_DEVICE="${NET_DEVICE:-virtio-net}"
+    SOUND=""
+    SMM="${SMM:-off}"
+    local TEMP_PORT=""
+    USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
+    VGA=""
+    VIDEO=""
+
+    KERNEL_NAME=$(uname --kernel-name)
+    KERNEL_NODE="($(uname --nodename))"
+    KERNEL_VER=$(uname --kernel-release | cut -d'.' -f1-2)
+
+    if [ -e /etc/os-release ]; then
+        LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
+    fi
+
+    echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
+    echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+
+    # Force to lowercase.
+    boot=${boot,,}
+    guest_os=${guest_os,,}
+    args=()
+
+    configure_cpu
+    configure_ram
+    configure_bios
+    configure_os_quirks
+    configure_storage
+    configure_display
+    configure_audio
+    # Set the hostname of the VM
+    NET="user,hostname=${VMNAME}"
+    configure_ports
+    configure_file_sharing
+    configure_usb
+    configure_tpm
+
+    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
     # shellcheck disable=SC2054,SC2206,SC2140
     args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
         -enable-kvm -machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
-        ${VIDEO} -display ${DISPLAY_RENDER}
         -rtc base=localtime,clock=host,driftfix=slew)
 
+    # shellcheck disable=SC2206
+    args+=(${VIDEO} -display ${DISPLAY_RENDER})
     # Only enable SPICE is using SPICE display
     if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
         # shellcheck disable=SC2054
@@ -996,7 +1024,7 @@ function vm_boot() {
         -device usb-ccid
     )
 
-    if "${QEMU}" -chardev spicevmc,id=ccid,name= 2>&1 | grep -q smartcard; then
+    if ${QEMU} -device help | grep -q smartcard; then
         # shellcheck disable=SC2054
         args+=(-chardev spicevmc,id=ccid,name=smartcard
                -device ccid-card-passthru,chardev=ccid)
