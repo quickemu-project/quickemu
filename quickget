@@ -2115,7 +2115,7 @@ function get_macos() {
 
             if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
                 echo " - Converting RecoveryImage.dmg"
-                qemu-img convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
+                ${QEMU_IMG} convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
             fi
             rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
             echo " - RecoveryImage.img is ready."
@@ -3317,7 +3317,7 @@ function create_vm() {
             fi;;
         easyos)
             if [[ ${ISO} = *".img"* ]]; then
-                qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+                ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
                 ISO="${ISO/.img/}"
             fi;;
         freedos)
