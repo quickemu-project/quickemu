@@ -1223,9 +1223,9 @@ function vm_boot() {
         fi
     elif [ "${monitor}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
-        args+=(-monitor unix:${VM_MONITOR_SOCKETPATH},server,nowait)
-        echo " - Monitor:  On host:  nc -U \"${VM_MONITOR_SOCKETPATH}\""
-        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_MONITOR_SOCKETPATH}"
+        args+=(-monitor unix:${SOCKET_MONITOR},server,nowait)
+        echo " - Monitor:  On host:  nc -U \"${SOCKET_MONITOR}\""
+        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
     else
         echo "ERROR! \"${monitor}\" is an unknown monitor option."
         exit 1
@@ -1253,9 +1253,9 @@ function vm_boot() {
         fi
     elif [ "${serial}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
-        args+=(-serial unix:${VM_SERIAL_SOCKETPATH},server,nowait)
-        echo " - Serial:   On host:  nc -U \"${VM_SERIAL_SOCKETPATH}\""
-        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${VM_SERIAL_SOCKETPATH}"
+        args+=(-serial unix:${SOCKET_SERIAL},server,nowait)
+        echo " - Serial:   On host:  nc -U \"${SOCKET_SERIAL}\""
+        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
     else
         echo "ERROR! \"${serial}\" is an unknown serial option."
         exit 1
@@ -1476,7 +1476,7 @@ function monitor_send_cmd {
     case "${monitor}" in
         socket)
             echo -e " - Sending:  via socket ${MSG}"
-            echo -e "${MSG}" | socat -,shut-down unix-connect:"${VM_MONITOR_SOCKETPATH}" > /dev/null 2>&1;;
+            echo -e "${MSG}" | socat -,shut-down unix-connect:"${SOCKET_MONITOR}" > /dev/null 2>&1;;
         telnet)
             echo -e " - Sending:  via telnet ${MSG}"
             echo -e "${MSG}" | socat - tcp:"${monitor_telnet_host}":"${monitor_telnet_port}" > /dev/null 2>&1;;
@@ -1540,21 +1540,21 @@ DELETE_DISK=0
 DELETE_VM=0
 FULLSCREEN=""
 KILL_VM=0
+MONITOR_CMD=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
 SHORTCUT=0
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
+SOCKET_MONITOR=""
+SOCKET_SERIAL=""
 STATUS_QUO=""
 USB_PASSTHROUGH=""
 VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
-MONITOR_CMD=""
-VM_MONITOR_SOCKETPATH=""
-VM_SERIAL_SOCKETPATH=""
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
@@ -1708,8 +1708,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VMDIR=$(dirname "${disk_img}")
     VMNAME=$(basename "${VM}" .conf)
     VMPATH=$(realpath "$(dirname "${VM}")")
-    VM_MONITOR_SOCKETPATH="${VMDIR}/${VMNAME}-monitor.socket"
-    VM_SERIAL_SOCKETPATH="${VMDIR}/${VMNAME}-serial.socket"
+    SOCKET_MONITOR="${VMDIR}/${VMNAME}-monitor.socket"
+    SOCKET_SERIAL="${VMDIR}/${VMNAME}-serial.socket"
 
     if [ -z "${disk_img}" ]; then
         echo "ERROR! No disk_img defined."
