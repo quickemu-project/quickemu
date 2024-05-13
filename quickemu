@@ -1513,8 +1513,8 @@ function monitor_send_cmd {
 # Lowercase variables are used in the VM config file only
 boot="efi"
 cpu_cores=""
-disk_img=""
 disk_format="${disk_format:-qcow2}"
+disk_img="${disk_img:-}"
 disk_size=""
 display="${display:-sdl}"
 extra_args="${extra_args:-}"
@@ -1728,9 +1728,9 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     SOCKET_MONITOR="${VMDIR}/${VMNAME}-monitor.socket"
     SOCKET_SERIAL="${VMDIR}/${VMNAME}-serial.socket"
 
+    # if not disk_img is configured, do the right thing.
     if [ -z "${disk_img}" ]; then
-        echo "ERROR! No disk_img defined."
-        exit 1
+        disk_img="${VMDIR}/disk.${disk_format}"
     fi
 
     # Iterate over any actions and exit.
