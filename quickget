@@ -1494,10 +1494,8 @@ EOF
                 ;;
             zorin)
                 case ${EDITION} in
-                education64|edulite64)
-                    echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-                esac
-                ;;
+                    education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
+                esac;;
             reactos)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
                 echo "disk_size=\"12G\"" >> "${CONF_FILE}"
