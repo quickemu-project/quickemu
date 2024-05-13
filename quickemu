@@ -1591,7 +1591,7 @@ fi
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
 QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
-    echo "ERROR! Qemu 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
+    echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
     exit 1
 fi
 
@@ -1736,7 +1736,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     SOCKET_MONITOR="${VMDIR}/${VMNAME}-monitor.socket"
     SOCKET_SERIAL="${VMDIR}/${VMNAME}-serial.socket"
 
-    # if not disk_img is configured, do the right thing.
+    # if disk_img is not configured, do the right thing.
     if [ -z "${disk_img}" ]; then
         disk_img="${VMDIR}/disk.${disk_format}"
     fi
