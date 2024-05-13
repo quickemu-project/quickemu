@@ -611,6 +611,7 @@ function vm_boot() {
                     NET_DEVICE="virtio-net"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
                     GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
+                    sound_card="${sound_card:-usb-audio}"
                     usb_controller="xhci";;
                 *)
                     # Backwards compatibility if no macos_release is specified.
