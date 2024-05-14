@@ -205,6 +205,18 @@ function configure_usb() {
     fi
 }
 
+# get the number of processing units
+function get_nproc() {
+    if command -v nproc &>/dev/null; then
+        nproc
+    elif command -v sysctl &>/dev/null; then
+        sysctl -n hw.ncpu
+    else
+        echo "ERROR! Unable to determine the number of processing units."
+        exit 1
+    fi
+}
+
 # macOS and Linux compatible get_cpu_info function
 function get_cpu_info() {
     local INFO_NAME="${1}"
@@ -255,7 +267,7 @@ function efi_vars() {
 }
 
 function configure_cpu() {
-    HOST_CPU_CORES=$(nproc)
+    HOST_CPU_CORES=$(get_nproc)
     HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
