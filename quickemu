@@ -423,27 +423,35 @@ function configure_bios() {
         # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
         # does not support SMM.
 
+        local SHARE_PATH="/usr/share"
+        if [ ${DARWIN} -eq 1 ]; then
+            # Do not assume brew; quickemu could have been installed via Nix
+            if command -v brew &>/dev/null; then
+                SHARE_PATH="$(brew --prefix qemu)/share/qemu"
+            fi
+        fi
+
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
         if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             case ${secureboot} in
                 on) # shellcheck disable=SC2054,SC2140
-                    ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.secboot.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
-                        "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
-                        "/usr/share/OVMF/x64/OVMF_CODE.secboot.fd","/usr/share/OVMF/x64/OVMF_VARS.fd" \
-                        "/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd","/usr/share/edk2-ovmf/OVMF_VARS.fd" \
-                        "/usr/share/qemu/ovmf-x86_64-smm-ms-code.bin","/usr/share/qemu/ovmf-x86_64-smm-ms-vars.bin" \
-                        "/usr/share/qemu/edk2-x86_64-secure-code.fd","/usr/share/qemu/edk2-x86_64-code.fd" \
-                        "/usr/share/edk2-ovmf/x64/OVMF_CODE.secboot.fd","/usr/share/edk2-ovmf/x64/OVMF_VARS.fd"
+                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
+                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
+                        "${SHARE_PATH}/qemu/edk2-x86_64-secure-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd"
                     );;
                 *)  # shellcheck disable=SC2054,SC2140
-                    ovmfs=("/usr/share/OVMF/OVMF_CODE_4M.fd","/usr/share/OVMF/OVMF_VARS_4M.fd" \
-                        "/usr/share/edk2/ovmf/OVMF_CODE.fd","/usr/share/edk2/ovmf/OVMF_VARS.fd" \
-                        "/usr/share/OVMF/OVMF_CODE.fd","/usr/share/OVMF/OVMF_VARS.fd" \
-                        "/usr/share/OVMF/x64/OVMF_CODE.fd","/usr/share/OVMF/x64/OVMF_VARS.fd" \
-                        "/usr/share/edk2-ovmf/OVMF_CODE.fd","/usr/share/edk2-ovmf/OVMF_VARS.fd" \
-                        "/usr/share/qemu/ovmf-x86_64-4m-code.bin","/usr/share/qemu/ovmf-x86_64-4m-vars.bin" \
-                        "/usr/share/qemu/edk2-x86_64-code.fd","/usr/share/qemu/edk2-x86_64-code.fd" \
-                        "/usr/share/edk2-ovmf/x64/OVMF_CODE.fd","/usr/share/edk2-ovmf/x64/OVMF_VARS.fd"
+                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
+                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/OVMF/OVMF_CODE.fd","${SHARE_PATH}/OVMF/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                        "${SHARE_PATH}/qemu/ovmf-x86_64-4m-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-4m-vars.bin" \
+                        "${SHARE_PATH}/qemu/edk2-x86_64-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd"
                     );;
             esac
             # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
