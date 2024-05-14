@@ -244,11 +244,21 @@ function get_cpu_info() {
 }
 
 function check_cpu_flag() {
-    local HOST_CPU_FLAG="${1}"
-    if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
-        return 0
+    local HOST_CPU_FLAG=""
+    if [ ${DARWIN} -eq 1 ]; then
+        HOST_CPU_FLAG="${1}^^"
+        if sysctl -n machdep.cpu.features | grep -o "${HOST_CPU_FLAG}" > /dev/null; then
+            return 0
+        else
+            return 1
+        fi
     else
-        return 1
+      HOST_CPU_FLAG="${1},,"
+      if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
+          return 0
+      else
+          return 1
+      fi
     fi
 }
 
