@@ -379,7 +379,7 @@ function configure_cpu() {
     fi
 }
 
-configure_ram() {
+function configure_ram() {
     RAM_VM="2G"
     if [ -z "${ram}" ]; then
         local RAM_HOST=""
