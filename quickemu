@@ -205,6 +205,30 @@ function configure_usb() {
     fi
 }
 
+# macOS and Linux compatible get_cpu_info function
+function get_cpu_info() {
+    local INFO_NAME="${1}"
+
+    if [ ${DARWIN} -eq 1 ]; then
+        if [ "^Model name:" == "${INFO_NAME}" ]; then
+            sysctl -n machdep.cpu.brand_string | sed 's/ //g'
+        elif [ "Socket" == "${INFO_NAME}" ]; then
+            sysctl -n hw.packages
+        elif [ "Vendor" == "${INFO_NAME}" ]; then
+            sysctl -n machdep.cpu.vendor | sed 's/ //g'
+        else
+            echo "ERROR! Could not find macOS translation for ${INFO_NAME}"
+            exit 1
+        fi
+    else
+        if [ "^Model name:" == "${INFO_NAME}" ]; then
+            lscpu | grep "${INFO_NAME}" | cut -d':' -f2 | sed -e 's/^[[:space:]]*//'
+        else
+            lscpu | grep -E "${INFO_NAME}" | cut -d':' -f2 | sed 's/ //g'
+        fi
+    fi
+}
+
 function check_cpu_flag() {
     local HOST_CPU_FLAG="${1}"
     if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
@@ -232,9 +256,9 @@ function efi_vars() {
 
 function configure_cpu() {
     HOST_CPU_CORES=$(nproc)
-    HOST_CPU_MODEL=$(lscpu | grep '^Model name:' | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
-    HOST_CPU_SOCKETS=$(lscpu | grep -E 'Socket' | cut -d':' -f2 | sed 's/ //g')
-    HOST_CPU_VENDOR=$(lscpu | grep -E 'Vendor' | cut -d':' -f2 | sed 's/ //g')
+    HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
+    HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
+    HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
     # A CPU with Intel VT-x / AMD SVM support is required
     if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
