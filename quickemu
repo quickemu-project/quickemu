@@ -1242,11 +1242,6 @@ function vm_boot() {
             -device tpm-tis,tpmdev=tpm0)
     fi
 
-    if [ -n "${monitor_telnet_port}" ] && ! is_numeric "${monitor_telnet_port}"; then
-        echo "ERROR: telnet port must be a number!"
-        exit 1
-    fi
-
     if [ "${monitor}" == "none" ]; then
         args+=(-monitor none)
         echo " - Monitor:  (off)"
@@ -1269,11 +1264,6 @@ function vm_boot() {
         echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
     else
         echo "ERROR! \"${monitor}\" is an unknown monitor option."
-        exit 1
-    fi
-
-    if [ -n "${serial_telnet_port}" ] && ! is_numeric "${serial_telnet_port}"; then
-        echo "ERROR: serial port must be a number!"
         exit 1
     fi
 
@@ -1483,6 +1473,16 @@ function ports_param_check() {
 
     if [ -n "${spice_port}" ] && ! is_numeric "${spice_port}"; then
         echo "ERROR: spice_port must be a number!"
+        exit 1
+    fi
+
+    if [ -n "${monitor_telnet_port}" ] && ! is_numeric "${monitor_telnet_port}"; then
+        echo "ERROR: telnet port must be a number!"
+        exit 1
+    fi
+
+    if [ -n "${serial_telnet_port}" ] && ! is_numeric "${serial_telnet_port}"; then
+        echo "ERROR: serial port must be a number!"
         exit 1
     fi
 }
