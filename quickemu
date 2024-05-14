@@ -1028,9 +1028,9 @@ function vm_boot() {
     VGA=""
     VIDEO=""
 
-    KERNEL_NAME="$(${UNAME} --kernel-name)"
-    KERNEL_NODE="$(${UNAME} --nodename)"
-    KERNEL_VER="$(${UNAME} --kernel-release | cut -d'.' -f1-2)"
+    KERNEL_NAME="$(uname -s)"
+    KERNEL_NODE="$(uname -n | cut -d'.' -f 1)"
+    KERNEL_VER="$(uname -r)"
 
     if [ -e /etc/os-release ]; then
         LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
@@ -1763,18 +1763,13 @@ if [ ! -e "${QEMU}" ] || [ ! -e "${QEMU_IMG}" ]; then
 fi
 
 # Check for gnu tools on macOS
-UNAME="uname"
-if command -v guname &>/dev/null; then
-    UNAME="guname"
-fi
-
 STAT="stat"
 if command -v gstat &>/dev/null; then
     STAT="gstat"
 fi
 
 DARWIN=0
-if [ "${UNAME}" == "Darwin" ]; then
+if [ "$(uname -s)" == "Darwin" ]; then
     DARWIN=1
 fi
 
