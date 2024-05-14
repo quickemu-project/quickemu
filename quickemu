@@ -1168,7 +1168,8 @@ function vm_boot() {
         args+=(-k "${keyboard_layout}")
     fi
 
-    if [ -n "${BRAILLE}" ]; then
+    # Braille requires SDL, so disable for macOS
+    if [ -n "${BRAILLE}" ] && [ ${DARWIN} -eq 0 ]; then
         if ${QEMU} -chardev help | grep -q braille; then
             # shellcheck disable=SC2054
             #args+=(-chardev braille,id=brltty
