@@ -818,8 +818,8 @@ check the Discussions
 creates a virtual machine configuration.
 .IP
 .EX
-quickget macos catalina
-quickemu \-\-vm macos\-catalina.conf
+quickget macos big\-sur
+quickemu \-\-vm macos\-big\-sur.conf
 .EE
 .PP
 macOS \f[CR]mojave\f[R], \f[CR]catalina\f[R], \f[CR]big\-sur\f[R],
@@ -920,15 +920,15 @@ The default macOS configuration looks like this:
 .IP
 .EX
 guest_os=\[dq]macos\[dq]
-img=\[dq]macos\-catalina/RecoveryImage.img\[dq]
-disk_img=\[dq]macos\-catalina/disk.qcow2\[dq]
-macos_release=\[dq]catalina\[dq]
+img=\[dq]macos\- big\-sur/RecoveryImage.img\[dq]
+disk_img=\[dq]macos\- big\-sur/disk.qcow2\[dq]
+macos_release=\[dq] big\-sur\[dq]
 .EE
 .IP \[bu] 2
 \f[CR]guest_os=\[dq]macos\[dq]\f[R] instructs Quickemu to optimise for
 macOS.
 .IP \[bu] 2
-\f[CR]macos_release=\[dq]catalina\[dq]\f[R] instructs Quickemu to
+\f[CR]macos_release=\[dq] big\-sur\[dq]\f[R] instructs Quickemu to
 optimise for a particular macOS release.
 .RS 2
 .IP \[bu] 2
@@ -944,11 +944,9 @@ There are some considerations when running macOS via Quickemu.
 Supported macOS releases:
 .RS 2
 .IP \[bu] 2
-High Sierra
-.IP \[bu] 2
 Mojave
 .IP \[bu] 2
-Catalina \f[B](Recommended)\f[R]
+Catalina
 .IP \[bu] 2
 Big Sur
 .IP \[bu] 2
@@ -1001,7 +999,8 @@ UHCI (USB 2.0) on macOS Catalina and earlier.
 XHCI (USB 3.0) on macOS Big Sur and newer.
 .RE
 .IP \[bu] 2
-Display resolution can only be changed via macOS System Preferences.
+Display resolution can be changed via \f[CR]quickemu\f[R] using
+\f[CR]\-\-width\f[R] and \f[CR]\-\-height\f[R] command line arguments.
 .IP \[bu] 2
 \f[B]Full Duplex audio requires \c
 .UR https://github.com/chris1111/VoodooHDA-OC
