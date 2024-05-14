@@ -1558,16 +1558,17 @@ function display_param_check() {
         display="sdl"
     fi
 
-    if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
-        echo "ERROR! Requested output '${display}' is not recognised."
-        exit 1
-    elif [ "${display}" == "cocoa" ] && [ ${DARWIN} -eq 0 ]; then
-        echo "ERROR! Requested output '${display}' is only supported on macOS."
-        exit 1
-    elif [ "${display}" != "cocoa" ] && [ ${DARWIN} -eq 1 ]; then
-        echo "WARNING! Requested output '${display}' but only 'cocoa' is avalible on macOS."
-        echo "         Setting display to 'cocoa'."
-        display="cocoa"
+    if [ ${DARWIN} -eq 1 ]; then
+        if [ "${display}" != "cocoa" ]; then
+          echo "WARNING! Requested output '${display}' but only 'cocoa' is avalible on macOS."
+          echo "         Setting display to 'cocoa'."
+          display="cocoa"
+        fi
+    else
+        if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
+            echo "ERROR! Requested output '${display}' is not recognised."
+            exit 1
+        fi
     fi
 
     # Set the default 3D acceleration.
