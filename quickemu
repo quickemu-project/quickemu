@@ -1109,25 +1109,28 @@ function vm_boot() {
     fi
 
     # shellcheck disable=SC2054
-    args+=(-device virtio-rng-pci,rng=rng0
-        -object rng-random,id=rng0,filename=/dev/urandom
-        -device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
-        -chardev spicevmc,id=usbredirchardev1,name=usbredir
-        -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-        -chardev spicevmc,id=usbredirchardev2,name=usbredir
-        -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-        -chardev spicevmc,id=usbredirchardev3,name=usbredir
-        -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-        -device pci-ohci,id=smartpass
-        -device usb-ccid
-    )
+    args+=(-device virtio-rng-pci,rng=rng0 -object rng-random,id=rng0,filename=/dev/urandom)
 
-    if ${QEMU} -device help | grep -q smartcard; then
+    # macOS doesn't support SPICE
+    if [ ${DARWIN} -eq 0 ]; then
         # shellcheck disable=SC2054
-        args+=(-chardev spicevmc,id=ccid,name=smartcard
-               -device ccid-card-passthru,chardev=ccid)
-    else
-        echo " - WARNING!  ${QEMU} was not compiled with support for smartcard devices"
+        args+=(-device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
+            -chardev spicevmc,id=usbredirchardev1,name=usbredir
+            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+            -chardev spicevmc,id=usbredirchardev2,name=usbredir
+            -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+            -chardev spicevmc,id=usbredirchardev3,name=usbredir
+            -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+            -device pci-ohci,id=smartpass
+            -device usb-ccid)
+
+        if ${QEMU} -device help | grep -q smartcard; then
+            # shellcheck disable=SC2054
+            args+=(-chardev spicevmc,id=ccid,name=smartcard
+                  -device ccid-card-passthru,chardev=ccid)
+        else
+            echo " - WARNING!  ${QEMU} was not compiled with support for smartcard devices"
+        fi
     fi
 
     # setup usb-controller
