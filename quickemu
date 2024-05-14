@@ -1531,6 +1531,28 @@ function viewer_param_check() {
     fi
 }
 
+function fileshare_param_check() {
+    if [ "${PUBLIC}" == "none" ]; then
+        PUBLIC=""
+    else
+        # PUBLICSHARE is the only directory exposed to guest VMs for file
+        # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
+        if [ -z "${PUBLIC}" ]; then
+            if command -v xdg-user-dir &>/dev/null; then
+                PUBLIC=$(xdg-user-dir PUBLICSHARE)
+            fi
+        fi
+
+        if [ ! -d "${PUBLIC}" ]; then
+            echo " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
+        else
+            PUBLIC_TAG="Public-${USER,,}"
+            # shellcheck disable=SC2012
+            PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+        fi
+    fi
+}
+
 function parse_ports_from_file {
     local FILE="${VMDIR}/${VMNAME}.ports"
     local host_name=""
@@ -1614,7 +1636,6 @@ width="${width:-}"
 height="${height:-}"
 ssh_port="${ssh_port:-}"
 spice_port="${spice_port:-}"
-public_dir=""
 monitor="${monitor:-socket}"
 monitor_telnet_port="${monitor_telnet_port:-4440}"
 monitor_telnet_host="${monitor_telnet_host:-localhost}"
@@ -1855,27 +1876,7 @@ ports_param_check
 sound_card_param_check
 tpm_param_check
 viewer_param_check
-
-if [ "${PUBLIC}" == "none" ]; then
-    PUBLIC=""
-else
-    # PUBLICSHARE is the only directory exposed to guest VMs for file
-    # sharing via 9P, spice-webdavd and Samba. This path is not configurable.
-    if [ -z "${PUBLIC}" ]; then
-        if command -v xdg-user-dir &>/dev/null; then
-            PUBLIC=$(xdg-user-dir PUBLICSHARE)
-        fi
-    fi
-
-    if [ ! -d "${PUBLIC}" ]; then
-        echo "ERROR! Public directory: '${PUBLIC}' doesn't exist!"
-        exit 1
-    fi
-
-    PUBLIC_TAG="Public-${USER,,}"
-    # shellcheck disable=SC2012
-    PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
-fi
+fileshare_param_check
 
 # Check if vm is already run
 VM_PID=""
