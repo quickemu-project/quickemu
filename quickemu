@@ -288,7 +288,7 @@ function configure_cpu() {
     if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
         if ! check_cpu_flag vmx; then
             echo "ERROR! Intel VT-x support is required."
-            exit 1
+            #exit 1
         fi
     elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
         if ! check_cpu_flag svm; then
