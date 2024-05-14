@@ -453,11 +453,12 @@ function configure_bios() {
         if [ ${DARWIN} -eq 1 ]; then
             # Do not assume brew; quickemu could have been installed via Nix
             if command -v brew &>/dev/null; then
-                SHARE_PATH="$(brew --prefix qemu)/share/qemu"
+                SHARE_PATH="$(brew --prefix qemu)/share"
             fi
         fi
 
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
+        # TODO: Check if macOS should use 'edk2-i386-vars.fd'
         if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             case ${secureboot} in
                 on) # shellcheck disable=SC2054,SC2140
