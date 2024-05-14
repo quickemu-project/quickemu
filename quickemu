@@ -1804,8 +1804,8 @@ readonly VERSION="4.9.5"
 # TODO: Make this run the native architecture binary
 QEMU=$(command -v qemu-system-x86_64)
 QEMU_IMG=$(command -v qemu-img)
-if [ ! -e "${QEMU}" ] || [ ! -e "${QEMU_IMG}" ]; then
-    echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
+if [ ! -x "${QEMU}" ] || [ ! -x "${QEMU_IMG}" ]; then
+    echo "ERROR! QEMU not found. Please make sure 'qemu-system-x86_64' and 'qemu-img' are installed."
     exit 1
 fi
 

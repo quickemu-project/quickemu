@@ -3391,7 +3391,7 @@ fi
 I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
-if [ ! -e "${CURL}" ]; then
+if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
