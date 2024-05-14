@@ -876,6 +876,7 @@ function configure_ports() {
 
 function configure_file_sharing() {
     if [ -n "${PUBLIC}" ]; then
+        # WebDAV
         case ${guest_os} in
             macos)
                 if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
@@ -883,30 +884,30 @@ function configure_file_sharing() {
                     echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
                     echo " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
                 fi;;
-            *)
-                echo " - WebDAV:   On guest: dav://localhost:9843/";;
+            *) echo " - WebDAV:   On guest: dav://localhost:9843/";;
         esac
-    fi
 
-    if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
-        echo -n " - 9P:       On guest: "
-        if [ "${guest_os}" == "linux" ]; then
-            echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
-        elif [ "${guest_os}" == "macos" ]; then
-            # PUBLICSHARE needs to be world writeable for seamless integration with
-            # macOS. Test if it is world writeable, and prompt what to do if not.
-            echo "sudo mount_9p ${PUBLIC_TAG}"
-            if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
-                echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
-                echo "             Required for macOS integration 👆"
+        # 9P
+        if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ]; then
+            echo -n " - 9P:       On guest: "
+            if [ "${guest_os}" == "linux" ]; then
+                echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+            elif [ "${guest_os}" == "macos" ]; then
+                # PUBLICSHARE needs to be world writeable for seamless integration with
+                # macOS. Test if it is world writeable, and prompt what to do if not.
+                echo "sudo mount_9p ${PUBLIC_TAG}"
+                if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
+                    echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
+                    echo "             Required for macOS integration 👆"
+                fi
             fi
         fi
-    fi
 
-    # If smbd is available and ~/Public is present export it to the guest via samba
-    if [[ -x "$(command -v smbd)" && -n ${PUBLIC} ]]; then
-        NET+=",smb=${PUBLIC}"
-        echo " - smbd:     On guest: smb://10.0.2.4/qemu"
+        # SMB
+        if [ -x "$(command -v smbd)" ]; then
+            NET+=",smb=${PUBLIC}"
+            echo " - smbd:     On guest: smb://10.0.2.4/qemu"
+        fi
     fi
 }
 
