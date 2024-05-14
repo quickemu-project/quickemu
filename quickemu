@@ -1331,7 +1331,6 @@ function vm_boot() {
 function start_viewer {
     errno=0
     if [ "${viewer}" != "none" ]; then
-
         # If output is 'none' then SPICE was requested.
         if [ "${display}" == "spice" ]; then
             if [ "${viewer}" == "remote-viewer" ]; then
@@ -1345,7 +1344,6 @@ function start_viewer {
                     ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
                     errno=$?
                 fi
-
             elif [ "${viewer}" == "spicy" ]; then
                 # show via viewer: spicy
                 if [ -n "${PUBLIC}" ]; then
@@ -1454,7 +1452,7 @@ function display_param_check() {
 
     # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
     case "${display}" in
-      sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
+        sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
     esac
 
     # Set the default 3D acceleration.
