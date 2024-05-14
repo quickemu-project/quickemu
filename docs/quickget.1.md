@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 13, 2024
+date: May 14, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -331,21 +331,21 @@ macOS `mojave`, `catalina`, `big-sur`, `monterey`, `ventura` and
 sudo trimforce enable
 ```
 
-You will be prompted to enter your account’s password to gain the
-privilege needed. Once you’ve entered your password and pressed
+You will be prompted to enter your account's password to gain the
+privilege needed. Once you've entered your password and pressed
 <kbd>enter</kbd> the command will request confirmation in the form of
-two questions that require you to type <kbd>y</kbd> (for a “yes”
+two questions that require you to type <kbd>y</kbd> (for a "yes"
 response) followed by <kbd>enter</kbd> to confirm.
 
 If you press <kbd>enter</kbd> without first typing <kbd>y</kbd> the
-system will consider that a negative response as though you said “no”:
+system will consider that a negative response as though you said "no":
 
 ``` plain
 IMPORTANT NOTICE: This tool force-enables TRIM for all relevant attached devices, even though such devices may not have been validated for data integrity while using TRIM. Use of this tool to enable TRIM may result in unintended data loss or data corruption. It should not be used in a commercial operating environment or with important data. Before using this tool, you should back up all of your data and regularly back up data while TRIM is enabled. This tool is provided on an "as is" basis. APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING THIS TOOL OR ITS USE ALONE OR IN COMBINATION WITH YOUR DEVICES, SYSTEMS, OR SERVICES. BY USING THIS TOOL TO ENABLE TRIM, YOU AGREE THAT, TO THE EXTENT PERMITTED BY APPLICABLE LAW, USE OF THE TOOL IS AT YOUR SOLE RISK AND THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND EFFORT IS WITH YOU.
 Are you sure you with to proceed (y/N)?
 ```
 
-And a second confirmation once you’ve confirmed the previous one:
+And a second confirmation once you've confirmed the previous one:
 
 ``` plain
 Your system will immediately reboot when this is complete.
@@ -416,7 +416,7 @@ There are some considerations when running macOS via Quickemu.
 
 # macOS App Store
 
-If you see *“Your device or computer could not be verified”* when you
+If you see *"Your device or computer could not be verified"* when you
 try to login to the App Store, make sure that your wired ethernet device
 is `en0`. Use `ifconfig` in a terminal to verify this.
 
@@ -443,7 +443,7 @@ automatically and create an optimised virtual machine configuration.
 This configuration also includes the [VirtIO drivers for
 Windows](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/).
 
-**Windows 8.1** is also supported but doesn’t feature any automated
+**Windows 8.1** is also supported but doesn't feature any automated
 installation or driver optimisation.
 
 `quickget` can also download [Windows 10

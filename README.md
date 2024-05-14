@@ -19,7 +19,7 @@
 # Introduction
 
 **Quickemu** is a wrapper for the excellent [QEMU](https://www.qemu.org/) that
-automatically *“does the right thing”* when creating virtual machines. No
+automatically *"does the right thing"* when creating virtual machines. No
 requirement for exhaustive configuration options. You decide what operating
 system you want to run and Quickemu takes care of the rest 🤖
 
