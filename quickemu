@@ -1025,7 +1025,7 @@ function vm_boot() {
     KERNEL_NAME="Unknown"
     KERNEL_NODE=""
     KERNEL_VER="?"
-    LSB_DESCRIPTION="Unknown OS"
+    local HOST_OS="Unknown OS"
     MACHINE_TYPE="${MACHINE_TYPE:-q35}"
     MAC_BOOTLOADER=""
     MAC_MISSING=""
@@ -1042,12 +1042,17 @@ function vm_boot() {
     KERNEL_NODE="$(uname -n | cut -d'.' -f 1)"
     KERNEL_VER="$(uname -r)"
 
-    if [ -e /etc/os-release ]; then
-        LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
+    if [ ${DARWIN} -eq 1 ]; then
+        # Get macOS product name and version using swvers
+        if [ -x "$(command -v sw_vers)" ]; then
+            HOST_OS="$(sw_vers --productName) $(sw_vers --productVersion)"
+        fi
+    elif [ -e /etc/os-release ]; then
+        HOST_OS=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
     fi
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
-    echo " - Host:     ${LSB_DESCRIPTION} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+    echo " - Host:     ${HOST_OS} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
 
     # Force to lowercase.
     boot=${boot,,}
