@@ -936,7 +936,6 @@ function vm_boot() {
     DISK_USED=""
     DISPLAY_DEVICE=""
     DISPLAY_RENDER=""
-    #EFI_CODE="${EFI_CODE}"
     EFI_CODE=""
     EFI_VARS=""
     GUEST_CPU_CORES=""
