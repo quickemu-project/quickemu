@@ -599,7 +599,7 @@ function releases_archlinux() {
 
 function releases_arcolinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E ">v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sed -e "s/>//" | sort -r | head -n 5)
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
 }
 
 function editions_arcolinux() {
