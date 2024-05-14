@@ -1540,6 +1540,8 @@ function fileshare_param_check() {
         if [ -z "${PUBLIC}" ]; then
             if command -v xdg-user-dir &>/dev/null; then
                 PUBLIC=$(xdg-user-dir PUBLICSHARE)
+            elif [ -d "${HOME}/Public" ]; then
+                PUBLIC="${HOME}/Public"
             fi
         fi
 
