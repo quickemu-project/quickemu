@@ -623,7 +623,7 @@ function configure_os_quirks() {
             done
 
             # Disable S3 support in the VM to prevent macOS suspending during install
-            GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
+            GUEST_TWEAKS="${KVM_GUEST_TWEAKS}-global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
@@ -671,7 +671,7 @@ function configure_os_quirks() {
             fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
             #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-            GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard -global ICH9-LPC.disable_s3=1"
+            GUEST_TWEAKS="${KVM_GUEST_TWEAKS}-global ICH9-LPC.disable_s3=1"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
@@ -1801,10 +1801,12 @@ fi
 DARWIN=0
 CPU_KVM=",kvm=on"
 CPU_KVM_UNHALT=",kvm_pv_unhalt"
+KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
 if [ "$(uname -s)" == "Darwin" ]; then
     DARWIN=1
     CPU_KVM=""
     CPU_KVM_UNHALT=""
+    KVM_GUEST_TWEAKS=""
 fi
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
