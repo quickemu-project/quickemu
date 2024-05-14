@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 13, 2024
+date: May 14, 2024
 footer: quickemu_conf
 header: Quickemu Configuration Manual
 section: 1
@@ -149,7 +149,7 @@ following line to the VM configuration:
 
 ### Floppy disks
 
-If you’re like [Alan Pope](https://popey.com) you’ll probably want to
+If you're like [Alan Pope](https://popey.com) you'll probably want to
 mount a floppy disk image in the guest. To do so add the following line
 to the VM configuration:
 
@@ -177,8 +177,8 @@ when the virtual machine is started. For example:
 
      - smbd:     On guest: smb://10.0.2.4/qemu
 
-If using a Windows guest, right-click on “This PC”, click “Add a network
-location”, and paste this address, removing `smb:` and replacing forward
+If using a Windows guest, right-click on "This PC", click "Add a network
+location", and paste this address, removing `smb:` and replacing forward
 slashes with backslashes (in this example `\\10.0.2.4\qemu`).
 
 #### SPICE WebDAV 🐧 🪟
@@ -245,7 +245,7 @@ pass-through.
 
 #### SPICE redirection (recommended)
 
-Using SPICE for USB pass-through is easiest as it doesn’t require any
+Using SPICE for USB pass-through is easiest as it doesn't require any
 elevated permission:
 
 - Start Quickemu with `--display spice` and then
