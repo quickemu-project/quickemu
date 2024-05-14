@@ -962,9 +962,9 @@ function vm_boot() {
     VGA=""
     VIDEO=""
 
-    KERNEL_NAME=$(uname --kernel-name)
-    KERNEL_NODE="($(uname --nodename))"
-    KERNEL_VER=$(uname --kernel-release | cut -d'.' -f1-2)
+    KERNEL_NAME="$(${UNAME} --kernel-name)"
+    KERNEL_NODE="$(${UNAME} --nodename)"
+    KERNEL_VER="$(${UNAME} --kernel-release | cut -d'.' -f1-2)"
 
     if [ -e /etc/os-release ]; then
         LSB_DESCRIPTION=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
@@ -1685,6 +1685,16 @@ QEMU_IMG=$(command -v qemu-img)
 if [ ! -e "${QEMU}" ] || [ ! -e "${QEMU_IMG}" ]; then
     echo "ERROR! QEMU not found. Please make install qemu-system-x86_64 and qemu-img"
     exit 1
+fi
+
+# Check for gnu tools on macOS
+UNAME="uname"
+if command -v guname &>/dev/null; then
+    UNAME="guname"
+fi
+DARWIN=0
+if [ "${UNAME}" == "Darwin" ]; then
+    DARWIN=1
 fi
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
