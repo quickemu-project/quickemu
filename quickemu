@@ -541,7 +541,7 @@ function configure_os_quirks() {
     # Make any OS specific adjustments
     case ${guest_os} in
         batocera|*bsd|freedos|haiku|linux*|*solaris)
-            CPU="-cpu host${CPU_KVM}"
+            CPU="-cpu ${CPU_MODEL}${CPU_KVM}"
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
             fi
@@ -662,9 +662,9 @@ function configure_os_quirks() {
             ;;
         windows|windows-server)
             if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                CPU="-cpu host${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+                CPU="-cpu ${CPU_MODEL}${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
             else
-                CPU="-cpu host${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+                CPU="-cpu ${CPU_MODEL}${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
             fi
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
@@ -681,7 +681,7 @@ function configure_os_quirks() {
             fi
             SMM="on"
             ;;
-        *) CPU="-cpu host${CPU_KVM}"
+        *) CPU="-cpu ${CPU_MODEL}${CPU_KVM}"
            NET_DEVICE="rtl8139"
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
@@ -1799,11 +1799,13 @@ if command -v gstat &>/dev/null; then
 fi
 
 DARWIN=0
+CPU_MODEL="host"
 CPU_KVM=",kvm=on"
 CPU_KVM_UNHALT=",kvm_pv_unhalt"
 KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
 if [ "$(uname -s)" == "Darwin" ]; then
     DARWIN=1
+    CPU_MODEL="Penryn"
     CPU_KVM=""
     CPU_KVM_UNHALT=""
     KVM_GUEST_TWEAKS=""
