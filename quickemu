@@ -1077,12 +1077,21 @@ function vm_boot() {
 
     echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
+
+    # Changing process name is not supported on macOS
+    if [ ${DARWIN} -eq 1 ];  then
+        # shellcheck disable=SC2054,SC2206,SC2140
+        args+=(-accel hvf)
+    else
+        # shellcheck disable=SC2054,SC2206,SC2140
+        args+=(-name ${VMNAME},process=${VMNAME} -enable-kvm)
+    fi
     # shellcheck disable=SC2054,SC2206,SC2140
-    args+=(-name ${VMNAME},process=${VMNAME} -pidfile "${VMDIR}/${VMNAME}.pid"
-        -enable-kvm -machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
+    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
-        -rtc base=localtime,clock=host,driftfix=slew)
+        -rtc base=localtime,clock=host,driftfix=slew
+        -pidfile "${VMDIR}/${VMNAME}.pid")
 
     # shellcheck disable=SC2206
     args+=(${VIDEO} -display ${DISPLAY_RENDER})
