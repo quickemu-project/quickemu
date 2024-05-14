@@ -341,8 +341,13 @@ configure_ram() {
     RAM_VM="2G"
     if [ -z "${ram}" ]; then
         local RAM_HOST=""
-        # Determine the number of gigabytes of RAM in the host by extracting the first numerical value from the output.
-        RAM_HOST=$(free --giga | tr ' ' '\n' | grep -m 1 [0-9])
+        if [ ${DARWIN} -eq 1 ]; then
+            RAM_HOST=$(($(sysctl -n hw.memsize) / (1048576*1024)))
+        else
+            # Determine the number of gigabytes of RAM in the host by extracting the first numerical value from the output.
+            RAM_HOST=$(free --giga -h | tr ' ' '\n' | grep -m 1 [0-9] | cut -d'G' -f 1)
+        fi
+
         if [ "${RAM_HOST}" -ge 128 ]; then
             RAM_VM="32G"
         elif [ "${RAM_HOST}" -ge 64 ]; then
