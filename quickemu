@@ -1060,6 +1060,8 @@ function vm_boot() {
     boot=${boot,,}
     guest_os=${guest_os,,}
     args=()
+    # Set the hostname of the VM
+    NET="user,hostname=${VMNAME}"
 
     configure_cpu
     configure_ram
@@ -1068,8 +1070,6 @@ function vm_boot() {
     configure_storage
     configure_display
     configure_audio
-    # Set the hostname of the VM
-    NET="user,hostname=${VMNAME}"
     configure_ports
     configure_file_sharing
     configure_usb
