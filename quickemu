@@ -284,16 +284,32 @@ function configure_cpu() {
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
-    # A CPU with Intel VT-x / AMD SVM support is required
-    if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
-        if ! check_cpu_flag vmx; then
-            echo "ERROR! Intel VT-x support is required."
-            #exit 1
-        fi
-    elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-        if ! check_cpu_flag svm; then
-            echo "ERROR! AMD SVM support is required."
-            exit 1
+    # Detect if running in a VM
+    if [ ${DARWIN} -eq 1 ]; then
+        MANUFACTURER=$(ioreg -l | grep -e Manufacturer | grep -v iMan | cut -d'"' -f4 | sort -u)
+    else
+        MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
+    fi
+
+    case ${MANUFACTURER,,} in
+        qemu) CPU_MODEL="Penryn"
+              IN_VM=0;;
+        *)    CPU_MODEL="host"
+              IN_VM=1;;
+    esac
+
+    if [ ! ${IN_VM} ]; then
+        # A CPU with Intel VT-x / AMD SVM support is required
+        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
+            if ! check_cpu_flag vmx; then
+                echo "ERROR! Intel VT-x support is required."
+                exit 1
+            fi
+        elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+            if ! check_cpu_flag svm; then
+                echo "ERROR! AMD SVM support is required."
+                exit 1
+            fi
         fi
     fi
 
@@ -1077,11 +1093,12 @@ function vm_boot() {
 
     echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
-
     # Changing process name is not supported on macOS
-    if [ ${DARWIN} -eq 1 ];  then
-        # shellcheck disable=SC2054,SC2206,SC2140
-        args+=(-accel hvf)
+    if [ ${DARWIN} -eq 1 ]; then
+        if [ ! ${IN_VM} ]; then
+            # shellcheck disable=SC2054,SC2206,SC2140
+            args+=(-accel hvf)
+        fi
     else
         # shellcheck disable=SC2054,SC2206,SC2140
         args+=(-name ${VMNAME},process=${VMNAME} -enable-kvm)
@@ -1799,13 +1816,13 @@ if command -v gstat &>/dev/null; then
 fi
 
 DARWIN=0
-CPU_MODEL="host"
 CPU_KVM=",kvm=on"
 CPU_KVM_UNHALT=",kvm_pv_unhalt"
 KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
+
+# Detect macOS and disable KVM
 if [ "$(uname -s)" == "Darwin" ]; then
     DARWIN=1
-    CPU_MODEL="Penryn"
     CPU_KVM=""
     CPU_KVM_UNHALT=""
     KVM_GUEST_TWEAKS=""
