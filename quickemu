@@ -265,10 +265,16 @@ function configure_cpu() {
         GUEST_CPU_CORES="${cpu_cores}"
     fi
 
-    if [ "${guest_os}" == "macos" ] && [ "${GUEST_CPU_CORES}" -gt 10 ] || [ "${GUEST_CPU_CORES}" -eq 6 ] || [ "${GUEST_CPU_CORES}" -eq 7 ]; then
-        # macOS guests cannot boot with most core counts not powers of 2. This will fix the issue by rounding the core count down to a power of 2. Uses wc and factor from coreutils.
-        factorCPUCores=$(factor "${GUEST_CPU_CORES}")
-        GUEST_CPU_CORES=$(( 2 ** $(echo "${factorCPUCores#*:}" | grep -o '[0-9]' | wc -l) ))
+    # macOS guests cannot boot with most core counts not powers of 2.
+    # Find the nearest but lowest power of 2 using a predefined table
+    if [ "${guest_os}" == "macos" ]; then
+        local POWERS=(1 2 4 8 16 32 64 128 256 512 1024)
+        for (( i=${#POWERS[@]}-1; i>=0; i-- )); do
+            if [ "${POWERS[i]}" -le "${GUEST_CPU_CORES}" ]; then
+                GUEST_CPU_CORES="${POWERS[i]}"
+                break
+            fi
+        done
     fi
 
     # Account for Hyperthreading/SMT.
