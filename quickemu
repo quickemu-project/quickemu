@@ -22,7 +22,9 @@ function ignore_msrs_always() {
 
 function ignore_msrs_alert() {
     local ignore_msrs=""
-    if [ -e /sys/module/kvm/parameters/ignore_msrs ]; then
+    if [ ${DARWIN} -eq 1 ]; then
+        return
+    elif [ -e /sys/module/kvm/parameters/ignore_msrs ]; then
         ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
         if [ "${ignore_msrs}" == "N" ]; then
             echo " - MSR:      WARNING! Ignoring unhandled Model-Specific Registers is disabled."
