@@ -241,16 +241,37 @@ So you can generate your own MAC addresses with:
 ### USB redirection
 
 Quickemu supports USB redirection via SPICE pass-through and host
-pass-through.
+pass-through. Quickemu supports USB redirection via SPICE pass-through
+and host pass-through.
+
+**NOTE!** When a USB device is redirected from the host, it will not be
+usable by host operating system until the guest redirection is stopped.
+Therefore, do not redirect the input devices, such as the keyboard and
+mouse, as it will be difficult (or impossible) to revert the situation.
 
 #### SPICE redirection (recommended)
 
 Using SPICE for USB pass-through is easiest as it doesn't require any
 elevated permission:
 
+Both `spicy` from
+[spice-gtk](https://www.spice-space.org/spice-gtk.html) (*Input -\>
+Select USB Devices for redirection*) and `remote-viewer` from
+[virt-viewer](https://gitlab.com/virt-viewer/virt-viewer) (*File -\> USB
+device selection*) support this feature.
+
 - Start Quickemu with `--display spice` and then
-- select `Input` -\> `Select USB Device for redirection` from the menu
+- Select `Input` -\> `Select USB Device for redirection` from the menu
   to choose which device(s) you want to attach to the guest.
+- \*\*`spicy` (default)
+  - \*\*Select `Input` -\> `Select USB Device for redirection` from the
+    menu to choose which device(s) you want to attach to the guest.
+- \*\*`remote-viewer`
+  - \*\*Select `File` -\> `USB device selection` from the menu to choose
+    which device(s) you want to attach to the guest.
+
+To ensure that this functionality works as expected, make sure that you
+have installed the necessary SPICE Guest Tools on the virtual machine.
 
 ##### Enabling SPICE redirection on NixOS
 

@@ -228,14 +228,51 @@ So you can generate your own MAC addresses with:
 .SS USB redirection
 Quickemu supports USB redirection via SPICE pass\-through and host
 pass\-through.
+Quickemu supports USB redirection via SPICE pass\-through and host
+pass\-through.
+.PP
+\f[B]NOTE!\f[R] When a USB device is redirected from the host, it will
+not be usable by host operating system until the guest redirection is
+stopped.
+Therefore, do not redirect the input devices, such as the keyboard and
+mouse, as it will be difficult (or impossible) to revert the situation.
 .SS SPICE redirection (recommended)
 Using SPICE for USB pass\-through is easiest as it doesn\[aq]t require
 any elevated permission:
+.PP
+Both \f[CR]spicy\f[R] from \c
+.UR https://www.spice-space.org/spice-gtk.html
+spice\-gtk
+.UE \c
+\ (\f[I]Input \-> Select USB Devices for redirection\f[R]) and
+\f[CR]remote\-viewer\f[R] from \c
+.UR https://gitlab.com/virt-viewer/virt-viewer
+virt\-viewer
+.UE \c
+\ (\f[I]File \-> USB device selection\f[R]) support this feature.
 .IP \[bu] 2
 Start Quickemu with \f[CR]\-\-display spice\f[R] and then
 .IP \[bu] 2
-select \f[CR]Input\f[R] \-> \f[CR]Select USB Device for redirection\f[R]
+Select \f[CR]Input\f[R] \-> \f[CR]Select USB Device for redirection\f[R]
 from the menu to choose which device(s) you want to attach to the guest.
+.IP \[bu] 2
+**\f[CR]spicy\f[R] (default)
+.RS 2
+.IP \[bu] 2
+**Select \f[CR]Input\f[R] \->
+\f[CR]Select USB Device for redirection\f[R] from the menu to choose
+which device(s) you want to attach to the guest.
+.RE
+.IP \[bu] 2
+**\f[CR]remote\-viewer\f[R]
+.RS 2
+.IP \[bu] 2
+**Select \f[CR]File\f[R] \-> \f[CR]USB device selection\f[R] from the
+menu to choose which device(s) you want to attach to the guest.
+.RE
+.PP
+To ensure that this functionality works as expected, make sure that you
+have installed the necessary SPICE Guest Tools on the virtual machine.
 .SS Enabling SPICE redirection on NixOS
 On NixOS, if you encounter this error:
 .IP
