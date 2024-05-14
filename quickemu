@@ -1549,8 +1549,7 @@ function fileshare_param_check() {
             echo " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
         else
             PUBLIC_TAG="Public-${USER,,}"
-            # shellcheck disable=SC2012
-            PUBLIC_PERMS=$(ls -ld "${PUBLIC}" | cut -d' ' -f1)
+            PUBLIC_PERMS=$(stat -c "%A" "${PUBLIC}")
         fi
     fi
 }
