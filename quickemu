@@ -653,7 +653,7 @@ function configure_storage() {
 
         # Only check disk image size if preallocation is off
         if [ "${preallocation}" == "off" ]; then
-            DISK_CURR_SIZE=$(stat -c%s "${disk_img}")
+            DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
             if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
                 echo "             Looks unused, booting from ${iso}${img}"
                 if [ -z "${iso}" ] && [ -z "${img}" ]; then
@@ -1553,7 +1553,7 @@ function fileshare_param_check() {
             echo " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
         else
             PUBLIC_TAG="Public-${USER,,}"
-            PUBLIC_PERMS=$(stat -c "%A" "${PUBLIC}")
+            PUBLIC_PERMS=$(${STAT}  -c "%A" "${PUBLIC}")
         fi
     fi
 }
@@ -1692,6 +1692,12 @@ UNAME="uname"
 if command -v guname &>/dev/null; then
     UNAME="guname"
 fi
+
+STAT="stat"
+if command -v gstat &>/dev/null; then
+    STAT="gstat"
+fi
+
 DARWIN=0
 if [ "${UNAME}" == "Darwin" ]; then
     DARWIN=1
