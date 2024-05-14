@@ -775,6 +775,7 @@ function configure_display() {
 
     # Map Quickemu $display to QEMU -display
     case ${display} in
+        cocoa)      DISPLAY_RENDER="${display}";;
         gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
         none|spice) DISPLAY_RENDER="none";;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
@@ -1445,7 +1446,7 @@ function usage() {
     echo "  --braille                         : Enable braille support. Requires SDL."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"
     echo "  --delete-vm                       : Delete the entire VM and its configuration"
-    echo "  --display                         : Select display backend. 'sdl' (default), 'gtk', 'none', 'spice' or 'spice-app'"
+    echo "  --display                         : Select display backend. 'sdl' (default), 'cocoa', 'gtk', 'none', 'spice' or 'spice-app'"
     echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
     echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
     echo "  --kill                            : Kill the VM process if it is running"
@@ -1489,12 +1490,14 @@ function display_param_check() {
     if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
         echo "ERROR! Requested output '${display}' is not recognised."
         exit 1
+    elif [ "${display}" == "cocoa" ] && [ ${DARWIN} -eq 0 ]; then
+        echo "ERROR! Requested output '${display}' is only supported on macOS."
+        exit 1
+    elif [ "${display}" != "cocoa" ] && [ ${DARWIN} -eq 1 ]; then
+        echo "WARNING! Requested output '${display}' but only 'cocoa' is avalible on macOS."
+        echo "         Setting display to 'cocoa'."
+        display="cocoa"
     fi
-
-    # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
-    case "${display}" in
-        sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
-    esac
 
     # Set the default 3D acceleration.
     if [ -z "${gl}" ]; then
@@ -1508,6 +1511,13 @@ function display_param_check() {
             gl="on"
         fi
     fi
+
+    # Disable GL for cocoa
+    # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
+    case "${display}" in
+        cocoa) gl="off";;
+        sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
+    esac
 }
 
 function ports_param_check() {
