@@ -772,6 +772,7 @@ function configure_display() {
     # Setup the appropriate audio device based on the display output
     # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
     case ${display} in
+        cocoa) AUDIO_DEV="coreaudio,id=audio0";;
         none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
         *) AUDIO_DEV="pa,id=audio0";;
     esac
