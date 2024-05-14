@@ -253,7 +253,7 @@ function check_cpu_flag() {
             return 1
         fi
     else
-      HOST_CPU_FLAG="${1},,"
+      HOST_CPU_FLAG="${1}"
       if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
           return 0
       else
