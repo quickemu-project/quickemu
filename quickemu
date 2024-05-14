@@ -287,7 +287,7 @@ function configure_cpu() {
 
     SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
     echo " - CPU:      ${HOST_CPU_MODEL}"
-    echo -n " - CPU VM:   ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
+    echo " - CPU VM:   ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
 
     if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         # Display MSRs alert if the guest is macOS or windows
@@ -313,7 +313,7 @@ configure_ram() {
     else
         RAM_VM="${ram}"
     fi
-    echo ", ${RAM_VM} RAM"
+    echo " - RAM VM:   ${RAM_VM} RAM"
 
     if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         if [ "${RAM_VM//G/}" -lt 4 ]; then
