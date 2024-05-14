@@ -541,7 +541,7 @@ function configure_os_quirks() {
     # Make any OS specific adjustments
     case ${guest_os} in
         batocera|*bsd|freedos|haiku|linux*|*solaris)
-            CPU="-cpu host,kvm=on"
+            CPU="-cpu host${CPU_KVM}"
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
             fi
@@ -566,7 +566,7 @@ function configure_os_quirks() {
             fi
             ;;
         kolibrios|reactos)
-            CPU="-cpu qemu32,kvm=on"
+            CPU="-cpu qemu32${CPU_KVM}"
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
             fi
@@ -593,21 +593,21 @@ function configure_os_quirks() {
             case ${macos_release} in
                 ventura|sonoma)
                     if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        CPU="-cpu Haswell-v4,kvm=on,vendor=GenuineIntel,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        CPU="-cpu Haswell-v4${CPU_KVM},vendor=GenuineIntel,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
                         exit 1
                     fi;;
                 catalina|big-sur|monterey)
                     if check_cpu_flag sse4_2; then
-                        CPU="-cpu Haswell-v4,kvm=on,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        CPU="-cpu Haswell-v4${CPU_KVM},vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                         exit 1
                     fi;;
                 *)
                     if check_cpu_flag sse4_1; then
-                        CPU="-cpu Penryn,kvm=on,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
+                        CPU="-cpu Penryn${CPU_KVM},vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
                         exit 1
@@ -662,9 +662,9 @@ function configure_os_quirks() {
             ;;
         windows|windows-server)
             if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+                CPU="-cpu host${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
             else
-                CPU="-cpu host,kvm=on,+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies,kvm_pv_unhalt,hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+                CPU="-cpu host${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
             fi
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
@@ -681,7 +681,7 @@ function configure_os_quirks() {
             fi
             SMM="on"
             ;;
-        *) CPU="-cpu host,kvm=on"
+        *) CPU="-cpu host${CPU_KVM}"
            NET_DEVICE="rtl8139"
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
@@ -1799,8 +1799,12 @@ if command -v gstat &>/dev/null; then
 fi
 
 DARWIN=0
+CPU_KVM=",kvm=on"
+CPU_KVM_UNHALT=",kvm_pv_unhalt"
 if [ "$(uname -s)" == "Darwin" ]; then
     DARWIN=1
+    CPU_KVM=""
+    CPU_KVM_UNHALT=""
 fi
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
