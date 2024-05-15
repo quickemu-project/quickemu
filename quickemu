@@ -1645,6 +1645,10 @@ function tpm_param_check() {
 }
 
 function viewer_param_check() {
+    if [ ${DARWIN} -eq 1 ]; then
+        return
+    fi
+
     if [ "${viewer}" != "none" ] && [ "${viewer}" != "spicy" ] && [ "${viewer}" != "remote-viewer" ]; then
         echo "ERROR! Requested viewer '${viewer}' is not recognised."
         exit 1
