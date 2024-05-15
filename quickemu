@@ -287,33 +287,34 @@ function configure_cpu() {
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
     CPU_MODEL="host"
+    QEMU_ACCEL="tcg"
     # Configure appropriately for the host platform
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         MANUFACTURER=$(ioreg -l | grep -e Manufacturer | grep -v iMan | cut -d'"' -f4 | sort -u)
         CPU_KVM_UNHALT=""
         KVM_GUEST_TWEAKS=""
-        QEMU_ACCEL=",accel=hvf"
+        QEMU_ACCEL="hvf"
         # QEMU for macOS from Homebrew does not support SMM
         SMM="off"
     else
         MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
         CPU_KVM_UNHALT=",kvm_pv_unhalt"
         KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
-        QEMU_ACCEL=",accel=kvm"
+        QEMU_ACCEL="kvm"
     fi
 
     # If the architecture of the VM is different from the host, disable acceleration
     if [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
-        QEMU_ACCEL=""
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
         KVM_GUEST_TWEAKS=""
+        QEMU_ACCEL="tcg"
     fi
 
     # Detect if running in a VM
     case ${MANUFACTURER,,} in
         qemu|virtualbox) CPU_MODEL="qemu64"
-                         QEMU_ACCEL=""
+                         QEMU_ACCEL="tcg"
                          HYPERVISOR="${MANUFACTURER,,}";;
         *) HYPERVISOR="";;
     esac
@@ -1133,7 +1134,7 @@ function vm_boot() {
         args+=(-name ${VMNAME},process=${VMNAME})
     fi
     # shellcheck disable=SC2054,SC2206,SC2140
-    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off${QEMU_ACCEL} ${GUEST_TWEAKS}
+    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
         -rtc base=localtime,clock=host,driftfix=slew
