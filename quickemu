@@ -293,12 +293,12 @@ function configure_cpu() {
 
     case ${MANUFACTURER,,} in
         qemu) CPU_MODEL="Penryn"
-              IN_VM=0;;
+              HYPERVISOR="${MANUFACTURER,,}";;
         *)    CPU_MODEL="host"
-              IN_VM=1;;
+              HYPERVISOR="";
     esac
 
-    if [ ! ${IN_VM} ]; then
+    if [ -z "${HYPERVISOR}" ]; then
         # A CPU with Intel VT-x / AMD SVM support is required
         if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
             if ! check_cpu_flag vmx; then
@@ -1095,7 +1095,7 @@ function vm_boot() {
 
     # Changing process name is not supported on macOS
     if [ ${DARWIN} -eq 1 ]; then
-        if [ ! ${IN_VM} ]; then
+        if [ -z "${HYPERVISOR}" ]; then
             # shellcheck disable=SC2054,SC2206,SC2140
             args+=(-accel hvf)
         fi
