@@ -1831,6 +1831,7 @@ if [ "$(uname -s)" == "Darwin" ]; then
     CPU_KVM=""
     CPU_KVM_UNHALT=""
     KVM_GUEST_TWEAKS=""
+    display="cocoa"
 fi
 
 QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
