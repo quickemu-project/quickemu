@@ -849,16 +849,11 @@ function configure_display() {
                 gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
                 cocoa|sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
             esac;;
-        *) if [ "${OS_KERNEL}" == "Darwin" ]; then
-               DISPLAY_DEVICE="VGA"
-            else
-               DISPLAY_DEVICE="qxl-vga"
-            fi;;
+        *) DISPLAY_DEVICE="qxl-vga";;
     esac
 
     # Map Quickemu $display to QEMU -display
     case ${display} in
-        cocoa)      DISPLAY_RENDER="${display}";;
         gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
         none|spice) DISPLAY_RENDER="none";;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
@@ -1585,10 +1580,9 @@ function display_param_check() {
     fi
 
     if [ "${OS_KERNEL}" == "Darwin" ]; then
-        if [ "${display}" != "cocoa" ]; then
-          echo "WARNING! Requested output '${display}' but only 'cocoa' is avalible on macOS."
-          echo "         Setting display to 'cocoa'."
-          display="cocoa"
+        if [ "${display}" != "cocoa" ] && [ "${display}" != "none" ]; then
+          echo "ERROR! Requested output '${display}' but only 'cocoa' and 'none' are avalible on macOS."
+          exit 1
         fi
     else
         if [ "${display}" != "gtk" ] && [ "${display}" != "none" ] && [ "${display}" != "sdl" ] && [ "${display}" != "spice" ] && [ "${display}" != "spice-app" ]; then
