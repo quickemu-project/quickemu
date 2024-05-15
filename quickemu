@@ -1063,7 +1063,7 @@ function vm_boot() {
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         # Get macOS product name and version using swvers
         if [ -x "$(command -v sw_vers)" ]; then
-            OS_RELEASE="$(sw_vers --productName) $(sw_vers --productVersion)"
+            OS_RELEASE="$(sw_vers -productName) $(sw_vers -productVersion)"
         fi
     elif [ -e /etc/os-release ]; then
         OS_RELEASE=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
