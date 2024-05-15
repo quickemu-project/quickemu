@@ -847,9 +847,13 @@ function configure_display() {
             # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
             case ${display} in
                 gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
-                sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
+                cocoa|sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
             esac;;
-        *) DISPLAY_DEVICE="qxl-vga";;
+        *) if [ "${OS_KERNEL}" == "Darwin" ]; then
+               DISPLAY_DEVICE="VGA"
+            else
+               DISPLAY_DEVICE="qxl-vga"
+            fi;;
     esac
 
     # Map Quickemu $display to QEMU -display
