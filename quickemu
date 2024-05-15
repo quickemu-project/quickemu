@@ -22,7 +22,7 @@ function ignore_msrs_always() {
 
 function ignore_msrs_alert() {
     local ignore_msrs=""
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         return
     elif [ -e /sys/module/kvm/parameters/ignore_msrs ]; then
         ignore_msrs=$(cat /sys/module/kvm/parameters/ignore_msrs)
@@ -223,7 +223,7 @@ function get_nproc() {
 function get_cpu_info() {
     local INFO_NAME="${1}"
 
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         if [ "^Model name:" == "${INFO_NAME}" ]; then
             sysctl -n machdep.cpu.brand_string | sed 's/ //g'
         elif [ "Socket" == "${INFO_NAME}" ]; then
@@ -245,7 +245,7 @@ function get_cpu_info() {
 
 function check_cpu_flag() {
     local HOST_CPU_FLAG=""
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         HOST_CPU_FLAG="${1}^^"
         if sysctl -n machdep.cpu.features | grep -o "${HOST_CPU_FLAG}" > /dev/null; then
             return 0
@@ -285,7 +285,7 @@ function configure_cpu() {
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
     # Detect if running in a VM
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         MANUFACTURER=$(ioreg -l | grep -e Manufacturer | grep -v iMan | cut -d'"' -f4 | sort -u)
     else
         MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
@@ -341,7 +341,7 @@ function configure_cpu() {
         done
     fi
 
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         # Get the number of physical cores
         physicalcpu=$(sysctl -n hw.physicalcpu)
         # Get the number of logical processors
@@ -383,7 +383,7 @@ function configure_ram() {
     RAM_VM="2G"
     if [ -z "${ram}" ]; then
         local RAM_HOST=""
-        if [ ${DARWIN} -eq 1 ]; then
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
             RAM_HOST=$(($(sysctl -n hw.memsize) / (1048576*1024)))
         else
             # Determine the number of gigabytes of RAM in the host by extracting the first numerical value from the output.
@@ -466,7 +466,7 @@ function configure_bios() {
         # does not support SMM.
 
         local SHARE_PATH="/usr/share"
-        if [ ${DARWIN} -eq 1 ]; then
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
             # Do not assume brew; quickemu could have been installed via Nix
             if command -v brew &>/dev/null; then
                 SHARE_PATH="$(brew --prefix qemu)/share"
@@ -1060,7 +1060,7 @@ function vm_boot() {
     KERNEL_NODE="$(uname -n | cut -d'.' -f 1)"
     KERNEL_VER="$(uname -r)"
 
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         # Get macOS product name and version using swvers
         if [ -x "$(command -v sw_vers)" ]; then
             OS_RELEASE="$(sw_vers --productName) $(sw_vers --productVersion)"
@@ -1094,7 +1094,7 @@ function vm_boot() {
     echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
     # Changing process name is not supported on macOS
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         if [ -z "${HYPERVISOR}" ]; then
             # shellcheck disable=SC2054,SC2206,SC2140
             args+=(-accel hvf)
@@ -1129,7 +1129,7 @@ function vm_boot() {
     args+=(-device virtio-rng-pci,rng=rng0 -object rng-random,id=rng0,filename=/dev/urandom)
 
     # macOS doesn't support SPICE
-    if [ ${DARWIN} -eq 0 ]; then
+    if [ "${OS_KERNEL}" == "Linux" ]; then
         # shellcheck disable=SC2054
         args+=(-device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
             -chardev spicevmc,id=usbredirchardev1,name=usbredir
@@ -1186,7 +1186,7 @@ function vm_boot() {
     fi
 
     # Braille requires SDL, so disable for macOS
-    if [ -n "${BRAILLE}" ] && [ ${DARWIN} -eq 0 ]; then
+    if [ -n "${BRAILLE}" ] && [ "${OS_KERNEL}" == "Linux" ]; then
         if ${QEMU} -chardev help | grep -q braille; then
             # shellcheck disable=SC2054
             #args+=(-chardev braille,id=brltty
@@ -1558,7 +1558,7 @@ function display_param_check() {
         display="sdl"
     fi
 
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         if [ "${display}" != "cocoa" ]; then
           echo "WARNING! Requested output '${display}' but only 'cocoa' is avalible on macOS."
           echo "         Setting display to 'cocoa'."
@@ -1645,7 +1645,7 @@ function tpm_param_check() {
 }
 
 function viewer_param_check() {
-    if [ ${DARWIN} -eq 1 ]; then
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
         return
     fi
 
@@ -1820,14 +1820,12 @@ if command -v gstat &>/dev/null; then
     STAT="gstat"
 fi
 
-DARWIN=0
+OS_KERNEL=$(uname -s)
 CPU_KVM=",kvm=on"
 CPU_KVM_UNHALT=",kvm_pv_unhalt"
 KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
-
 # Detect macOS and disable KVM
-if [ "$(uname -s)" == "Darwin" ]; then
-    DARWIN=1
+if [ "${OS_KERNEL}" == "Darwin" ]; then
     CPU_KVM=""
     CPU_KVM_UNHALT=""
     KVM_GUEST_TWEAKS=""
