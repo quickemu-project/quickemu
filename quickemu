@@ -1839,8 +1839,8 @@ if [ "${OS_KERNEL}" == "Darwin" ]; then
     display="cocoa"
 fi
 
-QEMU_VER_LONG=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1)
-QEMU_VER_SHORT=$(${QEMU} -version | head -n1 | cut -d' ' -f4 | cut -d'(' -f1 | sed 's/\.//g' | cut -c1-2)
+QEMU_VER_LONG=$(${QEMU_IMG} --version | head -1 | awk '{print $3}')
+QEMU_VER_SHORT=$(echo "${QEMU_VER_LONG//./}" | cut -c1-2)
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
     echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
     exit 1
