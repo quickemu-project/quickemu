@@ -246,7 +246,9 @@ function get_cpu_info() {
 function check_cpu_flag() {
     local HOST_CPU_FLAG=""
     if [ "${OS_KERNEL}" == "Darwin" ]; then
-        HOST_CPU_FLAG="${1}^^"
+        # Convert the flag to uppercase and replace _ with .
+        HOST_CPU_FLAG="${1^^}"
+        HOST_CPU_FLAG="${HOST_CPU_FLAG//_/.}"
         if sysctl -n machdep.cpu.features | grep -o "${HOST_CPU_FLAG}" > /dev/null; then
             return 0
         else
