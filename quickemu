@@ -297,7 +297,12 @@ function configure_cpu() {
         qemu) CPU_MODEL="Penryn"
               HYPERVISOR="${MANUFACTURER,,}";;
         *)    CPU_MODEL="host"
-              HYPERVISOR="";
+              # Disable huge pages
+              # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
+              if [ "${OS_KERNEL}" == "Darwin" ]; then
+                  CPU_MODEL+=",-pdpe1gb"
+              fi
+              HYPERVISOR="";;
     esac
 
     if [ -z "${HYPERVISOR}" ]; then
