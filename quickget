@@ -3393,6 +3393,13 @@ if [ ! -e "${CURL}" ]; then
 fi
 CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
 
+# Only currently used for MacOS
+QEMU_IMG=$(command -v qemu-img)
+if [ ! -e "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu-img not found. Please install qemu-img"
+    exit 1
+fi
+
 #TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
 case "${1}" in
     --download|-download)
