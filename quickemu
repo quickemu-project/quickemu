@@ -286,23 +286,39 @@ function configure_cpu() {
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
-    # Detect if running in a VM
+    CPU_MODEL="host"
+    # Configure appropriately for the host platform
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         MANUFACTURER=$(ioreg -l | grep -e Manufacturer | grep -v iMan | cut -d'"' -f4 | sort -u)
+        # Disable huge pages on macOS to prevent crashes
+        # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
+        CPU_MODEL+=",-pdpe1gb"
+        CPU_KVM_UNHALT=""
+        KVM_GUEST_TWEAKS=""
+        QEMU_ACCEL=",accel=hvf"
+        # QEMU for macOS from Homebrew does not support SMM
+        SMM="off"
     else
         MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
+        CPU_KVM_UNHALT=",kvm_pv_unhalt"
+        KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
+        QEMU_ACCEL=",accel=kvm"
     fi
 
+    # If the architecture of the VM is different from the host, disable acceleration
+    if [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
+        QEMU_ACCEL=""
+        CPU_MODEL="qemu64"
+        CPU_KVM_UNHALT=""
+        KVM_GUEST_TWEAKS=""
+    fi
+
+    # Detect if running in a VM
     case ${MANUFACTURER,,} in
-        qemu) CPU_MODEL="Penryn"
-              HYPERVISOR="${MANUFACTURER,,}";;
-        *)    CPU_MODEL="host"
-              # Disable huge pages
-              # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
-              if [ "${OS_KERNEL}" == "Darwin" ]; then
-                  CPU_MODEL+=",-pdpe1gb"
-              fi
-              HYPERVISOR="";;
+        qemu|virtualbox) CPU_MODEL="qemu64"
+                         QEMU_ACCEL=""
+                         HYPERVISOR="${MANUFACTURER,,}";;
+        *) HYPERVISOR="";;
     esac
 
     if [ -z "${HYPERVISOR}" ]; then
@@ -564,7 +580,7 @@ function configure_os_quirks() {
     # Make any OS specific adjustments
     case ${guest_os} in
         batocera|*bsd|freedos|haiku|linux*|*solaris)
-            CPU="-cpu ${CPU_MODEL}${CPU_KVM}"
+            CPU="-cpu ${CPU_MODEL}"
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
             fi
@@ -589,7 +605,7 @@ function configure_os_quirks() {
             fi
             ;;
         kolibrios|reactos)
-            CPU="-cpu qemu32${CPU_KVM}"
+            CPU="-cpu qemu32"
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
             fi
@@ -616,21 +632,21 @@ function configure_os_quirks() {
             case ${macos_release} in
                 ventura|sonoma)
                     if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        CPU="-cpu Haswell-v4${CPU_KVM},vendor=GenuineIntel,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        CPU="-cpu Haswell-v4,vendor=GenuineIntel,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
                         exit 1
                     fi;;
                 catalina|big-sur|monterey)
                     if check_cpu_flag sse4_2; then
-                        CPU="-cpu Haswell-v4${CPU_KVM},vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        CPU="-cpu Haswell-v4,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                         exit 1
                     fi;;
                 *)
                     if check_cpu_flag sse4_1; then
-                        CPU="-cpu Penryn${CPU_KVM},vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
+                        CPU="-cpu Penryn,vendor=GenuineIntel,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
                         exit 1
@@ -685,9 +701,9 @@ function configure_os_quirks() {
             ;;
         windows|windows-server)
             if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                CPU="-cpu ${CPU_MODEL}${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
             else
-                CPU="-cpu ${CPU_MODEL}${CPU_KVM},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
             fi
             if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
                 CPU="${CPU},topoext"
@@ -702,9 +718,13 @@ function configure_os_quirks() {
             else
               GUEST_TWEAKS+=" -no-hpet"
             fi
-            SMM="on"
+
+            # SMM is not available on QEMU for macOS via Homebrew
+            if [ "${OS_KERNEL}" == "Linux" ]; then
+                SMM="on"
+            fi
             ;;
-        *) CPU="-cpu ${CPU_MODEL}${CPU_KVM}"
+        *) CPU="-cpu ${CPU_MODEL}"
            NET_DEVICE="rtl8139"
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
@@ -1101,17 +1121,12 @@ function vm_boot() {
     echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
     # Changing process name is not supported on macOS
-    if [ "${OS_KERNEL}" == "Darwin" ]; then
-        if [ -z "${HYPERVISOR}" ]; then
-            # shellcheck disable=SC2054,SC2206,SC2140
-            args+=(-accel hvf)
-        fi
-    else
+    if [ "${OS_KERNEL}" == "Linux" ]; then
         # shellcheck disable=SC2054,SC2206,SC2140
-        args+=(-name ${VMNAME},process=${VMNAME} -enable-kvm)
+        args+=(-name ${VMNAME},process=${VMNAME})
     fi
     # shellcheck disable=SC2054,SC2206,SC2140
-    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
+    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off${QEMU_ACCEL} ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
         -rtc base=localtime,clock=host,driftfix=slew
@@ -1830,14 +1845,7 @@ if command -v gstat &>/dev/null; then
 fi
 
 OS_KERNEL=$(uname -s)
-CPU_KVM=",kvm=on"
-CPU_KVM_UNHALT=",kvm_pv_unhalt"
-KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
-# Detect macOS and disable KVM
 if [ "${OS_KERNEL}" == "Darwin" ]; then
-    CPU_KVM=""
-    CPU_KVM_UNHALT=""
-    KVM_GUEST_TWEAKS=""
     display="cocoa"
 fi
 
