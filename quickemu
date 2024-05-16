@@ -296,14 +296,13 @@ function configure_cpu() {
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         MANUFACTURER=$(ioreg -l | grep -e Manufacturer | grep -v iMan | cut -d'"' -f4 | sort -u)
         CPU_KVM_UNHALT=""
-        KVM_GUEST_TWEAKS=""
         QEMU_ACCEL="hvf"
         # QEMU for macOS from Homebrew does not support SMM
         SMM="off"
     else
         MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
         CPU_KVM_UNHALT=",kvm_pv_unhalt"
-        KVM_GUEST_TWEAKS="-global kvm-pit.lost_tick_policy=discard "
+        GUEST_TWEAKS+=" -global kvm-pit.lost_tick_policy=discard"
         QEMU_ACCEL="kvm"
     fi
 
@@ -311,7 +310,6 @@ function configure_cpu() {
     if [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
-        KVM_GUEST_TWEAKS=""
         QEMU_ACCEL="tcg"
     fi
 
@@ -675,7 +673,7 @@ function configure_os_quirks() {
             fi
 
             # Disable S3 support in the VM to prevent macOS suspending during install
-            GUEST_TWEAKS="${KVM_GUEST_TWEAKS}-global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
+            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
@@ -696,7 +694,7 @@ function configure_os_quirks() {
                     MAC_DISK_DEV="virtio-blk-pci"
                     NET_DEVICE="virtio-net"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
-                    GUEST_TWEAKS="${GUEST_TWEAKS} -global nec-usb-xhci.msi=off"
+                    GUEST_TWEAKS+=" -global nec-usb-xhci.msi=off"
                     sound_card="${sound_card:-usb-audio}"
                     usb_controller="xhci";;
                 *)
@@ -723,7 +721,7 @@ function configure_os_quirks() {
             fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
             #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-            GUEST_TWEAKS="${KVM_GUEST_TWEAKS}-global ICH9-LPC.disable_s3=1"
+            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
