@@ -610,21 +610,24 @@ function configure_os_quirks() {
             esac
             ;;
         macos)
-            # quickget current list: mojave catalina big-sur monterey ventura sonoma
+            # If the host has an Intel CPU, passes the host CPU model features, model, stepping, exactly to the guest.
+            # Disable huge pages (,-pdpe1gb) on macOS to prevent crashes
+            # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
+            if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -n "${HYPERVISOR}" ]; then
+                CPU_MODEL="host"
+                CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
+            else
+                CPU_MODEL="Haswell-v4"
+                CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,vmware-cpuid-freq=on"
+            fi
             # A CPU with fma is required for Metal support
             # A CPU with invtsc is required for macOS to boot
-            # A CPU with SSE4.1 support is required for >= macOS Sierra
-            # A CPU with SSE4.2 support is required for >= macOS Catalina
-            # A CPU with AVX2 support is required for >= macOS Ventura
             case ${macos_release} in
-                # Disable huge pages (,-pdpe1gb) on macOS to prevent crashes
-                # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
                 ventura|sonoma)
+                    # A CPU with AVX2 support is required for >= macOS Ventura
                     if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU="-cpu host,-pdpe1gb"
-                        else
-                            CPU="-cpu Haswell-v4,vendor=GenuineIntel,-pdpe1gb,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+avx2,+sse4.2"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
@@ -632,22 +635,20 @@ function configure_os_quirks() {
                         exit 1
                     fi;;
                 catalina|big-sur|monterey)
+                    # A CPU with SSE4.2 support is required for >= macOS Catalina
                     if check_cpu_flag sse4_2; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU="-cpu host,-pdpe1gb"
-                        else
-                            CPU="-cpu Haswell-v4,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.2"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
                         exit 1
                     fi;;
                 *)
+                    # A CPU with SSE4.1 support is required for >= macOS Sierra
                     if check_cpu_flag sse4_1; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU="-cpu host,-pdpe1gb"
-                        else
-                            CPU="-cpu Penryn,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.1"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
@@ -656,13 +657,13 @@ function configure_os_quirks() {
             esac
 
             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-              for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
-                          mmx movbe mpx pdpe1gb popcnt smep vaes vbmi2 vpclmulqdq \
+                for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
+                          mmx movbe mpx popcnt smep vaes vbmi2 vpclmulqdq \
                           xgetbv1 xsave xsaveopt; do
-                  if check_cpu_flag "${FLAG}"; then
-                      CPU+=",+${FLAG}"
-                  fi
-              done
+                    if check_cpu_flag "${FLAG}"; then
+                        CPU+=",+${FLAG}"
+                    fi
+                done
             fi
 
             # Disable S3 support in the VM to prevent macOS suspending during install
