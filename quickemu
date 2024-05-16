@@ -581,10 +581,6 @@ function configure_os_quirks() {
     case ${guest_os} in
         batocera|*bsd|freedos|haiku|linux*|*solaris)
             CPU="-cpu ${CPU_MODEL}"
-            if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-                CPU="${CPU},topoext"
-            fi
-
             if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
                 mouse="usb"
             elif [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
@@ -606,9 +602,6 @@ function configure_os_quirks() {
             ;;
         kolibrios|reactos)
             CPU="-cpu qemu32"
-            if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-                CPU="${CPU},topoext"
-            fi
             MACHINE_TYPE="pc"
             case ${guest_os} in
                 kolibrios) NET_DEVICE="rtl8139";;
@@ -716,9 +709,6 @@ function configure_os_quirks() {
             else
                 CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
             fi
-            if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
-                CPU="${CPU},topoext"
-            fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
             #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
             GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
@@ -739,6 +729,10 @@ function configure_os_quirks() {
            NET_DEVICE="rtl8139"
            echo "WARNING! Unrecognised guest OS: ${guest_os}";;
     esac
+
+    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
+      CPU+=",topoext"
+    fi
 }
 
 function configure_storage() {
