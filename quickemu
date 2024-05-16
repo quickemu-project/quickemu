@@ -336,6 +336,111 @@ function configure_cpu() {
         fi
     fi
 
+    CPU="-cpu ${CPU_MODEL}"
+
+    # Make any OS specific adjustments
+    if [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
+        # SMM is not available on QEMU for macOS via Homebrew
+        if [ "${OS_KERNEL}" == "Linux" ]; then
+            SMM="on"
+        fi
+    fi
+
+    case ${guest_os} in
+        batocera|freedos|haiku|solaris) MACHINE_TYPE="pc";;
+        kolibrios|reactos)
+            CPU="-cpu qemu32"
+            MACHINE_TYPE="pc";;
+        macos)
+            # If the host has an Intel CPU, passes the host CPU model features, model, stepping, exactly to the guest.
+            # Disable huge pages (,-pdpe1gb) on macOS to prevent crashes
+            # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
+            if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                CPU_MODEL="host"
+                CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
+            else
+                CPU_MODEL="Haswell-v4"
+                CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,vmware-cpuid-freq=on"
+            fi
+            # A CPU with fma is required for Metal support
+            # A CPU with invtsc is required for macOS to boot
+            case ${macos_release} in
+                ventura|sonoma)
+                    # A CPU with AVX2 support is required for >= macOS Ventura
+                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+avx2,+sse4.2"
+                        fi
+                    else
+                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
+                        echo "       Try macOS Monterey or Big Sur."
+                        exit 1
+                    fi;;
+                catalina|big-sur|monterey)
+                    # A CPU with SSE4.2 support is required for >= macOS Catalina
+                    if check_cpu_flag sse4_2; then
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.2"
+                        fi
+                    else
+                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
+                        exit 1
+                    fi;;
+                *)
+                    # A CPU with SSE4.1 support is required for >= macOS Sierra
+                    if check_cpu_flag sse4_1; then
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.1"
+                        fi
+                    else
+                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
+                        exit 1
+                    fi;;
+            esac
+
+            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
+                          mmx movbe mpx popcnt smep vaes vbmi2 vpclmulqdq \
+                          xgetbv1 xsave xsaveopt; do
+                    if check_cpu_flag "${FLAG}"; then
+                        CPU+=",+${FLAG}"
+                    fi
+                done
+            fi
+
+            # Disable S3 support in the VM to prevent macOS suspending during install
+            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
+
+            # Disable High Precision Timer
+            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+                MACHINE_TYPE+=",hpet=off"
+            else
+                GUEST_TWEAKS+=" -no-hpet"
+            fi
+            ;;
+        windows|windows-server)
+            if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
+            else
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+            fi
+            # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
+            #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
+            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
+
+            # Disable High Precision Timer
+            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+              MACHINE_TYPE+=",hpet=off"
+            else
+              GUEST_TWEAKS+=" -no-hpet"
+            fi
+            ;;
+    esac
+
+    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
+        CPU+=",topoext"
+    fi
+
     if [ -z "${cpu_cores}" ]; then
         if [ "${HOST_CPU_CORES}" -ge 32 ]; then
             GUEST_CPU_CORES="16"
@@ -577,106 +682,24 @@ function configure_bios() {
 }
 
 function configure_os_quirks() {
-    # Make any OS specific adjustments
+
+    if [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "kolibrios" ]; then
+        NET_DEVICE="rtl8139"
+    fi
+
+    if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
+        mouse="usb"
+    fi
+
     case ${guest_os} in
-        batocera|*bsd|freedos|haiku|linux*|*solaris)
-            CPU="-cpu ${CPU_MODEL}"
-            if [ "${guest_os}" == "freebsd" ] || [ "${guest_os}" == "ghostbsd" ]; then
-                mouse="usb"
-            elif [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ]; then
-                MACHINE_TYPE="pc"
-                NET_DEVICE="rtl8139"
-            fi
-
-            if [ "${guest_os}" == "freedos" ] ; then
-                # fix for #382
-                SMM="on"
-                sound_card="sb16"
-            fi
-
-            if [[ "${guest_os}" == *"solaris" ]]; then
-                MACHINE_TYPE="pc"
-                usb_controller="xhci"
-                sound_card="ac97"
-            fi
-            ;;
-        kolibrios|reactos)
-            CPU="-cpu qemu32"
-            MACHINE_TYPE="pc"
-            case ${guest_os} in
-                kolibrios) NET_DEVICE="rtl8139";;
-                reactos)   NET_DEVICE="e1000"
-                           keyboard="ps2";;
-            esac
-            ;;
+        *bsd|linux*|windows*) NET_DEVICE="virtio-net";;
+        freedos) sound_card="sb16";;
+        *solaris) usb_controller="xhci"
+                  sound_card="ac97";;
+        reactos) NET_DEVICE="e1000"
+                 keyboard="ps2";;
         macos)
-            # If the host has an Intel CPU, passes the host CPU model features, model, stepping, exactly to the guest.
-            # Disable huge pages (,-pdpe1gb) on macOS to prevent crashes
-            # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
-            if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -n "${HYPERVISOR}" ]; then
-                CPU_MODEL="host"
-                CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
-            else
-                CPU_MODEL="Haswell-v4"
-                CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,vmware-cpuid-freq=on"
-            fi
-            # A CPU with fma is required for Metal support
-            # A CPU with invtsc is required for macOS to boot
-            case ${macos_release} in
-                ventura|sonoma)
-                    # A CPU with AVX2 support is required for >= macOS Ventura
-                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+avx2,+sse4.2"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
-                        echo "       Try macOS Monterey or Big Sur."
-                        exit 1
-                    fi;;
-                catalina|big-sur|monterey)
-                    # A CPU with SSE4.2 support is required for >= macOS Catalina
-                    if check_cpu_flag sse4_2; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.2"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
-                        exit 1
-                    fi;;
-                *)
-                    # A CPU with SSE4.1 support is required for >= macOS Sierra
-                    if check_cpu_flag sse4_1; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.1"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
-                        exit 1
-                    fi;;
-            esac
-
-            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
-                          mmx movbe mpx popcnt smep vaes vbmi2 vpclmulqdq \
-                          xgetbv1 xsave xsaveopt; do
-                    if check_cpu_flag "${FLAG}"; then
-                        CPU+=",+${FLAG}"
-                    fi
-                done
-            fi
-
-            # Disable S3 support in the VM to prevent macOS suspending during install
-            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
-
-            # Disable High Precision Timer
-            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
-                MACHINE_TYPE+=",hpet=off"
-            else
-                GUEST_TWEAKS+=" -no-hpet"
-            fi
-
-            # Tune Qemu optimisations based on the macOS release, or fallback to lowest
+            # Tune QEMU optimisations based on the macOS release, or fallback to lowest
             # common supported options if none is specified.
             #   * VirtIO Block Media doesn't work in High Sierra (at all) or the Mojave (Recovery Image)
             #   * VirtIO Network is supported since Big Sur
@@ -704,36 +727,8 @@ function configure_os_quirks() {
                     USB_HOST_PASSTHROUGH_CONTROLLER="usb-ehci";;
             esac
             ;;
-        windows|windows-server)
-            if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
-            else
-                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
-            fi
-            # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
-            #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
-            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
-
-            # Disable High Precision Timer
-            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
-              MACHINE_TYPE+=",hpet=off"
-            else
-              GUEST_TWEAKS+=" -no-hpet"
-            fi
-
-            # SMM is not available on QEMU for macOS via Homebrew
-            if [ "${OS_KERNEL}" == "Linux" ]; then
-                SMM="on"
-            fi
-            ;;
-        *) CPU="-cpu ${CPU_MODEL}"
-           NET_DEVICE="rtl8139"
-           echo "WARNING! Unrecognised guest OS: ${guest_os}";;
+        *) NET_DEVICE="rtl8139";;
     esac
-
-    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
-      CPU+=",topoext"
-    fi
 }
 
 function configure_storage() {
