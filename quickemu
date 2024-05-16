@@ -665,7 +665,7 @@ function configure_os_quirks() {
             esac
 
             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-              for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist ept_1gb f16c fma invtsc \
+              for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
                           mmx movbe mpx pdpe1gb popcnt smep vaes vbmi2 vpclmulqdq \
                           xgetbv1 xsave xsaveopt; do
                   if check_cpu_flag "${FLAG}"; then
