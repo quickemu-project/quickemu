@@ -630,7 +630,7 @@ function configure_os_quirks() {
                 # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
                 ventura|sonoma)
                     if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
+                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU="-cpu host,-pdpe1gb"
                         else
                             CPU="-cpu Haswell-v4,vendor=GenuineIntel,-pdpe1gb,+avx,+avx2,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
@@ -642,7 +642,7 @@ function configure_os_quirks() {
                     fi;;
                 catalina|big-sur|monterey)
                     if check_cpu_flag sse4_2; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
+                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU="-cpu host,-pdpe1gb"
                         else
                             CPU="-cpu Haswell-v4,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,+sse4.2,vmware-cpuid-freq=on"
@@ -653,7 +653,7 @@ function configure_os_quirks() {
                     fi;;
                 *)
                     if check_cpu_flag sse4_1; then
-                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
+                        if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU="-cpu host,-pdpe1gb"
                         else
                             CPU="-cpu Penryn,vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,+sse4.1,vmware-cpuid-freq=on"
@@ -664,7 +664,7 @@ function configure_os_quirks() {
                     fi;;
             esac
 
-            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ]; then
+            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
               for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist ept_1gb f16c fma invtsc \
                           mmx movbe mpx pdpe1gb popcnt smep vaes vbmi2 vpclmulqdq \
                           xgetbv1 xsave xsaveopt; do
