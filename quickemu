@@ -322,7 +322,10 @@ function configure_cpu() {
         QEMU_ACCEL="tcg"
     fi
 
-    # Detect if running in a VM
+    # TODO: More robust detection of running in a VM
+    # - macOS check for CPU flag: vmx
+    # - Linux AMD check for CPU flag: svm
+    # - Linux Intel check for CPU flag: vmx
     case ${MANUFACTURER,,} in
         qemu|virtualbox) CPU_MODEL="qemu64"
                          QEMU_ACCEL="tcg"
