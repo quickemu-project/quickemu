@@ -300,7 +300,9 @@ function configure_cpu() {
         # QEMU for macOS from Homebrew does not support SMM
         SMM="off"
     else
-        MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
+        if [ -r /sys/class/dmi/id/sys_vendor ]; then
+            MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
+        fi
         CPU_KVM_UNHALT=",kvm_pv_unhalt"
         GUEST_TWEAKS+=" -global kvm-pit.lost_tick_policy=discard"
         QEMU_ACCEL="kvm"
