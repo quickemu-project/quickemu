@@ -13,96 +13,40 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  list-all-supported:
-    name: "List all supported OS 📝"
-    runs-on: ubuntu-22.04
-    # The type of runner that the job will run on
-    #runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-      - name: "List all supported OS variants"
-        run: |
-          mkdir -p results
-          ./quickget --list | tee results/supported.txt
-          echo -e "\nResults:"
-          echo "- All supported OS variants: $(wc -l results/supported.txt | cut -d' ' -f 1)"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: supported
-          path: results/supported.txt
-
-  list-all-urls:
-    needs: [list-all-supported]
-    name: "List all URLs 🔗"
+  quickget-tests:
+    name: "Run quickget tests 👟"
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: "quickget --url"
+      - name: "Install dependencies 📦️"
         run: |
-          export TERM=xterm-256color
+          sudo apt-get -y update
+          sudo apt-get -y install curl qemu-utils
+      - name: "List OS variants 📃"
+        run: |
           mkdir -p results
-          ./quickget --url | tee results/urls.txt
-      - uses: actions/download-artifact@v4
-        with:
-          path: results
-          merge-multiple: true
-      - name: "Show differences ⚖️"
+          ./quickget --list | tail -n +2 | tee results/list.txt
+      - name: "Check OS downloads 💿️"
         run: |
-          echo -e "\nResults:"
-          echo -e "List All URLs:\t$(grep -c http results/urls.txt)"
-          echo -e "OS Info URLs:\t$(wc -l results/supported.txt | cut -d' ' -f 1)"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: urls
-          path: results/urls.txt
-
-  check-all-urls:
-    name: "Check all image URLs 💿️"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: "quickget --check"
-        run: |
-          export TERM=xterm-256color
           mkdir -p results
-          ./quickget --check | tee results/checks.txt
-          WINDOWS=$(grep -c "windows-" results/checks.txt)
-          FAILED=$(grep -c ^FAIL results/checks.txt)
-          SKIPPED=$(grep -c ^SKIP results/checks.txt)
-          PASSED=$(grep -c ^PASS results/checks.txt)
-          CHECKED=$((FAILED + SKIPPED + PASSED))
+          ./quickget --check | tee results/check.txt
+      - name: "Display results 📊"
+        run: |
+          WINDOWS=$(grep -c "windows-" results/check.txt)
+          FAILED=$(grep -c ^FAIL results/check.txt)
+          SKIPPED=$(grep -c ^SKIP results/check.txt)
+          PASSED=$(grep -c ^PASS results/check.txt)
+          CHECKED=$((WINDOWS + FAILED + SKIPPED + PASSED))
           echo -e "\nResults:"
+          echo -e "- CHECKED:\t${CHECKED}"
           echo -e "- PASSED:\t${PASSED}"
           echo -e "- SKIPPED:\t${SKIPPED}\t(of which ${WINDOWS} are Windows)"
           echo -e "- FAILED:\t${FAILED}\n"
-          grep ^FAIL results/checks.txt | tee results/failed.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: checks
-          path: results/checks.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: failed
-          path: results/failed.txt
-
-  upload-artifacts:
-    needs: [list-all-urls, check-all-urls]
-    name: "Uploading artifacts"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: results
-          merge-multiple: true
-      - name: "List results"
-        run: |
-          ls -R results/
-      - uses: actions/upload-artifact@v4
-        with:
-          overwrite: true
-          name: results
-          path: results/
+          grep ^FAIL results/check.txt | tee results/failed.txt
+          VARIATIONS=$(wc -l results/list.txt | cut -d' ' -f 1)
+          DOWNLOADS=$(wc -l results/check.txt | cut -d' ' -f 1)
+          echo
+          echo "Compare OS variations with downloads:"
+          echo -e "- Variations:\t${VARIATIONS}"
+          echo -e "- Downloads:\t${DOWNLOADS}"
