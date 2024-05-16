@@ -225,11 +225,15 @@ function get_cpu_info() {
 
     if [ "${OS_KERNEL}" == "Darwin" ]; then
         if [ "^Model name:" == "${INFO_NAME}" ]; then
-            sysctl -n machdep.cpu.brand_string | sed 's/ //g'
+            sysctl -n machdep.cpu.brand_string
         elif [ "Socket" == "${INFO_NAME}" ]; then
             sysctl -n hw.packages
         elif [ "Vendor" == "${INFO_NAME}" ]; then
-            sysctl -n machdep.cpu.vendor | sed 's/ //g'
+            if [ "${ARCH_HOST}" == "arm64" ]; then
+                sysctl -n machdep.cpu.brand_string | cut -d' ' -f1
+            else
+                sysctl -n machdep.cpu.vendor | sed 's/ //g'
+            fi
         else
             echo "ERROR! Could not find macOS translation for ${INFO_NAME}"
             exit 1
