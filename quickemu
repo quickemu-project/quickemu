@@ -240,9 +240,11 @@ function get_cpu_info() {
         fi
     else
         if [ "^Model name:" == "${INFO_NAME}" ]; then
-            lscpu | grep "${INFO_NAME}" | cut -d':' -f2 | sed -e 's/^[[:space:]]*//'
+            for MODEL_NAME in $(IFS=$'\n' lscpu | grep "${INFO_NAME}" | cut -d':' -f2 | sed -e 's/^[[:space:]]*//'); do
+                echo -n "${MODEL_NAME} "
+            done
         else
-            lscpu | grep -E "${INFO_NAME}" | cut -d':' -f2 | sed 's/ //g'
+            lscpu | grep -E "${INFO_NAME}" | cut -d':' -f2 | sed 's/ //g' | sort -u
         fi
     fi
 }
