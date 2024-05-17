@@ -306,8 +306,15 @@ function configure_cpu() {
         QEMU_ACCEL="kvm"
     fi
 
-    # If the architecture of the VM is different from the host, disable acceleration
-    if [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
+    if [ "${ARCH_VM}" == "aarch64"  ]; then
+        # Support to run aarch64 VMs (best guess; untested)
+        # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
+        case ${ARCH_HOST} in
+            arm64|aarch64) CPU_MODEL="max"
+                           MACHINE_TYPE="virt,highmem=off";;
+        esac
+    elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
+        # If the architecture of the VM is different from the host, disable acceleration
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
         QEMU_ACCEL="tcg"
