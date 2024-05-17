@@ -247,12 +247,45 @@ function get_cpu_info() {
     fi
 }
 
+# returns an enabled or disable CPU flag for QEMU, based on the host CPU
+# capabilities, or nothing if the flag is not supported
+# converts the flags appropriately from macOS and Linux to QEMU
+function configure_cpu_flag() {
+    local HOST_CPU_FLAG="${1}"
+    # Convert the flag to lowercase for QEMU
+    local QEMU_CPU_FLAG=${HOST_CPU_FLAG,,}
+    if check_cpu_flag "${HOST_CPU_FLAG}"; then
+        # Replace _ with - to make it compatible with QEMU
+        QEMU_CPU_FLAG="${HOST_CPU_FLAG//_/-}"
+        QEMU_CPU_FLAG="${QEMU_CPU_FLAG//4_/4\.}"
+        # macOS uses different flag names
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
+            case "${HOST_CPU_FLAG}" in
+                avx) QEMU_CPU_FLAG="AVX1.0";;
+            esac
+        fi
+        echo ",+${QEMU_CPU_FLAG}"
+    else
+        # Fully disable any QEMU flags that are not supported by the host CPU
+        if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+            case ${HOST_CPU_FLAG} in
+                pcid) echo ",-${QEMU_CPU_FLAG}";;
+            esac
+        fi
+    fi
+}
+
+# checks if a CPU flag is supported by the host CPU on Linux and macOS
 function check_cpu_flag() {
     local HOST_CPU_FLAG=""
     if [ "${OS_KERNEL}" == "Darwin" ]; then
-        # Convert the flag to uppercase and replace _ with .
+        # Make the macOS compatible: uppercase, replace _ with . and replace X2APIC with x2APIC
         HOST_CPU_FLAG="${1^^}"
         HOST_CPU_FLAG="${HOST_CPU_FLAG//_/.}"
+        HOST_CPU_FLAG="${HOST_CPU_FLAG//X2APIC/x2APIC}"
+        if [ "${HOST_CPU_FLAG}" == "AVX" ]; then
+            HOST_CPU_FLAG="AVX1.0"
+        fi
         if sysctl -n machdep.cpu.features | grep -o "${HOST_CPU_FLAG}" > /dev/null; then
             return 0
         else
@@ -371,8 +404,8 @@ function configure_cpu() {
                 CPU_MODEL="host"
                 CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
             else
-                CPU_MODEL="Haswell-v4"
-                CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+sse3,vmware-cpuid-freq=on"
+                CPU_MODEL="Haswell-v2"
+                CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+ssse3,vmware-cpuid-freq=on"
             fi
             # A CPU with fma is required for Metal support
             # A CPU with invtsc is required for macOS to boot
@@ -411,12 +444,12 @@ function configure_cpu() {
             esac
 
             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                for FLAG in abm adx aes amd-ssbd bmi1 bmi2 cx8 eist f16c fma invtsc \
-                          mmx movbe mpx popcnt smep vaes vbmi2 vpclmulqdq \
-                          xgetbv1 xsave xsaveopt; do
-                    if check_cpu_flag "${FLAG}"; then
-                        CPU+=",+${FLAG}"
-                    fi
+                for FLAG in abm adx aes amd-ssbd apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
+                            eist erms f16c fma fp87 fsgsbase fxsr invpcid invtsc lahf_lm lm \
+                            mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
+                            rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
+                            x2apic xgetbv1 xsave xsaveopt; do
+                    CPU+=$(configure_cpu_flag "${FLAG}")
                 done
             fi
 
