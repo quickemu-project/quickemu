@@ -446,10 +446,10 @@ function configure_cpu() {
             esac
 
             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                for FLAG in abm adx aes amd-ssbd apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
+                for FLAG in abm aes apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
                             eist erms f16c fma fp87 fsgsbase fxsr invpcid invtsc lahf_lm lm \
                             mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
-                            rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
+                            rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vpclmulqdq \
                             x2apic xgetbv1 xsave xsaveopt; do
                     CPU+=$(configure_cpu_flag "${FLAG}")
                 done
