@@ -798,7 +798,7 @@ function configure_storage() {
         esac
 
         case ${disk_format} in
-            qcow2) create_options="lazy_refcounts=on,preallocation=${preallocation}";;
+            qcow2) create_options="lazy_refcounts=on,preallocation=${preallocation},nocow=on";;
             raw) create_options="preallocation=${preallocation}";;
             *) true;;
         esac
