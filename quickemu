@@ -786,6 +786,7 @@ function configure_os_quirks() {
 }
 
 function configure_storage() {
+    local create_options=""
     echo " - Disk:     ${disk_img} (${disk_size})"
     if [ ! -f "${disk_img}" ]; then
         # If there is no disk image, create a new image.
@@ -796,8 +797,14 @@ function configure_storage() {
                exit 1;;
         esac
 
+        case ${disk_format} in
+            qcow2) create_options="lazy_refcounts=on,preallocation=${preallocation}";;
+            raw) create_options="preallocation=${preallocation}";;
+            *) true;;
+        esac
+
         # https://blog.programster.org/qcow2-performance
-        if ! ${QEMU_IMG} create -q -f "${disk_format}" -o lazy_refcounts=on,preallocation="${preallocation}" "${disk_img}" "${disk_size}"; then
+        if ! ${QEMU_IMG} create -q -f "${disk_format}" -o "${create_options=}" "${disk_img}" "${disk_size}"; then
             echo "ERROR! Failed to create ${disk_img} using ${disk_format} format."
             exit 1
         fi
