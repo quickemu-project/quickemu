@@ -3,6 +3,7 @@
 quick_report() {
     local GPUS
     local PRETTY_NAME
+    local QUICKEMU
     local VERSION
     if [ -e /etc/os-release ]; then
         PRETTY_NAME="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)"
@@ -10,8 +11,15 @@ quick_report() {
         PRETTY_NAME="Unknown OS"
     fi
 
-    if command -v quickemu &> /dev/null; then
-        VERSION=$(quickemu --version)
+    CWD="$(dirname "${0}")"
+    if [ -x "${CWD}/quickemu" ]; then
+        QUICKEMU="${CWD}/quickemu"
+    elif [ -x "$(command -v quickemu)" ]; then
+        QUICKEMU="$(command -v quickemu)"
+    fi
+
+    if [ -n "${QUICKEMU}" ]; then
+        VERSION=$(${QUICKEMU} --version)
         echo \
 "----------------------------------
         Quickemu ${VERSION}
