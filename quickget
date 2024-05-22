@@ -719,7 +719,7 @@ function editions_debian() {
 
 function releases_deepin() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | sort -r)
+    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | tail -n 10 | sort -r)
 }
 
 function releases_devuan() {
