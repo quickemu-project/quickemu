@@ -156,11 +156,11 @@ function error_specify_release() {
     case ${OS} in
         *ubuntu-server*)
             echo -en " - Releases:\t"
-            releases_ubuntu-server | sed -Ee 's/eol-\S+//g' # hide eol releases
+            releases_ubuntu-server
             ;;
         *ubuntu*)
             echo -en " - Releases:\t"
-            releases_ubuntu | sed -Ee 's/eol-\S+//g' # hide eol releases
+            releases_ubuntu
             ;;
         *windows*)
             echo -en " - Releases:\t"
@@ -302,7 +302,7 @@ function csv_data() {
             EDITIONS=$(editions_"${OS}")
         fi
 
-        for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+        for RELEASE in $("releases_${FUNC}"); do
             if [[ "${OS}" == *"ubuntu"* ]] && [[ ${RELEASE} == *"daily"*  ]] && [ ${HAS_ZSYNC} -eq 1 ]; then
                 DOWNLOADER="zsync"
             else
@@ -410,7 +410,7 @@ function test_all() {
     fi
     local URL=""
 
-    for RELEASE in $("releases_${FUNC}" | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
+    for RELEASE in $("releases_${FUNC}"); do
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
@@ -1101,24 +1101,21 @@ function releases_tuxedo-os() {
 function releases_ubuntu() {
     local VERSION_DATA=""
     local SUPPORTED_VERSIONS=()
-    local EOL_VERSIONS=()
     VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
     # shellcheck disable=SC2207
     SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
-    # shellcheck disable=SC2207
-    EOL_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Obsolete") | .version' <<<"${VERSION_DATA}" | sort))
     case "${OS}" in
         ubuntu)
-            echo "${SUPPORTED_VERSIONS[@]}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]}" daily-live;;
         kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
             # after 16.04
-            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live;;
         ubuntu-budgie)
             # after 18.04
-            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live;;
         edubuntu|ubuntu-unity|ubuntucinnamon)
             # after 23.10
-            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live "${EOL_VERSIONS[@]/#/eol-}";;
+            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live;;
     esac
 }
 
@@ -2580,9 +2577,7 @@ function get_ubuntu() {
         # Ubuntu Studio daily-live images are in the dvd directory
         RELEASE="dvd"
     fi
-    if [[ "${RELEASE}" == "eol-"* ]]; then
-        URL="https://old-releases.ubuntu.com/releases/${RELEASE/eol-/}"
-    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+    if [[ "${RELEASE}" == "jammy-daily" ]]; then
         if [[ "${OS}" == "ubuntustudio" ]]; then
             URL="https://cdimage.ubuntu.com/${OS}/jammy/dvd/current"
         else
