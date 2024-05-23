@@ -336,7 +336,7 @@ function configure_cpu() {
         SMM="off"
     else
         if [ -r /sys/class/dmi/id/sys_vendor ]; then
-            MANUFACTURER=$(head -1 /sys/class/dmi/id/sys_vendor)
+            MANUFACTURER=$(head -n 1 /sys/class/dmi/id/sys_vendor)
         fi
         CPU_KVM_UNHALT=",kvm_pv_unhalt"
         GUEST_TWEAKS+=" -global kvm-pit.lost_tick_policy=discard"
@@ -1895,7 +1895,7 @@ if [ "${OS_KERNEL}" == "Darwin" ]; then
     display="cocoa"
 fi
 
-QEMU_VER_LONG=$(${QEMU_IMG} --version | head -1 | awk '{print $3}')
+QEMU_VER_LONG=$(${QEMU_IMG} --version | head -n 1 | awk '{print $3}')
 QEMU_VER_SHORT=$(echo "${QEMU_VER_LONG//./}" | cut -c1-2)
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
     echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
@@ -2094,7 +2094,7 @@ fileshare_param_check
 # Check if vm is already run
 VM_PID=""
 if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
-    VM_PID=$(head -1 "${VMDIR}/${VMNAME}.pid")
+    VM_PID=$(head -n 1 "${VMDIR}/${VMNAME}.pid")
     if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
         # VM is not running, cleaning up.
         VM_PID=""

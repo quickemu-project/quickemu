@@ -414,7 +414,7 @@ function test_all() {
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 validate_release releases_"${OS}"
-                URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
+                URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
@@ -443,7 +443,7 @@ function test_all() {
             (get_ubuntu)
         else
             validate_release releases_"${OS}"
-            URL=$(get_"${OS}" | cut -d' ' -f1 | head -1)
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
@@ -610,7 +610,7 @@ function editions_arcolinux() {
 
 function releases_artixlinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -1)
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n 1)
 }
 
 function editions_artixlinux() {
@@ -625,7 +625,7 @@ function releases_athenaos() {
 
 function releases_batocera() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail +2 | head -n 5)
+    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail -n +2 | head -n 5)
 }
 
 function releases_bazzite() {
@@ -635,7 +635,7 @@ function releases_bazzite() {
 
 function releases_biglinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -1)
+    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -n 1)
 }
 
 function editions_biglinux() {
@@ -728,8 +728,8 @@ function releases_dragonflybsd() {
 function releases_easyos() {
     #local Y2023=""
     #local Y2024=""
-    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
-    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
+    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
     #echo -n ${2024}
     #echo ${Y2023}
     # Not dynamic for now
@@ -795,7 +795,7 @@ function editions_gentoo() {
 
 function releases_ghostbsd() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail +3 | head -3)
+    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail -n +3 | head -n 3)
 }
 
 function editions_ghostbsd() {
@@ -917,7 +917,7 @@ function releases_openbsd() {
 
 function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail +2 | head -n 5)
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
 }
 
 function editions_openindiana() {
@@ -1009,7 +1009,7 @@ function editions_siduction() {
 
 function releases_slackware() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -5)
+    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -n 5)
 }
 
 function releases_slax() {
@@ -1136,7 +1136,7 @@ function releases_vanillaos() {
 
 function releases_void() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -3)
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
 }
 
 function editions_void() {
@@ -1599,7 +1599,7 @@ function get_antix() {
         full-*) ISO+="_x64-full.iso";;
         net-*)  ISO+="-net_x64-net.iso";;
     esac
-    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1694,7 +1694,7 @@ function get_bunsenlabs() {
     local HASH=""
     local ISO="boron-1-240123-amd64.hybrid.iso"
     local URL="https://ddl.bunsenlabs.org/ddl"
-    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -1 | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -n 1 | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -1747,7 +1747,7 @@ function get_debian() {
         URL="${URL/hybrid/cd}"
         ISO="${ISO/-live/}"
     fi
-    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1 | head -1)
+    HASH=$(web_pipe "${URL}/SHA512SUMS" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2208,7 +2208,7 @@ function get_nitrux() {
     local ISO=""
     URLBASE="https://sourceforge.net/projects/nitruxos/files/Release"
     URL="${URLBASE}/ISO"
-    ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -1 | cut -d']' -f1 | cut -d '/' -f4)
+    ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -n 1 | cut -d']' -f1 | cut -d '/' -f4)
     HASH=$(web_pipe "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2225,7 +2225,7 @@ function get_nwg-shell() {
     local HASH=""
     local ISO="nwg-live-${RELEASE}-x86_64.iso"
     local URL="https://sourceforge.net/projects/nwg-iso/files"
-    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -1)"
+    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n 1)"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2459,7 +2459,7 @@ function get_sparkylinux() {
         minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
         *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
     esac
-    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -2 | grep 'iso' | cut -d' ' -f1)
+    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -n 2 | grep 'iso' | cut -d' ' -f1)
     echo "${URL}/${ISO}" "${HASH}"
 }
 
@@ -2627,7 +2627,7 @@ function get_vanillaos() {
     local HASH=""
     local HASH_URL=""
     local ISO=""
-    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -1 | cut -d'"' -f4)
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n 1 | cut -d'"' -f4)
     HASH_URL="${ISO//.iso/.sha256.txt}"
     HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
@@ -3394,7 +3394,7 @@ if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
     exit 1
 fi
-CURL_VERSION=$("${CURL}" --version | head -1 | cut -d' ' -f2)
+CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
 QEMU_IMG=$(command -v qemu-img)
 if [ ! -x "${QEMU_IMG}" ]; then
