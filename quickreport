@@ -2,11 +2,21 @@
 
 quick_report() {
     local GPUS
+    local OS_KERNEL
     local PRETTY_NAME
     local QUICKEMU
     local VERSION
-    if [ -e /etc/os-release ]; then
-        PRETTY_NAME="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)"
+    OS_KERNEL=$(uname -s)
+
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
+        # Get macOS product name and version using swvers
+        if [ -x "$(command -v sw_vers)" ]; then
+            PRETTY_NAME="$(sw_vers -productName) $(sw_vers -productVersion)"
+        else
+            PRETTY_NAME="macOS"
+        fi
+    elif [ -e /etc/os-release ]; then
+        PRETTY_NAME=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
     else
         PRETTY_NAME="Unknown OS"
     fi
@@ -26,10 +36,22 @@ quick_report() {
 ----------------------------------"
         echo -e "Distro:\t${PRETTY_NAME}"
         echo -e "Kernel:\t$(uname -s -r -m)"
-        echo -e "Memory:\t$(free --si -h | awk '/Mem:/{print $2}')"
+
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
+            echo -e "Memory:\t$(($(sysctl -n hw.memsize) / (1048576*1024)))G"
+        else
+            # Determine the number of gigabytes of RAM in the host by extracting the first numerical value from the output.
+            echo -e "Memory:\t$(free --giga -h | tr ' ' '\n' | grep -m 1 [0-9] | cut -d'G' -f 1)G"
+        fi
+
         # Break IFS on new line
         IFS=$'\n'
-        GPUS=$(lspci | grep -i vga | cut -d':' -f3)
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
+            # Get GPU information using system_profiler
+            GPUS=$(system_profiler SPDisplaysDataType | grep "Chipset Model" | awk -F: '{print $2}' | sed 's/^ *//')
+        else
+            GPUS=$(lspci | grep -i vga | cut -d':' -f3)
+        fi
 
         if [ "$(echo "${GPUS}" | wc -l)" -eq 1 ]; then
             echo "GPU:"
@@ -63,13 +85,20 @@ quick_report() {
 ----------------------------------"
     fi
 
-    if command -v qemu-system-"$(uname -m)" &> /dev/null; then
-        VERSION=$(qemu-system-"$(uname -m)" -version | head -n 1 | cut -d' ' -f4)
+    local HOST_ARCH
+    HOST_ARCH=$(uname -m)
+    local QEMU_ARCH="${HOST_ARCH}"
+    if [ "${HOST_ARCH}" == "arm64" ]; then
+        QEMU_ARCH="aarch64"
+    fi
+
+    if command -v "qemu-system-${QEMU_ARCH}" &> /dev/null; then
+        VERSION=$("qemu-system-${QEMU_ARCH}" --version | head -n 1 | cut -d' ' -f4)
         echo \
 "----------------------------------
             QEMU ${VERSION}
 ----------------------------------"
-        qemu-system-"$(uname -m)" -cpu help
+        "qemu-system-${QEMU_ARCH}" -cpu help
     else
         echo \
 "----------------------------------
@@ -81,7 +110,11 @@ quick_report() {
 "----------------------------------
                CPU
 ----------------------------------"
-    lscpu
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
+        sysctl -n machdep.cpu.brand_string
+    else
+        lscpu
+    fi
 }
 
 clear
