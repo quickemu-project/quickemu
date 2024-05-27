@@ -67,13 +67,13 @@ required to run the virtual machines.
 - `quickget` automatically downloads the ISO image for the operating system you want to run and creates a configuration file for the virtual machine.
 
 ``` shell
-quickget nixos unstable
+quickget nixos unstable minimal
 ```
 
 - `quickemu` starts the virtual machine using the configuration file created by `quickget`.
 
 ``` shell
-quickemu --vm nixos-unstable.conf
+quickemu --vm nixos-unstable-minimal.conf
 ```
 
 Execute `quickget` (with no arguments) to see a list of all the supported operating systems.
