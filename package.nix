@@ -33,7 +33,6 @@ let
     cdrtools
     curl
     gawk
-    glxinfo
     gnugrep
     gnused
     jq
@@ -45,11 +44,13 @@ let
     socat
     swtpm
     unzip
-    usbutils
     util-linux
-    xdg-user-dirs
     xrandr
     zsync
+  ] ++ lib.optionals stdenv.isLinux [
+    glxinfo
+    usbutils
+    xdg-user-dirs
   ];
 in
 
