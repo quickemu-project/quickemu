@@ -1,5 +1,7 @@
 {
+  lib,
   mkShell,
+  stdenv,
   cdrtools,
   curl,
   gawk,
@@ -34,7 +36,6 @@ mkShell {
     curl
     gawk
     git
-    glxinfo
     gnugrep
     gnused
     jq
@@ -46,12 +47,14 @@ mkShell {
     qemu
     socat
     spice-gtk
-    swtpm
     unzip
-    usbutils
     util-linux
-    xdg-user-dirs
     xrandr
+  ] ++ lib.optionals stdenv.isLinux [
+    glxinfo
+    swtpm
+    usbutils
+    xdg-user-dirs
     zsync
     OVMF
     OVMFFull

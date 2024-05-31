@@ -13,10 +13,9 @@
     forAllSystems = function:
       nixpkgs.lib.genAttrs [
         "x86_64-linux"
-        # TODO: Add support for these platforms in quickemu and quickget
-        # "aarch64-linux"
-        # "x86_64-darwin"
-        # "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ] (system: function nixpkgs.legacyPackages.${system});
   in {
     # Schemas tell Nix about the structure of your flake's outputs
