@@ -995,7 +995,7 @@ function configure_ports() {
     fi
 
     if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
-        local SPICE="disable-ticketing=on"
+        SPICE="disable-ticketing=on"
         # gl=on can be use with 'spice' too, but only over local connections (not tcp ports)
         if [ "${display}" == "spice-app" ]; then
             SPICE+=",gl=${gl}"
@@ -1124,6 +1124,7 @@ function vm_boot() {
     MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
     NET_DEVICE="${NET_DEVICE:-virtio-net}"
     SOUND=""
+    SPICE=""
     SMM="${SMM:-off}"
     local TEMP_PORT=""
     USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
