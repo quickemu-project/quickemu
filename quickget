@@ -910,7 +910,7 @@ function releases_nixos() {
 }
 
 function editions_nixos() {
-    echo minimal plasma5 gnome
+    echo minimal plasma5 plasma6 gnome
 }
 
 function releases_nwg-shell() {
