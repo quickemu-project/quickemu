@@ -995,7 +995,7 @@ function configure_ports() {
     fi
 
     if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
-        local SPICE="disable-ticketing=on"
+        SPICE="disable-ticketing=on"
         # gl=on can be use with 'spice' too, but only over local connections (not tcp ports)
         if [ "${display}" == "spice-app" ]; then
             SPICE+=",gl=${gl}"
