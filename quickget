@@ -199,7 +199,7 @@ function error_not_supported_release() {
 }
 
 function error_not_supported_edition() {
-    if [[ ! "${EDITIONS[*]}" =~ ${EDITION} ]]; then
+    if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
         echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
         echo -n ' - Supported editions: '
         for EDITION in "${EDITIONS[@]}"; do
@@ -3483,8 +3483,6 @@ if [ -n "${2}" ]; then
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
         EDITIONS=("$(editions_"${OS}")")
-        # Default to the first edition if none is specified.
-        EDITION=${EDITIONS[0]}
         if [ -n "${3}" ]; then
             EDITION="${3}"
             error_not_supported_edition
@@ -3512,7 +3510,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! "${I18NS[*]}" =~ ${I18N} ]]; then
+            if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
