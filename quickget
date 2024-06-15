@@ -906,7 +906,7 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    echo unstable 23.11 23.05
+    echo unstable 24.05 23.11
 }
 
 function editions_nixos() {
@@ -942,7 +942,7 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-    echo 6.0 5.3
+    echo 6.1 6.0
 }
 
 function editions_parrotsec() {
