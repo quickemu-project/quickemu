@@ -906,7 +906,7 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    echo unstable 24.05 23.11
+    echo unstable 23.11 23.05
 }
 
 function editions_nixos() {
