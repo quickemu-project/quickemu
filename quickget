@@ -906,8 +906,9 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    # unstable plus the two most recent releases
-    echo unstable $(web_pipe https://nix-channels.s3.amazonaws.com/?delimiter=/ | grep -o -P '(?<=<Key>nixos-)[0-9]+.[0-9]+(?=</Key>)' | sort -nr | head -n +2)
+    # Lists unstable plus the two most recent releases
+    #shellcheck disable=SC2046
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -P '(?<=<Key>nixos-)[0-9]+.[0-9]+(?=</Key>)' | sort -nr | head -n +2)
 }
 
 function editions_nixos() {
