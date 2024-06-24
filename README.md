@@ -5,7 +5,7 @@
 
 **Quickly create and run optimised Windows, macOS and Linux virtual machines:**
 
-**Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/>**
+**Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/> & <img src=".github/apple.png" align="top" width="24" alt="Apple (macOS)"/>**
 </div>
 
 <p align="center">
@@ -37,6 +37,7 @@ required to run the virtual machines.
 
 # Features
 
+- Host support for **Linux and macOS**
 - **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
 - **Windows** 10 and 11 including TPM 2.0
 - **Windows Server** 2022 2019 2016 2012-r2
