@@ -828,7 +828,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    web_pipe "https://github.com/HoloISO/releases/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -n 1 | cut -d'/' -f 3
+    web_pipe "https://github.com/HoloISO/releases/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\(\.[[:digit:]]\+\)*' | head -n 1 | cut -d'/' -f 3
 }
 
 function releases_kali() {
