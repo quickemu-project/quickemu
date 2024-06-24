@@ -945,7 +945,7 @@ function releases_oraclelinux() {
 
 function releases_parrotsec() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n +2)
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n 1)
 }
 
 function editions_parrotsec() {
