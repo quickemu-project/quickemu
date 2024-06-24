@@ -898,7 +898,7 @@ function releases_netboot() {
 function releases_netbsd() {
     # V8 is EOL so filter it out
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr)
+    echo $(web_pipe "http://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
 }
 
 function releases_nitrux() {
