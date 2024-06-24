@@ -1211,12 +1211,12 @@ function vm_boot() {
             -device pci-ohci,id=smartpass
             -device usb-ccid)
 
-        if ${QEMU} -device help | grep -q smartcard; then
+        if ${QEMU} -device help | grep -q "passthrough smartcard"; then
             # shellcheck disable=SC2054
             args+=(-chardev spicevmc,id=ccid,name=smartcard
                   -device ccid-card-passthru,chardev=ccid)
         else
-            echo " - WARNING!  ${QEMU} was not compiled with support for smartcard devices"
+            echo " - WARNING!  ${QEMU} or SPICE was not compiled with support for smartcard devices"
         fi
     fi
 
