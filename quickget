@@ -1032,9 +1032,7 @@ function editions_slax() {
 }
 
 function releases_slint() {
-    # 15.0.1 returns a 404 so is excluded
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://slackware.uk/slint/x86_64/" | grep "slint-" | cut -d'>' -f2 | cut -d'-' -f2 | tr -d "/\"" | grep -v "15.0.1" | sort -ru)
+    echo "15.0-5"
 }
 
 function releases_slitaz() {
@@ -2442,9 +2440,10 @@ function get_slax() {
 
 function get_slint() {
     local HASH=""
-    local ISO=""
-    local URL="https://slackware.uk/slint/x86_64/slint-${RELEASE}/iso"
-    ISO=$(web_pipe "${URL}" | grep "slint64-" | cut -d'>' -f2 | cut -d'"' -f2 | head -n1)
+    local MAJ_VER=""
+    local ISO="slint64-${RELEASE}.iso"
+    MAJ_VER="$(echo "${RELEASE}" | cut -d'-' -f 1)"
+    local URL="https://slackware.uk/slint/x86_64/slint-${MAJ_VER}/iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f4)
     echo "${URL}/${ISO}" "${HASH}"
 }
