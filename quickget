@@ -719,7 +719,7 @@ function editions_debian() {
 
 function releases_deepin() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://cdimage.deepin.com/releases/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | tail -n 10 | sort -r)
+    echo $(web_pipe "https://mirrors.kernel.org/deepin-cd/" | grep "href=" | cut -d'"' -f2 | grep -v "\.\." | grep -v nightly | grep -v preview | sed 's|/||g' | tail -n 10 | sort -r)
 }
 
 function releases_devuan() {
@@ -1764,11 +1764,9 @@ function get_deepin() {
     local REV=${RELEASE}
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
-    # fix iso name
-    if [[ "${RELEASE}" == *"20" ]] ; then
-        REV="1003"
-    elif [[ "${RELEASE}" == *"20.1" ]]; then
-        REV="1010"
+    # Correct URL for 23-RC onwards which has architecture directories
+    if [[ "${RELEASE}" == *"23-RC"* ]] ; then
+        URL+="/amd64"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
     HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
