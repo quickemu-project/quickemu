@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: May 26, 2024
+date: June 24, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
