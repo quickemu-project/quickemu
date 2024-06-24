@@ -943,7 +943,7 @@ function releases_oraclelinux() {
 }
 
 function releases_parrotsec() {
-    echo 6.0 5.3
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -P '(?<=href=")[0-9].*(?=/")' | sort -nr | head -n +2)
 }
 
 function editions_parrotsec() {
