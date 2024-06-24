@@ -884,7 +884,7 @@ function releases_manjaro() {
 }
 
 function releases_mxlinux() {
-    echo 23.2
+    echo 23.3
 }
 
 function editions_mxlinux() {
