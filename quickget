@@ -912,7 +912,7 @@ function releases_nixos() {
 }
 
 function editions_nixos() {
-    echo minimal plasma5 plasma6 gnome
+    echo minimal plasma gnome
 }
 
 function releases_nwg-shell() {
@@ -2223,6 +2223,16 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
+    # Adapt the plasma edition according to the NixOS release
+    case "${EDITION}" in
+        plasma)
+            if [ "${RELEASE}" == "23.11" ]; then
+                EDITION+="5"
+            else
+                EDITION+="6"
+            fi
+            ;;
+    esac
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
