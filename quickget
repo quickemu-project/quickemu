@@ -774,7 +774,7 @@ function editions_fedora() {
 
 function releases_freebsd() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/" | grep -e 'class="link"' | grep -v '\.\.' | cut -d\" -f 4 | grep -v "14.1" | tr -d '/' | sort -r)
+    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r)
 }
 
 function editions_freebsd() {
