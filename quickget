@@ -831,7 +831,7 @@ function editions_haiku() {
 }
 
 function releases_holoiso() {
-    web_pipe "https://github.com/HoloISO/releases/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | head -n 1 | cut -d'/' -f 3
+    echo "latest"
 }
 
 function releases_kali() {
@@ -1963,6 +1963,7 @@ function get_haiku() {
 function get_holoiso() {
     local HASH=""
     local URL=""
+    RELEASE="$(web_pipe "https://github.com/HoloISO/releases/releases" | grep -o -e 'releases/tag/[[:digit:]]\+\(\.[[:digit:]]\+\)*' | head -n 1 | cut -d'/' -f 3)"
     URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq -r ".[] | select(.tag_name==\"${RELEASE}\") | .body" | sed -n 's/.*\(https:\/\/[^ ]*holoiso\.ru\.eu\.org\/[^ ]*\.iso\).*/\1/p' | head -n 1)
     echo "${URL} ${HASH}"
 }
