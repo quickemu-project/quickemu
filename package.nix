@@ -52,11 +52,18 @@ let
     usbutils
     xdg-user-dirs
   ];
+  versionMatches =
+    builtins.match ''
+      .*
+      readonly[[:blank:]]VERSION="([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"
+      .*
+    '' (builtins.readFile ./quickemu);
 in
 
 stdenv.mkDerivation rec {
   pname = "quickemu";
-  version = "4.9.4";
+  version = builtins.concatStringsSep "" versionMatches;
+    
   src = lib.cleanSource ./.;
 
   postPatch = ''
