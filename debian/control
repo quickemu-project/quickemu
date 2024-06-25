@@ -18,7 +18,7 @@ Depends:
  genisoimage,
  jq,
  mesa-utils,
- pciutils
+ pciutils,
  procps,
  python3-minimal,
  qemu-system (>= 6.0),
