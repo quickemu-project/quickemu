@@ -940,7 +940,7 @@ function configure_display() {
     esac
 
     # Configure multiscreen if max_outputs was provided in the .conf file
-    if [ -v max_outputs ]; then
+    if [ -n "${max_outputs}" ]; then
         VIDEO="${VIDEO},max_outputs=${max_outputs}"
     fi
 
