@@ -56,6 +56,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "quickemu";
+  version = "4.9.4";
   src = lib.cleanSource ./.;
 
   postPatch = ''
