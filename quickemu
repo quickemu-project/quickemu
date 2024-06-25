@@ -555,6 +555,7 @@ function configure_cpu() {
 }
 
 function configure_ram() {
+    local OS_PRETTY_NAME=""
     RAM_VM="2G"
     if [ -z "${ram}" ]; then
         local RAM_HOST=""
@@ -581,23 +582,22 @@ function configure_ram() {
 
     case "${guest_os}" in
         windows|windows-server)
-            os_pretty_name="Windows"
+            OS_PRETTY_NAME="Windows"
             min_ram="4"
             ;;
         macos)
-            os_pretty_name="macOS"
+            OS_PRETTY_NAME="macOS"
             min_ram="8"
             ;;
     esac
 
     if [ -n "${min_ram}" ] && [ "${RAM_VM//G/}" -lt "${min_ram}" ]; then
         if [ -z "${ram}" ]; then
-            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run ${os_pretty_name}."
-            echo "       You can override the guest RAM allocation by adding 'ram=4G' to ${VM}"
+            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run ${OS_PRETTY_NAME}."
+            echo "       You can override the guest RAM allocation by adding 'ram=${min_ram}G' to ${VM}"
             exit 1
         else
-            echo "WARNING! The guest virtual machine has been allocated less than the recommended RAM to run ${os_pretty_name}."
-            echo "         You have been warned."
+            echo "WARNING! You have allocated less than the recommended ammount of RAM to run ${OS_PRETTY_NAME}."
         fi
     fi
 }
