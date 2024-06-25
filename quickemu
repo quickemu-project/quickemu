@@ -593,11 +593,11 @@ function configure_ram() {
 
     if [ -n "${min_ram}" ] && [ "${RAM_VM//G/}" -lt "${min_ram}" ]; then
         if [ -z "${ram}" ]; then
-            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run ${OS_PRETTY_NAME}."
-            echo "       You can override the guest RAM allocation by adding 'ram=${min_ram}G' to ${VM}"
+            echo "             ERROR! The guest virtual machine has been allocated insufficient RAM to run ${OS_PRETTY_NAME}."
+            echo "             You can override the guest RAM allocation by adding 'ram=${min_ram}G' to ${VM}"
             exit 1
         else
-            echo "WARNING! You have allocated less than the recommended ammount of RAM to run ${OS_PRETTY_NAME}."
+            echo "             WARNING! You have allocated less than the recommended amount of RAM to run ${OS_PRETTY_NAME}."
         fi
     fi
 }
