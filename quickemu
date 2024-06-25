@@ -579,17 +579,25 @@ function configure_ram() {
     fi
     echo " - RAM VM:   ${RAM_VM} RAM"
 
-    if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-        if [ "${RAM_VM//G/}" -lt 4 ]; then
-            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run Windows."
+    case "${guest_os}" in
+        windows|windows-server)
+            os_pretty_name="Windows"
+            min_ram="4"
+            ;;
+        macos)
+            os_pretty_name="macOS"
+            min_ram="8"
+            ;;
+    esac
+
+    if [ -n "${min_ram}" ] && [ "${RAM_VM//G/}" -lt "${min_ram}" ]; then
+        if [ -z "${ram}" ]; then
+            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run ${os_pretty_name}."
             echo "       You can override the guest RAM allocation by adding 'ram=4G' to ${VM}"
             exit 1
-        fi
-    elif [ "${guest_os}" == "macos" ]; then
-        if [ "${RAM_VM//G/}" -lt 8 ]; then
-            echo "ERROR! The guest virtual machine has been allocated insufficient RAM to run macOS."
-            echo "       You can override the guest RAM allocation by adding 'ram=8G' to ${VM}"
-            exit 1
+        else
+            echo "WARNING! The guest virtual machine has been allocated less than the recommended RAM to run ${os_pretty_name}."
+            echo "         You have been warned."
         fi
     fi
 }
