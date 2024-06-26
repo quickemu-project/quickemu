@@ -1,64 +1,50 @@
-{
-  lib,
+{ lib,
   mkShell,
+  pkgs,
   stdenv,
-  cdrtools,
-  curl,
-  gawk,
-  git,
-  glxinfo,
-  gnugrep,
-  gnused,
-  jq,
-  ncurses,
-  nixpkgs-fmt,
-  pciutils,
-  procps,
-  python3,
-  qemu,
-  socat,
-  spice-gtk,
-  swtpm,
-  unzip,
-  usbutils,
-  util-linux,
-  xdg-user-dirs,
-  xrandr,
-  zsync,
-  OVMF,
-  OVMFFull,
 }:
 mkShell {
-  strictDeps = true;
-
-  nativeBuildInputs = [
+  packages = with pkgs; ([
     cdrtools
     curl
     gawk
-    git
     gnugrep
     gnused
     jq
     ncurses
-    nixpkgs-fmt
-    procps
     pciutils
+    procps
     python3
     qemu
     socat
     spice-gtk
+    swtpm
     unzip
     util-linux
-    xrandr
-  ] ++ lib.optionals stdenv.isLinux [
-    glxinfo
-    swtpm
-    usbutils
-    xdg-user-dirs
+    xorg.xrandr
     zsync
     OVMF
     OVMFFull
+  ] ++ lib.optionals stdenv.isLinux [
+    glxinfo
+    usbutils
+    xdg-user-dirs
+  ]);
+
+  inputsFrom = with pkgs; [
+    git
   ];
 
-  buildInputs = [];
+  shellHook = ''
+    echo "**********************************************************************"
+    echo "* 'direnv reload' to update '.direnv/bin/quickemu' for testing  *"
+    echo "**********************************************************************"
+    sed \
+      -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMFFull.firmware}","${pkgs.OVMFFull.variables}" |' \
+      -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMF.firmware}","${pkgs.OVMF.variables}" |' \
+      -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
+      -e 's/Icon=.*qemu.svg/Icon=qemu/' \
+      quickemu > $PWD/.direnv/bin/quickemu
+      chmod +x $PWD/.direnv/bin/quickemu
+  '';
 }
