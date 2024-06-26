@@ -27,6 +27,7 @@
 , zsync
 , OVMF
 , OVMFFull
+, quickemu
 }:
 let
   runtimePaths = [
@@ -47,6 +48,8 @@ let
     util-linux
     xrandr
     zsync
+    OVMF
+    OVMFFull
   ] ++ lib.optionals stdenv.isLinux [
     glxinfo
     usbutils
@@ -59,11 +62,9 @@ let
       .*
     '' (builtins.readFile ./quickemu);
 in
-
 stdenv.mkDerivation rec {
   pname = "quickemu";
   version = builtins.concatStringsSep "" versionMatches;
-    
   src = lib.cleanSource ./.;
 
   postPatch = ''
@@ -94,10 +95,13 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  passthru.tests = testers.testVersion { package = quickemu; };
+
+  meta = {
     description = "Quickly create and run optimised Windows, macOS and Linux virtual machines";
     homepage = "https://github.com/quickemu-project/quickemu";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fedx-sudo flexiondotorg ];
+    mainProgram = "quickemu";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fedx-sudo flexiondotorg ];
   };
 }
