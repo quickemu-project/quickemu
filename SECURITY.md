@@ -11,8 +11,8 @@ Here are the versions of Quickemu currently being supported with security update
 
 ## Reporting a Vulnerability
 
-If you discover a vulnerability in Quickemu then [file an issue](https://github.com/quickemu-project/quickemu/issues/new) prefixed `security:`
+If you discover a vulnerability in Quickemu then [file an issue](https://github.com/quickemu-project/quickemu/issues/new) and click *Report a vulnerability*.
 
-Quickemu is a spare-time hobby project.
-We do not have SLAs for responding to security issues.
-It is a best-efforts basis.
+- Quickemu is a spare-time hobby project.
+- We do not have SLAs for responding to security issues.
+- It is a best-efforts basis.
