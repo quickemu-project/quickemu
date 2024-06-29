@@ -15,7 +15,8 @@
 , pciutils
 , procps
 , python3
-, qemu
+, qemu_full
+, samba
 , socat
 , spice-gtk
 , swtpm
@@ -41,7 +42,8 @@ let
     pciutils
     procps
     python3
-    qemu
+    qemu_full
+    samba
     socat
     swtpm
     unzip
