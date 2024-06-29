@@ -1,0 +1,20 @@
+name: Flake ❄️ Lock 🔒️ Updater ✨
+
+on:
+  schedule:
+    - cron: '37 13 14,28 * *'
+  workflow_dispatch:
+
+jobs:
+  lock-updater:
+    name: Flake Lock Updater
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: DeterminateSystems/nix-installer-action@v12
+      - uses: DeterminateSystems/magic-nix-cache-action@v7
+      - uses: DeterminateSystems/update-flake-lock@v22
+        with:
+          pr-title: "chore: update flake.lock"
