@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: June 24, 2024
+date: June 29, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -229,7 +229,8 @@ requirements manually:
 - [python3](https://www.python.org/)
 - [mkisofs](http://cdrtools.sourceforge.net/private/cdrecord.html)
 - [usbutils](https://github.com/gregkh/usbutils)
-- [util-linux](https://github.com/karelzak/util-linux)
+- [util-linux](https://github.com/karelzak/util-linux); including
+  `uuidgen`
 - [sed](https://www.gnu.org/software/sed/)
 - [socat](http://www.dest-unreach.org/socat/)
 - [spicy](https://gitlab.freedesktop.org/spice/spice-gtk)
@@ -260,7 +261,7 @@ sudo apt-get install bash coreutils curl genisoimage grep jq mesa-utils ovmf pci
 #### Install requirements on Fedora hosts
 
 ``` shell
-sudo dnf install bash coreutils curl edk2-tools genisoimage grep jq mesa-demos pciutils procps python3 qemu sed socat spice-gtk-tools swtpm unzip usbutils util-linux xdg-user-dirs xrandr zsync
+sudo dnf install bash coreutils curl edk2-tools genisoimage grep jq mesa-demos pciutils procps python3 qemu sed socat spice-gtk-tools swtpm unzip usbutils util-linux uuidgen-runtime xdg-user-dirs xrandr zsync
 ```
 
 ### Install requirements on Gentoo
@@ -331,24 +332,6 @@ sudo apt install quickgui
 Many thanks to [Luke Wesley-Holley](https://github.com/Lukewh) and
 [Philipp Kiemle](https://github.com/daPhipz) for creating the
 **[Quickemu icons](https://github.com/Lukewh/quickemu-icons)** 🎨
-
-### qqX
-
-There is also a multi option desktop integrated text interface, the
-**quickemu quickget X terminal project**, or **qqX**, with lots of
-unique tools and utilities to help you make light work of installations,
-snapshots and disk management
-
-- **[qqX](https://github.com/TuxVinyards/qqX)** is independently curated
-  by [Alex Genovese](https://github.com/TuxVinyards) (see the github
-  pages)
-
-<figure>
-<img
-src="https://github.com/TuxVinyards/qqX/assets/3956806/18e5c495-8072-49a5-8b9c-e1302549efcf"
-alt="qqX-vmm" />
-<figcaption aria-hidden="true">qqX-vmm</figcaption>
-</figure>
 
 ## Creating Linux guests 🐧
 
