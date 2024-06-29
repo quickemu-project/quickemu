@@ -4,7 +4,7 @@ Upstream-Contact: Martin Wimpress <code@wimpress.io>
 Source: https://github.com/quickemu-project/quickemu
 
 Files: *
-Copyright: 2020-2021 Martin Wimpress <code@wimpress.io>
+Copyright: 2020-2024 Martin Wimpress <code@wimpress.io>
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ License: MIT
 # If you want to use GPL v2 or later for the /debian/* files use
 # the following clauses, or change it to suit. Delete these two lines
 Files: debian/*
-Copyright: 2021 Martin Wimpress <code@wimpress.io>
+Copyright: 2021 - 2024 Martin Wimpress <code@wimpress.io>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
