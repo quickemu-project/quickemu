@@ -2121,16 +2121,15 @@ if [ -z "${VM_PID}" ]; then
     fi
 
     vm_boot
-    # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
-    if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
-        sleep 3.5
-        monitor_send_cmd "sendkey ret"
-    fi
-    if [ -n "${iso}" ] && [ "${guest_os}" == "windows-server" ]; then
-        sleep 7
-        monitor_send_cmd "sendkey ret"
-    fi
     start_viewer
+    # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
+    if [ -n "${iso}" ] && [[ "${guest_os}" == "windows"* ]]; then
+        # shellcheck disable=SC2034
+        for LOOP in {1..5}; do
+          sleep 1
+          monitor_send_cmd "sendkey ret"
+        done
+    fi
 else
     echo "${VMNAME}"
     echo " - Process:  Already running ${VM} as ${VMNAME} (${VM_PID})"
