@@ -39,7 +39,7 @@ function ignore_msrs_alert() {
 }
 
 function delete_shortcut() {
-    local SHORTCUT_DIR="${HOME}/.local/share/applications/"
+    local SHORTCUT_DIR="${HOME}/.local/share/applications"
     if [ -e "${SHORTCUT_DIR}/${VMNAME}.desktop" ]; then
         rm "${SHORTCUT_DIR}/${VMNAME}.desktop"
         echo " - Deleted ${SHORTCUT_DIR}/${VMNAME}.desktop"
@@ -1566,10 +1566,10 @@ function shortcut_create {
 Version=1.0
 Type=Application
 Terminal=false
-Exec=${0} --vm ${VM}
+Exec=$(basename "${0}") --vm ${VM} ${SHORTCUT_OPTIONS}
 Path=${VMPATH}
 Name=${VMNAME}
-Icon=/usr/share/icons/hicolor/scalable/apps/qemu.svg
+Icon=qemu
 EOF
     echo " - ${filename} created."
 }
@@ -1866,6 +1866,7 @@ MONITOR_CMD=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
+SHORTCUT_OPTIONS=""
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 SOCKET_MONITOR=""
@@ -1917,9 +1918,11 @@ else
     while [ $# -gt 0 ]; do
         case "${1}" in
             -access|--access)
+                SHORTCUT_OPTIONS+="--access ${2} "
                 ACCESS="${2}"
                 shift 2;;
             -braille|--braille)
+                SHORTCUT_OPTIONS+="--braille "
                 BRAILLE="on"
                 shift;;
             -delete|--delete|-delete-disk|--delete-disk)
@@ -1929,10 +1932,12 @@ else
                 ACTIONS+=(delete_vm)
                 shift;;
             -display|--display)
+                SHORTCUT_OPTIONS+="--display ${2} "
                 display="${2}"
                 display_param_check
                 shift 2;;
             -fullscreen|--fullscreen|-full-screen|--full-screen)
+                SHORTCUT_OPTIONS+="--fullscreen "
                 FULLSCREEN="--full-screen"
                 shift;;
             -ignore-msrs-always|--ignore-msrs-always)
@@ -1942,6 +1947,7 @@ else
                 ACTIONS+=(kill_vm)
                 shift;;
             -offline|--offline)
+                SHORTCUT_OPTIONS+="--offline "
                 network="none"
                 shift;;
             -snapshot|--snapshot)
@@ -1970,63 +1976,83 @@ else
                 VM="${2}"
                 shift 2;;
             -viewer|--viewer)
+                SHORTCUT_OPTIONS+="--viewer ${2} "
                 viewer="${2}"
                 shift 2;;
             -width|--width)
+                SHORTCUT_OPTIONS+="--width ${2} "
                 width="${2}"
                 shift 2;;
             -height|--height)
+                SHORTCUT_OPTIONS+="--height ${2} "
                 height="${2}"
                 shift 2;;
             -ssh-port|--ssh-port)
+                SHORTCUT_OPTIONS+="--ssh-port ${2} "
                 ssh_port="${2}"
                 shift 2;;
             -spice-port|--spice-port)
+                SHORTCUT_OPTIONS+="--spice-port ${2} "
                 spice_port="${2}"
                 shift 2;;
             -public-dir|--public-dir)
+                SHORTCUT_OPTIONS+="--public-dir ${2} "
                 PUBLIC="${2}"
                 shift 2;;
             -monitor|--monitor)
+                SHORTCUT_OPTIONS+="--monitor ${2} "
                 monitor="${2}"
                 shift 2;;
             -monitor-cmd|--monitor-cmd)
+                SHORTCUT_OPTIONS+="--monitor-cmd ${2} "
                 MONITOR_CMD="${2}"
                 shift 2;;
             -monitor-telnet-host|--monitor-telnet-host)
+                SHORTCUT_OPTIONS+="--monitor-telnet-host ${2} "
                 monitor_telnet_host="${2}"
                 shift 2;;
             -monitor-telnet-port|--monitor-telnet-port)
+                SHORTCUT_OPTIONS+="--monitor-telnet-port ${2} "
                 monitor_telnet_port="${2}"
                 shift 2;;
             -serial|--serial)
+                SHORTCUT_OPTIONS+="--serial ${2} "
                 serial="${2}"
                 shift 2;;
             -serial-telnet-host|--serial-telnet-host)
+                SHORTCUT_OPTIONS+="--serial-telnet-host ${2} "
                 serial_telnet_host="${2}"
                 shift 2;;
             -serial-telnet-port|--serial-telnet-port)
+                SHORTCUT_OPTIONS+="--serial-telnet-port ${2} "
                 serial_telnet_port="${2}"
                 shift 2;;
             -keyboard|--keyboard)
+                SHORTCUT_OPTIONS+="--keyboard ${2} "
                 keyboard="${2}"
                 shift 2;;
             -keyboard_layout|--keyboard_layout)
+                SHORTCUT_OPTIONS+="--keyboard_layout ${2} "
                 keyboard_layout="${2}"
                 shift 2;;
             -mouse|--mouse)
+                SHORTCUT_OPTIONS+="--mouse ${2} "
                 mouse="${2}"
                 shift 2;;
             -usb-controller|--usb-controller)
+                SHORTCUT_OPTIONS+="--usb-controller ${2} "
                 usb_controller="${2}"
                 shift 2;;
             -extra_args|--extra_args)
+                SHORTCUT_OPTIONS+="--extra_args ${2} "
                 extra_args+="${2}"
                 shift 2;;
             -sound-card|--sound-card)
+                SHORTCUT_OPTIONS+="--sound-card ${2} "
                 sound_card="${2}"
                 shift 2;;
             -sound-duplex|--sound-duplex)
+                SHORTCUT_OPTIONS+="--sound-duplex ${2} "
                 sound_duplex="${2}"
                 shift 2;;
             -version|--version)
