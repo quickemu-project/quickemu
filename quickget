@@ -1532,7 +1532,7 @@ EOF
         fi
 
         # Enable TPM for Windows 11
-        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == 11 ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
+        if [ "${OS}" == "windows" ] && [ "${RELEASE}" == "11" ] || [ "${OS}" == "windows-server" ] && [ "${RELEASE}" == "2022" ]; then
             echo "tpm=\"on\"" >> "${CONF_FILE}"
             echo "secureboot=\"off\"" >> "${CONF_FILE}"
         fi
