@@ -1179,7 +1179,7 @@ function languages_windows() {
 }
 
 function releases_windows-server() {
-    echo 2022 2019 2016 2012-r2
+    echo 2022 2019 2016
 }
 
 function languages_windows-server() {
@@ -3046,7 +3046,6 @@ function download_windows_server() {
 
     case "${RELEASE}" in
         "10-ltsc") PRETTY_RELEASE="10 LTSC";;
-        "2012-r2") PRETTY_RELEASE="2012 R2";;
         *) PRETTY_RELEASE="${RELEASE}";;
     esac
 
