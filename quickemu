@@ -52,9 +52,7 @@ function delete_disk() {
         rm "${disk_img}" >/dev/null 2>&1
         # Remove any EFI vars, but not for macOS
         rm "${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
-        rm "${VMPATH}/${VMDIR}"/OVMF_VARS*.fd >/dev/null 2>&1
         rm "${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
-        rm "${VMPATH}/${VMDIR}/${VMNAME}-vars.fd" >/dev/null 2>&1
         echo " - Deleted ${disk_img}"
         delete_shortcut
     else
@@ -2058,6 +2056,12 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         disk_img="${VMDIR}/disk.${disk_format}"
     fi
 
+    # Fixes running VMs when PWD is not relative to the VM directory
+    # https://github.com/quickemu-project/quickemu/pull/875
+    if [ ! -f "${disk_img}" ]; then
+        pushd "${VMPATH}" >/dev/null || exit
+    fi
+
     # Iterate over any actions and exit.
     if [ ${#ACTIONS[@]} -ge 1 ]; then
         for ACTION in "${ACTIONS[@]}"; do
@@ -2113,13 +2117,6 @@ if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
 fi
 
 if [ -z "${VM_PID}" ]; then
-    #TODO: double quote the args array to prevent word splitting and this can be removed
-    # Fix failing to start VM with spaces in the path
-    # https://github.com/quickemu-project/quickemu/pull/875
-    if [ ! -f "${disk_img}" ]; then
-        pushd "${VMPATH}" || exit
-    fi
-
     vm_boot
     # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
     if [ -n "${iso}" ] && [ "${guest_os}" == "windows" ]; then
