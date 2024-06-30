@@ -1505,7 +1505,7 @@ function vm_boot() {
         echo "${QEMU}" "${SHELL_ARGS}" "2>/dev/null" >> "${VMDIR}/${VMNAME}.sh"
         sed -i -e 's/ -/ \\\n    -/g' "${VMDIR}/${VMNAME}.sh"
         ${QEMU} "${args[@]}" &> "${VMDIR}/${VMNAME}.log" &
-        local VM_PID=$!
+        VM_PID=$!
         sleep 0.25
         if kill -0 "${VM_PID}" 2>/dev/null; then
             echo " - Process:  Started ${VM} as ${VMNAME} (${VM_PID})"
@@ -2062,6 +2062,17 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         pushd "${VMPATH}" >/dev/null || exit
     fi
 
+    # Check if VM is already running
+    VM_PID=""
+    if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
+        VM_PID=$(head -n 1 "${VMDIR}/${VMNAME}.pid")
+        if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
+            #VM is not running, cleaning up.
+            VM_PID=""
+            rm -f "${VMDIR}/${VMNAME}.pid"
+        fi
+    fi
+
     # Iterate over any actions and exit.
     if [ ${#ACTIONS[@]} -ge 1 ]; then
         for ACTION in "${ACTIONS[@]}"; do
@@ -2104,17 +2115,6 @@ sound_card_param_check
 tpm_param_check
 viewer_param_check
 fileshare_param_check
-
-# Check if vm is already run
-VM_PID=""
-if [ -r "${VMDIR}/${VMNAME}.pid" ]; then
-    VM_PID=$(head -n 1 "${VMDIR}/${VMNAME}.pid")
-    if ! kill -0 "${VM_PID}" > /dev/null 2>&1; then
-        # VM is not running, cleaning up.
-        VM_PID=""
-        rm -f "${VMDIR}/${VMNAME}.pid"
-    fi
-fi
 
 if [ -z "${VM_PID}" ]; then
     vm_boot
