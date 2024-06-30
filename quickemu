@@ -747,7 +747,8 @@ function configure_os_quirks() {
     fi
 
     case ${guest_os} in
-        *bsd|linux*|windows*) NET_DEVICE="virtio-net";;
+        windows-server) NET_DEVICE="e1000";;
+        *bsd|linux*|windows) NET_DEVICE="virtio-net";;
         freedos) sound_card="sb16";;
         *solaris) usb_controller="xhci"
                   sound_card="ac97";;
