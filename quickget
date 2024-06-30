@@ -1158,24 +1158,14 @@ function releases_vxlinux() {
 }
 
 function releases_windows() {
-    echo 11 10-ltsc 10 8
+    echo 11 10
 }
 
 function languages_windows() {
-    if [ "${RELEASE}" == 8 ]; then
-        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Chinese (Traditional Hong Kong)" \
-        "Croatian" "Czech" "Danish" "Dutch" "English (United States)" "English International" "Estonian" "Finnish" "French" "German" "Greek" \
-        "Hebrew" "Hungarian" "Italian" "Japanese" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" \
-        "Slovak" "Slovenian" "Spanish" "Swedish" "Thai" "Turkish" "Ukrainian")
-    elif [ "${RELEASE}" == "10-ltsc" ]; then
-        I18NS=("English (United States)" "English (Great Britain)" "Chinese (Simplified)" "Chinese (Traditional)" \
-        "French" "German" "Italian" "Japanese" "Korean" "Portuguese (Brazil)" "Spanish")
-    else
-        I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
-        "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
-        "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
-        "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
-    fi
+    I18NS=("Arabic" "Brazilian Portuguese" "Bulgarian" "Chinese (Simplified)" "Chinese (Traditional)" "Croatian" "Czech" "Danish" "Dutch" \
+    "English (United States)" "English International" "Estonian" "Finnish" "French" "French Canadian" "German" "Greek" "Hebrew" "Hungarian" \
+    "Italian" "Japanese" "Korean" "Latvian" "Lithuanian" "Norwegian" "Polish" "Portuguese" "Romanian" "Russian" "Serbian Latin" "Slovak" \
+    "Slovenian" "Spanish" "Spanish (Mexico)" "Swedish" "Thai" "Turkish" "Ukrainian")
 }
 
 function releases_windows-server() {
@@ -3045,7 +3035,6 @@ function download_windows_server() {
     local PRETTY_RELEASE=""
 
     case "${RELEASE}" in
-        "10-ltsc") PRETTY_RELEASE="10 LTSC";;
         *) PRETTY_RELEASE="${RELEASE}";;
     esac
 
@@ -3159,12 +3148,12 @@ function download_windows_workstation() {
     # https://github.com/ElliotKillick/Mido
     # Download newer consumer Windows versions from behind gated Microsoft API
 
-    # Either 8, 10, or 11
+    # Either 10, or 11
     local windows_version="$1"
 
     local url="https://www.microsoft.com/en-us/software-download/windows$windows_version"
     case "$windows_version" in
-        8 | 10) url="${url}ISO";;
+        10) url="${url}ISO";;
     esac
 
     local user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0"
@@ -3262,9 +3251,7 @@ function download_windows_workstation() {
 }
 
 function get_windows() {
-    if [ "${RELEASE}" == "10-ltsc" ]; then
-        download_windows_server windows-10-enterprise ltsc
-    elif [ "${OS}" == "windows-server" ]; then
+    if [ "${OS}" == "windows-server" ]; then
         download_windows_server "windows-server-${RELEASE}"
     else
         download_windows_workstation "${RELEASE}"
