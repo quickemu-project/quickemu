@@ -1,6 +1,6 @@
 # Description
 
-Please include a summary of the changes and any relevant motivation and context.
+Please include a summary of the changes along with any relevant motivation and context.
 
 <!-- Close any related issues. Delete if not relevant -->
 
@@ -10,15 +10,17 @@ Please include a summary of the changes and any relevant motivation and context.
 
 ## Type of change
 
-<!-- Please delete options that are not relevant. -->
+<!-- Delete any that are not relevant -->
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation (updates documentation)
+- [ ] Packaging (updates the packaging)
+- [ ] Documentation (updates the documentation)
 
 # Checklist:
 
 - [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
+- [ ] I have tested my code in common scenarios and confirmed there are no regressions
+- [ ] I have added comments to my code, particularly in hard-to-understand sections
+- [ ] I have made corresponding changes to the documentation (*remove if no documentation changes were required*)
