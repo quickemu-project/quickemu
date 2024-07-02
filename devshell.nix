@@ -11,7 +11,6 @@ mkShell {
     gnugrep
     gnused
     jq
-    ncurses
     pciutils
     procps
     python3
