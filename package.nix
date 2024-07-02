@@ -74,7 +74,7 @@ stdenv.mkDerivation rec {
       -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
       -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
-      -e 's/Icon=.*qemu.svg/Icon=qemu/' \
+      -e 's,\$(command -v smbd),${samba}/bin/smbd,' \
       quickemu
   '';
 
