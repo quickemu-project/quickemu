@@ -11,7 +11,6 @@
 , gnugrep
 , gnused
 , jq
-, ncurses
 , pciutils
 , procps
 , python3
@@ -38,7 +37,6 @@ let
     gnugrep
     gnused
     jq
-    ncurses
     pciutils
     procps
     python3
