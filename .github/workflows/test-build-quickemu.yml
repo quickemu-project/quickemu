@@ -8,7 +8,8 @@ on:
       - quickemu
       - quickget
       - debian/**
-      - *.nix
+      - flake.nix
+      - package.nix
   push:
     branches:
       - master
@@ -16,7 +17,8 @@ on:
       - quickemu
       - quickget
       - debian/**
-      - *.nix
+      - flake.nix
+      - package.nix
   workflow_dispatch:
 
 # TODO: arm64 runner

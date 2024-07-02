@@ -9,7 +9,7 @@ on:
       - quickget
   pull_request:
     branches:
-      - **
+      - '**'
     paths:
       - quickget
 
