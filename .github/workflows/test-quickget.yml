@@ -3,15 +3,15 @@ name: "Test quickget 🧪"
 on:
   workflow_dispatch:
   push:
-    branches: '**'
-    paths: [ quickget ]
+    branches:
+      - master
+    paths:
+      - quickget
   pull_request:
-    branches: '**'
-    paths: [ quickget ]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches:
+      - **
+    paths:
+      - quickget
 
 jobs:
   quickget-tests:
