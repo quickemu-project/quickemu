@@ -138,7 +138,7 @@ function os_homepage() {
 function error_specify_os() {
     echo "ERROR! You must specify an operating system."
     echo "- Supported Operating Systems:"
-    os_support | fold -s -w "$(tput cols)"
+    os_support | fmt -w 80
     echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
 }
@@ -146,7 +146,7 @@ function error_specify_os() {
 function os_supported() {
     if [[ ! "$(os_support)" =~ ${OS} ]]; then
         echo -e "ERROR! ${OS} is not a supported OS.\n"
-        os_support | fold -s -w "$(tput cols)"
+        os_support | fmt -w 80
         exit 1
     fi
 }
@@ -171,10 +171,10 @@ function error_specify_release() {
             ;;
         *)
             echo -en " - Releases:\t"
-            "releases_${OS}" | fold -s -w "$(tput cols)"
+            "releases_${OS}" | fmt -w 80
             if [[ $(type -t "editions_${OS}") == function ]]; then
                 echo -en " - Editions:\t"
-                "editions_${OS}" | fold -s -w "$(tput cols)"
+                "editions_${OS}" | fmt -w 80
             fi
             ;;
     esac
@@ -3364,7 +3364,7 @@ Arguments:
 --------------------------------------------------------------------------------
 
 Supported Operating Systems:\n\n' "$(quickemu --version)" "${CURL_VERSION}"
-    os_support | fold -s -w "$(tput cols)"
+    os_support | fmt -w 80
 }
 
 trap cleanup EXIT
