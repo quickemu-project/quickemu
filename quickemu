@@ -1633,7 +1633,6 @@ function usage() {
     echo "  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)"
     echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
     echo "  --version                         : Print version"
-    exit 1
 }
 
 function display_param_check() {
@@ -1921,6 +1920,7 @@ fi
 # Take command line arguments
 if [ $# -lt 1 ]; then
     usage
+    exit 1
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
@@ -2066,10 +2066,12 @@ else
                 echo "${VERSION}"
                 exit;;
             -h|--h|-help|--help)
-                usage;;
+                usage
+                exit 0;;
               *)
                 echo "ERROR! \"${1}\" is not a supported parameter."
-                usage;;
+                usage
+                exit 1;;
         esac
     done
 fi
@@ -2134,12 +2136,14 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
                 exit;;
             *)
                 echo "ERROR! \"${SNAPSHOT_ACTION}\" is not a supported snapshot action."
-                usage;;
+                usage
+                exit 1;;
         esac
     fi
 else
     echo "ERROR! Virtual machine configuration not found."
     usage
+    exit 1
 fi
 
 display_param_check
