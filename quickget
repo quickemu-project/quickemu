@@ -3330,7 +3330,7 @@ function create_vm() {
 # fallback to checking if quickemu is in the current directory.
 function resolve_quickemu() {
     if command -v quickemu >/dev/null 2>&1; then
-        echo "$(command -v quickemu)"
+        command -v quickemu
     elif [ -f "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
