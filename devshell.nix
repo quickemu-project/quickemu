@@ -15,7 +15,8 @@ mkShell {
     pciutils
     procps
     python3
-    qemu
+    qemu_full
+    samba
     socat
     spice-gtk
     swtpm
@@ -43,8 +44,8 @@ mkShell {
       -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMFFull.firmware}","${pkgs.OVMFFull.variables}" |' \
       -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${pkgs.OVMF.firmware}","${pkgs.OVMF.variables}" |' \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
-      -e 's/Icon=.*qemu.svg/Icon=qemu/' \
+      -e 's,\$(command -v smbd),${pkgs.samba}/bin/smbd,' \
       quickemu > $PWD/.direnv/bin/quickemu
-      chmod +x $PWD/.direnv/bin/quickemu
+    chmod +x $PWD/.direnv/bin/quickemu
   '';
 }
