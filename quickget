@@ -1410,7 +1410,7 @@ function make_vm_config() {
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
         cat << EOF > "${CONF_FILE}"
-#!$(which quickemu) --vm
+#!${QUICKEMU} --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
@@ -3326,6 +3326,19 @@ function create_vm() {
     make_vm_config "${ISO}"
 }
 
+# Use command -v command to check if quickemu is in the system's PATH and
+# fallback to checking if quickemu is in the current directory.
+function resolve_quickemu() {
+    if command -v quickemu >/dev/null 2>&1; then
+        echo "$(command -v quickemu)"
+    elif [ -f "./quickemu" ]; then
+        echo "$(pwd)/quickemu"
+    else
+        echo "quickemu not found" >&2
+        exit 1
+    fi
+}
+
 function help_message() {
     #shellcheck disable=SC2016
     printf '
@@ -3363,7 +3376,7 @@ Arguments:
   --list-json                              : List everything in json format
 --------------------------------------------------------------------------------
 
-Supported Operating Systems:\n\n' "$(quickemu --version)" "${CURL_VERSION}"
+Supported Operating Systems:\n\n' "$(${QUICKEMU} --version)" "${CURL_VERSION}"
     os_support | fmt -w 80
 }
 
@@ -3374,6 +3387,7 @@ if ((BASH_VERSINFO[0] < 4)); then
     exit 1
 fi
 
+QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
