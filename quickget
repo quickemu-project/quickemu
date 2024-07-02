@@ -182,30 +182,11 @@ function error_specify_release() {
     exit 1
 }
 
-function error_specify_edition() {
-    show_os_info "${OS}"
-    echo -e " - Editions:\t$("editions_${OS}" | fold -s -w "$(tput cols)")"
-    echo -e "\nERROR! You must specify an edition."
-    exit 1
-}
-
 function error_not_supported_release() {
     if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
         echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
         echo -n ' - Supported releases: '
         "releases_${OS}"
-        exit 1
-    fi
-}
-
-function error_not_supported_edition() {
-    if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
-        echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
-        echo -n ' - Supported editions: '
-        for EDITION in "${EDITIONS[@]}"; do
-            echo -n "${EDITION} "
-        done
-        echo ""
         exit 1
     fi
 }
@@ -3487,9 +3468,20 @@ if [ -n "${2}" ]; then
         EDITIONS=("$(editions_"${OS}")")
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            error_not_supported_edition
+            if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
+                echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
+                echo -n ' - Supported editions: '
+                for EDITION in "${EDITIONS[@]}"; do
+                    echo -n "${EDITION} "
+                done
+                echo ""
+                exit 1
+            fi
         else
-            error_specify_edition
+            show_os_info "${OS}"
+            echo -e " - Editions:\t$("editions_${OS} | fmt -w 80")"
+            echo -e "\nERROR! You must specify an edition."
+            exit 1
         fi
         handle_missing
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
