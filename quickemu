@@ -1463,8 +1463,11 @@ function vm_boot() {
     elif [ "${monitor}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-monitor unix:${SOCKET_MONITOR},server,nowait)
-        echo " - Monitor:  On host:  nc -U \"${SOCKET_MONITOR}\""
-        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
+        if command -v socat &>/dev/null; then
+            echo " - Monitor:  On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
+        elif command -v nc &>/dev/null; then
+            echo " - Monitor:  On host:  nc -U \"${SOCKET_MONITOR}\""
+        fi
     else
         echo "ERROR! \"${monitor}\" is an unknown monitor option."
         exit 1
@@ -1488,8 +1491,11 @@ function vm_boot() {
     elif [ "${serial}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-serial unix:${SOCKET_SERIAL},server,nowait)
-        echo " - Serial:   On host:  nc -U \"${SOCKET_SERIAL}\""
-        echo "             or     :  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
+        if command -v socat &>/dev/null; then
+            echo " - Serial:   On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
+        elif command -v nc &>/dev/null; then
+            echo " - Serial:   On host:  nc -U \"${SOCKET_SERIAL}\""
+        fi
     else
         echo "ERROR! \"${serial}\" is an unknown serial option."
         exit 1
