@@ -62,4 +62,21 @@ jobs:
           tree ./result
           ./result/bin/quickemu --help
           ./result/bin/quickget --help
+          ./result/bin/quickreport
+          # Text a VM if the Nix Installer successfully enabled KVM
+          if [ $DETERMINATE_NIX_KVM -eq 1 ]; then
+            ./result/bin/quickget alpine v3.20
+            ./result/bin/quickemu --vm alpine-v3.20.conf --display none
+            sleep 5
+            if pgrep -F ./alpine-v3.20/alpine-v3.20.pid; then
+              echo "Test VM is running"
+            else
+              echo "Test VM is not running"
+              exit 1
+            fi
+            # Test a few more quickemu commands to clean up
+            ./result/bin/quickemu --vm alpine-v3.20.conf --kill
+            ./result/bin/quickemu --vm alpine-v3.20.conf --delete-disk
+            ./result/bin/quickemu --vm alpine-v3.20.conf --delete-vm
+          fi
 
