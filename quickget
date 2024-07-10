@@ -2612,7 +2612,9 @@ function get_zorin() {
 }
 
 function unattended_windows() {
-    cat << 'EOF' > "${1}"
+    mkdir -p "${1}/unattended" 2>/dev/null
+
+    cat << 'EOF' > "${1}/unattended/autounattend.xml"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend"
   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
@@ -2894,6 +2896,15 @@ function unattended_windows() {
   </settings>
 </unattend>
 EOF
+
+
+echo "Downloading Spice drivers..."
+web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
+web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
+web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
+
+echo "Making unattended.iso"
+mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
 }
 
 function handle_curl_error() {
@@ -3203,13 +3214,7 @@ function get_windows() {
     rm -f "${VM_PATH}/unattended.iso"
     case ${RELEASE} in
         10|11)
-            mkdir -p "${VM_PATH}/unattended" 2>/dev/null
-            web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-            web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
-            echo "Making unattended.iso"
-            unattended_windows "${VM_PATH}/unattended/autounattend.xml"
-            mkisofs -quiet -l -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
+            unattended_windows "${VM_PATH}"
             ;;
     esac
 
