@@ -3324,6 +3324,18 @@ function create_config() {
         *windows-server*) CUSTOM_OS="windows-server";;
         *windows*)
             CUSTOM_OS="windows"
+            while [ $# -gt 2 ]; do
+                case "${3}" in
+                    -unattended|--unattended)
+                        echo "Downloading VirtIO drivers..."
+                        web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+                        FIXED_ISO=${VM_PATH}/virtio-win.iso
+
+                        rm -f "${VM_PATH}/unattended.iso"
+                        unattended_windows "${VM_PATH}"
+                        shift
+                esac
+            done
             ;;
 
         *freebsd*) CUSTOM_OS="freebsd";;
@@ -3333,7 +3345,11 @@ function create_config() {
     esac
     echo "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS."
     echo
+    if [ -n "${FIXED_ISO}" ]; then
+        make_vm_config "${INPUT}" "${FIXED_ISO}"
+    else
         make_vm_config "${INPUT}"
+    fi
 }
 
 # Use command -v command to check if quickemu is in the system's PATH and
@@ -3373,11 +3389,14 @@ Advanced usage:
 
 Arguments:
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url]          : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
   --help                                   : Show this help message
+------------------------------------ Flags -------------------------------------
+--create-config:
+  --unattended                             : Unattended windows installation
 -------------------------- For testing & development ---------------------------
   --url           [os] [release] [edition] : Show image URL(s)
   --check         [os] [release] [edition] : Check image URL(s)
