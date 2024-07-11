@@ -82,11 +82,11 @@ stdenv.mkDerivation rec {
     runHook preInstall
 
     installManPage docs/quickget.1 docs/quickemu.1 docs/quickemu_conf.1
-    install -Dm755 -t "$out/bin" chunkcheck quickemu quickget quickreport windowskey
+    install -Dm755 -t "$out/bin" chunkcheck quickemu quickget quickreport
 
     # spice-gtk needs to be put in suffix so that when virtualisation.spiceUSBRedirection
     # is enabled, the wrapped spice-client-glib-usb-acl-helper is used
-    for f in chunkcheck quickget quickemu quickreport windowskey; do
+    for f in chunkcheck quickget quickemu quickreport; do
       wrapProgram $out/bin/$f \
         --prefix PATH : "${lib.makeBinPath runtimePaths}" \
         --suffix PATH : "${lib.makeBinPath [ spice-gtk ]}"
