@@ -3339,7 +3339,7 @@ function create_config() {
                 echo
                 echo "Downloading VirtIO drivers..."
                 web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
-                FIXED_ISO=${VM_PATH}/virtio-win.iso
+                FIXED_ISO="virtio-win.iso"
                 rm -f "${VM_PATH}/unattended.iso"
                 unattended_windows "${VM_PATH}"
             fi
