@@ -3300,13 +3300,17 @@ function create_config() {
         INPUT="$(web_redirect "${INPUT}")"
         if [[ "${INPUT}" == *".iso" ]] || [[ "${INPUT}" == *".img" ]]; then
             web_get "${INPUT}" "${VM_PATH}"
-            INPUT="${VM_PATH}/${INPUT##*/}"
+            INPUT="${INPUT##*/}"
         else
             echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
             exit 1
         fi
     fi
-    if [[ "${INPUT}" == *".iso" ]]; then
+
+    if [ ! -f "${INPUT}" ]; then
+        echo "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
+        exit 1
+    elif [[ "${INPUT}" == *".iso" ]]; then
         echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
         CUSTOM_IMAGE_TYPE="iso"
     elif [[ "${INPUT}" == *".img" ]]; then
@@ -3319,10 +3323,15 @@ function create_config() {
         echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
         exit 1
     fi
+    INPUT="$(basename "${INPUT}")"
+
     echo "Creating custom VM config for ${INPUT##*/}."
     case "${INPUT,,}" in
-        *windows-server*) CUSTOM_OS="windows-server";;
-        *windows*)
+        *freebsd*) CUSTOM_OS="freebsd";;
+        *kolibrios*) CUSTOM_OS="kolibrios";;
+        *reactos*) CUSTOM_OS="reactos";;
+        *windows-server*|*eval_oemret_x*|*eval_x*) CUSTOM_OS="windows-server";;
+        *windows*|win*)
             CUSTOM_OS="windows"
             while [ $# -gt 2 ]; do
                 case "${3}" in
@@ -3338,18 +3347,10 @@ function create_config() {
             done
             ;;
 
-        *freebsd*) CUSTOM_OS="freebsd";;
-        *kolibrios*) CUSTOM_OS="kolibrios";;
-        *reactos*) CUSTOM_OS="reactos";;
         *) CUSTOM_OS="linux";;
     esac
-    echo "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS."
-    echo
-    if [ -n "${FIXED_ISO}" ]; then
-        make_vm_config "${INPUT}" "${FIXED_ISO}"
-    else
-        make_vm_config "${INPUT}"
-    fi
+    echo -e "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\n"
+    make_vm_config "${INPUT}" "${FIXED_ISO}"
 }
 
 # Use command -v command to check if quickemu is in the system's PATH and
