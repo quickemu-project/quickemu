@@ -1156,6 +1156,9 @@ function web_pipe() {
 
 # Download a file from the web
 function web_get() {
+
+    trap 'echo && echo "Skipping download" && echo; trap '"'exit'"' SIGINT' SIGINT
+
     local CHECK=""
     local HEADERS=()
     local URL="${1}"
@@ -1208,6 +1211,8 @@ function web_get() {
         echo "ERROR! Failed to download ${URL} with curl."
         rm -f "${DIR}/${FILE}"
     fi
+
+    trap 'exit' SIGINT
 }
 
 # checks if a URL needs to be redirected and returns the final URL
