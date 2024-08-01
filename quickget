@@ -875,7 +875,7 @@ function editions_openindiana() {
 
 function releases_opensuse() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) microos tumbleweed
+    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) aeon microos tumbleweed
 }
 
 function releases_oraclelinux() {
@@ -2209,6 +2209,9 @@ function get_opensuse() {
     elif [ "${RELEASE}" == "microos" ]; then
         ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
         URL="https://download.opensuse.org/tumbleweed/iso"
+    elif [ "${RELEASE}" == "aeon" ]; then
+        ISO="opensuse-aeon.x86_64.iso"
+        URL="https://mirrorcache.opensuse.org/tumbleweed/appliances/iso"
     elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
         ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
         URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
