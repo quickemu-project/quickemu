@@ -124,7 +124,7 @@ You can also use `quickget` with advanced options :
 
 ``` text
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
