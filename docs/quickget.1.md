@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: June 24, 2024
+date: August 2, 2024
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -124,11 +124,12 @@ You can also use `quickget` with advanced options :
 
 ``` text
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url]          : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
   --help                                   : Show this help message
+  --disable-unattended                     : Force quickget not to set up an unattended installation
   --url           [os] [release] [edition] : Show image URL(s)
   --check         [os] [release] [edition] : Check image URL(s)
   --list                                   : List all supported systems
