@@ -175,7 +175,7 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 - Host support for **Linux and macOS**
 - **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
 - **Windows** 10 and 11 including TPM 2.0
-- **Windows Server** 2022 2019 2016 2012-r2
+- **Windows Server** 2022 2019 2016
 - [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
   flavours](https://ubuntu.com/download/flavours)**
 - **Nearly 1000 operating system editions are supported!**
@@ -394,7 +394,7 @@ You can also use `quickget` with advanced options :
 
 ``` text
   --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for a OS image
+  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
   --open-homepage <os>                     : Open homepage for the OS
   --show          [os]                     : Show OS information
   --version                                : Show version
