@@ -991,12 +991,17 @@ function editions_solus() {
 
 function releases_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f3 | sort -ru)
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" |  grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f2 | sort -ru)
 }
 
 function editions_sparkylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep "ISO image" | cut -d'-' -f5 | cut -d'.' -f 1 | sort -u)
+    if [ -z "${RELEASE}" ]; then
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    else
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    fi
+    
 }
 
 function releases_spirallinux() {
