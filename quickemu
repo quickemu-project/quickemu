@@ -1090,7 +1090,9 @@ function configure_file_sharing() {
         fi
 
         # SMB
-        if [ -x "$(command -v smbd)" ]; then
+        # We need to search in NixOS compatible paths as well as the standard location
+        # since /usr/sbin/smbd may not be in the PATH.
+        if [ -x "$(command -v smbd)" ] || [ -x "/usr/sbin/smbd" ]; then
             NET+=",smb=${PUBLIC}"
             echo " - smbd:     On guest: smb://10.0.2.4/qemu"
         fi
