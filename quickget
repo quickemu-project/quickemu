@@ -3521,7 +3521,7 @@ if [ -n "${2}" ]; then
             fi
         else
             show_os_info "${OS}"
-            echo -e " - Editions:\t$("editions_${OS} | fmt -w 80")"
+            echo -e " - Editions:\t$(editions_${OS} | fmt -w 80)"
             echo -e "\nERROR! You must specify an edition."
             exit 1
         fi
