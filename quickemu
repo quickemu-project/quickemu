@@ -1328,7 +1328,7 @@ function vm_boot() {
         fi
 
         # shellcheck disable=SC2054,SC2206
-        args+=(-nic bridge,br=${network},model=virtio-net-pci${MAC})
+        args+=(-nic bridge,br=${network},helper=$(type -p qemu-bridge-helper),model=virtio-net-pci${MAC})
     else
         echo " - Network:  User (${NET_DEVICE})"
         # shellcheck disable=SC2054,SC2206
