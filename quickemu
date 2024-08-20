@@ -1198,7 +1198,7 @@ function vm_boot() {
         args+=(-rtc base=localtime,clock=host,driftfix=slew)
     else
         # shellcheck disable=SC2054
-        args+=(-rtc base=utc,clock=host,driftfix=slew)
+        args+=(-rtc base=utc,clock=host)
     fi
 
     # shellcheck disable=SC2206
