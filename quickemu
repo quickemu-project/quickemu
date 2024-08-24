@@ -323,6 +323,10 @@ function configure_cpu() {
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
     HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
 
+    if [ "${HOST_CPU_SOCKETS}" = "-" ]; then
+        HOST_CPU_SOCKETS=1
+    fi
+
     CPU_MODEL="host"
     QEMU_ACCEL="tcg"
     # Configure appropriately for the host platform
