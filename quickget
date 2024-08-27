@@ -900,7 +900,7 @@ function editions_peppermint() {
 }
 
 function releases_popos() {
-    echo 22.04 21.10 20.04
+    echo 22.04 20.04
 }
 
 function editions_popos() {
