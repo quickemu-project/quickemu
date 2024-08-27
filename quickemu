@@ -1191,8 +1191,15 @@ function vm_boot() {
     args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
         ${CPU} ${SMP}
         -m ${RAM_VM} ${BALLOON}
-        -rtc base=localtime,clock=host,driftfix=slew
         -pidfile "${VMDIR}/${VMNAME}.pid")
+
+    if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ] || [ "${guest_os}" == "reactos" ] || [ "${guest_os}" == "freedos" ]; then
+        # shellcheck disable=SC2054
+        args+=(-rtc base=localtime,clock=host,driftfix=slew)
+    else
+        # shellcheck disable=SC2054
+        args+=(-rtc base=utc,clock=host)
+    fi
 
     # shellcheck disable=SC2206
     args+=(${VIDEO} -display ${DISPLAY_RENDER})
