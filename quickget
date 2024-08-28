@@ -787,7 +787,7 @@ function releases_linuxlite() {
 }
 
 function releases_linuxmint() {
-    echo 21.3 21.2 21.1 21 20.3 20.2
+    echo 22 21.3 21.2 21.1 21 20.3 20.2
 }
 
 function editions_linuxmint() {
