@@ -849,4 +849,4 @@ Submit bug reports online at:
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu_conf(1), quickget(1), quickgui(1)
+quickemu_conf(5), quickget(1), quickgui(1)
