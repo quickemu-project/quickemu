@@ -132,7 +132,7 @@ function pretty_name() {
 
 # Just in case quickget want use it
 function os_homepage() {
-    os_info "${1}" | cut -d'|' -f 4
+    os_info "${1}" | cut -d'|' -f 3
 }
 
 function error_specify_os() {
@@ -3239,7 +3239,7 @@ function open_homepage() {
     if [ -z "$(os_info "${1}")" ]; then
         error_specify_os
     else
-        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        URL="$(os_info "${1}" | cut -d'|' -f 3)"
         # shellcheck disable=SC2034
         XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
         exit 0
