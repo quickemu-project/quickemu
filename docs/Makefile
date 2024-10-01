@@ -20,6 +20,7 @@ install_docs: all
 	install -m 644 quickget.1 $(DESTDIR)$(mandir)/man1
 	install -m 644 quickemu.1 $(DESTDIR)$(mandir)/man1
 	install -m 644 quickemu_conf.5 $(DESTDIR)$(mandir)/man5
+	rm -f $(DESTDIR)$(mandir)/man1/quickemu_conf.1
 
 #   install -m 644 quickgui.1 $(DESTDIR)$(mandir)/man1
 
