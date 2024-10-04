@@ -485,4 +485,4 @@ Submit bug reports online at:
 
 Full sources at: <https://github.com/quickemu-project/quickemu>
 
-quickemu(1), quickemu_conf(1), quickgui(1)
+quickemu(1), quickemu_conf(5), quickgui(1)
