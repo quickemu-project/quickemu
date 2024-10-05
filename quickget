@@ -81,6 +81,7 @@ function os_info() {
         popos)            INFO="Pop!_OS|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
         porteus)          INFO="Porteus|-|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
         primtux)          INFO="PrimTux|-|https://primtux.fr/|A complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware.";;
+        proxmox-ve)       INFO="Proxmox VE|-|https://proxmox.com/en/proxmox-virtual-environment/|Proxmox Virtual Environment is a complete, open-source server management platform for enterprise virtualization.";;
         pureos)           INFO="PureOS|-|https://www.pureos.net/|A fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation.";;
         reactos)          INFO="ReactOS|-|https://reactos.org/|Imagine running your favorite Windows applications and drivers in an open-source environment you can trust.";;
         rebornos)         INFO="RebornOS|-|https://rebornos.org/|Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal.";;
@@ -461,6 +462,7 @@ function os_support() {
     popos \
     porteus \
     primtux \
+    proxmox-ve \
     pureos \
     reactos \
     rebornos \
@@ -932,6 +934,10 @@ function releases_primtux() {
 
 function editions_primtux() {
     echo 2022-10
+}
+
+function releases_proxmox-ve() {
+    echo 8.2-2
 }
 
 function releases_pureos() {
@@ -1463,6 +1469,10 @@ EOF
                 if [ "${RELEASE}" == "monterey" ]; then
                     echo "cpu_cores=2" >> "${CONF_FILE}"
                 fi
+                ;;
+            proxmox-ve)
+                echo "disk_size=\"20G\"" >> "${CONF_FILE}"
+                echo "ram=\"4G\"" >> "${CONF_FILE}"
                 ;;
         esac
 
@@ -2319,6 +2329,17 @@ function get_primtux() {
     URL="https://sourceforge.net/projects/primtux/files/Distribution"
     HASH=$(web_pipe "${URL}/${ISO}.md5" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_proxmox-ve() {
+    local HASH="c96ad84eacbbcef299ab8f407f9602f832abb5ceb08a9aa288c1e1164df2da97"
+    local ISO=""
+    local URL=""
+    ISO="proxmox-ve_${RELEASE}.iso"
+    URL="https://enterprise.proxmox.com/iso"
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+
 }
 
 function get_pureos() {
