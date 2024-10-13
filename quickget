@@ -1547,7 +1547,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
-    URL="$(curl -sLIf -m 30 --retry 3 "${URL}" | grep -i 'location:' | grep -v mirror | cut -d: -f2- | cut -d? -f1)"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
     echo "${URL} ${HASH}"
 }
 
