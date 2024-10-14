@@ -132,7 +132,7 @@ function pretty_name() {
 
 # Just in case quickget want use it
 function os_homepage() {
-    os_info "${1}" | cut -d'|' -f 4
+    os_info "${1}" | cut -d'|' -f 3
 }
 
 function error_specify_os() {
@@ -759,7 +759,7 @@ function releases_guix() {
 }
 
 function releases_haiku() {
-    echo r1beta4 r1beta3
+    echo r1beta5 r1beta4 r1beta3
 }
 
 function editions_haiku() {
@@ -787,7 +787,7 @@ function releases_linuxlite() {
 }
 
 function releases_linuxmint() {
-    echo 21.3 21.2 21.1 21 20.3 20.2
+    echo 22 21.3 21.2 21.1 21 20.3 20.2
 }
 
 function editions_linuxmint() {
@@ -900,7 +900,7 @@ function editions_peppermint() {
 }
 
 function releases_popos() {
-    echo 22.04 21.10 20.04
+    echo 22.04 20.04
 }
 
 function editions_popos() {
@@ -3240,7 +3240,7 @@ function open_homepage() {
     if [ -z "$(os_info "${1}")" ]; then
         error_specify_os
     else
-        URL="$(os_info "${1}" | cut -d'|' -f 4)"
+        URL="$(os_info "${1}" | cut -d'|' -f 3)"
         # shellcheck disable=SC2034
         XDG_OPEN=$(xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}")
         exit 0
@@ -3362,10 +3362,9 @@ function create_config() {
 
 # Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
-function resolve_quickemu() {
-    if command -v quickemu >/dev/null 2>&1; then
-        command -v quickemu
-    elif [ -f "./quickemu" ]; then
+function resolve_quickemu() {   
+    command -v quickemu || \
+    if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
         echo "quickemu not found" >&2
