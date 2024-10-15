@@ -1921,7 +1921,8 @@ function get_kdeneon() {
 function get_kolibrios() {
     local HASH=""
     local ISO="kolibri.iso"
-    local URL="https://builds.kolibrios.org/eng"
+    local URL="http://builds.kolibrios.org/en_US/latest-iso.7z"
+    # quick fix for url - now has editions ... 
     echo "${URL}/${ISO} ${HASH}"
 }
 
