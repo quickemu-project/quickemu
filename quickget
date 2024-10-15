@@ -1221,7 +1221,7 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" | cut -d? -f1)
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1547,7 +1547,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
-    URL="$(web_redirect "${URL}" )"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
     echo "${URL} ${HASH}"
 }
 
@@ -3284,12 +3284,14 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
     esac
     make_vm_config "${ISO}"
