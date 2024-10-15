@@ -1221,7 +1221,7 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" | cut -d? -f1)
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1547,7 +1547,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
-    URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    URL="$(web_redirect "${URL}" )"
     echo "${URL} ${HASH}"
 }
 
