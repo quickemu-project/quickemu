@@ -881,7 +881,7 @@ function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
     if ! command -v pacmd >/dev/null 2>&1 ; then
-      AUDIO_DRIVER="alsa"
+        AUDIO_DRIVER="alsa"
     fi
 
     # Setup the appropriate audio device based on the display output
