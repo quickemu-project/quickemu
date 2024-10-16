@@ -878,12 +878,18 @@ function configure_storage() {
 }
 
 function configure_display() {
+    # Determine which audio driver use between Pulseaudio or ALSA
+    local AUDIO_DRIVER="pa"
+    if ! command -v pacmd >/dev/null 2>&1 ; then
+      AUDIO_DRIVER="alsa"
+    fi
+
     # Setup the appropriate audio device based on the display output
     # https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
     case ${display} in
         cocoa) AUDIO_DEV="coreaudio,id=audio0";;
         none|spice|spice-app) AUDIO_DEV="spice,id=audio0";;
-        *) AUDIO_DEV="pa,id=audio0";;
+        *) AUDIO_DEV="${AUDIO_DRIVER},id=audio0";;
     esac
 
     # Determine a sane resolution for Linux guests.
