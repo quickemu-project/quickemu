@@ -211,7 +211,12 @@ function handle_missing() {
     # Handle odd missing Fedora combinations
     case "${OS}" in
         fedora)
-            if [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${RELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
+            if [[ "${RELEASE}" == "41_Beta" ]]; then
+                NRELEASE="41"
+                else
+                NRELEASE="${RELEASE}"
+            fi
+            if [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
                 echo "ERROR! Unsupported combination"
                 echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1
@@ -703,7 +708,7 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sort -r)
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/41 Beta/41_Beta/' | sort -r)
 }
 
 function editions_fedora() {
@@ -1800,7 +1805,14 @@ function get_fedora() {
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
+    # but we need to convert it back to a space for the URL search in the JSON
+    # RELEASE="${RELEASE/_/ }"
+    if [[ "${RELEASE}" == "41_Beta" ]]; then
+        RELEASE="41 Beta"
+    fi
     #shellcheck disable=SC2086
+
     JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and .sha256 != null)')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
