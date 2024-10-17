@@ -3296,8 +3296,8 @@ function create_vm() {
                     7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
                     rm -f "${VM_PATH}/${ISO}"
                     ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                    ISO="$(basename "${ISO}")"
                 fi
-                ISO="$(basename "$ISO")"
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
