@@ -583,13 +583,8 @@ function editions_biglinux() {
 }
 
 function releases_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/gnome/" | grep "\.iso" | cut -c81- | cut -d'"' -f2 | cut -d'-' -f2)
-}
-
-function editions_blendos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.ico277.xyz/blendos/" | grep "\[DIR\]" | cut -c81-90 | cut -d'/' -f1 | grep -v testing | sort -u)
+    # there is now just a single latest iso
+    echo latest
 }
 
 function releases_bodhi() {
@@ -1616,8 +1611,8 @@ function get_biglinux() {
 
 function get_blendos() {
     local HASH=""
-    local ISO="blendos-${RELEASE}-stable-${EDITION}.iso"
-    local URL="https://mirror.ico277.xyz/blendos/${EDITION}"
+    local ISO="blendOS.iso"
+    local URL="https://kc1.mirrors.199693.xyz/blend/isos/testing"
     echo "${URL}/${ISO} ${HASH}"
 }
 
