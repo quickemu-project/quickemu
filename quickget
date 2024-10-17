@@ -584,7 +584,7 @@ function editions_biglinux() {
 
 function releases_blendos() {
     # there is now just a single latest iso
-    echo Latest
+    echo latest
 }
 
 function releases_bodhi() {
