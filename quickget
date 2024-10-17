@@ -605,10 +605,12 @@ function releases_bunsenlabs() {
 }
 
 function releases_cachyos() {
+    # new cdn setup 10/2024
     echo latest
 }
 
 function editions_cachyos() {
+    # desktop version now installs different desktop environments
     echo desktop handheld
 }
 
