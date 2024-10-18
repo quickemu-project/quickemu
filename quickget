@@ -1700,7 +1700,7 @@ function get_deepin() {
     # deepin-desktop-community-20.3-amd64.iso
     local URL="https://cdimage.deepin.com/releases/"${RELEASE}
     # Correct URL for 23-RC onwards which has architecture directories
-    if [[ "${RELEASE}" == *"23-RC"* ]] ; then
+    if [[ ! "${RELEASE}" == "20.9" ]] ; then
         URL+="/amd64"
     fi
     local ISO="deepin-desktop-community-${REV}-amd64.iso"
