@@ -600,12 +600,13 @@ function releases_bunsenlabs() {
 }
 
 function releases_cachyos() {
+    # new cdn setup 10/2024
     echo latest
 }
 
 function editions_cachyos() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.cachyos.org/ISO/" | grep "title=" | grep -v testing | grep -v cli | cut -d'"' -f4 | cut -d '/' -f1 | sort)
+    # desktop version now installs different desktop environments
+    echo desktop handheld
 }
 
 function releases_centos-stream() {
@@ -1638,12 +1639,10 @@ function get_bunsenlabs() {
 
 function get_cachyos() {
     local HASH=""
-    local REL=""
-    local URL="https://mirror.cachyos.org/ISO/${EDITION}/"
-    REL=$(web_pipe "${URL}" | grep -o '>[0-9]*/</a>' | grep -o '[0-9]*' | sort -ru | tail -n 1)
-    local ISO="cachyos-${EDITION}-linux-${REL}.iso"
-    HASH=$(web_pipe "${URL}/${REL}/${ISO}.sha256" | cut -d' ' -f1)
-    echo "${URL}/${REL}/${ISO} ${HASH}"
+    local URL=""
+    URL="$(web_pipe "https://cachyos.org/download/" | tr '&' '\n' | grep "ISO/${EDITION}" | grep -v 'iso.sha' | grep -v 'iso.sig' | cut -d';' -f2)"
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
 }
 
 function get_centos-stream() {
