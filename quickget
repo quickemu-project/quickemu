@@ -1645,9 +1645,7 @@ function get_bunsenlabs() {
 function get_cachyos() {
     local HASH=""
     local URL=""
-    local ISO=""
     URL="$(web_pipe "https://cachyos.org/download/" | tr '&' '\n' | grep "ISO/${EDITION}" | cut -d';' -f2)"
-    ISO="$(basename "${ISO}")"
     HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
