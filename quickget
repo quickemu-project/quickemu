@@ -778,6 +778,10 @@ function releases_kolibrios() {
     echo latest
 }
 
+function editions_kolibrios() {
+    echo en_US  ru_RU  it_IT  es_ES
+}
+
 function releases_linuxlite() {
     echo 6.6 6.4 6.2 6.0
 }
@@ -819,7 +823,8 @@ function releases_manjaro() {
 }
 
 function releases_mxlinux() {
-    echo 23.3
+    # needs header, so not web_pipe:
+    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
 }
 
 function editions_mxlinux() {
@@ -1913,8 +1918,8 @@ function get_kdeneon() {
 
 function get_kolibrios() {
     local HASH=""
-    local ISO="kolibri.iso"
-    local URL="https://builds.kolibrios.org/eng"
+    local ISO="latest-iso.7z"
+    local URL="http://builds.kolibrios.org/${EDITION}"
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -3277,6 +3282,16 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+            fi;;
+        kolibrios)
+            if [[ ${ISO} = *".7z" ]]; then
+                if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
+                else
+                    7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+                    rm -f "${VM_PATH}/${ISO}"
+                    ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                    ISO="$(basename "${ISO}")"
+                fi
             fi;;
         reactos)
             if [[ ${ISO} = *".zip"* ]]; then
