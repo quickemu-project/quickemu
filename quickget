@@ -1222,7 +1222,7 @@ function web_redirect() {
     local URL="${1}"
     # Check for URL redirections
     # Output to nonexistent directory so the download fails fast
-    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}" )
     if [ "${REDIRECT_URL}" != "${URL}" ]; then
         echo "${REDIRECT_URL}"
     else
@@ -1548,6 +1548,7 @@ function get_archcraft() {
     local HASH=""
     local URL=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
     echo "${URL} ${HASH}"
 }
 
@@ -3282,6 +3283,7 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
         kolibrios)
             if [[ ${ISO} = *".7z" ]]; then
@@ -3298,6 +3300,7 @@ function create_vm() {
                 unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
                 rm -f "${VM_PATH}/${ISO}"
                 ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+                ISO="$(basename "${ISO}")"
             fi;;
     esac
     make_vm_config "${ISO}"
@@ -3537,7 +3540,7 @@ if [ -n "${2}" ]; then
             fi
         else
             show_os_info "${OS}"
-            echo -e " - Editions:\t$(editions_${OS} | fmt -w 80)"
+            echo -e " - Editions:\t$("editions_${OS}" | fmt -w 80)"
             echo -e "\nERROR! You must specify an edition."
             exit 1
         fi
