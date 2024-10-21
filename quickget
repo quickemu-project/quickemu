@@ -1002,7 +1002,7 @@ function editions_sparkylinux() {
     else
         echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
     fi
-    
+
 }
 
 function releases_spirallinux() {
@@ -1391,6 +1391,8 @@ EOF
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             batocera)
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
+            bazzite)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
@@ -3373,7 +3375,7 @@ function create_config() {
 
 # Use command -v command to check if quickemu is in the system's PATH and
 # fallback to checking if quickemu is in the current directory.
-function resolve_quickemu() {   
+function resolve_quickemu() {
     command -v quickemu || \
     if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
