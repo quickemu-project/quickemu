@@ -982,12 +982,12 @@ function releases_slitaz() {
 
 function releases_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'-' -f 2 | sort -ru)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/" | jq -r '.[].name[:-1]' | grep -E "^[0-9-]+$" | sort -u)
 }
 
 function editions_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getsol.us/download/" | grep "isos" | grep Download | cut -d'.' -f5 | cut -d'-' -f2- | sort -u)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -1158,6 +1158,11 @@ function check_hash() {
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
     curl --silent --location "${1}"
+}
+
+# Download a JSON file from the web and pipe it to stdout
+function web_pipe_json() {
+     curl --silent --location --header "Accept: application/json" "${1}"
 }
 
 # Download a file from the web
@@ -2401,7 +2406,7 @@ function get_slitaz() {
 
 function get_solus() {
     local HASH=""
-    local ISO="Solus-${RELEASE}-${EDITION}.iso"
+    local ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
