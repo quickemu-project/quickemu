@@ -212,8 +212,8 @@ function handle_missing() {
     case "${OS}" in
         fedora)
             # First we need to handle the Beta naming kludge
-            if [[ "${RELEASE}" == "41_Beta" ]]; then
-                NRELEASE="41"
+            if [[ "${RELEASE}" == *"_Beta" ]]; then
+                NRELEASE="${RELEASE/_Beta/}"
                 else
                 NRELEASE="${RELEASE}"
             fi
@@ -709,7 +709,7 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/41 Beta/41_Beta/' | sort -r)
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
 }
 
 function editions_fedora() {
@@ -1812,12 +1812,15 @@ function get_fedora() {
     esac
     # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
     # but we need to convert it back to a space for the URL search in the JSON
-    # RELEASE="${RELEASE/_/ }"
-    if [[ "${RELEASE}" == "41_Beta" ]]; then
-        RELEASE="41 Beta"
-    fi
     #shellcheck disable=SC2086
+    # if RELEASE contains an underscore, replace it with a space
+     if [[ "${RELEASE}" == *"_"* ]]; then
+        RELEASE="${RELEASE/_/ }"
+    fi
 
+    
+
+    # shellcheck disable=SC2086
     JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and .sha256 != null)')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
