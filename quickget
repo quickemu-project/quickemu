@@ -1218,6 +1218,7 @@ function web_get() {
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
         echo "- URL: ${URL}"
+        echo "- PATH: ${DIR}/${FILE}"
     fi
 
     if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
