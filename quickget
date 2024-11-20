@@ -937,7 +937,7 @@ function editions_primtux() {
 }
 
 function releases_proxmox-ve() {
-    echo 8.2-2
+    echo $(web_pipe https://enterprise.proxmox.com/iso/ | grep proxmox-ve | grep -E -o '[0-9]+\.[0-9]+-[0-9]\.iso' | uniq | sort -ru | cut -d'.' -f 1-2)
 }
 
 function releases_pureos() {
@@ -2332,7 +2332,7 @@ function get_primtux() {
 }
 
 function get_proxmox-ve() {
-    local HASH="c96ad84eacbbcef299ab8f407f9602f832abb5ceb08a9aa288c1e1164df2da97"
+    local HASH=""
     local ISO=""
     local URL=""
     ISO="proxmox-ve_${RELEASE}.iso"
