@@ -937,6 +937,7 @@ function editions_primtux() {
 }
 
 function releases_proxmox-ve() {
+    #shellcheck disable=SC2046,SC2005
     echo $(web_pipe https://enterprise.proxmox.com/iso/ | grep proxmox-ve | grep -E -o '[0-9]+\.[0-9]+-[0-9]\.iso' | uniq | sort -ru | cut -d'.' -f 1-2)
 }
 
