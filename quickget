@@ -686,7 +686,7 @@ function releases_easyos() {
 }
 
 function releases_elementary() {
-    echo 7.1 7.0
+    echo 8.0 7.1 7.0
 }
 
 function releases_endeavouros() {
@@ -1763,6 +1763,7 @@ function get_elementary() {
     case ${RELEASE} in
         7.0) STAMP="20230129rc";;
         7.1) STAMP="20230926rc";;
+        8.0) STAMP="20241122rc";;        
     esac
     local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
