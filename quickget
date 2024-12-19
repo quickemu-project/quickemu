@@ -63,6 +63,7 @@ function os_info() {
         linuxmint)        INFO="Linux Mint|-|https://linuxmint.com/|Designed to work out of the box and comes fully equipped with the apps most people need.";;
         lmde)             INFO="Linux Mint Debian Edition|-|https://www.linuxmint.com/download_lmde.php|Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead.";;
         lubuntu)          INFO="Lubuntu|-|https://lubuntu.me/|Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt.";;
+        maboxlinux)       INFO="Mabox Linux|-|https://maboxlinux.org/|Lightweight, functional and easy to customize Openbox desktop";;
         mageia)           INFO="Mageia|-|https://www.mageia.org/|Stable, secure operating system for desktop & server.";;
         manjaro)          INFO="Manjaro|-|https://manjaro.org/|Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware.";;
         mxlinux)          INFO="MX Linux|-|https://mxlinux.org/|Designed to combine elegant and efficient desktops with high stability and solid performance.";;
@@ -443,6 +444,7 @@ function os_support() {
     linuxmint \
     lmde \
     lubuntu \
+    maboxlinux \
     macos \
     mageia \
     manjaro \
@@ -810,6 +812,10 @@ function editions_lmde() {
 
 function releases_lmde() {
     echo 6
+}
+
+function releases_maboxlinux() {
+    echo latest
 }
 
 function releases_macos() {
@@ -1969,6 +1975,14 @@ function get_lmde() {
     local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
     HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_maboxlinux() {
+    local HASH=""
+    local URL=""
+    URL="https://sourceforge.net/projects/mabox-linux/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    echo "${URL} ${HASH}"
 }
 
 function generate_id() {
