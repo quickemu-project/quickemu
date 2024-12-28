@@ -1061,7 +1061,7 @@ function releases_truenas-core() {
 }
 
 function releases_truenas-scale() {
-    echo 23
+    echo 24
 }
 
 function releases_tuxedo-os() {
