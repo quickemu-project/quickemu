@@ -698,7 +698,7 @@ function releases_endeavouros() {
 }
 
 function releases_endless() {
-    echo 5.1.1
+    echo 6.0.4
 }
 
 function editions_endless() {
@@ -1798,11 +1798,11 @@ function get_endless() {
     # Endless edition names are "base" for the small minimal one or the Language for the large full release
     # The isos are stamped as they are finished so ....
     case ${EDITION} in
-        base)  FILE_TS="240103-025438";;
-        en)    FILE_TS="240103-025437";;
-        es)    FILE_TS="240103-025438";;
-        fr)    FILE_TS="240103-025438";;
-        pt_BR) FILE_TS="240103-030103";;
+        base)  FILE_TS="241023-183516";;
+        en)    FILE_TS="241023-200926";;
+        es)    FILE_TS="241023-184649";;
+        fr)    FILE_TS="241023-191212";;
+        pt_BR) FILE_TS="241023-191427";;
     esac
     URL="https://images-dl.endlessm.com/release/${RELEASE}/eos-amd64-amd64/${EDITION}"
     ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
