@@ -1,0 +1,657 @@
+#!/usr/bin/env bash
+
+CACHE_FILE="quickget_data.json.zst"
+CACHE_URL="https://github.com/lj3954/quickget_configs/releases/download/daily/quickget_data.json.zst"
+IMAGE_TYPES=("iso" "img" "fixed_iso" "floppy")
+QUICKGETC_VERSION="0.1.0"
+
+function cleanup() {
+    if [ -n "$(jobs -p)" ]; then
+        kill "$(jobs -p)" 2>/dev/null
+    fi
+}
+
+function check_hash() {
+    local iso=""
+    local hash=""
+    local hash_algo=""
+    if [ "${OPERATION}" == "download" ]; then
+        iso="${1}"
+    else
+        iso="${VM_PATH}/${1}"
+    fi
+    hash="${2}"
+    # Guess the hash algorithm by the hash length
+    case ${#hash} in
+        32) hash_algo=md5sum;;
+        40) hash_algo=sha1sum;;
+        64) hash_algo=sha256sum;;
+        128) hash_algo=sha512sum;;
+        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+            return;;
+    esac
+    echo -n "Checking ${iso} with ${hash_algo}... "
+    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+        echo "ERROR!"
+        echo "${iso} doesn't match ${hash}. Try running 'quickgetc' again."
+        exit 1
+    else
+        echo "Good!"
+    fi
+}
+
+function web_get() {
+    local CHECK=""
+    local HEADERS=()
+    local URL="${1}"
+    local DIR="${2}"
+    local FILE="${3}"
+    local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+
+    # Process any URL redirections after the file name has been extracted
+    URL=$(web_redirect "${URL}")
+
+    # Process any headers
+    while (( "$#" )); do
+        if [ "${1}" == "--header" ]; then
+            HEADERS+=("${1}" "${2}")
+            shift 2
+        else
+            shift
+        fi
+    done
+
+    # Test mode for ISO
+    if [ "${OPERATION}" == "show" ]; then
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
+        exit 0
+    elif [ "${OPERATION}" == "test" ]; then
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+        exit 0
+    elif [ "${OPERATION}" == "download" ]; then
+        DIR="$(pwd)"
+    fi
+
+    if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
+        echo "ERROR! Unable to create directory ${DIR}"
+        exit 1
+    fi
+
+    if ! curl --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+        echo "ERROR! Failed to download ${URL} with curl."
+        rm -f "${DIR}/${FILE}"
+    fi
+}
+
+function test_result() {
+    local OS="${1}"
+    local RELEASE="${2}"
+    local EDITION="${3:-}"
+    local URL="${4:-}"
+    local RESULT="${5:-}"
+    if [ -n "${EDITION}" ]; then
+        OS="${OS}-${RELEASE}-${EDITION}"
+    else
+        OS="${OS}-${RELEASE}"
+    fi
+
+    if [ -n "${RESULT}" ]; then
+        # Pad the OS string for consistent output
+        OS=$(printf "%-35s" "${OS}")
+        echo -e "${RESULT}: ${OS} ${URL}"
+    else
+        OS=$(printf "%-36s" "${OS}:")
+        echo -e "${OS} ${URL}"
+    fi
+}
+
+# checks if a URL needs to be redirected and returns the final URL
+function web_redirect() {
+    local REDIRECT_URL=""
+    local URL="${1}"
+    # Check for URL redirections
+    # Output to nonexistent directory so the download fails fast
+    REDIRECT_URL=$(curl --silent --location --fail --write-out '%{url_effective}' --output /var/cache/${RANDOM}/${RANDOM} "${URL}")
+    if [ "${REDIRECT_URL}" != "${URL}" ]; then
+        echo "${REDIRECT_URL}"
+    else
+        echo "${URL}"
+    fi
+}
+
+# checks if a URL is reachable
+function web_check() {
+    local HEADERS=()
+    local URL="${1}"
+    # Process any headers
+    while (( "$#" )); do
+        if [ "${1}" == "--header" ]; then
+            HEADERS+=("${1}" "${2}")
+            shift 2
+        else
+            shift
+        fi
+    done
+    curl --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
+}
+
+function get_homepage() {
+    jq -r '.homepage' <<< "${OS_ENTRY}"
+}
+
+function get_description() {
+    jq -r '.description' <<< "${OS_ENTRY}"
+}
+
+function show_os_info() {
+    local HOMEPAGE
+    local DESCRIPTION
+    
+    HOMEPAGE=$(get_homepage)
+    DESCRIPTION=$(get_description)
+
+    echo -e "\n${PRETTY_NAME}"
+    if [ -n "${HOMEPAGE}" ]; then
+        echo " - Website: ${HOMEPAGE}"
+    fi
+    if [ -n "${DESCRIPTION}" ]; then
+        echo -e " - Description: ${DESCRIPTION}"
+    fi
+}
+
+function list_json() {
+    # Reference: https://stackoverflow.com/a/67359273
+    list_csv | jq -R 'split(",") as $h|reduce inputs as $in ([]; . += [$in|split(",")|. as $a|reduce range(0,length) as $i ({};.[$h[$i]]=$a[$i])])'
+
+    exit 0
+}
+
+function list_csv() {
+    echo "Display Name,OS,Release,Option,Downloader,PNG,SVG"
+
+    jq -r '.[] | .name as $name | .pretty_name as $pretty_name | .releases[] | [$name, $pretty_name, .release, .edition, null, "https://quickemu-project.github.io/quickemu-icons/png/\($name)/\($name)-quickemu-white-pinkbg.png", "https://quickemu-project.github.io/quickemu-icons/svg/\($name)/\($name)-quickemu-white-pinkbg.svg"] | @tsv' <<< "${JSON}" | tr "\t" ","
+
+    exit 0
+}
+
+function unsupported_arch() {
+    echo "ERROR! ${ARCH} is not a supported architecture for ${PRETTY_NAME} ${RELEASE}${EDITION:+ $EDITION}."
+    echo " - Supported architectures: $(jq -s -r '[.[] | .arch] | join(" ")' <<< "${EDITION_ENTRIES}")"
+    exit 1
+}
+
+function find_edition_entry() {
+    EDITION="${1}"
+    local EDITION_ENTRIES
+
+    if [ -n "${EDITION}" ]; then
+        EDITION_ENTRIES=$(jq -c 'select(.edition=="'"${EDITION}"'")' <<< "${RELEASE_ENTRIES}")
+    else
+        EDITION_ENTRIES=$(jq -c '. | select(.edition==null)' <<< "${RELEASE_ENTRIES}")
+    fi
+    if [ -z "${EDITION_ENTRIES}" ]; then
+        error_not_supported_edition
+    fi
+
+    local PREFERRED_ARCH="${ARCH:-$(uname -m)}"
+    ENTRY=$(jq -c '. | select(.arch=="'"${PREFERRED_ARCH}"'")' <<< "${EDITION_ENTRIES}")
+
+    if [ -z "${ENTRY}" ]; then
+        if [ -n "${ARCH}" ]; then
+            unsupported_arch
+        else
+            ENTRY=$(jq -c '.[0]' <<< "${EDITION_ENTRIES}")
+        fi
+    fi
+}
+
+function error_specify_edition() {
+    show_os_info
+    echo -e " - Editions:\t$(list_editions "${RELEASE}" | fold -s -w "$(tput cols)")"
+    echo -e "\nERROR! You must specify an edition."
+    exit 1
+}
+
+function list_editions() {
+    local RELEASE=${1}
+    jq -r '[.releases[] | select(.release=="'"${RELEASE}"'") | .edition] | unique | join(" ")' <<< "${OS_ENTRY}"
+}
+
+function error_no_edition_required() {
+    echo "ERROR! ${PRETTY_NAME} ${RELEASE} does not require an edition."
+    exit 1
+}
+
+function error_specify_release() {
+    show_os_info
+    list_releases
+}
+
+function release_requires_edition() {
+    [ "$(jq -s 'any(.[]; .edition == null)' <<< "${RELEASE_ENTRIES}")" == "false" ]
+}
+
+function list_releases() {
+    local CURRENT_EDITIONS
+    RELEASES=$(list_releases_raw)
+    declare -A EDITIONS
+    for RELEASE in ${RELEASES}; do
+        CURRENT_EDITIONS=$(list_editions "${RELEASE}")
+        EDITIONS["${RELEASE}"]=${CURRENT_EDITIONS}
+
+        if [ "${CURRENT_EDITIONS}" != "${EDITIONS["${RELEASES%% *}"]}" ]; then
+            UNIQUE_EDITIONS=1
+        elif [ "${CURRENT_EDITIONS}" ]; then
+            HAS_EDITIONS=1
+        fi
+    done
+
+
+    if [ "${UNIQUE_EDITIONS}" ]; then
+        printf " - %-15s | %s\n" "Releases" "Editions"
+        for RELEASE in ${RELEASES}; do
+            printf "  %-16s | %s\n" "${RELEASE}" "$(echo "${EDITIONS["${RELEASE}"]}" | tr "!" " ")"
+        done
+    else
+        echo " - Releases: $(list_releases_raw)"
+        if [ "${HAS_EDITIONS}" ]; then
+            echo " - Editions: ${CURRENT_EDITIONS}"
+        fi
+    fi
+}
+
+function list_releases_raw() {
+    # Reference: https://unix.stackexchange.com/questions/738691/get-unique-without-sorting-in-jq
+    jq -r 'reduce (.releases[].release) as $a ([]; if IN(.[]; $a) then . else . += [$a] end) | join(" ")' <<< "${OS_ENTRY}"
+}
+
+function find_release_entries() {
+    RELEASE="${1}"
+
+    RELEASE_ENTRIES="$(jq -c '.releases[] | select(.release=="'"${RELEASE}"'")' <<< "${OS_ENTRY}")"
+
+    if [ -z "${RELEASE_ENTRIES}" ]; then
+        echo -e "ERROR! ${PRETTY_NAME} ${RELEASE} is not a supported release.\n"
+        list_releases | fold -s -w "$(tput cols)"
+        exit 1
+    fi
+}
+
+function os_support() {
+    jq -r '[.[] | .name] | join(" ")' <<< "${JSON}"
+}
+
+function error_specify_os() {
+    echo "ERROR! You must specify an operating system."
+    echo "- Supported Operating Systems:"
+    os_support | fold -s -w "$(tput cols)"
+    echo -e "\nTo see all possible arguments, use:\n   quickgetc -h  or  quickgetc --help"
+    exit 1
+}
+
+function find_os_entry() {
+    OS="${1}"
+
+    OS_ENTRY="$(jq -c '.[] | select(.name=="'"${OS}"'") | .releases[] |= (. + {arch: (.arch // "x86_64"), release: (.release // "latest")})' <<< "${JSON}")"
+
+    if [ -z "${OS_ENTRY}" ]; then
+        echo -e "ERROR! ${OS} is not a supported OS.\n"
+        os_support | fold -s -w "$(tput cols)"
+    fi
+    PRETTY_NAME=$(jq -r '.pretty_name' <<< "${OS_ENTRY}")
+}
+
+function supported_archs() {
+    echo x86_64 aarch64 riscv64
+}
+
+function set_arch() {
+    case "${1}" in
+        x86_64|amd64) ARCH="x86_64";;
+        aarch64|arm64|armv8) ARCH="aarch64";;
+        riscv64|riscv) ARCH="riscv64";;
+        *)
+            echo "ERROR! ${1} is not a supported architecture."
+            echo " - Supported architectures: $(supported_archs)"
+            exit 1;;
+    esac
+}
+
+function cache_is_valid() {
+    if [ ! -f "${1}" ]; then
+        return 1
+    fi
+
+    CURRENT_DAY=$(date -u +%j%Y)
+    CACHE_DAY=$(date -u -d "$(stat -c %y "${1}")" +%j%Y)
+
+    if [ "${CURRENT_DAY}" -ne "${CACHE_DAY}" ]; then
+        return 1
+    else 
+        return 0
+    fi
+}
+
+function populate_cache() {
+    local CACHE_DIR="${XDG_CACHE_HOME:-${HOME}/.cache}"
+    if ! cache_is_valid "${CACHE_DIR}/${CACHE_FILE}"; then
+        echo "Downloading quickget data from ${CACHE_URL}"
+        web_get "${CACHE_URL}" "${CACHE_DIR}" "${CACHE_FILE}"
+    fi 
+    if ! JSON=$(zstd -dc "${CACHE_DIR}/${CACHE_FILE}"); then
+        echo "ERROR! Failed to decompress ${CACHE_DIR}/${CACHE_FILE}. Try running quickgetc again."
+        rm "${CACHE_DIR}/${CACHE_FILE}"
+        exit 1
+    fi
+}
+
+function open_homepage() {
+    find_os_entry "${1}"
+    local URL
+    URL=$(get_homepage)
+    if [ -n "${URL}" ]; then
+        xdg-open "${URL}" || sensible-browser "${URL}" || x-www-browser "${URL}" || gnome-open "${URL}"
+    else
+        echo "ERROR! No homepage found for ${PRETTY_NAME}"
+    fi
+}
+
+
+function handle_sources() {
+    local IMAGE_TYPE
+    local SOURCE
+
+    for IMAGE_TYPE in "${IMAGE_TYPES[@]}"; do
+        SOURCE=$(jq -r '."'${IMAGE_TYPE}'"[0]' <<< "${ENTRY}")
+        if [ "${SOURCE}" != "null" ]; then
+            handle_source_type "${IMAGE_TYPE}" "${SOURCE}"
+        fi
+    done
+}
+
+function handle_source_type() {
+    local IMAGE_TYPE="${1}"
+    local SOURCE="${2}"
+    local WEB_SOURCE
+    local FILE_NAME
+    local CUSTOM
+
+    WEB_SOURCE=$(jq -r '.web // ""' <<< "${SOURCE}")
+    FILE_NAME=$(jq -r '.file_name// ""' <<< "${SOURCE}")
+    CUSTOM=$(jq -r '.custom // ""' <<< "${SOURCE}")
+
+    if [ "${WEB_SOURCE}" ]; then
+        handle_websource "${IMAGE_TYPE}" "${WEB_SOURCE}"
+    elif [ "${FILE_NAME}" ]; then
+        IMAGES["${IMAGE_TYPE}"]="${VM_PATH}/${FILE_NAME}"
+    elif [ "${CUSTOM}" ]; then
+        echo "ERROR! Custom source not implemented"
+        exit 1
+    else
+        echo "ERROR! No source found for ${IMAGE_TYPE}"
+        exit 1
+    fi
+}
+
+function handle_websource() {
+    local IMAGE_TYPE="${1}"
+    local SOURCE="${2}"
+    local URL
+    local CHECKSUM
+    local ARCHIVE_FORMAT
+    local FILE_NAME
+
+    URL=$(jq -r '.url' <<< "${SOURCE}")
+    CHECKSUM=$(jq -r '.checksum // ""' <<< "${SOURCE}")
+    ARCHIVE_FORMAT=$(jq -r '.archive_format // ""' <<< "${SOURCE}")
+    FILE_NAME=$(jq -r '.file_name' <<< "${SOURCE}")
+
+    if [ "${FILE_NAME}" == "null" ]; then
+        FILE_NAME="${URL##*/}"
+    fi
+
+    web_get "${URL}" "${VM_PATH}" "${FILE_NAME}"
+    if [ -n "${CHECKSUM}" ]; then
+        check_hash "${FILE_NAME}" "${CHECKSUM}"
+    fi
+
+    if [ "${OPERATION}" = "download" ]; then
+        FINAL_FILE="${FILE_NAME}"
+        VM_PATH="$(pwd)"
+    else
+        FINAL_FILE="${VM_PATH}/${FILE_NAME}"
+    fi
+
+    case "${ARCHIVE_FORMAT}" in
+        tar*)
+            tar xf "${FINAL_FILE}" -C "${VM_PATH}"
+            IMAGES["${IMAGE_TYPE}"]="$(ls -1 "${VM_PATH}/"*".${IMAGE_TYPE}")"
+            ;;
+        xz)
+            xz -d "${FINAL_FILE}"
+            IMAGES["${IMAGE_TYPE}"]="${FINAL_FILE/.xz/}"
+            ;;
+        gz)
+            gzip -d "${FINAL_FILE}"
+            IMAGES["${IMAGE_TYPE}"]="${FINAL_FILE/.gz/}"
+            ;;
+        bz2)
+            bzip2 -d "${FINAL_FILE}"
+            IMAGES["${IMAGE_TYPE}"]="${FINAL_FILE/.bz2/}"
+            ;;
+        zip)
+            unzip -d "${VM_PATH}" "${FINAL_FILE}"
+            IMAGES["${IMAGE_TYPE}"]="$(ls -1 "${VM_PATH}/"*".${IMAGE_TYPE}")"
+            ;;
+        *)
+            IMAGES["${IMAGE_TYPE}"]="${FINAL_FILE}"
+            ;;
+    esac
+}
+
+function make_vm_config() {
+    local CONF_FILE
+    local ARCH
+    local GUEST_OS
+    # Add correct logic for disks later
+    local DISK_IMG="${VM_PATH}/disk.qcow2"
+    
+    if [ "${OPERATION}" == "download" ]; then
+        exit 0
+    fi
+
+    GUEST_OS=$(jq -r '.guest_os' <<< "${ENTRY}")
+    ARCH=$(jq -r '.arch' <<< "${ENTRY}")
+    RAM=$(jq -r '.ram // ""' <<< "${ENTRY}")
+
+    CONF_FILE="${VM_PATH}.conf"
+
+    if [ ! -e "${CONF_FILE}" ]; then
+        echo "Making ${CONF_FILE}"
+        cat << EOF > "${CONF_FILE}"
+#!$(which quickemu) --vm
+guest_os="${GUEST_OS}"
+disk_img="${DISK_IMG}"
+arch_vm="${ARCH}"
+EOF
+        echo " - Setting ${CONF_FILE} executable"
+        chmod u+x "${CONF_FILE}"
+        
+        for IMAGE in "${!IMAGES[@]}"; do
+            echo "${IMAGE}='"'${IMAGES["${IMAGE}"]}'"'" >> "${CONF_FILE}"
+        done
+
+        if [ -n "${RAM}" ]; then
+            echo "ram=$((${RAM} / 1024 / 1024 / 1024))" >> "${CONF_FILE}"
+        fi
+    fi
+}
+
+function create_vm() {
+    local DISKS
+
+    declare -A IMAGES
+
+    handle_sources
+    make_vm_config
+}
+
+function help_message() {
+    #shellcheck disable=SC2016
+    printf '
+             _      _              _
+  __ _ _   _(_) ___| | ____ _  ___| |_      ___
+ / _` | | | | |/ __| |/ / _` |/ _ \ __     / __|
+| (_| | |_| | | (__|   < (_| |  __/ |_    | (__
+ \__, |\__,_|_|\___|_|\_\__, |\___|\__|___ \___|
+    |_|                 |___/ v%s, using curl %s
+--------------------------------------------------------------------------------
+ Project - https://github.com/quickemu-project/quickemu
+ Discord - https://wimpysworld.io/discord
+--------------------------------------------------------------------------------
+
+Usage:
+  quickgetc <os> <release> [edition]
+  quickgetc ubuntu 22.04
+
+Advanced usage:
+  quickgetc <arg> [path] <os> [release] [edition]
+  quickgetc --download ubuntu 22.04
+
+Arguments:
+  --arch          <arch>                   : Specify the image architecture
+  --download      <os> <release> [edition] : Download image; no VM configuration
+  --create-config <os> [path/url]          : Create VM config for a OS image
+  --open-homepage <os>                     : Open homepage for the OS
+  --show          [os]                     : Show OS information
+  --version                                : Show version
+  --help                                   : Show this help message
+-------------------------- For testing & development ---------------------------
+  --url           [os] [release] [edition] : Show image URL(s)
+  --check         [os] [release] [edition] : Check image URL(s)
+  --list                                   : List all supported systems
+  --list-csv                               : List everything in csv format
+  --list-json                              : List everything in json format
+--------------------------------------------------------------------------------
+
+Supported Operating Systems:\n\n' "${QUICKGETC_VERSION}" "${CURL_VERSION}"
+    os_support | fold -s -w "$(tput cols)"
+}
+
+trap cleanup EXIT
+
+if ((BASH_VERSINFO[0] < 4)); then
+    echo "Sorry, you need bash 4.0 or newer to run this script."
+    exit 1
+fi
+
+OPERATION=""
+CURL=$(command -v curl)
+if [ ! -x "${CURL}" ]; then
+    echo "ERROR! curl not found. Please install curl"
+    exit 1
+fi
+CURL_VERSION=$("${CURL}" --version | head -n +1 | cut -d' ' -f2)
+
+QEMU_IMG=$(command -v qemu-img)
+if [ ! -x "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+    exit 1
+fi
+
+populate_cache
+
+case "${1}" in
+    --arch|-arch|-a)
+        shift
+        if [ -z "${1}" ]; then
+            echo "ERROR! You must specify an architecture."
+            echo " - Supported architectures: $(supported_archs)"
+            exit 1
+        fi
+        set_arch "${1}"
+        shift
+        ;;
+    --download|-download)
+        OPERATION="download"
+        shift
+        ;;
+    --create-config|-create-config)
+        OPERATION="config"
+        shift
+        create_config "${@}"
+        ;;
+    --open-homepage|-open-homepage)
+        shift
+        open_homepage "${1}"
+        ;;
+    --show|-show)
+        shift
+        if [ -z "${1}" ]; then
+            for OS in $(os_support); do
+                find_os_entry "${OS}"
+                show_os_info
+            done
+        else
+            find_os_entry "${1,,}"
+            show_os_info
+        fi
+        exit 0;;
+    --version|-version|-V)
+        echo "${QUICKGETC_VERSION}"
+        exit 0;;
+    --help|-help|--h|-h)
+        help_message
+        exit 0;;
+    --url|-url)
+        OPERATION="show"
+        shift
+        if [ -z "${1}" ]; then
+            for OS in $(os_support); do
+                (test_all "${OS}")
+            done
+            exit 0
+        elif [ -z "${2}" ]; then
+            test_all "${1}"
+            exit 0
+        fi;;
+    --list-csv|-list-csv|list|list_csv) list_csv;;
+    --list-json|-list-json|list_json) list_json;;
+    --list|-list) list_supported;;
+    -*) error_not_supported_argument;;
+esac
+
+if [ -n "${1}" ]; then
+    find_os_entry "${1,,}"
+else
+    error_specify_os
+fi
+
+if [ -n "${2}" ]; then
+    find_release_entries "${2}"
+    VM_PATH="${OS}-${RELEASE}"
+
+    if release_requires_edition; then
+        if [ -n "${3}" ]; then
+            find_edition_entry "${3}"
+            VM_PATH+="-${EDITION}"
+        else
+            error_specify_edition
+        fi
+    elif [ -n "${3}" ]; then
+        error_no_edition_required
+    else
+        find_edition_entry
+    fi
+
+    if [ -n "${ARCH}" ]; then
+        VM_PATH+="-${ARCH}"
+    fi
+
+    create_vm
+else
+    error_specify_release
+fi
+
+# vim:tabstop=4:shiftwidth=4:expandtab
