@@ -679,15 +679,16 @@ function releases_dragonflybsd() {
 }
 
 function releases_easyos() {
-    #local Y2023=""
-    #local Y2024=""
-    #Y2024=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2024/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
-    #Y2023=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/2023/ | grep "tr class" | tail -n +2 | cut -d'"' -f6 | cut -d'/' -f1 | sort -r)
-    #echo -n ${2024}
-    #echo ${Y2023}
-    # Not dynamic for now
-    echo 5.7 5.6.7 5.6.6 5.6.5 5.6.4 5.6.3 5.6.2 5.6.1
+    local ALL_RELEASES=""
+    local YEAR=""
+    # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
+    TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
+    for YEAR in ${TWO_YEARS} ; do
+        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / | sort -nr)"
+    done
+    echo ${ALL_RELEASES}
 }
+
 
 function releases_elementary() {
     echo 8.0 7.1 7.0
@@ -1766,12 +1767,14 @@ function get_easyos() {
     local ISO=""
     local YEAR=""
     ISO="easy-${RELEASE}-amd64.img"
-    case ${RELEASE} in
-        5.6.5|5.6.4|5.6.3|5.6.2|5.6.1) YEAR="2023";;
-        5.7|5.6.7|5.6.6)               YEAR="2024";;
-    esac
-    URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
-    HASH=$(web_pipe "${URL}/md5.sum.txt" | cut -d' ' -f1)
+    TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
+    for YEAR in ${TWO_YEARS} ; do
+        if web_check "https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}/" ; then
+            URL="https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/${RELEASE}"
+            HASH=$(web_pipe "${URL}/md5.sum.txt" | cut -d' ' -f1)
+            break
+        fi
+    done
     echo "${URL}/${ISO} ${HASH}"
 }
 
