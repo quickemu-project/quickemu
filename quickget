@@ -3216,7 +3216,7 @@ function download_windows_workstation() {
         return $?
     }
 
-    sku_id="$(echo "${language_skuid_table_json}" | jq -r '.Skus[] | select(.LocalizedLanguage=="'"${I18N}"'").Id')"
+    sku_id="$(echo "${language_skuid_table_json}" | jq -r '.Skus[] | select(.LocalizedLanguage=="'"${I18N}"'" or .Language=="'"${I18N}"'").Id')"
     echo "$sku_id"
 
     echo " - Getting ISO download link..."
