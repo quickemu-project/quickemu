@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: August 2, 2024
+date: December 30, 2024
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -473,6 +473,7 @@ Further information is available from the project
 - `linuxlite` (Linux Lite)
 - `linuxmint` (Linux Mint)
 - `lmde` (Linux Mint Debian Edition)
+- `maboxlinux` (Mabox Linux)
 - `mageia` (Mageia)
 - `manjaro` (Manjaro)
 - `mxlinux` (MX Linux)
@@ -490,6 +491,7 @@ Further information is available from the project
 - `popos` (Pop!\_OS)
 - `porteus` (Porteus)
 - `primtux` (PrimTux)
+- `proxmox-ve` (Proxmox VE)
 - `pureos` (PureOS)
 - `reactos` (ReactOS)
 - `rebornos` (RebornOS)
