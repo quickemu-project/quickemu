@@ -979,7 +979,8 @@ function releases_siduction() {
 
 function editions_siduction() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/Standing_on_the_Shoulders_of_Giants/" | grep folder | cut -d'"' -f8 | tr -d '/' | sort -u)
+    NAME=$(web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/" | grep folder | cut -d'"' -f8 | tr -d '/')
+    web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/${NAME}/" | grep folder | cut -d'"' -f8 | tr -d '/' | sort -u
 }
 
 function releases_slackware() {
@@ -2415,10 +2416,14 @@ function get_siduction() {
     local HASH=""
     local DATE=""
     local ISO=""
-    local URL="https://mirrors.dotsrc.org/siduction/iso/Standing_on_the_Shoulders_of_Giants/${EDITION}"
+    local NAME=""
+    local URL=""
+    NAME=$(web_pipe "https://mirror.math.princeton.edu/pub/siduction/iso/" | grep folder | cut -d'"' -f8 | tr -d '/')
+    URL="https://mirrors.dotsrc.org/siduction/iso/${NAME}/${EDITION}"
     DATE=$(web_pipe "${URL}"| grep .iso.md5 | cut -d'-' -f6 | cut -d'.' -f1)
     HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
-    ISO="siduction-2023.1.1-Standing_on_the_Shoulders_of_Giants-${EDITION}-amd64-${DATE}.iso"
+    VERSION=$(web_pipe "${URL}"| grep .iso.md5 | cut -d'-' -f2)
+    ISO="siduction-${VERSION}-${NAME}-${EDITION}-amd64-${DATE}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
 
