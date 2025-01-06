@@ -1,0 +1,24 @@
+# Template file for 'freebsd'
+OSNAME="freebsd"
+PRETTY="FreeBSD"
+BASEDOF="-"
+HOMEPAGE="https://www.freebsd.org"
+DESCRIPTION="Operating system used to power modern servers, desktops, and embedded platforms"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r)
+}
+
+function editions_() {
+    echo disc1 dvd1
+}
+
+function get_() {
+    local HASH=""
+    local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-${EDITION}.iso"
+    local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
+    HASH=$(web_pipe "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

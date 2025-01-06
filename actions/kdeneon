@@ -1,0 +1,20 @@
+# Template file for 'kdeneon'
+OSNAME="kdeneon"
+PRETTY="KDE Neon"
+BASEDOF="Debian Ubuntu"
+HOMEPAGE="https://neon.kde.org"
+DESCRIPTION="Latest and greatest of KDE community software packaged on a rock-solid base"
+CREDENTIALS="-"
+
+function releases_() {
+    echo user testing unstable developer
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://files.kde.org/neon/images/${RELEASE}/current"
+    ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

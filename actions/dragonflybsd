@@ -1,0 +1,22 @@
+# Template file for 'dragonflybsd'
+OSNAME="dragonflybsd"
+PRETTY="DragonFlyBSD"
+BASEDOF="FreeBSD"
+HOMEPAGE="https://www.dragonflybsd.org"
+DESCRIPTION="Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series"
+CREDENTIALS="-"
+
+function releases_() {
+    # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
+    # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
+}
+
+function get_() {
+    local HASH=""
+    local ISO="dfly-x86_64-${RELEASE}_REL.iso.bz2"
+    local URL="http://mirror-master.dragonflybsd.org/iso-images"
+    HASH=$(web_pipe "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

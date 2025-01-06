@@ -1,0 +1,19 @@
+# Template file for 'bunsenlabs'
+OSNAME="bunsenlabs"
+PRETTY="Bunsenlabs"
+BASEDOF="Debian"
+HOMEPAGE="https://www.bunsenlabs.org"
+DESCRIPTION="Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux"
+CREDENTIALS="-"
+
+function releases_() {
+    echo boron
+}
+
+function get_() {
+    local HASH=""
+    local ISO="boron-1-240123-amd64.hybrid.iso"
+    local URL="https://ddl.bunsenlabs.org/ddl"
+    HASH=$(web_pipe "${URL}/release.sha256.txt" | head -n 1 | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

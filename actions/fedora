@@ -1,0 +1,46 @@
+# Template file for 'fedora'
+OSNAME="fedora"
+PRETTY="Fedora"
+BASEDOF="-"
+HOMEPAGE="https://www.fedoraproject.org"
+DESCRIPTION="Innovative platform for hardware, clouds, and containers, built with love by you"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
+}
+
+function editions_() {
+    #shellcheck disable=SC2046,SC2005
+    if [[ -z ${RELEASE} ]]; then
+          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    else
+        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+    fi
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local JSON=""
+    local URL=""
+    local VARIANT=""
+    case ${EDITION} in
+        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+        *) VARIANT="Spins";;
+    esac
+    # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
+    # but we need to convert it back to a space for the URL search in the JSON
+    #shellcheck disable=SC2086
+    # if RELEASE contains an underscore, replace it with a space
+     if [[ "${RELEASE}" == *"_"* ]]; then
+        RELEASE="${RELEASE/_/ }"
+    fi
+
+    # shellcheck disable=SC2086
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
+    URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
+    HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
+    echo "${URL} ${HASH}"
+}

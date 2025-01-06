@@ -1,0 +1,23 @@
+# Template file for 'alma'
+OSNAME=alma
+PRETTY=AlmaLinux
+BASEDOF="Fedora RedHat"
+DESCRIPTION="Community distribution, focused on long-term stability, providing a robust production-grade platform. Binary compatible with RHEL®"
+HOMEPAGE="https://almalinux.org/"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 9 8
+}
+
+function editions_() {
+    echo boot minimal dvd
+}
+
+function get_() {
+    local HASH=""
+    local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
+    local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
+    HASH="$(web_pipe "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${ISO} ${HASH}"
+}

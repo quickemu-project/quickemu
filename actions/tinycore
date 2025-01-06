@@ -1,0 +1,27 @@
+# Template file for 'tinycore'
+OSNAME="tinycore"
+PRETTY="Tiny Core Linux"
+BASEDOF="-"
+HOMEPAGE="http://www.tinycorelinux.net"
+DESCRIPTION="Highly modular based system with community build extensions"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 15 14
+}
+
+function editions_() {
+    echo Core TinyCore CorePlus CorePure64 TinyCorePure64
+}
+
+function get_() {
+    local ARCH="x86"
+    local HASH=""
+    local ISO="${EDITION}-${RELEASE}.0.iso"
+    case "${EDITION}" in
+        *Pure*) ARCH+="_64";;
+    esac
+    local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

@@ -1,0 +1,28 @@
+# Template file for 'rockylinux'
+OSNAME="rockylinux"
+PRETTY="Rocky Linux"
+BASEDOF="RedHat"
+HOMEPAGE="https://rockylinux.org"
+DESCRIPTION="Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | sort -ru)
+}
+
+function editions_() {
+    echo minimal dvd boot
+}
+
+function get_() {
+    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]; then
+        EDITION="dvd1"
+    fi
+    local HASH=""
+    local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
+    local URL=""
+    URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
+    HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

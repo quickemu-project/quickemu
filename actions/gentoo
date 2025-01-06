@@ -1,0 +1,27 @@
+# Template file for 'gentoo'
+OSNAME="gentoo"
+PRETTY="Gentoo"
+BASEDOF="-"
+HOMEPAGE="https://www.gentoo.org"
+DESCRIPTION="Highly flexible, source-based Linux distribution"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo minimal livegui
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds"
+    case ${EDITION} in
+        minimal) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1);;
+        livegui) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep livegui | cut -d' ' -f1);;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

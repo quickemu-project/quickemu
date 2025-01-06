@@ -1,0 +1,24 @@
+# Template file for 'popos'
+OSNAME="popos"
+PRETTY="Pop!_OS"
+BASEDOF="Ubuntu"
+HOMEPAGE="https://pop.system76.com"
+DESCRIPTION="Operating system for STEM and creative professionals who use their computer as a tool to discover and create"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 22.04 20.04
+}
+
+function editions_() {
+    echo intel nvidia
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL=$(web_pipe "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .url)
+    HASH=$(web_pipe "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
+    echo "${URL} ${HASH}"
+}

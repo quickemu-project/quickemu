@@ -1,0 +1,20 @@
+# Template file for 'kali'
+OSNAME="kali"
+PRETTY="Kali Linux"
+BASEDOF="Debian"
+HOMEPAGE="https://www.kali.org"
+DESCRIPTION="The most advanced Penetration Testing Distribution"
+CREDENTIALS="-"
+
+function releases_() {
+    echo current kali-weekly
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://cdimage.kali.org/${RELEASE}"
+    ISO=$(web_pipe "${URL}/?C=M;O=D" | grep -o ">kali-linux-.*-installer-amd64.iso" | head -n 1 | cut -c 2-)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

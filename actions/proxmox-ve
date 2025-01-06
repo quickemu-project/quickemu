@@ -1,0 +1,22 @@
+# Template file for 'proxmox-ve'
+OSNAME="proxmox-ve"
+PRETTY="Proxmox VE"
+BASEDOF="Debian"
+HOMEPAGE="https://proxmox.com/en/proxmox-virtual-environment"
+DESCRIPTION="Proxmox Virtual Environment is a complete, open-source server management platform for enterprise virtualization"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe https://enterprise.proxmox.com/iso/ | grep proxmox-ve | grep -E -o '[0-9]+\.[0-9]+-[0-9]\.iso' | uniq | sort -ru | cut -d'.' -f 1-2)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    ISO="proxmox-ve_${RELEASE}.iso"
+    URL="https://enterprise.proxmox.com/iso"
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

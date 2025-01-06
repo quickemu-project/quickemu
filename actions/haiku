@@ -1,0 +1,22 @@
+# Template file for 'haiku'
+OSNAME="haiku"
+PRETTY="Haiku"
+BASEDOF="-"
+HOMEPAGE="https://www.haiku-os.org"
+DESCRIPTION="Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful"
+CREDENTIALS="-"
+
+function releases_() {
+    echo r1beta5 r1beta4 r1beta3
+}
+
+function editions_() {
+    echo x86_64 x86_gcc2h
+}
+
+function get_() {
+    local ISO="haiku-${RELEASE}-${EDITION}-anyboot.iso"
+    local URL="http://mirror.rit.edu/haiku/${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

@@ -1,0 +1,20 @@
+# Template file for 'truenas-core'
+OSNAME="truenas-core"
+PRETTY="TrueNAS Core"
+BASEDOF="FreeBSD"
+HOMEPAGE="https://www.truenas.com/truenas-core"
+DESCRIPTION="World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 13
+}
+
+function get_() {
+    local ISO=""
+    local URL=""
+    local DLINFO="https://www.truenas.com/download-truenas-core/"
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}".sha256 | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}

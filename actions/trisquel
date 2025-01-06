@@ -1,0 +1,29 @@
+# Template file for 'trisquel'
+OSNAME="trisquel"
+PRETTY="Trisquel"
+BASEDOF="Ubuntu"
+HOMEPAGE="https://trisquel.info"
+DESCRIPTION="Fully free operating system for home users, small enterprises and educational centers"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 11.0 10.0.1
+}
+
+function editions_() {
+    echo mate lxde kde sugar
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
+    case ${EDITION} in
+        mate) ISO="trisquel_${RELEASE}_amd64.iso";;
+        lxde) ISO="trisquel-mini_${RELEASE}_amd64.iso";;
+        kde) ISO="triskel_${RELEASE}_amd64.iso";;
+        sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

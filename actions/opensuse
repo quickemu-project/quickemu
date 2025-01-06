@@ -1,0 +1,36 @@
+# Template file for 'opensuse'
+OSNAME="opensuse"
+PRETTY="openSUSE"
+BASEDOF="-"
+HOMEPAGE="https://www.opensuse.org"
+DESCRIPTION="The makers choice for sysadmins, developers and desktop users"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.opensuse.org/distribution/leap/" | grep 'class="name"' | cut -d '/' -f2 | grep -v 42 | sort -r) aeon microos tumbleweed
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    if [ "${RELEASE}" == "tumbleweed" ]; then
+        ISO="openSUSE-Tumbleweed-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso"
+    elif [ "${RELEASE}" == "microos" ]; then
+        ISO="openSUSE-MicroOS-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/tumbleweed/iso"
+    elif [ "${RELEASE}" == "aeon" ]; then
+        ISO="opensuse-aeon.x86_64.iso"
+        URL="https://mirrorcache.opensuse.org/tumbleweed/appliances/iso"
+    elif [ "${RELEASE}" == 15.0 ] || [ "${RELEASE}" == 15.1 ]; then
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
+    else
+        ISO="openSUSE-Leap-${RELEASE}-DVD-x86_64-Current.iso"
+        URL="https://download.opensuse.org/distribution/leap/${RELEASE}/iso"
+    fi
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | awk '{if(NR==4) print $0}' | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

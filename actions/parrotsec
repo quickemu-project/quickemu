@@ -1,0 +1,26 @@
+# Template file for 'parrotsec'
+OSNAME="parrotsec"
+PRETTY="Parrot Security"
+BASEDOF="Debian"
+HOMEPAGE="https://www.parrotsec.org"
+DESCRIPTION="Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way"
+CREDENTIALS="parrot:parrot"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.parrot.sh/parrot/iso/" |  grep -o -E 'href="[[:digit:]]\.[[:digit:]]+' | sort -nr | head -n 3 | cut -d\" -f 2 )
+}
+
+function editions_() {
+    echo home htb security
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    ISO="Parrot-${EDITION}-${RELEASE}_amd64.iso"
+    URL="https://download.parrot.sh/parrot/iso/${RELEASE}"
+    HASH="$(web_pipe "${URL}/signed-hashes.txt" | grep "${ISO}" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}

@@ -1,0 +1,27 @@
+# Template file for 'dsl'
+OSNAME="dsl"
+PRETTY="Damn Small Linux"
+BASEDOF="Antix"
+HOMEPAGE="https://www.damnsmalllinux.org/"
+DESCRIPTION="Goal of DSL is to pack as much usable desktop distribution into an image small enough to fit on a single CD"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 2024.rc7
+}
+
+function editions_() {
+    echo lz4 cdrom
+}
+
+function get_() {
+    local ISO=""
+    local HASH=""
+    local URL="https://www.damnsmalllinux.org/download"
+    case "$EDITION" in
+      lz4) ISO="dsl-${RELEASE}.lz4.iso";;
+      cdrom) ISO="dsl-${RELEASE}.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

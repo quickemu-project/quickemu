@@ -1,0 +1,26 @@
+# Template file for 'artixlinux'
+OSNAME="artixlinux"
+PRETTY="Artix Linux"
+BASEDOF="Arch"
+HOMEPAGE="https://artixlinux.org"
+DESCRIPTION="The Art of Linux. Simple. Fast. Systemd-free"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n 1)
+}
+
+function editions_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.artixlinux.org/iso"
+    ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/sha256sums" | grep "${ISO}")
+    echo "${URL}/${ISO} ${HASH}"
+}

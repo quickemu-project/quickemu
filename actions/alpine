@@ -1,0 +1,29 @@
+# Template file for 'alpine'
+OSNAME=alpine
+PRETTY="Alpine Linux"
+BASEDOF="-"
+DESCRIPTION="Security-oriented, lightweight Linux distribution based on musl libc and busybox"
+HOMEPAGE="https://alpinelinux.org/"
+CREDENTIALS="-"
+
+function releases_() {
+    local REL=""
+    local RELS=""
+    RELS=$(web_pipe "https://dl-cdn.alpinelinux.org/alpine/" | grep '"v' | cut -d'"' -f2 | tr -d / | sort -Vr | head -n 10)
+    for REL in ${RELS}; do
+        if web_check "https://dl-cdn.alpinelinux.org/alpine/${REL}/releases/x86_64/"; then
+            echo -n "${REL} "
+        fi
+    done
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
+    local VERSION=""
+    VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
+    ISO="alpine-virt-${VERSION}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    echo "${URL}/${ISO} ${HASH}"
+}

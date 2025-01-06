@@ -1,0 +1,28 @@
+# Template file for 'ghostbsd'
+OSNAME="ghostbsd"
+PRETTY="GhostBSD"
+BASEDOF="FreeBSD"
+HOMEPAGE="https://www.ghostbsd.org"
+DESCRIPTION="Simple, elegant desktop BSD Operating System"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.ghostbsd.org/releases/amd64/" | grep "href" | cut -d'"' -f2 | cut -d'/' -f1 | sort -r | tail -n +3 | head -n 3)
+}
+
+function editions_() {
+    echo mate xfce
+}
+
+function get_() {
+    local ISO=""
+    local URL="https://download.ghostbsd.org/releases/amd64/${RELEASE}"
+    local HASH=""
+    case ${EDITION} in
+        mate) ISO="GhostBSD-${RELEASE}.iso";;
+        xfce) ISO="GhostBSD-${RELEASE}-XFCE.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

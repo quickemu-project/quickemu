@@ -1,0 +1,162 @@
+# Template file for 'ubuntu'
+case "${OS}" in
+	ubuntu)
+	  OSNAME="ubuntu"
+		PRETTY="Ubuntu"
+		BASEDOF="Debian"
+		HOMEPAGE="https://ubuntu.com"
+		DESCRIPTION="Complete desktop Linux operating system, freely available with both community and professional support"
+		CREDENTIALS="-";;
+	edubuntu)
+    # Template file for 'edubuntu'
+    OSNAME="edubuntu"
+    PRETTY="Edubuntu"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://www.edubuntu.org"
+    DESCRIPTION="Stable, secure and privacy concious option for schools"
+    CREDENTIALS="-";;
+	kubuntu)
+    # Template file for 'kubuntu'
+    OSNAME="kubuntu"
+    PRETTY="Kubuntu"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://kubuntu.org"
+    DESCRIPTION="Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share"
+    CREDENTIALS="-";;
+	lubuntu)
+    # Template file for 'lubuntu'
+    OSNAME="lubuntu"
+    PRETTY="Lubuntu"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://lubuntu.me"
+    DESCRIPTION="Complete Operating System that ships the essential apps and services for daily use: office applications, PDF reader,  image editor, music and video players, etc. Using lightwave lxde/lxqt"
+    CREDENTIALS="-";;
+  xubuntu)
+    # Template file for 'xubuntu'
+    OSNAME="xubuntu"
+    PRETTY="Xubuntu"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://xubuntu.org"
+    DESCRIPTION="Elegant and easy to use operating system. Xubuntu comes with Xfce, which is a stable, light and configurable desktop environment"
+    CREDENTIALS="-";;
+  ubuntu-budgie)
+    # Template file for 'ubuntu-budgie'
+    OSNAME="ubuntu-budgie"
+    PRETTY="Ubuntu Budgie"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntubudgie.org"
+    DESCRIPTION="Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core"
+    CREDENTIALS="-";;
+  ubuntu-cinnamon)
+    # Template file for 'ubuntu-cinnamon'
+    OSNAME="ubuntu-cinnamon"
+    PRETTY="Ubuntu Cinnamon"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntucinnamon.org"
+    DESCRIPTION="Community-driven, featuring Linux Mint’s Cinnamon Desktop with Ubuntu at the core, packed fast and full of features, here is the most traditionally modern desktop you will ever love"
+    CREDENTIALS="-";;
+	ubuntu-kylin)
+    # Template file for 'ubuntu-kylin'
+    OSNAME="ubuntu-kylin"
+    PRETTY="Ubuntu Kylin"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntukylin.com"
+    DESCRIPTION="Universal desktop operating system for personal computers, laptops, and embedded devices. It is dedicated to bringing a smarter user experience to users all over the world"
+    CREDENTIALS="-";;
+  ubuntu-mate)
+    # Template file for 'ubuntu-mate'
+    OSNAME="ubuntu-mate"
+    PRETTY="Ubuntu Mate"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntu-mate.org"
+    DESCRIPTION="Stable, easy-to-use operating system with a configurable desktop environment. It is ideal for those who want the most out of their computers and prefer a traditional desktop metaphor. Using Mate desktop"
+    CREDENTIALS="-";;
+  ubuntu-unity)
+    # Template file for 'ubuntu-unity'
+    OSNAME="ubuntu-unity"
+    PRETTY="Ubuntu Unity"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntuunity.org"
+    DESCRIPTION="Flavor of Ubuntu featuring the Unity7 desktop environment (the default desktop environment used by Ubuntu from 2010-2017)"
+    CREDENTIALS="-";;
+  ubuntustudio)
+    # Template file for 'ubuntustudio'
+    OSNAME="ubuntustudio"
+    PRETTY="UbuntuStudio"
+    BASEDOF="Ubuntu"
+    HOMEPAGE="https://ubuntustudio.org"
+    DESCRIPTION="Comes preinstalled with a selection of the most common free multimedia applications available, and is configured for best performance for various purposes: Audio, Graphics, Video, Photography and Publishing"
+    CREDENTIALS="-";;
+esac
+
+function releases_() {
+    local VERSION_DATA=""
+    local SUPPORTED_VERSIONS=()
+    VERSION_DATA="$(IFS=$'\n' web_pipe https://api.launchpad.net/devel/ubuntu/series | jq -r '.entries[]')"
+    # shellcheck disable=SC2207
+    SUPPORTED_VERSIONS=($(IFS=$'\n' jq -r 'select(.status=="Supported" or .status=="Current Stable Release") | .version' <<<"${VERSION_DATA}" | sort))
+    case "${OS}" in
+        ubuntu)
+            echo "${SUPPORTED_VERSIONS[@]}" daily-live;;
+        kubuntu|lubuntu|ubuntukylin|ubuntu-mate|ubuntustudio|xubuntu)
+            # after 16.04
+            echo "${SUPPORTED_VERSIONS[@]:1}" daily-live;;
+        ubuntu-budgie)
+            # after 18.04
+            echo "${SUPPORTED_VERSIONS[@]:2}" daily-live;;
+        edubuntu|ubuntu-unity|ubuntucinnamon)
+            # after 23.10
+            echo "${SUPPORTED_VERSIONS[@]:5}" daily-live;;
+    esac
+}
+
+function get_() {
+    local ISO=""
+    local HASH=""
+    local URL=""
+    local DATA=""
+
+    if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
+        # Ubuntu Studio daily-live images are in the dvd directory
+        RELEASE="dvd"
+    fi
+    if [[ "${RELEASE}" == "jammy-daily" ]]; then
+        if [[ "${OS}" == "ubuntustudio" ]]; then
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/dvd/current"
+        else
+            URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
+        fi
+        VM_PATH="${OS}-jammy-live"
+    elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+        VM_PATH="${OS}-${RELEASE}"
+    elif [ "${OS}" == "ubuntu" ]; then
+        URL="https://releases.ubuntu.com/${RELEASE}"
+    else
+        URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
+    fi
+    if web_check "${URL}/SHA256SUMS"; then
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
+        HASH=$(cut -d' ' -f1 <<<"${DATA}" | sed '1q;d')
+    else
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
+    fi
+    if [ -z "${ISO}" ] || [ -z "${HASH}" ]; then
+        echo "${PRETTY} ${RELEASE} is currently unavailable. Please select other OS/Release combination"
+        exit 1
+    fi
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
+    elif [[ "${RELEASE}" == "jammy-daily" ]]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-jammy-live.iso"
+        make_vm_config "${OS}-jammy-live.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
+}

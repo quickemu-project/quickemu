@@ -1,0 +1,21 @@
+# Template file for 'truenas-scale'
+OSNAME="truenas-scale"
+PRETTY="TrueNAS Scale"
+BASEDOF="Debian"
+HOMEPAGE="https://www.truenas.com/truenas-scale"
+DESCRIPTION="Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 24
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local DLINFO="https://www.truenas.com/download-truenas-scale/"
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}

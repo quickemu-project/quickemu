@@ -1,0 +1,23 @@
+# Template file for 'lmde'
+OSNAME="lmde"
+PRETTY="Linux Mint Debian Edition"
+BASEDOF="Debian"
+HOMEPAGE="https://www.linuxmint.com/download_lmde.php"
+DESCRIPTION="Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 6
+}
+
+function editions_() {
+    echo cinnamon
+}
+
+function get_() {
+    local HASH=""
+    local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
+    local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
+    HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

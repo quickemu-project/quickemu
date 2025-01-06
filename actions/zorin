@@ -1,0 +1,24 @@
+# Template file for 'zorin'
+OSNAME=zorin
+PRETTY="Zorin OS"
+BASEDOF="Ubuntu"
+DESCRIPTION="Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting"
+HOMEPAGE="https://zorin.com/os"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 17 16
+}
+
+function editions_() {
+    echo core64 lite64 education64
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    # Process the URL redirections; required for Zorin
+    URL=$(web_redirect "https://zrn.co/${RELEASE}${EDITION}")
+    echo "${URL} ${HASH}"
+}

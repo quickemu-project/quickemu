@@ -1,0 +1,21 @@
+# Template file for 'tails'
+OSNAME="tails"
+PRETTY="Tails"
+BASEDOF="Debian"
+HOMEPAGE="https://tails.net"
+DESCRIPTION="Portable operating system that protects against surveillance and censorship"
+CREDENTIALS="-"
+
+function releases_() {
+    echo stable
+}
+
+function get_() {
+    local JSON=""
+    local HASH=""
+    local URL=""
+    JSON="$(web_pipe "https://tails.boum.org/install/v2/Tails/amd64/${RELEASE}/latest.json")"
+    URL=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].url')
+    HASH=$(echo "${JSON}" | jq -r '.installations[0]."installation-paths"[]|select(.type=="iso")|."target-files"[0].sha256')
+    echo "${URL} ${HASH}"
+}

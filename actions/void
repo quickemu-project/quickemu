@@ -1,0 +1,31 @@
+# Template file for 'void'
+OSNAME="void"
+PRETTY="Void Linux"
+BASEDOF="-"
+HOMEPAGE="https://voidlinux.org"
+DESCRIPTION="General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources"
+CREDENTIALS="anon:voidlinux root:voidlinux"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
+}
+
+function editions_() {
+    echo glibc musl xfce-glibc xfce-musl
+}
+
+function get_() {
+    local DATE=""
+    local HASH=""
+    local ISO=""
+    local URL="https://repo-default.voidlinux.org/live"
+    case ${EDITION} in
+        glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
+        musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+        xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+    esac
+    HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${RELEASE}/${ISO} ${HASH}"
+}

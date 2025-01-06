@@ -1,0 +1,25 @@
+# Template file for 'oraclelinux'
+OSNAME="oraclelinux"
+PRETTY="Oracle Linux"
+BASEDOF="RedHar"
+HOMEPAGE="https://www.oracle.com/linux"
+DESCRIPTION="Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local VER_MAJ=${RELEASE::1}
+    local VER_MIN=${RELEASE:2:1}
+    local URL="https://yum.oracle.com/ISOS/OracleLinux/OL${VER_MAJ}/u${VER_MIN}/x86_64"
+    case ${VER_MAJ} in
+        7) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64-dvd.iso";;
+        *) ISO="OracleLinux-R${VER_MAJ}-U${VER_MIN}-x86_64-dvd.iso";;
+    esac
+    HASH=$(web_pipe "https://linux.oracle.com/security/gpg/checksum/OracleLinux-R${VER_MAJ}-U${VER_MIN}-Server-x86_64.checksum" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

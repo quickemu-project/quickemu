@@ -1,0 +1,20 @@
+# Template file for 'vxlinux'
+OSNAME="vxlinux"
+PRETTY="VX Linux"
+BASEDOF="Void"
+HOMEPAGE="https://vxlinux.org"
+DESCRIPTION="Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://github.com/VX-Linux/main/releases/latest" | grep -o -e 'releases/tag/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]' | sort -u | cut -d'/' -f 3)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="vx-${RELEASE}.iso"
+    local URL="https://github.com/VX-Linux/main/releases/download/${RELEASE}"
+    HASH=$(web_pipe "${URL}/vx-${RELEASE}.md5" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

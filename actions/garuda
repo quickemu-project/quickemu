@@ -1,0 +1,24 @@
+# Template file for 'garuda'
+OSNAME="garuda"
+PRETTY="Garuda Linux"
+BASEDOF="Arch"
+HOMEPAGE="https://garudalinux.org"
+DESCRIPTION="Feature rich and easy to use Linux distribution"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
+    ISO=${EDITION}/latest.iso
+    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}

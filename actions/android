@@ -1,0 +1,35 @@
+# Template file for 'android'
+OSNAME="android"
+PRETTY="Android x86"
+BASEDOF="-"
+DESCRIPTION="Port Android Open Source Project to x86 platform"
+HOMEPAGE="https://www.android-x86.org"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 9.0 8.1 7.1
+}
+
+function editions_() {
+    echo x86_64 x86
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local JSON_ALL=""
+    local JSON_REL=""
+    local URL="https://mirrors.gigenet.com/OSDN/android-x86"
+    JSON_ALL=$(web_pipe "https://www.fosshub.com/Android-x86-old.html" | grep "var settings =" | cut -d'=' -f2-)
+    JSON_REL=$(echo "${JSON_ALL}" | jq --arg ver "${OS}-${EDITION}-${RELEASE}" 'first(.pool.f[] | select((.n | startswith($ver)) and (.n | endswith(".iso"))))')
+    ISO=$(echo "${JSON_REL}" | jq -r .n)
+    HASH=$(echo "${JSON_REL}" | jq -r .hash.sha256)
+    # Traverse the directories to find the .iso location
+    for DIR in $(web_pipe "${URL}" | grep -o -E '[0-9]{5}' | sort -ur); do
+        if web_pipe "${URL}/${DIR}" | grep "${ISO}" &>/dev/null; then
+            URL="${URL}/${DIR}"
+            break
+        fi
+    done
+    echo "${URL}/${ISO} ${HASH}"
+}

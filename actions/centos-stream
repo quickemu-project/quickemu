@@ -1,0 +1,24 @@
+# Template file for 'centos-stream'
+OSNAME="centos-stream"
+PRETTY="CentOS Stream"
+BASEDOF="Fedora RedHat"
+HOMEPAGE="https://www.centos.org/centos-stream"
+DESCRIPTION="Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://linuxsoft.cern.ch/centos-stream/" | grep "\-stream" | cut -d'"' -f 6 | cut -d'-' -f 1)
+}
+
+function editions_() {
+    echo boot dvd1
+}
+
+function get_() {
+    local HASH=""
+    local ISO="CentOS-Stream-${RELEASE}-latest-x86_64-${EDITION}.iso"
+    local URL="https://linuxsoft.cern.ch/centos-stream/${RELEASE}-stream/BaseOS/x86_64/iso"
+    HASH=$(web_pipe "${URL}/${ISO}.SHA256SUM" | grep "SHA256 (${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

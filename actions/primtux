@@ -1,0 +1,25 @@
+# Template file for 'primtux'
+OSNAME="primtux"
+PRETTY="PrimTux"
+BASEDOF="Ubuntu"
+HOMEPAGE="https://primtux.fr"
+DESCRIPTION="Complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 7
+}
+
+function editions_() {
+    echo 2022-10
+}
+
+function get_() {
+    local HASH=""
+    local URL=""
+    local ISO=""
+    ISO="PrimTux${RELEASE}-amd64-${EDITION}.iso"
+    URL="https://sourceforge.net/projects/primtux/files/Distribution"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

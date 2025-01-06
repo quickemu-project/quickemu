@@ -1,0 +1,19 @@
+# Template file for 'maboxlinux'
+OSNAME="maboxlinux"
+PRETTY="Mabox Linux"
+BASEDOF="Manjaro"
+HOMEPAGE="https://maboxlinux.org"
+DESCRIPTION="Lightweight, functional and easy to customize Openbox desktop"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local URL=""
+    URL="https://sourceforge.net/projects/mabox-linux/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    echo "${URL} ${HASH}"
+}

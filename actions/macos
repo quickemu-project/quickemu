@@ -1,0 +1,140 @@
+# Template file for 'macos'
+OSNAME="macos"
+PRETTY="MacOS"
+BASEDOF="-"
+HOMEPAGE="https://www.apple.com/macos"
+DESCRIPTION="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance."
+CREDENTIALS="-"
+RELEASES="mojave catalina big-sur monterey ventura sonoma"
+
+function releases_() {
+    echo mojave catalina big-sur monterey ventura sonoma
+}
+
+function generate_id() {
+    local macRecoveryID=""
+    local TYPE="${1}"
+    local valid_chars=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
+    for ((i=0; i<TYPE; i++)); do
+        macRecoveryID+="${valid_chars[$((RANDOM % 16))]}"
+    done
+    echo "${macRecoveryID}"
+}
+
+function get_() {
+    local appleSession=""
+    local info=""
+    local downloadLink=""
+    local downloadSession=""
+    local chunkListLink=""
+    local chunkListSession=""
+    local BOARD_ID=""
+    local CWD=""
+    local CHECK=""
+    local CHUNKCHECK=""
+    local MLB="00000000000000000"
+    local OS_TYPE="default"
+
+    case ${RELEASE} in
+        lion|10.7)
+            BOARD_ID="Mac-2E6FAB96566FE58C"
+            MLB="00000000000F25Y00";;
+        mountainlion|10.8)
+            BOARD_ID="Mac-7DF2A3B5E5D671ED"
+            MLB="00000000000F65100";;
+        mavericks|10.9)
+            BOARD_ID="Mac-F60DEB81FF30ACF6"
+            MLB="00000000000FNN100";;
+        yosemite|10.10)
+            BOARD_ID="Mac-E43C1C25D4880AD6"
+            MLB="00000000000GDVW00";;
+        elcapitan|10.11)
+            BOARD_ID="Mac-FFE5EF870D7BA81A"
+            MLB="00000000000GQRX00";;
+        sierra|10.12)
+            BOARD_ID="Mac-77F17D7DA9285301"
+            MLB="00000000000J0DX00";;
+        high-sierra|10.13)
+            BOARD_ID="Mac-BE088AF8C5EB4FA2"
+            MLB="00000000000J80300";;
+        mojave|10.14)
+            BOARD_ID="Mac-7BA5B2DFE22DDD8C"
+            MLB="00000000000KXPG00";;
+        catalina|10.15)
+            BOARD_ID="Mac-00BE6ED71E35EB86";;
+        big-sur|11)
+            BOARD_ID="Mac-42FD25EABCABB274";;
+        monterey|12)
+            BOARD_ID="Mac-E43C1C25D4880AD6";;
+        ventura|13)
+            BOARD_ID="Mac-BE088AF8C5EB4FA2";;
+        sonoma|14)
+            BOARD_ID="Mac-53FDB3D8DB8CA971";;
+        *) echo "ERROR! Unknown release: ${RELEASE}"
+           releases_macos
+           exit 1;;
+    esac
+
+    CWD="$(dirname "${0}")"
+    if [ -x "${CWD}/chunkcheck" ]; then
+        CHUNKCHECK="${CWD}/chunkcheck"
+    elif [ -x "$(command -v chunkcheck)" ]; then
+        CHUNKCHECK="$(command -v chunkcheck)"
+    fi
+
+    appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
+    info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
+                           -H "Connection: close" \
+                           -A "InternetRecovery/1.0" \
+                           -b "session=\"${appleSession}\"" \
+                           -H "Content-Type: text/plain" \
+                           -d $'cid='"$(generate_id 16)"$'\nsn='${MLB}$'\nbid='${BOARD_ID}$'\nk='"$(generate_id 64)"$'\nfg='"$(generate_id 64)"$'\nos='${OS_TYPE} \
+                           https://osrecovery.apple.com/InstallationPayload/RecoveryImage | tr ' ' '\n')
+    downloadLink=$(echo "$info" | grep 'oscdn' | grep 'dmg')
+    downloadSession=$(echo "$info" | grep 'expires' | grep 'dmg')
+    chunkListLink=$(echo "$info" | grep 'oscdn' | grep 'chunklist')
+    chunkListSession=$(echo "$info" | grep 'expires' | grep 'chunklist')
+
+    if [ "${OPERATION}" == "show" ]; then
+        test_result "${OS}" "${RELEASE}" "" "${downloadLink}" | tee -a "public/tmp_${OS}"
+        exit 0
+    elif [ "${OPERATION}" == "test" ]; then
+        CHECK=$(web_check "${downloadLink}" --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}" && echo "PASS" || echo "FAIL")
+        test_result "${OS}" "${RELEASE}" "" "${downloadLink}" "${CHECK}" | tee -a "public/tmp_${OS}"
+        exit 0
+    elif [ "${OPERATION}" == "download" ]; then
+        echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+        echo " - URL: ${downloadLink}"
+        web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+        web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+        VM_PATH="$(pwd)"
+    else
+        if [ ! -e "${VM_PATH}/RecoveryImage.chunklist" ]; then
+            echo "Downloading macOS (${RELEASE^}) RecoveryImage"
+            echo " - URL: ${downloadLink}"
+            web_get "${downloadLink}" "${VM_PATH}" RecoveryImage.dmg --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${downloadSession}"
+            web_get "${chunkListLink}" "${VM_PATH}" RecoveryImage.chunklist --header "Host: oscdn.apple.com" --header "Connection: close" --header "User-Agent: InternetRecovery/1.0" --header "Cookie: AssetToken=${chunkListSession}"
+            if ! "${CHUNKCHECK}" "${VM_PATH}" 2> /dev/null; then
+                echo " - WARNING! Verification failed, continuing anyway"
+            else
+                echo " - Verification passed"
+            fi
+
+            if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+                echo " - Converting RecoveryImage.dmg"
+                ${QEMU_IMG} convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
+            fi
+            rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
+            echo " - RecoveryImage.img is ready."
+        fi
+        echo "Downloading OpenCore & UEFI firmware"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+        if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
+            web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
+        fi
+    fi
+    make_vm_config RecoveryImage.img
+}

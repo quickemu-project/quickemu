@@ -1,0 +1,26 @@
+# Template file for 'devuan'
+OSNAME="devuan"
+PRETTY="Devuan"
+BASEDOF="Debian"
+HOMEPAGE="https://www.devuan.org"
+DESCRIPTION="Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom"
+CREDENTIALS="-"
+
+function releases_() {
+    echo daedalus chimaera beowulf
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://files.devuan.org/devuan_${RELEASE}/desktop-live"
+    local VER=""
+    case ${RELEASE} in
+        beowulf)  VER="3.1.1";;
+        chimaera) VER="4.0.3";;
+        daedalus) VER="5.0.0";;
+    esac
+    ISO="devuan_${RELEASE}_${VER}_amd64_desktop-live.iso"
+    HASH=$(web_pipe "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

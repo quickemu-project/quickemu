@@ -1,0 +1,18 @@
+# Template file for 'reactos'
+OSNAME="reactos"
+PRETTY="ReactOS"
+BASEDOF="-"
+HOMEPAGE="https://reactos.org"
+DESCRIPTION="Imagine running your favorite Windows applications and drivers in an open-source environment you can trust"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local URL=""
+    URL="$(web_redirect "https://sourceforge.net/projects/reactos/files/latest/download")"
+    echo "${URL} ${HASH}"
+}

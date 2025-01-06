@@ -1,0 +1,35 @@
+# Template file for 'nixos'
+OSNAME="nixos"
+PRETTY="NixOS"
+BASEDOF="-"
+HOMEPAGE="https://nixos.org"
+DESCRIPTION="Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration"
+CREDENTIALS="-"
+
+function releases_() {
+    # Lists unstable plus the two most recent releases
+    #shellcheck disable=SC2046
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
+}
+
+function editions_() {
+    echo minimal plasma gnome
+}
+
+function get_() {
+    local HASH=""
+    # Adapt the plasma edition according to the NixOS release
+    case "${EDITION}" in
+        plasma)
+            if [ "${RELEASE}" == "23.11" ]; then
+                EDITION+="5"
+            else
+                EDITION+="6"
+            fi
+            ;;
+    esac
+    local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
+    local URL="https://channels.nixos.org/nixos-${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

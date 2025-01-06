@@ -1,0 +1,20 @@
+# Template file for 'openbsd'
+OSNAME="openbsd"
+PRETTY="OpenBSD"
+BASEDOF="-"
+HOMEPAGE="https://www.openbsd.org"
+DESCRIPTION="Free, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="install${RELEASE//\./}.iso"
+    local URL="https://mirror.leaseweb.com/pub/OpenBSD/${RELEASE}/amd64"
+    HASH=$(web_pipe "${URL}/SHA256" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

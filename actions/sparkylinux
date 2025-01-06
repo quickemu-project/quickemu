@@ -1,0 +1,35 @@
+# Template file for 'sparkylinux'
+OSNAME="sparkylinux"
+PRETTY="SparkyLinux"
+BASEDOF="Debian"
+HOMEPAGE="https://sparkylinux.org"
+DESCRIPTION="Fast, lightweight and fully customizable operating system which offers several versions for different use cases"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://sparkylinux.org/download/stable/" |  grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f2 | sort -ru)
+}
+
+function editions_() {
+    #shellcheck disable=SC2046,SC2005
+    if [ -z "${RELEASE}" ]; then
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    else
+        echo $(web_pipe "https://sparkylinux.org/download/stable/" | grep -E -o "sparkylinux-${RELEASE}-.*\.iso\"" | cut -d'-' -f4 | cut -d'.' -f1 | sort -u)
+    fi
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    ISO="sparkylinux-${RELEASE}-x86_64-${EDITION}.iso"
+    case ${EDITION} in
+        minimalcli) URL="https://sourceforge.net/projects/sparkylinux/files/cli";;
+        minimalgui) URL="https://sourceforge.net/projects/sparkylinux/files/base";;
+        *) URL="https://sourceforge.net/projects/sparkylinux/files/${EDITION}";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.allsums.txt" | head -n 2 | grep 'iso' | cut -d' ' -f1)
+    echo "${URL}/${ISO}" "${HASH}"
+}

@@ -1,0 +1,27 @@
+# Template file for 'bazzite'
+OSNAME="bazzite"
+PRETTY="bazzite"
+BASEDOF="Fedora SteamOS"
+HOMEPAGE="https://bazzite.gg"
+DESCRIPTION="Container native gaming and a ready-to-game SteamOS like"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo gnome kde
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://download.bazzite.gg"
+    case ${EDITION} in
+        gnome) ISO="bazzite-gnome-stable.iso";;
+        kde)  ISO="bazzite-stable.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

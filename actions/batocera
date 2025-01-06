@@ -1,0 +1,20 @@
+# Template file for 'batocera'
+OSNAME="batocera"
+PRETTY="Batocera"
+BASEDOF="-"
+HOMEPAGE="https://batocera.org"
+DESCRIPTION="Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail -n +2 | head -n 5)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
+    ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
+    echo "${URL}/${ISO} ${HASH}"
+}

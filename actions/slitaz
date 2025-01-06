@@ -1,0 +1,20 @@
+# Template file for 'slitaz'
+OSNAME="slitaz"
+PRETTY="SliTaz"
+BASEDOF="-"
+HOMEPAGE="https://www.slitaz.org"
+DESCRIPTION="Simple, fast and low resource Linux OS for servers & desktops"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.slitaz.org/iso/rolling/" | grep "class='iso'" | cut -d"'" -f4 | cut -d'-' -f3- | grep iso | cut -d'.' -f1 | sort -u)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="slitaz-rolling-${RELEASE}"
+    local URL="http://mirror.slitaz.org/iso/rolling"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
+    echo "${URL}/${ISO}.iso ${HASH}"
+}

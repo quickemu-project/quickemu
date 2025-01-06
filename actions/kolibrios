@@ -1,0 +1,22 @@
+# Template file for 'kolibrios'
+OSNAME="kolibrios"
+PRETTY="KolibriOS"
+BASEDOF="-"
+HOMEPAGE="http://kolibrios.org"
+DESCRIPTION="Tiny yet incredibly powerful and fast operating system"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo en_US ru_RU it_IT es_ES
+}
+
+function get_() {
+    local HASH=""
+    local ISO="latest-iso.7z"
+    local URL="http://builds.kolibrios.org/${EDITION}"
+    echo "${URL}/${ISO} ${HASH}"
+}

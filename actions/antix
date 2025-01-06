@@ -1,0 +1,34 @@
+# Template file for 'antix'
+OSNAME="antix"
+PRETTY="Antix"
+BASEDOF="Debian"
+DESCRIPTION="Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems"
+HOMEPAGE="https://antixlinux.com"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 23.1 23 22 21
+}
+
+function editions_() {
+    echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+}
+
+function get_() {
+    # antiX uses a different URL and ISO naming for runit editions
+    if [[ "${EDITION}" == *"runit"* ]];then
+        ISO+="-runit"
+        README="README2"
+        case ${RELEASE} in
+            21) URL+="/runit-bullseye";;
+            *)  URL+="/runit-antiX-${RELEASE}";;
+        esac
+    fi
+    case ${EDITION} in
+        base-*) ISO+="_x64-base.iso";;
+        core-*) ISO+="_x64-core.iso";;
+        full-*) ISO+="_x64-full.iso";;
+        net-*)  ISO+="-net_x64-net.iso";;
+    esac
+    echo "${URL}/${ISO} ${HASH}"
+}

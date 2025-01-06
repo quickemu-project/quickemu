@@ -1,0 +1,23 @@
+# Template file for 'spirallinux'
+OSNAME="spirallinux"
+PRETTY="Spiral Linux"
+BASEDOF="Debian"
+HOMEPAGE="https://spirallinux.github.io"
+DESCRIPTION="Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+}
+
+function get_() {
+    local HASH=""
+    local ISO="SpiralLinux_${EDITION}_12.231005_x86-64.iso"
+    local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
+    HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
+    echo "${URL}/${ISO}" "${HASH}"
+}

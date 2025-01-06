@@ -1,0 +1,37 @@
+# Template file for 'peppermint'
+OSNAME="peppermint"
+PRETTY="PeppermintOS"
+BASEDOF="Devuan"
+HOMEPAGE="https://peppermintos.com"
+DESCRIPTION="Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box"
+CREDENTIALS="-"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo devuan-xfce devuan-gnome debian-xfce debian-gnome
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/peppermintos/files/isos"
+    case ${EDITION} in
+        devuan-xfce)
+            ISO="PeppermintOS-devuan_64_xfce.iso"
+            URL="${URL}/XFCE";;
+        debian-xfce)
+            ISO="PeppermintOS-Debian-64.iso"
+            URL="${URL}/XFCE";;
+        devuan-gnome)
+            ISO="PeppermintOS-devuan_64_gfb.iso"
+            URL="${URL}/Gnome_FlashBack";;
+        debian-gnome)
+            ISO="PeppermintOS-Debian_64_gfb.iso"
+            URL="${URL}/Gnome_FlashBack";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}-sha512.checksum" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

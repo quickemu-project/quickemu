@@ -1,0 +1,19 @@
+# Template file for 'blendos'
+OSNAME="blendos"
+PRETTY="BlendOS"
+BASEDOF="Arch"
+HOMEPAGE="https://blendos.co"
+DESCRIPTION="A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android"
+CREDENTIALS="-"
+
+function releases_() {
+    # there is now just a single latest iso
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local ISO="blendOS.iso"
+    local URL="https://kc1.mirrors.199693.xyz/blend/isos/testing"
+    echo "${URL}/${ISO} ${HASH}"
+}

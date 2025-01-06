@@ -1,0 +1,20 @@
+# Template file for 'athenaos'
+OSNAME="athenaos"
+PRETTY="Athena OS"
+BASEDOF="Arch"
+HOMEPAGE="https://athenaos.org"
+DESCRIPTION="Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/Athena-OS/athena/releases" | grep 'download_url' | grep rolling | cut -d'/' -f8 | sort -u)
+}
+
+function get_() {
+    local HASH=""
+    local URL="https://github.com/Athena-OS/athena/releases/download/${RELEASE}"
+    local ISO="athena-rolling-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

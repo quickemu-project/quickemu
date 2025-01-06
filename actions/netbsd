@@ -1,0 +1,21 @@
+# Template file for 'netbsd'
+OSNAME="netbsd"
+PRETTY="NetBSD"
+BASEDOF="-"
+HOMEPAGE="https://www.netbsd.org"
+DESCRIPTION="Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices"
+CREDENTIALS="-"
+
+function releases_() {
+    # V8 is EOL so filter it out
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://cdn.netbsd.org/pub/NetBSD/iso/" | grep -o -E '"[[:digit:]]+\.[[:digit:]]+/"' | tr -d '"/' | grep -v ^8 | sort -nr | head -n 4)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="NetBSD-${RELEASE}-amd64.iso"
+    local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images"
+    HASH=$(web_pipe "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}

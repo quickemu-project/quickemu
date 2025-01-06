@@ -1,0 +1,20 @@
+# Template file for 'slackware'
+OSNAME="slackware"
+PRETTY="slackware"
+BASEDOF="-"
+HOMEPAGE="http://www.slackware.com"
+DESCRIPTION="Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -n 5)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="slackware64-${RELEASE}-install-dvd.iso"
+    local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

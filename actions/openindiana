@@ -1,0 +1,26 @@
+# Template file for 'openindiana'
+OSNAME="openindiana"
+PRETTY="OpenIndiana"
+BASEDOF="Solaris OPenSolaris"
+HOMEPAGE="https://www.openindiana.org"
+DESCRIPTION="Community supported illumos-based operating system"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
+}
+
+function editions_() {
+    echo gui text minimal
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="https://dlc.openindiana.org/isos/hipster/${RELEASE}"
+    ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

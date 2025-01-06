@@ -1,0 +1,21 @@
+# Template file for 'slint'
+OSNAME="slint"
+PRETTY="Slint"
+BASEDOF="Slackware"
+HOMEPAGE="https://slint.fr"
+DESCRIPTION="Easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix"
+CREDENTIALS="-"
+
+function releases_() {
+    echo "15.0-5"
+}
+
+function get_() {
+    local HASH=""
+    local MAJ_VER=""
+    local ISO="slint64-${RELEASE}.iso"
+    MAJ_VER="$(echo "${RELEASE}" | cut -d'-' -f 1)"
+    local URL="https://slackware.uk/slint/x86_64/slint-${MAJ_VER}/iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f4)
+    echo "${URL}/${ISO}" "${HASH}"
+}

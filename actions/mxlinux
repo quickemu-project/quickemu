@@ -1,0 +1,29 @@
+# Template file for 'mxlinux'
+OSNAME="mxlinux"
+PRETTY="MX Linux"
+BASEDOF="Debian Antix"
+HOMEPAGE="https://mxlinux.org"
+DESCRIPTION="Designed to combine elegant and efficient desktops with high stability and solid performance"
+CREDENTIALS="-"
+
+function releases_() {
+    # needs header, so not web_pipe:
+    curl -Ils "https://sourceforge.net/projects/mx-linux/files/latest/download" | grep -i 'location:' | cut -d? -f1 | cut -d_ -f1 | cut -d- -f3
+}
+
+function editions_() {
+    echo Xfce KDE Fluxbox
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
+    case ${EDITION} in
+        Xfce) ISO="MX-${RELEASE}_x64.iso";;
+        KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
+        Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

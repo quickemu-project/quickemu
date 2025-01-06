@@ -1,0 +1,25 @@
+# Template file for 'chimeralinux'
+OSNAME="chimeralinux"
+PRETTY="Chimera Linux"
+BASEDOF="-"
+HOMEPAGE="https://chimera-linux.org"
+DESCRIPTION="Modern, general-purpose non-GNU Linux distribution"
+CREDENTIALS="anon:chimera root:chimera"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo base gnome
+}
+
+function get_() {
+    local DATE=""
+    local HASH=""
+    local URL="https://repo.chimera-linux.org/live/${RELEASE}"
+    DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
+    local ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

@@ -1,0 +1,28 @@
+# Template file for 'gnomeos'
+OSNAME="gnomeos"
+PRETTY="GNOME OS"
+BASEDOF="-"
+HOMEPAGE="https://os.gnome.org"
+DESCRIPTION="Alpha nightly bleeding edge distro of GNOME"
+CREDENTIALS="-"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep "title=" | awk -F'"' '{print $4}' | tr -d '/' | sort -nr)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="gnome_os_installer_${RELEASE}.iso"
+    local URL="https://download.gnome.org/gnomeos/${RELEASE}"
+    case ${RELEASE} in
+        nightly)
+            ISO="gnome_os_installer.iso"
+            URL="https://os.gnome.org/download/latest";;
+        46.0) ISO="gnome_os_installer_46.iso";;
+        3*) ISO="gnome_os_installer.iso";;
+    esac
+    # Process the URL redirections; required for GNOME
+    ISO=$(web_redirect "${URL}/${ISO}")
+    echo "${ISO} ${HASH}"
+}

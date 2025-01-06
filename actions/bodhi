@@ -1,0 +1,27 @@
+# Template file for 'bodhi'
+OSNAME="bodhi"
+PRETTY="Bodhi Linux"
+BASEDOF="Debian Ubuntu"
+HOMEPAGE="https://www.bodhilinux.com"
+DESCRIPTION="Lightweight distribution featuring the fast & fully customizable Moksha Desktop"
+CREDENTIALS="-"
+
+function releases_() {
+    echo 7.0.0
+}
+
+function editions_() {
+    echo standard hwe s76 apppack
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/bodhilinux/files/${RELEASE}"
+    case ${EDITION} in
+        standard) ISO="bodhi-${RELEASE}-64.iso";;
+        *) ISO="bodhi-${RELEASE}-64-${EDITION}.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}

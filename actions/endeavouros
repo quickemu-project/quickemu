@@ -1,0 +1,25 @@
+# Template file for 'endeavouros'
+OSNAME="endeavouros"
+PRETTY="EndeavourOS"
+BASEDOF="Arch"
+HOMEPAGE="https://endeavouros.com"
+DESCRIPTION="Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems"
+CREDENTIALS="-"
+
+function releases_() {
+    local ENDEAVOUR_RELEASES=""
+    ENDEAVOUR_RELEASES="$(web_pipe "https://mirror.alpix.eu/endeavouros/iso/" | grep -o '<a href="[^"]*.iso">' | sed 's/^<a href="//;s/.iso">.*//' | grep -v 'x86_64' | LC_ALL="en_US.UTF-8" sort -Mr | cut -c 13- | head -n 5 | tr '\n' ' ')"
+    echo "${ENDEAVOUR_RELEASES,,}"
+}
+
+function get_() {
+    local ENDEAVOUR_RELEASES=""
+    local HASH=""
+    local ISO=""
+    local URL="https://mirror.alpix.eu/endeavouros/iso"
+    # Find EndeavourOS releases from mirror, pick one matching release
+    ENDEAVOUR_RELEASES="$(web_pipe "${URL}/" | grep -o '<a href="[^"]*.iso">' | sed 's/^<a href="//;s/.iso">.*//' | grep -v 'x86_64')"
+    ISO="$(echo "${ENDEAVOUR_RELEASES}" | grep -i "${RELEASE}").iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha512sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
