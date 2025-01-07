@@ -1,0 +1,19 @@
+# Template file for ''
+OSNAME=""
+PRETTY=""
+BASEDOF=""
+HOMEPAGE=""
+DESCRIPTION=""
+CREDENTIALS="-"
+
+function releases_() {
+
+}
+
+function editions_() {
+
+}
+
+function get_() {
+
+}

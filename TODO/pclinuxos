@@ -1,0 +1,18 @@
+# Template file for 'pclinuxos'
+OSNAME="pclinuxos"
+PRETTY="PCLinuxOS"
+ORIGIN="Independent"
+HOMEPAGE="https://www.pclinuxos.com"
+DESCRIPTION="Free easy to use Linux-based Operating System for x86_64 desktops or laptops"
+CREDENTIALS="-"
+
+function releases_() {
+    echo kde-minimal kde mate xfce
+}
+
+function get_() {
+    ISO="pclinuxos64-kde-2024.10.iso"
+	URL="https://ftp.nluug.nl/os/Linux/distr/pclinuxos/pclinuxos/iso"
+	HASH=""
+	
+}

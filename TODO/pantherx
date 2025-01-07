@@ -1,0 +1,23 @@
+# Template file for 'pantherx'
+OSNAME="pantherx"
+PRETTY="PantherX"
+BASEDOF="guix"
+HOMEPAGE="https://www.pantherx.org"
+DESCRIPTION="PantherX is designed to enable everyone without a PHD in computer science to enjoy a fast, flexible and private work & entertainment platform that runs for years, with little intervention"
+CREDENTIALS="-"
+
+function releases_() {
+	latest
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local TEMP=""
+    URL="https://temp.pantherx.org"
+    TEMP="$(web_pipe "https://wiki.pantherx.org/" | grep --after-context 1 'iso')"
+    ISO="$(basename $(echo ${TEMP} | cut -d'"' -f2))"
+    HASH="$(echo "${TEMP}" | tail -1 | cut -d'>' -f3 | cut -d'<' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}

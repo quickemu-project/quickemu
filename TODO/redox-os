@@ -1,0 +1,26 @@
+# Template file for 'redox-os'
+OSNAME="redox-os"
+PRETTY="Redox OS"
+BASEDOF="-"
+HOMEPAGE="https://www.redox-os.org"
+DESCRIPTION="Microkernel-based operating system, with a large number of supported programs and components, to create a full-featured user and application environment"
+CREDENTIALS="-"
+
+function releases_() {
+    echo livedisk harddrive
+}
+
+function editions_() {
+    echo demo desktop server
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://static.redox-os.org/img/x86_64"
+    local DATA
+    DATA="$(curl -s "${URL}/SHA256SUM" | grep ".iso" | grep "${EDITION}" | grep "${RELEASE}")"
+    ISO="$(echo "${DATA}" | cut -d '*' -f2)"
+    HASH="$(echo "${DATA}" | cut_1)"
+    echo "${URL}/${ISO} ${HASH}"
+}

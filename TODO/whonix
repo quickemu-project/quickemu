@@ -1,0 +1,19 @@
+# Template file for 'whonix'
+OSNAME="whonix"
+PRETTY="Whonix"
+ORIGIN="Debian"
+HOMEPAGE="https://www.whonix.org"
+DESCRIPTION="Superior Internet Privacy with Whonix™ As handy as an app - delivering maximum anonymity and security"
+CREDENTIALS="-"
+
+function releases_() {
+
+}
+
+function editions_() {
+
+}
+
+function get_() {
+
+}
