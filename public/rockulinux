@@ -1,0 +1,9 @@
+# Template file for 'rockulinux'
+OSNAME="rockylinux"
+PRETTY="Rocky Linux"
+BASEDOF="RedHat"
+DESCRIPTION="Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux"
+HOMEPAGE="https://rockylinux.org"
+CREDENTIALS="-"
+RELEASES="9.5 9.4 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 8.3"
+EDITIONS="minimal dvd boot"

@@ -1,0 +1,9 @@
+# Template file for 'manjaro'
+OSNAME="manjaro"
+PRETTY="Manjaro"
+BASEDOF="Arch"
+DESCRIPTION="Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware"
+HOMEPAGE="https://manjaro.org"
+CREDENTIALS="-"
+RELEASES="xfce sway plasma i3 gnome cinnamon"
+EDITIONS="minimal full"

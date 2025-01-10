@@ -1,0 +1,9 @@
+# Template file for 'artixlinux'
+OSNAME="artixlinux"
+PRETTY="Artix Linux"
+BASEDOF="Arch"
+DESCRIPTION="The Art of Linux. Simple. Fast. Systemd-free"
+HOMEPAGE="https://artixlinux.org"
+CREDENTIALS="-"
+RELEASES="20240823"
+EDITIONS="xfce-s6 xfce-runit xfce-openrc xfce-dinit plasma-s6 plasma-runit plasma-openrc plasma-dinit mate-s6 mate-runit mate-openrc mate-dinit lxqt-s6 lxqt-runit lxqt-openrc lxqt-dinit lxde-s6 lxde-runit lxde-openrc lxde-dinit community-qt community-gtk cinnamon-s6 cinnamon-runit cinnamon-openrc cinnamon-dinit base-s6 base-runit base-openrc base-dinit"

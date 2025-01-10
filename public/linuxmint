@@ -1,0 +1,9 @@
+# Template file for 'linuxmint'
+OSNAME="linuxmint"
+PRETTY="Linux Mint"
+BASEDOF="Ubuntu"
+DESCRIPTION="Designed to work out of the box and comes fully equipped with the apps most people need"
+HOMEPAGE="https://linuxmint.com"
+CREDENTIALS="-"
+RELEASES="22 21.3 21.2 21.1 21 20.3 20.2"
+EDITIONS="xfce mate cinnamon"

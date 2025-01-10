@@ -1,0 +1,8 @@
+archlinux latest net-sysv
+archlinux latest core-sysv
+archlinux latest base-sysv
+archlinux latest full-sysv
+archlinux latest net-runit
+archlinux latest core-runit
+archlinux latest base-runit
+archlinux latest full-runit

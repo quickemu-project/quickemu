@@ -1,0 +1,9 @@
+# Template file for 'rebornos'
+OSNAME="rebornos"
+PRETTY="RebornOS"
+BASEDOF="Arch"
+DESCRIPTION="Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal"
+HOMEPAGE="https://rebornos.org"
+CREDENTIALS="-"
+RELEASES="latest"
+

@@ -1,0 +1,9 @@
+# Template file for 'easyos'
+OSNAME="easyos"
+PRETTY="EasyOS"
+BASEDOF="-"
+DESCRIPTION="Experimental distribution designed from scratch to support containers"
+HOMEPAGE="https://easyos.org"
+CREDENTIALS="-"
+RELEASES="5.8.5"
+

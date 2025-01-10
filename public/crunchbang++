@@ -1,0 +1,9 @@
+# Template file for 'crunchbang++'
+OSNAME="crunchbang++"
+PRETTY="Crunchbangplusplus"
+BASEDOF="Debian"
+DESCRIPTION="The classic minimal crunchbang feel, now with debian 12 bookworm"
+HOMEPAGE="https://www.crunchbangplusplus.org"
+CREDENTIALS="-"
+RELEASES="9.0 12.0 11.2 10.1"
+

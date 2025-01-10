@@ -1,0 +1,9 @@
+# Template file for 'bodhi'
+OSNAME="bodhi"
+PRETTY="Bodhi Linux"
+BASEDOF="Debian Ubuntu"
+DESCRIPTION="Lightweight distribution featuring the fast & fully customizable Moksha Desktop"
+HOMEPAGE="https://www.bodhilinux.com"
+CREDENTIALS="-"
+RELEASES="7.0.0"
+EDITIONS="standard s76 hwe apppack"

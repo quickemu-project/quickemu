@@ -1,0 +1,9 @@
+# Template file for 'slax'
+OSNAME="slax"
+PRETTY="Slax"
+BASEDOF="Debian Slackware"
+DESCRIPTION="Compact, fast, and modern Linux operating system that combines sleek design with modular approach. With the ability to run directly from a USB flash drive without the need for installation, Slax is truly portable and fits easily in your pocket"
+HOMEPAGE="https://www.slax.org"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="slackware debian"

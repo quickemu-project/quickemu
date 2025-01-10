@@ -1,0 +1,9 @@
+# Template file for 'guix'
+OSNAME="guix"
+PRETTY="Guix"
+BASEDOF="-"
+DESCRIPTION="Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users"
+HOMEPAGE="https://guix.gnu.org"
+CREDENTIALS="-"
+RELEASES="1.4.0 1.3.0"
+

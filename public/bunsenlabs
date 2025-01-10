@@ -1,0 +1,9 @@
+# Template file for 'bunsenlabs'
+OSNAME="bunsenlabs"
+PRETTY="Bunsenlabs"
+BASEDOF="Debian"
+DESCRIPTION="Light-weight and easily customizable Openbox desktop. The project is a community continuation of CrunchBang Linux"
+HOMEPAGE="https://www.bunsenlabs.org"
+CREDENTIALS="-"
+RELEASES="boron"
+

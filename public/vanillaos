@@ -1,0 +1,9 @@
+# Template file for 'vanillaos'
+OSNAME="vanillaos"
+PRETTY="Vanilla OS"
+BASEDOF="Ubuntu"
+DESCRIPTION="Designed to be a reliable and productive operating system for your daily work"
+HOMEPAGE="https://vanillaos.org"
+CREDENTIALS="-"
+RELEASES=""
+

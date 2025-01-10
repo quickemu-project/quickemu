@@ -1,0 +1,9 @@
+# Template file for 'peppermint'
+OSNAME="peppermint"
+PRETTY="PeppermintOS"
+BASEDOF="Devuan"
+DESCRIPTION="Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box"
+HOMEPAGE="https://peppermintos.com"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="devuan-xfce devuan-gnome debian-xfce debian-gnome"

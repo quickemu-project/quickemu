@@ -1,0 +1,9 @@
+# Template file for 'endeavouros'
+OSNAME="endeavouros"
+PRETTY="EndeavourOS"
+BASEDOF="Arch"
+DESCRIPTION="Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems"
+HOMEPAGE="https://endeavouros.com"
+CREDENTIALS="-"
+RELEASES="gemini-2024.04.20 galileo-neo-2024.01.25 galileo-11-2023 endeavour_neo-2024.09.22 endeavour-2024.06.25"
+

@@ -1,0 +1,9 @@
+# Template file for 'ghostbsd'
+OSNAME="ghostbsd"
+PRETTY="GhostBSD"
+BASEDOF="FreeBSD"
+DESCRIPTION="Simple, elegant desktop BSD Operating System"
+HOMEPAGE="https://www.ghostbsd.org"
+CREDENTIALS="-"
+RELEASES="24.10.1 24.07.3 24.07.2"
+EDITIONS="xfce mate"

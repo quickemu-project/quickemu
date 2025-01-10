@@ -1,0 +1,9 @@
+# Template file for 'archlinux'
+OSNAME="archlinux"
+PRETTY="Arch Linux"
+BASEDOF="-"
+DESCRIPTION="Lightweight and flexible Linux® distribution that tries to Keep It Simple"
+HOMEPAGE="https://archlinux.org"
+CREDENTIALS="-"
+RELEASES="latest"
+

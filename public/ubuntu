@@ -1,0 +1,9 @@
+# Template file for 'ubuntu'
+OSNAME="ubuntu"
+PRETTY="Ubuntu"
+BASEDOF="Debian"
+DESCRIPTION="Complete desktop Linux operating system, freely available with both community and professional support"
+HOMEPAGE="https://ubuntu.com"
+CREDENTIALS="-"
+RELEASES="daily-live 24.10 24.04 22.04 20.04 18.04 16.04 14.04"
+

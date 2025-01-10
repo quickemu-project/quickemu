@@ -1,0 +1,9 @@
+# Template file for 'endless'
+OSNAME="endless"
+PRETTY="Endless OS"
+BASEDOF="Debian"
+DESCRIPTION="Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More"
+HOMEPAGE="https://www.endlessos.org/os"
+CREDENTIALS="-"
+RELEASES="6.0.4"
+EDITIONS="pt_BR fr es en base"

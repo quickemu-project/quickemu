@@ -1,0 +1,9 @@
+# Template file for 'tuxedo-os'
+OSNAME="tuxedo-os"
+PRETTY="Tuxedo OS"
+BASEDOF="Ubuntu"
+DESCRIPTION="KDE Ubuntu LTS designed to go with their Linux hardware"
+HOMEPAGE="https://www.tuxedocomputers.com"
+CREDENTIALS="-"
+RELEASES="current"
+

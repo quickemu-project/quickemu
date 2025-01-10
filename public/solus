@@ -1,0 +1,9 @@
+# Template file for 'solus'
+OSNAME="solus"
+PRETTY="Solus"
+BASEDOF="-"
+DESCRIPTION="Designed for home computing. Every tweak enables us to deliver a cohesive computing experience"
+HOMEPAGE="https://getsol.us"
+CREDENTIALS="-"
+RELEASES="2024-10-14"
+EDITIONS="XFCE-Beta Plasma GNOME Budgie"

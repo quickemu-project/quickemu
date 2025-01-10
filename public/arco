@@ -1,0 +1,9 @@
+# Template file for 'arco'
+OSNAME="arcolinux"
+PRETTY="Arco Linux"
+BASEDOF="Arch"
+DESCRIPTION="Is all about becoming an expert in linux"
+HOMEPAGE="https://arcolinux.com"
+CREDENTIALS="-"
+RELEASES="v24.12.02 v24.11.01 v24.10.02 v24.09.02 v24.07.01"
+EDITIONS="pro plasma net"

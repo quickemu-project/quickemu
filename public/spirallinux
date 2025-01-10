@@ -1,0 +1,9 @@
+# Template file for 'spirallinux'
+OSNAME="spirallinux"
+PRETTY="Spiral Linux"
+BASEDOF="Debian"
+DESCRIPTION="Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments"
+HOMEPAGE="https://spirallinux.github.io"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="XFCE Plasma Mate LXQt Gnome Cinnamon Builder Budgie"

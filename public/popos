@@ -1,0 +1,9 @@
+# Template file for 'popos'
+OSNAME="popos"
+PRETTY="Pop!_OS"
+BASEDOF="Ubuntu"
+DESCRIPTION="Operating system for STEM and creative professionals who use their computer as a tool to discover and create"
+HOMEPAGE="https://pop.system76.com"
+CREDENTIALS="-"
+RELEASES="22.04 20.04"
+EDITIONS="nvidia intel"

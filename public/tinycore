@@ -1,0 +1,9 @@
+# Template file for 'tinycore'
+OSNAME="tinycore"
+PRETTY="Tiny Core Linux"
+BASEDOF="-"
+DESCRIPTION="Highly modular based system with community build extensions"
+HOMEPAGE="http://www.tinycorelinux.net"
+CREDENTIALS="-"
+RELEASES="15 14"
+EDITIONS="TinyCorePure64 TinyCore CorePure64 CorePlus Core"

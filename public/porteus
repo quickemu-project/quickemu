@@ -1,0 +1,9 @@
+# Template file for 'porteus'
+OSNAME="porteus"
+PRETTY="Porteus"
+BASEDOF="Slackware"
+DESCRIPTION="Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media"
+HOMEPAGE="http://www.porteus.org"
+CREDENTIALS="-"
+RELEASES="5.01"
+EDITIONS="xfce openbox mate lxqt lxde kde gnome cinnamon"

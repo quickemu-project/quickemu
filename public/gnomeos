@@ -1,0 +1,9 @@
+# Template file for 'gnomeos'
+OSNAME="gnomeos"
+PRETTY="GNOME OS"
+BASEDOF="-"
+DESCRIPTION="Alpha nightly bleeding edge distro of GNOME"
+HOMEPAGE="https://os.gnome.org"
+CREDENTIALS="-"
+RELEASES="nightly 47.rc 47.beta 47.alpha 47.0 46.rc 46.beta 46.alpha 46.0 45.rc 45.beta 44.rc 44.beta 44.0 43.beta 43.alpha 43.0 42.rc 42.beta 42.0 41.rc 41.beta 41.0 40.rc 40.beta 40.0 3.38.1 3.38.0"
+

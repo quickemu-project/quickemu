@@ -1,0 +1,9 @@
+# Template file for 'slackware'
+OSNAME="slackware"
+PRETTY="slackware"
+BASEDOF="-"
+DESCRIPTION="Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities"
+HOMEPAGE="http://www.slackware.com"
+CREDENTIALS="-"
+RELEASES="15.0 14.2 14.1 14.0 13.37"
+

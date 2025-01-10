@@ -1,0 +1,9 @@
+# Template file for 'gentoo'
+OSNAME="gentoo"
+PRETTY="Gentoo"
+BASEDOF="-"
+DESCRIPTION="Highly flexible, source-based Linux distribution"
+HOMEPAGE="https://www.gentoo.org"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="minimal livegui"

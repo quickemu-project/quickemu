@@ -1,0 +1,9 @@
+# Template file for 'biglinux'
+OSNAME="biglinux"
+PRETTY="BigLinux"
+BASEDOF="Manjaro"
+DESCRIPTION="Is the right choice if you want to have an easy and enriching experience with Linux. It has been perfected over more than 19 years, following our motto: 'In search of the perfect system'"
+HOMEPAGE="https://www.biglinux.com.br"
+CREDENTIALS="-"
+RELEASES=""
+EDITIONS=""

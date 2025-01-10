@@ -1,0 +1,4 @@
+vxlinux 6.1.5 glibc
+vxlinux 6.1.5 musl
+vxlinux 6.1.5 xfce-glibc
+vxlinux 6.1.5 xfce-musl

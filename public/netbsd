@@ -1,0 +1,9 @@
+# Template file for 'netbsd'
+OSNAME="netbsd"
+PRETTY="NetBSD"
+BASEDOF="-"
+DESCRIPTION="Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices"
+HOMEPAGE="https://www.netbsd.org"
+CREDENTIALS="-"
+RELEASES="9.4 9.3 10.1 10.0"
+

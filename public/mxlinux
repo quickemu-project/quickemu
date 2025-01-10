@@ -1,0 +1,9 @@
+# Template file for 'mxlinux'
+OSNAME="mxlinux"
+PRETTY="MX Linux"
+BASEDOF="Debian Antix"
+DESCRIPTION="Designed to combine elegant and efficient desktops with high stability and solid performance"
+HOMEPAGE="https://mxlinux.org"
+CREDENTIALS="-"
+RELEASES="23.4"
+EDITIONS="Xfce KDE Fluxbox"

@@ -1,0 +1,9 @@
+# Template file for 'centos-stream'
+OSNAME="centos-stream"
+PRETTY="CentOS Stream"
+BASEDOF="Fedora RedHat"
+DESCRIPTION="Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL"
+HOMEPAGE="https://www.centos.org/centos-stream"
+CREDENTIALS="-"
+RELEASES="9 10"
+EDITIONS="dvd1 boot"

@@ -1,0 +1,9 @@
+# Template file for 'devuan'
+OSNAME="devuan"
+PRETTY="Devuan"
+BASEDOF="Debian"
+DESCRIPTION="Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom"
+HOMEPAGE="https://www.devuan.org"
+CREDENTIALS="-"
+RELEASES="daedalus chimaera beowulf"
+

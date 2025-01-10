@@ -1,0 +1,9 @@
+# Template file for 'oraclelinux'
+OSNAME="oraclelinux"
+PRETTY="Oracle Linux"
+BASEDOF="RedHar"
+DESCRIPTION="Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge"
+HOMEPAGE="https://www.oracle.com/linux"
+CREDENTIALS="-"
+RELEASES="9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 7.9 7.8 7.7"
+

@@ -1,0 +1,9 @@
+# Template file for 'netboot'
+OSNAME="netboot"
+PRETTY="netboot.xyz"
+BASEDOF="iPXE"
+DESCRIPTION="Your favorite operating systems in one place"
+HOMEPAGE="https://netboot.xyz"
+CREDENTIALS="-"
+RELEASES="latest"
+

@@ -1,0 +1,9 @@
+# Template file for 'alma'
+OSNAME="alma"
+PRETTY="AlmaLinux"
+BASEDOF="Fedora RedHat"
+DESCRIPTION="Community distribution, focused on long-term stability, providing a robust production-grade platform. Binary compatible with RHEL®"
+HOMEPAGE="https://almalinux.org/"
+CREDENTIALS="-"
+RELEASES="9 8"
+EDITIONS="minimal dvd boot"

@@ -1,0 +1,9 @@
+# Template file for 'proxmox-ve'
+OSNAME="proxmox-ve"
+PRETTY="Proxmox VE"
+BASEDOF="Debian"
+DESCRIPTION="Proxmox Virtual Environment is a complete, open-source server management platform for enterprise virtualization"
+HOMEPAGE="https://proxmox.com/en/proxmox-virtual-environment"
+CREDENTIALS="-"
+RELEASES="8.3-1 8.2-2 7.4-1 6.4-1 5.4-1"
+

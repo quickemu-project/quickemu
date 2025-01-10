@@ -1,0 +1,9 @@
+# Template file for 'kali'
+OSNAME="kali"
+PRETTY="Kali Linux"
+BASEDOF="Debian"
+DESCRIPTION="The most advanced Penetration Testing Distribution"
+HOMEPAGE="https://www.kali.org"
+CREDENTIALS="-"
+RELEASES="kali-weekly current"
+

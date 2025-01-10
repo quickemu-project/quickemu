@@ -1,0 +1,9 @@
+# Template file for 'archcraft'
+OSNAME="archcraft"
+PRETTY="Archcraft"
+BASEDOF="Arch"
+DESCRIPTION="Yet another minimal Linux distribution, based on Arch Linux"
+HOMEPAGE="https://archcraft.io"
+CREDENTIALS="-"
+RELEASES="latest"
+

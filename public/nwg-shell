@@ -1,0 +1,9 @@
+# Template file for 'nwg-shell'
+OSNAME="nwg-shell"
+PRETTY="nwg-shell"
+BASEDOF="Arch"
+DESCRIPTION="Arch Linux ISO with nwg-shell for sway and Hyprland"
+HOMEPAGE="https://nwg-piotr.github.io/nwg-shell"
+CREDENTIALS="-"
+RELEASES="2025.01.01"
+

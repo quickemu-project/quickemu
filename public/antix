@@ -1,0 +1,9 @@
+# Template file for 'antix'
+OSNAME="antix"
+PRETTY="Antix"
+BASEDOF="Debian"
+DESCRIPTION="Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems"
+HOMEPAGE="https://antixlinux.com"
+CREDENTIALS="-"
+RELEASES="23.1 23 22 21"
+EDITIONS="net-sysv net-runit full-sysv full-runit core-sysv core-runit base-sysv base-runit"

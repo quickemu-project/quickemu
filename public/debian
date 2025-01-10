@@ -1,0 +1,9 @@
+# Template file for 'debian'
+OSNAME="debian"
+PRETTY="Debian"
+BASEDOF="-"
+DESCRIPTION="Complete Free Operating System with perfect level of ease of use and stability"
+HOMEPAGE="https://www.debian.org"
+CREDENTIALS="-"
+RELEASES="12.8.0 11.11.0 10.13.0"
+EDITIONS="xfce standard netinst mate lxqt lxde kde gnome cinnamon"

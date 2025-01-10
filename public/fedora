@@ -1,0 +1,9 @@
+# Template file for 'fedora'
+OSNAME="fedora"
+PRETTY="Fedora"
+BASEDOF="-"
+DESCRIPTION="Innovative platform for hardware, clouds, and containers, built with love by you"
+HOMEPAGE="https://www.fedoraproject.org"
+CREDENTIALS="-"
+RELEASES="41 40 39"
+EDITIONS="i3 Xfce Workstation Sway Silverblue Server Sericea Onyx MiracleWM Mate LXQt LXDE Kinoite KDE_Mobile KDE Cinnamon Budgie"

@@ -1,0 +1,9 @@
+# Template file for 'batocera'
+OSNAME="batocera"
+PRETTY="Batocera"
+BASEDOF="-"
+DESCRIPTION="Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently"
+HOMEPAGE="https://batocera.org"
+CREDENTIALS="-"
+RELEASES="41 40 39 38 37"
+

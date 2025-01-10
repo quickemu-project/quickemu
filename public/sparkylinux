@@ -1,0 +1,9 @@
+# Template file for 'sparkylinux'
+OSNAME="sparkylinux"
+PRETTY="SparkyLinux"
+BASEDOF="Debian"
+DESCRIPTION="Fast, lightweight and fully customizable operating system which offers several versions for different use cases"
+HOMEPAGE="https://sparkylinux.org"
+CREDENTIALS="-"
+RELEASES="7.6"
+EDITIONS="xfce minimalgui minimalcli mate lxqt kde"

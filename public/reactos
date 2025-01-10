@@ -1,0 +1,9 @@
+# Template file for 'reactos'
+OSNAME="reactos"
+PRETTY="ReactOS"
+BASEDOF="-"
+DESCRIPTION="Imagine running your favorite Windows applications and drivers in an open-source environment you can trust"
+HOMEPAGE="https://reactos.org"
+CREDENTIALS="-"
+RELEASES="latest"
+

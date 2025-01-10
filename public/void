@@ -1,0 +1,9 @@
+# Template file for 'void'
+OSNAME="void"
+PRETTY="Void Linux"
+BASEDOF="-"
+DESCRIPTION="General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources"
+HOMEPAGE="https://voidlinux.org"
+CREDENTIALS="anon:voidlinux root:voidlinux"
+RELEASES="20240314 20230628 20221001"
+EDITIONS="xfce-musl xfce-glibc musl glibc"

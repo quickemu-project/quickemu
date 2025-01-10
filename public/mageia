@@ -1,0 +1,9 @@
+# Template file for 'mageia'
+OSNAME="mageia"
+PRETTY="Mageia"
+BASEDOF="-"
+DESCRIPTION="Stable, secure operating system for desktop & server"
+HOMEPAGE="https://www.mageia.org"
+CREDENTIALS="-"
+RELEASES="9 8"
+EDITIONS="Xfce Plasma GNOME"

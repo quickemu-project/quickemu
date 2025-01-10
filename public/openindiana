@@ -1,0 +1,9 @@
+# Template file for 'openindiana'
+OSNAME="openindiana"
+PRETTY="OpenIndiana"
+BASEDOF="Solaris OPenSolaris"
+DESCRIPTION="Community supported illumos-based operating system"
+HOMEPAGE="https://www.openindiana.org"
+CREDENTIALS="-"
+RELEASES="20241026 20240426 20231027 20230502 20230421"
+EDITIONS="text minimal gui"

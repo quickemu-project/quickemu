@@ -1,0 +1,9 @@
+# Template file for 'elementary'
+OSNAME="elementary"
+PRETTY="elementary OS"
+BASEDOF="Debian Ubuntu"
+DESCRIPTION="Thoughtful, capable, and ethical replacement for Windows and macOS"
+HOMEPAGE="https://elementary.io"
+CREDENTIALS="-"
+RELEASES="8.0 7.1 7.0"
+

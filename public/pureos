@@ -1,0 +1,9 @@
+# Template file for 'pureos'
+OSNAME="pureos"
+PRETTY="PureOS"
+BASEDOF="Debian"
+DESCRIPTION="Fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation"
+HOMEPAGE="https://www.pureos.net"
+CREDENTIALS="-"
+RELEASES="10.3"
+EDITIONS="plasma gnome"

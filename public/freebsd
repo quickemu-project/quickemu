@@ -1,0 +1,9 @@
+# Template file for 'freebsd'
+OSNAME="freebsd"
+PRETTY="FreeBSD"
+BASEDOF="-"
+DESCRIPTION="Operating system used to power modern servers, desktops, and embedded platforms"
+HOMEPAGE="https://www.freebsd.org"
+CREDENTIALS="-"
+RELEASES="14.2 14.1 13.4 13.3"
+EDITIONS="dvd1 disc1"

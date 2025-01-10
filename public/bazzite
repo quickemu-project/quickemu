@@ -1,0 +1,9 @@
+# Template file for 'bazzite'
+OSNAME="bazzite"
+PRETTY="bazzite"
+BASEDOF="Fedora SteamOS"
+DESCRIPTION="Container native gaming and a ready-to-game SteamOS like"
+HOMEPAGE="https://bazzite.gg"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="kde gnome"

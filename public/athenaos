@@ -1,0 +1,9 @@
+# Template file for 'athenaos'
+OSNAME="athenaos"
+PRETTY="Athena OS"
+BASEDOF="Arch"
+DESCRIPTION="Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials"
+HOMEPAGE="https://athenaos.org"
+CREDENTIALS="-"
+RELEASES="v23.11 v23.06.23"
+

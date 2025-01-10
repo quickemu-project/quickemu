@@ -1,0 +1,9 @@
+# Template file for 'macos'
+OSNAME="macos"
+PRETTY="MacOS"
+BASEDOF="-"
+DESCRIPTION="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance."
+HOMEPAGE="https://www.apple.com/macos"
+CREDENTIALS="-"
+RELEASES="ventura sonoma monterey mojave catalina big-sur"
+

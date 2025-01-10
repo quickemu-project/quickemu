@@ -1,0 +1,9 @@
+# Template file for 'trisquel'
+OSNAME="trisquel"
+PRETTY="Trisquel"
+BASEDOF="Ubuntu"
+DESCRIPTION="Fully free operating system for home users, small enterprises and educational centers"
+HOMEPAGE="https://trisquel.info"
+CREDENTIALS="-"
+RELEASES="11.0 10.0.1"
+EDITIONS="sugar mate lxde kde"

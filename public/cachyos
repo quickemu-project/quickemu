@@ -1,0 +1,9 @@
+# Template file for 'cachyos'
+OSNAME="cachyos"
+PRETTY="CachyOS"
+BASEDOF="Arch"
+DESCRIPTION="Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it"
+HOMEPAGE="https://cachyos.org"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="handheld desktop"

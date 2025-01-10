@@ -1,0 +1,9 @@
+# Template file for 'slint'
+OSNAME="slint"
+PRETTY="Slint"
+BASEDOF="Slackware"
+DESCRIPTION="Easy-to-use, versatile, blind-friendly Linux distribution for 64-bit computers. Slint is based on Slackware and borrows tools from Salix"
+HOMEPAGE="https://slint.fr"
+CREDENTIALS="-"
+RELEASES="15.0-5"
+

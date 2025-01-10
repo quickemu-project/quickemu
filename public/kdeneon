@@ -1,0 +1,9 @@
+# Template file for 'kdeneon'
+OSNAME="kdeneon"
+PRETTY="KDE Neon"
+BASEDOF="Debian Ubuntu"
+DESCRIPTION="Latest and greatest of KDE community software packaged on a rock-solid base"
+HOMEPAGE="https://neon.kde.org"
+CREDENTIALS="-"
+RELEASES="user unstable testing developer"
+

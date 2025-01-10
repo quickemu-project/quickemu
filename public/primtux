@@ -1,0 +1,9 @@
+# Template file for 'primtux'
+OSNAME="primtux"
+PRETTY="PrimTux"
+BASEDOF="Ubuntu"
+DESCRIPTION="Complete and customizable GNU/Linux operating system intended for primary school students and suitable even for older hardware"
+HOMEPAGE="https://primtux.fr"
+CREDENTIALS="-"
+RELEASES="7"
+EDITIONS="2022-10"

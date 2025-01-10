@@ -1,0 +1,9 @@
+# Template file for 'siduction'
+OSNAME="siduction"
+PRETTY="siduction"
+BASEDOF="Debian"
+DESCRIPTION="Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian"
+HOMEPAGE="https://siduction.org"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="xorg xfce nox lxqt kde"
