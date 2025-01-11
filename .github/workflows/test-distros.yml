@@ -1,0 +1,70 @@
+name: "🧪 supported OS"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+    # paths:
+      # - quickget
+  pull_request:
+    branches:
+      - '**'
+    # paths:
+      # - quickget
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-matrix:
+    name: "Generate Matrix"
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v4
+
+      - name: "Generate Matrix"
+        id: set-matrix
+        run: |
+          SUPPORTED=$(./quickget | awk 'NR==2,/zorin/' | cut -d':' -f2 | tail -n +2 | paste -sd' ')
+          MATRIX="{\"include\": ["
+          for os in $SUPPORTED; do
+            MATRIX+="{\"os\": \"$os\"},"
+          done
+          MATRIX="${MATRIX%,}]}"
+          echo "Generated Matrix: $MATRIX"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+      - name: "Display Matrix"
+        run: |
+          echo "Matrix:"
+          echo "${{ steps.set-matrix.outputs.matrix }}"
+
+  run-actions:
+    name: "check 💿️"
+    needs: generate-matrix
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v4
+
+      - name: "Install dependencies 📦️"
+        run: |
+          apt-get -y update
+          apt-get -y install curl qemu-utils jq
+
+      - name: "🔨 ${{ matrix.os }}"
+        run: |
+          mkdir -p results
+          ./quickget --check ${{ matrix.os }} | tee results/${{ matrix.os }}.txt
+          if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.os }}.txt; then
+            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.os }}.txt >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
