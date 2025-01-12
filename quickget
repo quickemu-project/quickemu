@@ -310,9 +310,12 @@ function test_all() {
         FUNC="ubuntu"
     fi
     local URL=""
+    . "actions/${OS}"
 
     for RELEASE in $(releases_); do
+        . "actions/${OS}"
         if [[ $(type -t editions_) == function ]]; then
+            . "actions/${OS}"
             for EDITION in $(editions_); do
                 validate_release releases_
                 URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
