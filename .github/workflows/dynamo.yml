@@ -1,0 +1,68 @@
+name: "Test supported Operating Systems"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  generate-matrix:
+    name: "Generate Matrix"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v4
+
+      - name: "Generate Matrix"
+        id: set-matrix
+        run: |
+          FILES=$(find actions/ -maxdepth 1 -type f -printf "%f\n")
+          MATRIX="{\"include\": ["
+          for file in $FILES; do
+            MATRIX+="{\"file\": \"$file\"},"
+          done
+          MATRIX="${MATRIX%,}]}"
+          echo "Generated Matrix: $MATRIX"
+          echo "::set-output name=matrix::$MATRIX"
+
+      - name: "Display Matrix"
+        run: |
+          echo "Matrix:"
+          echo "${{ steps.set-matrix.outputs.matrix }}" >> $GITHUB_STEP_SUMMARY
+
+  run-actions:
+    name: "check 💿️"
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: "Check out repository"
+        uses: actions/checkout@v4
+
+      - name: "Install dependencies 📦️"
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install curl jq
+
+      - name: "Check out ${{ matrix.file }}"
+        run: |
+          mkdir -p results
+          ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
+          if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
+            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt | tee -a results/ALL.txt >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: "Upload ${{ matrix.file }} results"
+        uses: actions/upload-artifact@v3
+        with:
+          name: results-${{ matrix.file }}
+          path: results/${{ matrix.file }}.txt
