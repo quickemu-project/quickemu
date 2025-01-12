@@ -108,8 +108,8 @@ function validate_release() {
 
     DISPLAY_NAME="${PRETTY}"
     case ${OS} in
-        *ubuntu-server*) RELEASE_GENERATOR="releases_ubuntu-server";;
-        *ubuntu*) RELEASE_GENERATOR="releases_ubuntu";;
+        *ubuntu-server*) RELEASE_GENERATOR="releases_";;
+        *ubuntu*) RELEASE_GENERATOR="releases_";;
         *) RELEASE_GENERATOR="${1}";;
     esac
     RELEASES=$(${RELEASE_GENERATOR})
@@ -179,7 +179,7 @@ list_isos() {
         for RELEASE in $(releases_ | sed -Ee 's/eol-\S+//g' ); do # hide eol releases
              # If the OS has an editions_() function, use it.
             if [[ $(type -t editions_) == function ]]; then
-                for OPTION in $(editions_"${OS}"); do
+                for OPTION in $(editions_); do
                     URL=$(./quickget -u "${OS}" "${RELEASE}" "${OPTION}")
                     if [ -z "${URL}" ]; then
                         echo "${OS}|${RELEASE}|${OPTION}|${URL}"
@@ -243,7 +243,7 @@ function csv_data() {
         SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
 
         if [[ $(type -t editions_) == function ]]; then
-            EDITIONS=$(editions_"${OS}")
+            EDITIONS=$(editions_)
         fi
 
         for RELEASE in $(releases_); do
@@ -318,7 +318,7 @@ function test_all() {
             . "actions/${OS}"
             for EDITION in $(editions_); do
                 validate_release releases_
-                URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+                URL=$(get_ | cut -d' ' -f1 | head -n 1)
                 if [ "${OPERATION}" == "show" ]; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
                 elif [ "${OPERATION}" == "test" ]; then
@@ -347,7 +347,7 @@ function test_all() {
             (get_)
         else
             validate_release releases_
-            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+            URL=$(get_ | cut -d' ' -f1 | head -n 1)
             if [ "${OPERATION}" == "show" ]; then
                 test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
             elif [ "${OPERATION}" == "test" ]; then
