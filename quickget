@@ -799,6 +799,11 @@ function create_vm() {
                 zstd -d  "${VM_PATH}/${ISO}"
                 ISO="${ISO/.zst/}"
                 if [[ ${ISO} =~ ".img" ]]; then
+                    QEMU_IMG=$(command -v qemu-img)
+                    if [ ! -x "${QEMU_IMG}" ]; then
+                        echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+                        exit 1
+                    fi
                     qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
                     ISO="${ISO/.img/}"
                 else
@@ -1039,12 +1044,6 @@ if [ ! -x "${CURL}" ]; then
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
-
-QEMU_IMG=$(command -v qemu-img)
-if [ ! -x "${QEMU_IMG}" ]; then
-    echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
-    exit 1
-fi
 
 #TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
 case "${1}" in
