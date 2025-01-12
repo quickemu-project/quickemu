@@ -34,14 +34,14 @@ jobs:
       - name: "Display Matrix"
         run: |
           echo "Matrix:"
-          echo "${{ steps.set-matrix.outputs.matrix }}" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.set-matrix.outputs.matrix }}"
 
   run-actions:
     name: "check 💿️"
     needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: "Check out repository"
@@ -57,12 +57,6 @@ jobs:
           mkdir -p results
           ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
           if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
-            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt | tee -a results/ALL.txt >> $GITHUB_STEP_SUMMARY
+            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-
-      - name: "Upload ${{ matrix.file }} results"
-        uses: actions/upload-artifact@v3
-        with:
-          name: results-${{ matrix.file }}
-          path: results/${{ matrix.file }}.txt
