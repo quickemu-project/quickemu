@@ -208,6 +208,17 @@ function error_not_supported_argument() {
     exit 1
 }
 
+function is_valid_language() {
+    local I18N=""
+    local PASSED_I18N="${1}"
+    for I18N in "${I18NS[@]}"; do
+        if [[ "${I18N}" == "${PASSED_I18N}" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 function handle_missing() {
     # Handle odd missing Fedora combinations
     case "${OS}" in
@@ -3602,7 +3613,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! " ${I18NS[*]} " =~ \ "${I18N}"\  ]]; then
+            if ! is_valid_language "${I18N}"; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
