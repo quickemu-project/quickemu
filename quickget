@@ -822,7 +822,7 @@ function releases_maboxlinux() {
 }
 
 function releases_macos() {
-    echo mojave catalina big-sur monterey ventura sonoma
+    echo mojave catalina big-sur monterey ventura sonoma sequoia
 }
 
 function releases_mageia() {
@@ -2063,6 +2063,8 @@ function get_macos() {
         ventura|13)
             BOARD_ID="Mac-BE088AF8C5EB4FA2";;
         sonoma|14)
+            BOARD_ID="Mac-827FAC58A8FDFA22";;
+        sequoia|15)
             BOARD_ID="Mac-53FDB3D8DB8CA971";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
