@@ -145,7 +145,7 @@ function error_specify_os() {
 }
 
 function os_supported() {
-    if [[ ! "$(os_support)" =~ ${OS} ]]; then
+    if [[ ! " $(os_support) " =~ \ "${OS}"\  ]]; then
         echo -e "ERROR! ${OS} is not a supported OS.\n"
         os_support | fmt -w 80
         exit 1
@@ -184,7 +184,7 @@ function error_specify_release() {
 }
 
 function error_not_supported_release() {
-    if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
+    if [[ ! " ${RELEASES[*]} " =~ \ "${RELEASE}"\  ]]; then
         echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
         echo -n ' - Supported releases: '
         "releases_${OS}"
@@ -1769,7 +1769,7 @@ function get_elementary() {
     case ${RELEASE} in
         7.0) STAMP="20230129rc";;
         7.1) STAMP="20230926rc";;
-        8.0) STAMP="20241122rc";;        
+        8.0) STAMP="20241122rc";;
     esac
     local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
@@ -3566,7 +3566,7 @@ if [ -n "${2}" ]; then
         EDITIONS=("$(editions_"${OS}")")
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
+            if [[ ! " ${EDITIONS[*]} " = \ "${EDITION}"\  ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
                 echo -n ' - Supported editions: '
                 for EDITION in "${EDITIONS[@]}"; do
@@ -3602,7 +3602,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
+            if [[ ! " ${I18NS[*]} " =~ \ "${I18N}"\  ]]; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
