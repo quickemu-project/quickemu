@@ -882,7 +882,7 @@ function configure_storage() {
 function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
-    if ! command -v pacmd >/dev/null 2>&1 ; then
+    if ! command -v pacmd >/dev/null 2>&1 && ! command -v pipewire-pulse >/dev/null 2>&1; then
         AUDIO_DRIVER="alsa"
     fi
 
