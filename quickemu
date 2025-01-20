@@ -882,7 +882,12 @@ function configure_storage() {
 function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
-    if ! command -v pacmd >/dev/null 2>&1 ; then
+    if pidof pipewire >/dev/null 2>&1; then
+        # QEMU's pipewire audio backend was added in version 8.1
+        if [ "${QEMU_VER_SHORT}" -ge 81 ]; then
+            AUDIO_DRIVER="pipewire"
+        fi
+    elif ! pidof pulseaudio >/dev/null 2>&1; then
         AUDIO_DRIVER="alsa"
     fi
 
