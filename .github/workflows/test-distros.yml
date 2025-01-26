@@ -30,7 +30,8 @@ jobs:
       - name: "Generate Matrix"
         id: set-matrix
         run: |
-          SUPPORTED=$(./quickget | awk 'NR==2,/zorin/' | cut -d':' -f2 | tail -n +2 | paste -sd' ')
+          ls ./
+          SUPPORTED=$(./quickget | awk 'NR==3,/zorin/' | tr ' ' '\n')
           MATRIX="{\"include\": ["
           for os in $SUPPORTED; do
             MATRIX+="{\"os\": \"$os\"},"
