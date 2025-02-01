@@ -146,7 +146,7 @@ function error_specify_os() {
 }
 
 function os_supported() {
-    if [[ ! "$(os_support)" =~ ${OS} ]]; then
+    if [[ ! " $(os_support) " =~ \ "${OS}"\  ]]; then
         echo -e "ERROR! ${OS} is not a supported OS.\n"
         os_support | fmt -w 80
         exit 1
@@ -185,7 +185,7 @@ function error_specify_release() {
 }
 
 function error_not_supported_release() {
-    if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
+    if [[ ! " ${RELEASES[*]} " =~ \ "${RELEASE}"\  ]]; then
         echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
         echo -n ' - Supported releases: '
         "releases_${OS}"
@@ -207,6 +207,17 @@ function error_not_supported_argument() {
     echo "To see all possible arguments, use:"
     echo "   quickget -h  or  quickget --help"
     exit 1
+}
+
+function is_valid_language() {
+    local I18N=""
+    local PASSED_I18N="${1}"
+    for I18N in "${I18NS[@]}"; do
+        if [[ "${I18N}" == "${PASSED_I18N}" ]]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function handle_missing() {
@@ -3591,7 +3602,7 @@ if [ -n "${2}" ]; then
         EDITIONS=("$(editions_"${OS}")")
         if [ -n "${3}" ]; then
             EDITION="${3}"
-            if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
+            if [[ ! " ${EDITIONS[*]} " = \ "${EDITION}"\  ]]; then
                 echo -e "ERROR! ${EDITION} is not a supported $(pretty_name "${OS}") edition\n"
                 echo -n ' - Supported editions: '
                 for EDITION in "${EDITIONS[@]}"; do
@@ -3627,7 +3638,7 @@ if [ -n "${2}" ]; then
         "languages_${OS}"
         if [ -n "${3}" ]; then
             I18N="${3}"
-            if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
+            if ! is_valid_language "${I18N}"; then
                 error_not_supported_lang
             fi
             VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
