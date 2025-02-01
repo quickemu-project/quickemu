@@ -545,9 +545,7 @@ function releases_archlinux() {
 
 function releases_arcolinux() {
     #shellcheck disable=SC2046,SC2005
-    # breaking change in v24.05
-    # v24.05.1 is the first release with the new naming scheme and too complex to parse old and new so just show the new
-    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v24.0[5-9].[[:digit:]]{2}"  -e "v24.1[0-2].[[:digit:]]{2}" | sort -ru | head -n 5)
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
 }
 
 function editions_arcolinux() {
