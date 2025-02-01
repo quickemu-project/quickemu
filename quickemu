@@ -1187,6 +1187,8 @@ function vm_boot() {
     # Set the hostname of the VM
     NET="user,hostname=${VMNAME}"
 
+    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
+
     configure_cpu
     configure_ram
     configure_bios
@@ -1198,8 +1200,6 @@ function vm_boot() {
     configure_file_sharing
     configure_usb
     configure_tpm
-
-    echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
 
     # Changing process name is not supported on macOS
     if [ "${OS_KERNEL}" == "Linux" ]; then
