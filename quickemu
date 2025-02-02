@@ -395,6 +395,16 @@ function configure_cpu() {
         fi
     fi
 
+    # SMM is also required for Linux guests when Secure Boot is enabled
+    if [ "${secureboot}" == "on" ]; then
+        if [ "${guest_os}" == "linux" ]; then
+        # SMM is not available on QEMU for macOS via Homebrew
+            if [ "${OS_KERNEL}" == "Linux" ]; then
+                SMM="on"
+            fi
+        fi
+    fi
+
     case ${guest_os} in
         batocera|freedos|haiku|solaris) MACHINE_TYPE="pc";;
         kolibrios|reactos)
