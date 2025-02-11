@@ -742,7 +742,7 @@ function configure_bios() {
 
 function configure_os_quirks() {
 
-    if [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "kolibrios" ]; then
+    if [ "${guest_os}" == "batocera" ] || [ "${guest_os}" == "haiku" ] || [ "${guest_os}" == "kolibrios" ]; then
         NET_DEVICE="rtl8139"
     fi
 
@@ -753,7 +753,8 @@ function configure_os_quirks() {
     case ${guest_os} in
         windows-server) NET_DEVICE="e1000";;
         *bsd|linux*|windows) NET_DEVICE="virtio-net";;
-        freedos) sound_card="sb16";;
+        freedos) sound_card="sb16"
+                 NET_DEVICE="pcnet";;
         *solaris) usb_controller="xhci"
                   sound_card="ac97";;
         reactos) NET_DEVICE="e1000"
