@@ -970,13 +970,13 @@ function run_ui() {
         echo "gum could not be found, please install it first"
         exit 1
     fi
-    OS=$(gum choose --height=17 --header="Select an OS:" $(os_support))
+    OS=$(gum filter --height=17 --header="Select an OS:" $(os_support))
     #os_info "${OS}" > "$TMPFILE"
     # shellcheck source=actions/alpine
     . "public/${OS}"
-    RELEASE=$(gum choose --height=17 --header="Select $OS release:" ${RELEASES})
+    RELEASE=$(gum filter --height=5 --header="Select $OS release:" ${RELEASES})
     if declare -F editions_ > /dev/null; then
-        EDITION=$(gum choose --height=17 --header="Select $OS  $RELEASE edition:" ${EDITIONS})
+        EDITION=$(gum filter --height=5 --header="Select $OS  $RELEASE edition:" ${EDITIONS})
         echo ''
         run_itself "${OS}" "${RELEASE}" "${EDITION}"
     else
