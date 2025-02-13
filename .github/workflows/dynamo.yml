@@ -31,6 +31,11 @@ jobs:
           echo "Generated Matrix: $MATRIX"
           echo "::set-output name=matrix::$MATRIX"
 
+      - name: "Install dependencies 📦️"
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install curl jq
+
       - name: "Display Matrix"
         run: |
           echo "Matrix:"
@@ -47,11 +52,6 @@ jobs:
       - name: "Check out repository"
         uses: actions/checkout@v4
 
-      - name: "Install dependencies 📦️"
-        run: |
-          sudo apt-get -y update
-          sudo apt-get -y install curl jq
-
       - name: "Check out ${{ matrix.file }}"
         run: |
           mkdir -p results
@@ -60,3 +60,4 @@ jobs:
             grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
+
