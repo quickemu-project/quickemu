@@ -824,8 +824,7 @@ function create_config() {
 
     OS="custom"
     if ! mkdir "${VM_PATH}" 2>/dev/null; then
-        echo "ERROR! Could not create directory: ${VM_PATH}. Please verify that it does not already exist"
-        exit 1
+        echo "WARNING! This will overwrite content of directory: ${VM_PATH}"
     fi
     if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
         INPUT="$(web_redirect "${INPUT}")"
@@ -840,7 +839,7 @@ function create_config() {
 
     if [ ! -f "${INPUT}" ]; then
         echo "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
-        exit 1
+        echo "#TODO exit 1"
     elif [[ "${INPUT}" == *".iso" ]]; then
         echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
         CUSTOM_IMAGE_TYPE="iso"
