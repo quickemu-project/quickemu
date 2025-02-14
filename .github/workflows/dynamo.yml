@@ -1,17 +1,27 @@
-name: "Test supported Operating Systems"
+name: "Test supported 💿️"
 
 on:
   workflow_dispatch:
+
   push:
     branches:
       - '**'
+    paths:
+      - quickget
+
   pull_request:
     branches:
       - '**'
+    paths:
+      - quickget
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   generate-matrix:
-    name: "Generate Matrix"
+    name: "Generate 💿️ Matrix"
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -19,7 +29,7 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "Generate Matrix"
+      - name: "💿️ Matrix"
         id: set-matrix
         run: |
           FILES=$(find actions/ -maxdepth 1 -type f -printf "%f\n" | sort)
@@ -36,11 +46,6 @@ jobs:
           sudo apt-get -y update
           sudo apt-get -y install curl jq
 
-      - name: "Display Matrix"
-        run: |
-          echo "Matrix:"
-          echo "${{ steps.set-matrix.outputs.matrix }}"
-
   run-actions:
     name: "💿️"
     needs: generate-matrix
@@ -52,7 +57,7 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "Checkout ${{ matrix.file }}"
+      - name: "Checkout 👟 ${{ matrix.file }}"
         run: |
           mkdir -p results
           ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
@@ -70,7 +75,7 @@ jobs:
           path: results/${{ matrix.file }}.txt
 
   end:
-    name: "finish"
+    name: "Finish 🏁"
     needs: run-actions
     if: always()
     runs-on: ubuntu-latest
@@ -84,10 +89,10 @@ jobs:
           path: results
           merge-multiple: true
 
-      - name: "results"
+      - name: "Display results 📊"
         run: |
           for file in results/*.txt; do
-            cat "$file" | tee -a ../result
+            cat "$file" >> result
           done
           PASSED=$(grep -c '^PASS:' result | wc -l)
           FAILED=$(grep -c '^FAIL:' result | wc -l 2>/dev/null | echo '0')
