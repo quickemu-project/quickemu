@@ -21,7 +21,9 @@ function get_() {
     case "${EDITION}" in
         *Pure*) ARCH+="_64";;
     esac
-    local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
+    # tinycorelinux.net not stable enough
+    #local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
+    local URL="https://distro.ibiblio.org/tinycorelinux/${RELEASE}.x/${ARCH}/release"
     HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
