@@ -88,21 +88,21 @@ archlinux latest net-runit
 archlinux latest core-runit
 archlinux latest base-runit
 archlinux latest full-runit
+arco v25.02.04 net
+arco v25.02.04 plasma
+arco v25.02.04 pro
+arco v25.01.05 net
+arco v25.01.05 plasma
+arco v25.01.05 pro
+arco v25.01.01 net
+arco v25.01.01 plasma
+arco v25.01.01 pro
 arco v24.12.02 net
 arco v24.12.02 plasma
 arco v24.12.02 pro
 arco v24.11.01 net
 arco v24.11.01 plasma
 arco v24.11.01 pro
-arco v24.10.02 net
-arco v24.10.02 plasma
-arco v24.10.02 pro
-arco v24.09.02 net
-arco v24.09.02 plasma
-arco v24.09.02 pro
-arco v24.07.01 net
-arco v24.07.01 plasma
-arco v24.07.01 pro
 artixlinux 20240823 base-dinit
 artixlinux 20240823 base-openrc
 artixlinux 20240823 base-runit
@@ -369,15 +369,15 @@ crunchbang++ 10.1 base
 crunchbang++ 10.1 gnome
 crunchbang++ 9.0 base
 crunchbang++ 9.0 gnome
-debian 12.8.0 standard
-debian 12.8.0 cinnamon
-debian 12.8.0 gnome
-debian 12.8.0 kde
-debian 12.8.0 lxde
-debian 12.8.0 lxqt
-debian 12.8.0 mate
-debian 12.8.0 xfce
-debian 12.8.0 netinst
+debian 12.9.0 standard
+debian 12.9.0 cinnamon
+debian 12.9.0 gnome
+debian 12.9.0 kde
+debian 12.9.0 lxde
+debian 12.9.0 lxqt
+debian 12.9.0 mate
+debian 12.9.0 xfce
+debian 12.9.0 netinst
 debian 11.11.0 standard
 debian 11.11.0 cinnamon
 debian 11.11.0 gnome
@@ -396,15 +396,6 @@ debian 10.13.0 lxqt
 debian 10.13.0 mate
 debian 10.13.0 xfce
 debian 10.13.0 netinst
-deepin 23-RC2 standard
-deepin 23-RC2 cinnamon
-deepin 23-RC2 gnome
-deepin 23-RC2 kde
-deepin 23-RC2 lxde
-deepin 23-RC2 lxqt
-deepin 23-RC2 mate
-deepin 23-RC2 xfce
-deepin 23-RC2 netinst
 deepin 23 standard
 deepin 23 cinnamon
 deepin 23 gnome
@@ -669,6 +660,8 @@ elementary 7.1 lz4
 elementary 7.1 cdrom
 elementary 7.0 lz4
 elementary 7.0 cdrom
+endeavouros mercury-2025.02.08 lz4
+endeavouros mercury-2025.02.08 cdrom
 endeavouros gemini-2024.04.20 lz4
 endeavouros gemini-2024.04.20 cdrom
 endeavouros galileo-neo-2024.01.25 lz4
@@ -677,8 +670,6 @@ endeavouros galileo-11-2023 lz4
 endeavouros galileo-11-2023 cdrom
 endeavouros endeavour_neo-2024.09.22 lz4
 endeavouros endeavour_neo-2024.09.22 cdrom
-endeavouros endeavour-2024.06.25 lz4
-endeavouros endeavour-2024.06.25 cdrom
 endless 6.0.4 base
 endless 6.0.4 en
 endless 6.0.4 fr
@@ -764,6 +755,8 @@ ghostbsd 24.07.2 mate
 ghostbsd 24.07.2 xfce
 gnomeos nightly mate
 gnomeos nightly xfce
+gnomeos 48.alpha mate
+gnomeos 48.alpha xfce
 gnomeos 47.rc mate
 gnomeos 47.rc xfce
 gnomeos 47.beta mate
@@ -860,6 +853,9 @@ linuxlite 6.0 en_US
 linuxlite 6.0 ru_RU
 linuxlite 6.0 it_IT
 linuxlite 6.0 es_ES
+linuxmint 22.1 cinnamon
+linuxmint 22.1 mate
+linuxmint 22.1 xfce
 linuxmint 22 cinnamon
 linuxmint 22 mate
 linuxmint 22 xfce
@@ -883,17 +879,17 @@ linuxmint 20.2 mate
 linuxmint 20.2 xfce
 lmde 6 cinnamon
 maboxlinux latest cinnamon
-macos mojave                        http://oscdn.apple.com/content/downloads/04/36/041-94410/ge73si0bd3fdsdkfibykjgrlcfuzy1q9yx/RecoveryImage/BaseSystem.dmg
+macos mojave:                        http://oscdn.apple.com/content/downloads/04/36/041-94410/ge73si0bd3fdsdkfibykjgrlcfuzy1q9yx/RecoveryImage/BaseSystem.dmg
 macos mojave cinnamon
-macos catalina                      http://oscdn.apple.com/content/downloads/59/10/001-43312/oifium3yx72dhc4po3r65zfwblslmce191/RecoveryImage/BaseSystem.dmg
+macos catalina:                      http://oscdn.apple.com/content/downloads/59/10/001-43312/oifium3yx72dhc4po3r65zfwblslmce191/RecoveryImage/BaseSystem.dmg
 macos catalina cinnamon
-macos big-sur                       http://oscdn.apple.com/content/downloads/41/28/071-71279/5djpevqmc2w0ti2c4n1m8mkz7fm791t1ic/RecoveryImage/BaseSystem.dmg
+macos big-sur:                       http://oscdn.apple.com/content/downloads/41/28/071-71279/5djpevqmc2w0ti2c4n1m8mkz7fm791t1ic/RecoveryImage/BaseSystem.dmg
 macos big-sur cinnamon
-macos monterey                      http://oscdn.apple.com/content/downloads/59/11/012-51692/z29q5x5plswit63bvyxmubthavua9gbxic/RecoveryImage/BaseSystem.dmg
+macos monterey:                      http://oscdn.apple.com/content/downloads/59/11/012-51692/z29q5x5plswit63bvyxmubthavua9gbxic/RecoveryImage/BaseSystem.dmg
 macos monterey cinnamon
-macos ventura                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
+macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura cinnamon
-macos sonoma                        http://oscdn.apple.com/content/downloads/40/43/072-45921/md7t4hadqsc9cbv2se92blr2bvxile7212/RecoveryImage/BaseSystem.dmg
+macos sonoma:                        http://oscdn.apple.com/content/downloads/40/46/072-70660/yk1lzbgsbfcjusj5jd80j7jnlljq60qc8m/RecoveryImage/BaseSystem.dmg
 macos sonoma cinnamon
 mageia 9 Plasma
 mageia 9 GNOME
@@ -913,9 +909,9 @@ manjaro i3 full
 manjaro i3 minimal
 manjaro sway full
 manjaro sway minimal
-mxlinux 23.4 Xfce
-mxlinux 23.4 KDE
-mxlinux 23.4 Fluxbox
+mxlinux 23.5 Xfce
+mxlinux 23.5 KDE
+mxlinux 23.5 Fluxbox
 netboot latest Xfce
 netboot latest KDE
 netboot latest Fluxbox
@@ -1060,15 +1056,15 @@ oraclelinux 7.8 minimal
 oraclelinux 7.7 gui
 oraclelinux 7.7 text
 oraclelinux 7.7 minimal
+parrotsec 6.3 home
+parrotsec 6.3 htb
+parrotsec 6.3 security
 parrotsec 6.2 home
 parrotsec 6.2 htb
 parrotsec 6.2 security
 parrotsec 6.1 home
 parrotsec 6.1 htb
 parrotsec 6.1 security
-parrotsec 6.0 home
-parrotsec 6.0 htb
-parrotsec 6.0 security
 peppermint latest devuan-xfce
 peppermint latest devuan-gnome
 peppermint latest debian-xfce
@@ -1097,6 +1093,8 @@ reactos latest gnome
 reactos latest plasma
 rebornos latest gnome
 rebornos latest plasma
+rhino 2025.1 gnome
+rhino 2025.1 plasma
 rockulinux 9.5 minimal
 rockulinux 9.5 dvd
 rockulinux 9.5 boot
@@ -1180,10 +1178,6 @@ slitaz loram debian
 slitaz loram slackware
 slitaz preinit debian
 slitaz preinit slackware
-solus 2024-10-14 Budgie
-solus 2024-10-14 GNOME
-solus 2024-10-14 Plasma
-solus 2024-10-14 XFCE-Beta
 sparkylinux 7.6 kde
 sparkylinux 7.6 lxqt
 sparkylinux 7.6 mate
@@ -1280,10 +1274,6 @@ ubuntu-server 24.04 mate
 ubuntu-server 24.04 lxde
 ubuntu-server 24.04 kde
 ubuntu-server 24.04 sugar
-ubuntu-server 23.10 mate
-ubuntu-server 23.10 lxde
-ubuntu-server 23.10 kde
-ubuntu-server 23.10 sugar
 ubuntu-server 22.04 mate
 ubuntu-server 22.04 lxde
 ubuntu-server 22.04 kde
@@ -1304,6 +1294,54 @@ ubuntu-server 14.04 mate
 ubuntu-server 14.04 lxde
 ubuntu-server 14.04 kde
 ubuntu-server 14.04 sugar
+vanillaos 22.10-r8 mate
+vanillaos 22.10-r8 lxde
+vanillaos 22.10-r8 kde
+vanillaos 22.10-r8 sugar
+vanillaos 22.10-r7.5 mate
+vanillaos 22.10-r7.5 lxde
+vanillaos 22.10-r7.5 kde
+vanillaos 22.10-r7.5 sugar
+vanillaos 22.10-r7 mate
+vanillaos 22.10-r7 lxde
+vanillaos 22.10-r7 kde
+vanillaos 22.10-r7 sugar
+vanillaos 22.10-r6 mate
+vanillaos 22.10-r6 lxde
+vanillaos 22.10-r6 kde
+vanillaos 22.10-r6 sugar
+vanillaos 22.10-r5 mate
+vanillaos 22.10-r5 lxde
+vanillaos 22.10-r5 kde
+vanillaos 22.10-r5 sugar
+vanillaos 22.10-r4 mate
+vanillaos 22.10-r4 lxde
+vanillaos 22.10-r4 kde
+vanillaos 22.10-r4 sugar
+vanillaos 22.10-r3 mate
+vanillaos 22.10-r3 lxde
+vanillaos 22.10-r3 kde
+vanillaos 22.10-r3 sugar
+vanillaos 22.10-r2 mate
+vanillaos 22.10-r2 lxde
+vanillaos 22.10-r2 kde
+vanillaos 22.10-r2 sugar
+vanillaos 22.10-r1 mate
+vanillaos 22.10-r1 lxde
+vanillaos 22.10-r1 kde
+vanillaos 22.10-r1 sugar
+vanillaos 22.10 mate
+vanillaos 22.10 lxde
+vanillaos 22.10 kde
+vanillaos 22.10 sugar
+vanillaos 2.0 mate
+vanillaos 2.0 lxde
+vanillaos 2.0 kde
+vanillaos 2.0 sugar
+void 20250202 glibc
+void 20250202 musl
+void 20250202 xfce-glibc
+void 20250202 xfce-musl
 void 20240314 glibc
 void 20240314 musl
 void 20240314 xfce-glibc
@@ -1312,10 +1350,6 @@ void 20230628 glibc
 void 20230628 musl
 void 20230628 xfce-glibc
 void 20230628 xfce-musl
-void 20221001 glibc
-void 20221001 musl
-void 20221001 xfce-glibc
-void 20221001 xfce-musl
 vxlinux 6.1.5 glibc
 vxlinux 6.1.5 musl
 vxlinux 6.1.5 xfce-glibc
@@ -1346,4 +1380,296 @@ zorin 17 education64
 zorin 16 core64
 zorin 16 lite64
 zorin 16 education64
-rhino 2025.1
+rockylinux 9.5 minimal:              https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-minimal.iso
+rockylinux 9.5 dvd:                  https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-dvd.iso
+rockylinux 9.5 boot:                 https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-boot.iso
+rockylinux 9.4 minimal:              https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-minimal.iso
+rockylinux 9.4 dvd:                  https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-dvd.iso
+rockylinux 9.4 boot:                 https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-boot.iso
+rockylinux 9.3 minimal:              https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-minimal.iso
+rockylinux 9.3 dvd:                  https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-dvd.iso
+rockylinux 9.3 boot:                 https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-boot.iso
+rockylinux 9.2 minimal:              https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-minimal.iso
+rockylinux 9.2 dvd:                  https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-dvd.iso
+rockylinux 9.2 boot:                 https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-boot.iso
+rockylinux 9.1 minimal:              https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-minimal.iso
+rockylinux 9.1 dvd:                  https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-dvd.iso
+rockylinux 9.1 boot:                 https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-boot.iso
+rockylinux 9.0 minimal:              https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-minimal.iso
+rockylinux 9.0 dvd:                  https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-dvd.iso
+rockylinux 9.0 boot:                 https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-boot.iso
+rockylinux 8.9 minimal:              https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-minimal.iso
+rockylinux 8.9 dvd:                  https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-dvd1.iso
+rockylinux 8.9 boot:                 https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-boot.iso
+rockylinux 8.8 minimal:              https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-minimal.iso
+rockylinux 8.8 dvd:                  https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-dvd1.iso
+rockylinux 8.8 boot:                 https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-boot.iso
+rockylinux 8.7 minimal:              https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-minimal.iso
+rockylinux 8.7 dvd:                  https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-dvd1.iso
+rockylinux 8.7 boot:                 https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-boot.iso
+rockylinux 8.6 minimal:              https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-minimal.iso
+rockylinux 8.6 dvd:                  https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-dvd1.iso
+rockylinux 8.6 boot:                 https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-boot.iso
+rockylinux 8.5 minimal:              https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-minimal.iso
+rockylinux 8.5 dvd:                  https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-dvd1.iso
+rockylinux 8.5 boot:                 https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-boot.iso
+rockylinux 8.4 minimal:              https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-minimal.iso
+rockylinux 8.4 dvd:                  https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-dvd1.iso
+rockylinux 8.4 boot:                 https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-boot.iso
+rockylinux 8.3 minimal:              https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-minimal.iso
+rockylinux 8.3 dvd:                  https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-dvd1.iso
+rockylinux 8.3 boot:                 https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-boot.iso
+antix 23.1 net-sysv:                 /-net_x64-net.iso
+antix 23.1 core-sysv:                /-net_x64-net.iso/_x64-core.iso
+antix 23.1 base-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 23.1 full-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 23.1 net-runit:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso
+antix 23.1 core-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso
+antix 23.1 base-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso
+antix 23.1 full-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso
+antix 23 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso
+antix 23 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 23 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 23 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 23 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso
+antix 23 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso
+antix 23 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso
+antix 23 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso
+antix 22 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso
+antix 22 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 22 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 22 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 22 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso
+antix 22 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso
+antix 22 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso
+antix 22 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso
+antix 21 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso
+antix 21 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 21 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 21 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 21 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso
+antix 21 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso
+antix 21 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso/runit-bullseye/-runit_x64-base.iso
+antix 21 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso/runit-bullseye/-runit_x64-base.iso/runit-bullseye/-runit_x64-full.iso
+kdeneon user:                        https://files.kde.org/neon/images/user/current/neon-user-20250202-0745.iso
+kdeneon testing:                     https://files.kde.org/neon/images/testing/current/neon-testing-20250128-0430.iso
+kdeneon unstable:                    https://files.kde.org/neon/images/unstable/current/neon-unstable-20250202-1147.iso
+kdeneon developer:                   https://files.kde.org/neon/images/developer/current/neon-unstable-developer-20250203-0038.iso
+parrotsec 6.3 home:                  https://download.parrot.sh/parrot/iso/6.3/Parrot-home-6.3_amd64.iso
+parrotsec 6.3 htb:                   https://download.parrot.sh/parrot/iso/6.3/Parrot-htb-6.3_amd64.iso
+parrotsec 6.3 security:              https://download.parrot.sh/parrot/iso/6.3/Parrot-security-6.3_amd64.iso
+parrotsec 6.2 home:                  https://download.parrot.sh/parrot/iso/6.2/Parrot-home-6.2_amd64.iso
+parrotsec 6.2 htb:                   https://download.parrot.sh/parrot/iso/6.2/Parrot-htb-6.2_amd64.iso
+parrotsec 6.2 security:              https://download.parrot.sh/parrot/iso/6.2/Parrot-security-6.2_amd64.iso
+parrotsec 6.1 home:                  https://download.parrot.sh/parrot/iso/6.1/Parrot-home-6.1_amd64.iso
+parrotsec 6.1 htb:                   https://download.parrot.sh/parrot/iso/6.1/Parrot-htb-6.1_amd64.iso
+parrotsec 6.1 security:              https://download.parrot.sh/parrot/iso/6.1/Parrot-security-6.1_amd64.iso
+parrotsec 6.3.2 home:                https://download.parrot.sh/parrot/iso/6.3.2/Parrot-home-6.3.2_amd64.iso
+parrotsec 6.3.2 htb:                 https://download.parrot.sh/parrot/iso/6.3.2/Parrot-htb-6.3.2_amd64.iso
+parrotsec 6.3.2 security:            https://download.parrot.sh/parrot/iso/6.3.2/Parrot-security-6.3.2_amd64.iso
+parrotsec 6.2 home:                  https://download.parrot.sh/parrot/iso/6.2/Parrot-home-6.2_amd64.iso
+parrotsec 6.2 htb:                   https://download.parrot.sh/parrot/iso/6.2/Parrot-htb-6.2_amd64.iso
+parrotsec 6.2 security:              https://download.parrot.sh/parrot/iso/6.2/Parrot-security-6.2_amd64.iso
+parrotsec 6.1 home:                  https://download.parrot.sh/parrot/iso/6.1/Parrot-home-6.1_amd64.iso
+parrotsec 6.1 htb:                   https://download.parrot.sh/parrot/iso/6.1/Parrot-htb-6.1_amd64.iso
+parrotsec 6.1 security:              https://download.parrot.sh/parrot/iso/6.1/Parrot-security-6.1_amd64.iso
+tinycore 15 Core:                    http://www.tinycorelinux.net/15.x/x86/release/Core-15.0.iso
+tinycore 15 TinyCore:                http://www.tinycorelinux.net/15.x/x86/release/TinyCore-15.0.iso
+tinycore 15 CorePlus:                http://www.tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso
+tinycore 15 CorePure64:              http://www.tinycorelinux.net/15.x/x86_64/release/CorePure64-15.0.iso
+tinycore 15 TinyCorePure64:          http://www.tinycorelinux.net/15.x/x86_64/release/TinyCorePure64-15.0.iso
+tinycore 14 Core:                    http://www.tinycorelinux.net/14.x/x86/release/Core-14.0.iso
+tinycore 14 TinyCore:                http://www.tinycorelinux.net/14.x/x86/release/TinyCore-14.0.iso
+tinycore 14 CorePlus:                http://www.tinycorelinux.net/14.x/x86/release/CorePlus-14.0.iso
+tinycore 14 CorePure64:              http://www.tinycorelinux.net/14.x/x86_64/release/CorePure64-14.0.iso
+tinycore 14 TinyCorePure64:          http://www.tinycorelinux.net/14.x/x86_64/release/TinyCorePure64-14.0.iso
+antix 23.2 net-sysv:                 /-net_x64-net.iso
+antix 23.2 core-sysv:                /-net_x64-net.iso/_x64-core.iso
+antix 23.2 base-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 23.2 full-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 23.2 net-runit:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso
+antix 23.2 core-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso
+antix 23.2 base-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso
+antix 23.2 full-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso
+antix 23.1 net-sysv:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso
+antix 23.1 core-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 23.1 base-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 23.1 full-sysv:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 23.1 net-runit:                /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso
+antix 23.1 core-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso
+antix 23.1 base-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso
+antix 23.1 full-runit:               /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso
+antix 23 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso
+antix 23 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 23 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 23 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 23 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso
+antix 23 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso
+antix 23 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso
+antix 23 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso
+antix 22 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso
+antix 22 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 22 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 22 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 22 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso
+antix 22 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso
+antix 22 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso
+antix 22 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso
+antix 21 net-sysv:                   /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso
+antix 21 core-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso
+antix 21 base-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso
+antix 21 full-sysv:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso
+antix 21 net-runit:                  /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso
+antix 21 core-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso
+antix 21 base-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso/runit-bullseye/-runit_x64-base.iso
+antix 21 full-runit:                 /-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.2/-runit-net_x64-net.iso/runit-antiX-23.2/-runit_x64-core.iso/runit-antiX-23.2/-runit_x64-base.iso/runit-antiX-23.2/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23.1/-runit-net_x64-net.iso/runit-antiX-23.1/-runit_x64-core.iso/runit-antiX-23.1/-runit_x64-base.iso/runit-antiX-23.1/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-23/-runit-net_x64-net.iso/runit-antiX-23/-runit_x64-core.iso/runit-antiX-23/-runit_x64-base.iso/runit-antiX-23/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-antiX-22/-runit-net_x64-net.iso/runit-antiX-22/-runit_x64-core.iso/runit-antiX-22/-runit_x64-base.iso/runit-antiX-22/-runit_x64-full.iso/-net_x64-net.iso/_x64-core.iso/_x64-base.iso/_x64-full.iso/runit-bullseye/-runit-net_x64-net.iso/runit-bullseye/-runit_x64-core.iso/runit-bullseye/-runit_x64-base.iso/runit-bullseye/-runit_x64-full.iso
+antix 23.2 net-sysv:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2-net_x64-net.iso
+antix 23.2 core-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-core.iso
+antix 23.2 base-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-base.iso
+antix 23.2 full-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-full.iso
+antix 23.2 net-runit:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit-net_x64-net.iso
+antix 23.2 core-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-core.iso
+antix 23.2 base-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-base.iso
+antix 23.2 full-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-full.iso
+antix 23.1 net-sysv:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1-net_x64-net.iso
+antix 23.1 core-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-core.iso
+antix 23.1 base-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-base.iso
+antix 23.1 full-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-full.iso
+antix 23.1 net-runit:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit-net_x64-net.iso
+antix 23.1 core-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-core.iso
+antix 23.1 base-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-base.iso
+antix 23.1 full-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-full.iso
+antix 23 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23-net_x64-net.iso
+antix 23 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-core.iso
+antix 23 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-base.iso
+antix 23 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-full.iso
+antix 23 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit-net_x64-net.iso
+antix 23 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-core.iso
+antix 23 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-base.iso
+antix 23 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-full.iso
+antix 22 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22-net_x64-net.iso
+antix 22 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-core.iso
+antix 22 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-base.iso
+antix 22 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-full.iso
+antix 22 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit-net_x64-net.iso
+antix 22 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-core.iso
+antix 22 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-base.iso
+antix 22 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-full.iso
+antix 21 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21-net_x64-net.iso
+antix 21 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-core.iso
+antix 21 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-base.iso
+antix 21 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-full.iso
+antix 21 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit-net_x64-net.iso
+antix 21 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-core.iso
+antix 21 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-base.iso
+antix 21 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-full.iso
+vanillaos 22.10-r8:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r8/VanillaOS-22.10-all.20230226.iso
+vanillaos 22.10-r7.5:                https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r7.5/VanillaOS-22.10-all.20230214.iso
+vanillaos 22.10-r7:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r7.5/VanillaOS-22.10-all.20230214.iso
+vanillaos 22.10-r6:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r6/VanillaOS-22.10-all.20230123.iso
+vanillaos 22.10-r5:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r5/VanillaOS-22.10-all.20230116.iso
+vanillaos 22.10-r4:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r4/VanillaOS-22.10-all.20230115.iso
+vanillaos 22.10-r3:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r3/VanillaOS-22.10-all.20230105.iso
+vanillaos 22.10-r2:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r2/VanillaOS-22.10-all.20221231.iso
+vanillaos 22.10-r1:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r1/VanillaOS-22.10-all.20221230.iso
+vanillaos 22.10:                     https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r8/VanillaOS-22.10-all.20230226.iso
+vanillaos 2.0:                       https://github.com/Vanilla-OS/live-iso/releases/download/2.0/VanillaOS-2-stable.20250209.iso
+bazzite latest gnome:                https://download.bazzite.gg/bazzite-gnome-stable-amd64.iso
+bazzite latest kde:                  https://download.bazzite.gg/bazzite-stable-amd64.iso
+tinycore 15 Core:                    https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/Core-15.0.iso
+tinycore 15 TinyCore:                https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/TinyCore-15.0.iso
+tinycore 15 CorePlus:                https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.0.iso
+tinycore 15 CorePure64:              https://distro.ibiblio.org/tinycorelinux/15.x/x86_64/release/CorePure64-15.0.iso
+tinycore 15 TinyCorePure64:          https://distro.ibiblio.org/tinycorelinux/15.x/x86_64/release/TinyCorePure64-15.0.iso
+tinycore 14 Core:                    https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/Core-14.0.iso
+tinycore 14 TinyCore:                https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/TinyCore-14.0.iso
+tinycore 14 CorePlus:                https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/CorePlus-14.0.iso
+tinycore 14 CorePure64:              https://distro.ibiblio.org/tinycorelinux/14.x/x86_64/release/CorePure64-14.0.iso
+tinycore 14 TinyCorePure64:          https://distro.ibiblio.org/tinycorelinux/14.x/x86_64/release/TinyCorePure64-14.0.iso
+gnomeos nightly:                     https://1270333429.rsc.cdn77.org/nightly/790243/gnome_os_installer_790243.iso
+gnomeos 48.alpha:                    https://download.gnome.org/gnomeos/48.alpha/gnome_os_installer_48.alpha.iso
+gnomeos 47.rc:                       https://download.gnome.org/gnomeos/47.rc/gnome_os_installer_47.rc.iso
+gnomeos 47.beta:                     https://download.gnome.org/gnomeos/47.beta/gnome_os_installer_47.beta.iso
+gnomeos 47.alpha:                    https://download.gnome.org/gnomeos/47.alpha/gnome_os_installer_47.alpha.iso
+gnomeos 47.0:                        https://download.gnome.org/gnomeos/47.0/gnome_os_installer_47.0.iso
+gnomeos 46.rc:                       https://download.gnome.org/gnomeos/46.rc/gnome_os_installer_46.rc.iso
+gnomeos 46.beta:                     https://download.gnome.org/gnomeos/46.beta/gnome_os_installer_46.beta.iso
+gnomeos 46.alpha:                    https://download.gnome.org/gnomeos/46.alpha/gnome_os_installer_46.alpha.iso
+gnomeos 46.0:                        https://download.gnome.org/gnomeos/46.0/gnome_os_installer_46.iso
+gnomeos 45.rc:                       https://download.gnome.org/gnomeos/45.rc/gnome_os_installer_45.rc.iso
+gnomeos 45.beta:                     https://download.gnome.org/gnomeos/45.beta/gnome_os_installer_45.beta.iso
+gnomeos 44.rc:                       https://download.gnome.org/gnomeos/44.rc/gnome_os_installer_44.rc.iso
+gnomeos 44.beta:                     https://download.gnome.org/gnomeos/44.beta/gnome_os_installer_44.beta.iso
+gnomeos 44.0:                        https://download.gnome.org/gnomeos/44.0/gnome_os_installer_44.0.iso
+gnomeos 43.beta:                     https://download.gnome.org/gnomeos/43.beta/gnome_os_installer_43.beta.iso
+gnomeos 43.alpha:                    https://download.gnome.org/gnomeos/43.alpha/gnome_os_installer_43.alpha.iso
+gnomeos 43.0:                        https://download.gnome.org/gnomeos/43.0/gnome_os_installer_43.0.iso
+gnomeos 42.rc:                       https://download.gnome.org/gnomeos/42.rc/gnome_os_installer_42.rc.iso
+gnomeos 42.beta:                     https://download.gnome.org/gnomeos/42.beta/gnome_os_installer_42.beta.iso
+gnomeos 42.0:                        https://download.gnome.org/gnomeos/42.0/gnome_os_installer_42.0.iso
+gnomeos 41.rc:                       https://download.gnome.org/gnomeos/41.rc/gnome_os_installer_41.rc.iso
+gnomeos 41.beta:                     https://download.gnome.org/gnomeos/41.beta/gnome_os_installer_41.beta.iso
+gnomeos 41.0:                        https://download.gnome.org/gnomeos/41.0/gnome_os_installer_41.0.iso
+gnomeos 40.rc:                       https://download.gnome.org/gnomeos/40.rc/gnome_os_installer_40.rc.iso
+gnomeos 40.beta:                     https://download.gnome.org/gnomeos/40.beta/gnome_os_installer_40.beta.iso
+gnomeos 40.0:                        https://download.gnome.org/gnomeos/40.0/gnome_os_installer_40.0.iso
+gnomeos 3.38.1:                      https://download.gnome.org/gnomeos/3.38.1/gnome_os_installer.iso
+gnomeos 3.38.0:                      https://download.gnome.org/gnomeos/3.38.0/gnome_os_installer.iso
+gnomeos nightly:                     https://1270333429.rsc.cdn77.org/nightly/790243/gnome_os_installer_790243.iso
+gnomeos 48.alpha:                    https://download.gnome.org/gnomeos/48.alpha/gnome_os_installer_48.alpha.8.iso
+gnomeos 47.rc:                       https://download.gnome.org/gnomeos/47.rc/gnome_os_installer_47.rc.iso
+gnomeos 47.beta:                     https://download.gnome.org/gnomeos/47.beta/gnome_os_installer_47.beta.iso
+gnomeos 47.alpha:                    https://download.gnome.org/gnomeos/47.alpha/gnome_os_installer_47.alpha.iso
+gnomeos 47.0:                        https://download.gnome.org/gnomeos/47.0/gnome_os_installer_47.0.iso
+gnomeos 46.rc:                       https://download.gnome.org/gnomeos/46.rc/gnome_os_installer_46.rc.iso
+gnomeos 46.beta:                     https://download.gnome.org/gnomeos/46.beta/gnome_os_installer_46.beta.iso
+gnomeos 46.alpha:                    https://download.gnome.org/gnomeos/46.alpha/gnome_os_installer_46.alpha.iso
+gnomeos 46.0:                        https://download.gnome.org/gnomeos/46.0/gnome_os_installer_46.iso
+gnomeos 45.rc:                       https://download.gnome.org/gnomeos/45.rc/gnome_os_installer_45.rc.iso
+gnomeos 45.beta:                     https://download.gnome.org/gnomeos/45.beta/gnome_os_installer_45.beta.iso
+gnomeos 44.rc:                       https://download.gnome.org/gnomeos/44.rc/gnome_os_installer_44.rc.iso
+gnomeos 44.beta:                     https://download.gnome.org/gnomeos/44.beta/gnome_os_installer_44.beta.iso
+gnomeos 44.0:                        https://download.gnome.org/gnomeos/44.0/gnome_os_installer_44.0.iso
+gnomeos 43.beta:                     https://download.gnome.org/gnomeos/43.beta/gnome_os_installer_43.beta.iso
+gnomeos 43.alpha:                    https://download.gnome.org/gnomeos/43.alpha/gnome_os_installer_43.alpha.iso
+gnomeos 43.0:                        https://download.gnome.org/gnomeos/43.0/gnome_os_installer_43.0.iso
+gnomeos 42.rc:                       https://download.gnome.org/gnomeos/42.rc/gnome_os_installer_42.rc.iso
+gnomeos 42.beta:                     https://download.gnome.org/gnomeos/42.beta/gnome_os_installer_42.beta.iso
+gnomeos 42.0:                        https://download.gnome.org/gnomeos/42.0/gnome_os_installer_42.0.iso
+gnomeos 41.rc:                       https://download.gnome.org/gnomeos/41.rc/gnome_os_installer_41.rc.iso
+gnomeos 41.beta:                     https://download.gnome.org/gnomeos/41.beta/gnome_os_installer_41.beta.iso
+gnomeos 41.0:                        https://download.gnome.org/gnomeos/41.0/gnome_os_installer_41.0.iso
+gnomeos 40.rc:                       https://download.gnome.org/gnomeos/40.rc/gnome_os_installer_40.rc.iso
+gnomeos 40.beta:                     https://download.gnome.org/gnomeos/40.beta/gnome_os_installer_40.beta.iso
+gnomeos 40.0:                        https://download.gnome.org/gnomeos/40.0/gnome_os_installer_40.0.iso
+gnomeos 3.38.1:                      https://download.gnome.org/gnomeos/3.38.1/gnome_os_installer.iso
+gnomeos 3.38.0:                      https://download.gnome.org/gnomeos/3.38.0/gnome_os_installer.iso
+gnomeos nightly:                     https://1270333429.rsc.cdn77.org/nightly/790243/gnome_os_installer_790243.iso
+gnomeos 48.alpha:                    https://download.gnome.org/gnomeos/48.alpha/gnome_os_installer_48.alpha.8.iso
+gnomeos 47.rc:                       https://download.gnome.org/gnomeos/47.rc/gnome_os_installer_47.rc.iso
+gnomeos 47.beta:                     https://download.gnome.org/gnomeos/47.beta/gnome_os_installer_47.beta.iso
+gnomeos 47.alpha:                    https://download.gnome.org/gnomeos/47.alpha/gnome_os_installer_47.alpha.iso
+gnomeos 47.0:                        https://download.gnome.org/gnomeos/47.0/gnome_os_installer_47.0.iso
+gnomeos 46.rc:                       https://download.gnome.org/gnomeos/46.rc/gnome_os_installer_46.rc.iso
+gnomeos 46.beta:                     https://download.gnome.org/gnomeos/46.beta/gnome_os_installer_46.beta.iso
+gnomeos 46.alpha:                    https://download.gnome.org/gnomeos/46.alpha/gnome_os_installer_46.alpha.iso
+gnomeos 46.0:                        https://download.gnome.org/gnomeos/46.0/gnome_os_installer_46.iso
+gnomeos 45.rc:                       https://download.gnome.org/gnomeos/45.rc/gnome_os_installer_45.rc.iso
+gnomeos 45.beta:                     https://download.gnome.org/gnomeos/45.beta/gnome_os_installer_45.beta.iso
+gnomeos 44.rc:                       https://download.gnome.org/gnomeos/44.rc/gnome_os_installer_44.rc.iso
+gnomeos 44.beta:                     https://download.gnome.org/gnomeos/44.beta/gnome_os_installer_44.beta.iso
+gnomeos 44.0:                        https://download.gnome.org/gnomeos/44.0/gnome_os_installer_44.0.iso
+gnomeos 43.beta:                     https://download.gnome.org/gnomeos/43.beta/gnome_os_installer_43.beta.iso
+gnomeos 43.alpha:                    https://download.gnome.org/gnomeos/43.alpha/gnome_os_installer_43.alpha.iso
+gnomeos 43.0:                        https://download.gnome.org/gnomeos/43.0/gnome_os_installer_43.0.iso
+gnomeos 42.rc:                       https://download.gnome.org/gnomeos/42.rc/gnome_os_installer_42.rc.iso
+gnomeos 42.beta:                     https://download.gnome.org/gnomeos/42.beta/gnome_os_installer_42.beta.iso
+gnomeos 42.0:                        https://download.gnome.org/gnomeos/42.0/gnome_os_installer_42.0.iso
+gnomeos 41.rc:                       https://download.gnome.org/gnomeos/41.rc/gnome_os_installer_41.rc.iso
+gnomeos 41.beta:                     https://download.gnome.org/gnomeos/41.beta/gnome_os_installer_41.beta.iso
+gnomeos 41.0:                        https://download.gnome.org/gnomeos/41.0/gnome_os_installer_41.0.iso
+gnomeos 40.rc:                       https://download.gnome.org/gnomeos/40.rc/gnome_os_installer_40.rc.iso
+gnomeos 40.beta:                     https://download.gnome.org/gnomeos/40.beta/gnome_os_installer_40.beta.iso
+gnomeos 40.0:                        https://download.gnome.org/gnomeos/40.0/gnome_os_installer_40.0.iso
+gnomeos 3.38.1:                      https://download.gnome.org/gnomeos/3.38.1/gnome_os_installer.iso
+gnomeos 3.38.0:                      https://download.gnome.org/gnomeos/3.38.0/gnome_os_installer.iso
