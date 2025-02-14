@@ -7,7 +7,7 @@ DESCRIPTION="Designed to work out of the box and comes fully equipped with the a
 CREDENTIALS="-"
 
 function releases_() {
-    echo 22 21.3 21.2 21.1 21 20.3 20.2
+    echo 22.1 22 21.3 21.2 21.1 21 20.3 20.2
 }
 
 function editions_() {
