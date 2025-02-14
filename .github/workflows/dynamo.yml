@@ -16,7 +16,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: "Check out repository"
+      - name: "Checkout repository"
         uses: actions/checkout@v4
 
       - name: "Generate Matrix"
@@ -42,25 +42,55 @@ jobs:
           echo "${{ steps.set-matrix.outputs.matrix }}"
 
   run-actions:
-    name: "check 💿️"
+    name: "💿️"
     needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
-      - name: "Check out repository"
+      - name: "Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "Check out ${{ matrix.file }}"
+      - name: "Checkout ${{ matrix.file }}"
         run: |
           mkdir -p results
-          RESULTS_FILE="results/${{ matrix.file }}.txt"
-          ./quickget --check ${{ matrix.file }} | tee "$RESULTS_FILE"
-          if grep -vqE '^(PASS:|SKIP:)' "$RESULTS_FILE"; then
-            FAILED=$(grep -c '^FAIL:' "$RESULTS_FILE" | wc -l 2>/dev/null)
-            PASSED=$(grep -c '^PASS:' "$RESULTS_FILE" | wc -l 2>/dev/null)
-            echo "$FAILED/$PASSED 💀/🏁" >> $GITHUB_STEP_SUMMARY
-            grep -vE '^(PASS:|SKIP:)' "$RESULTS_FILE" >> $GITHUB_STEP_SUMMARY
+          ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
+          if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
+            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
+
+
+      - name: "Upload Results ⬆️"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.file }}.txt
+          path: results/${{ matrix.file }}.txt
+
+  end:
+    name: "finish"
+    needs: run-actions
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Download results ⬇️"
+        uses: actions/download-artifact@v4
+        with:
+          path: results
+          merge-multiple: true
+
+      - name: "results"
+        run: |
+          for file in results/*.txt; do
+            cat "$file" | tee -a ../results
+          done
+          PASSED=$(grep -c '^PASS:' results | wc -l 2>/dev/null)
+          FAILED=$(grep -c '^FAIL:' results | wc -l 2>/dev/null)
+          SKIPPED=$(grep -c '^SKIP:' results | wc -l 2>/dev/null)
+          echo "$PASSED/$FAILED 🏁 / 💀" >> $GITHUB_STEP_SUMMARY
+          echo "$SKIPPED Skipped" >> $GITHUB_STEP_SUMMARY
