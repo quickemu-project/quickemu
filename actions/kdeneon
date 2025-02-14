@@ -14,7 +14,11 @@ function get_() {
     local HASH=""
     local ISO=""
     local URL="https://files.kde.org/neon/images/${RELEASE}/current"
-    ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    if [ "$RELEASE" == 'developer' ]; then
+        ISO=$(web_pipe "${URL}/neon-unstable-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    else
+        ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    fi
     HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
