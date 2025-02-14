@@ -22,6 +22,7 @@ RELEASES="%s"
 %s
 ' "$OS" "$OSNAME" "$PRETTY" "$BASEDOF" "$DESCRIPTION" "$HOMEPAGE" "$CREDENTIALS" "$RELEASES" "$EDITIONS" | tee -a "public/${OS}"
     cat "public/tmp_${OS}" >> TODO/all
+    rm "public/tmp_${OS}"
     echo
 }
 
@@ -105,9 +106,9 @@ function get_releases() {
     OS="${1}"
     mkdir -p public
     rm -f "public/${OS}"
-    touch "public/${OS}"
+    #touch "public/${OS}"
     rm -f "public/tmp_${OS}"
-    touch "public/tmp_${OS}"
+    #touch "public/tmp_${OS}"
     . "actions/${OS}"
     if [[ "${OS}" == *ubuntu* && "${OS}" != "ubuntu-server" ]]; then
         FUNC="ubuntu"
@@ -172,12 +173,12 @@ function check_hash() {
 
 # Download a file from the web and pipe it to stdout
 function web_pipe() {
-    curl --silent --location "${1}"
+    curl --disable --silent --location "${1}"
 }
 
 # Download a JSON file from the web and pipe it to stdout
 function web_pipe_json() {
-     curl --silent --location --header "Accept: application/json" "${1}"
+     curl --disable --silent --location --header "Accept: application/json" "${1}"
 }
 
 # checks if a URL is reachable
