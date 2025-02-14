@@ -2,7 +2,7 @@
 OSNAME="rhino"
 PRETTY="Rhino Linux"
 BASEDOF="Ubuntu"
-DESCRIPTION="Re-invents the Ubuntu experience as a rolling-release distribution built on a stable desktop environment."
+DESCRIPTION="Re-invents the Ubuntu experience as a rolling-release distribution built on a stable desktop environment. With Pacstall & XFCE"
 HOMEPAGE="https://rhinolinux.org/"
 CREDENTIALS="-"
 RELEASES="2025.1"

@@ -5,5 +5,5 @@ BASEDOF="Debian"
 DESCRIPTION="Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home"
 HOMEPAGE="https://www.deepin.org"
 CREDENTIALS="-"
-RELEASES="23-RC2 23 20.9"
+RELEASES="23 20.9"
 

@@ -5,5 +5,5 @@ BASEDOF="Ubuntu"
 DESCRIPTION="Designed to be a reliable and productive operating system for your daily work"
 HOMEPAGE="https://vanillaos.org"
 CREDENTIALS="-"
-RELEASES=""
+RELEASES="22.10-r8 22.10-r7.5 22.10-r7 22.10-r6 22.10-r5 22.10-r4 22.10-r3 22.10-r2 22.10-r1 22.10 2.0"
 
