@@ -29,7 +29,7 @@ jobs:
           done
           MATRIX="${MATRIX%,}]}"
           echo "Generated Matrix: $MATRIX"
-          echo "::set-output name=matrix::$MATRIX"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
       - name: "Install dependencies 📦️"
         run: |
