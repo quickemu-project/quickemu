@@ -22,7 +22,7 @@ jobs:
       - name: "Generate Matrix"
         id: set-matrix
         run: |
-          FILES=$(find actions/ -maxdepth 1 -type f -printf "%f\n")
+          FILES=$(find actions/ -maxdepth 1 -type f -printf "%f\n" | sort)
           MATRIX="{\"include\": ["
           for file in $FILES; do
             MATRIX+="{\"file\": \"$file\"},"
