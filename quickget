@@ -934,7 +934,6 @@ run_itself() {
                 fi
             else
                 show_os_info "${OS}"
-                echo -e " - Editions:\t$(editions_ | fmt -w 80)"
                 echo -e "\nERROR! You must specify an edition."
                 exit 1
             fi
