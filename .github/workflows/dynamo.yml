@@ -55,9 +55,12 @@ jobs:
       - name: "Check out ${{ matrix.file }}"
         run: |
           mkdir -p results
-          ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
-          if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
-            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
+          RESULTS_FILE="results/${{ matrix.file }}.txt"
+          ./quickget --check ${{ matrix.file }} | tee "$RESULTS_FILE"
+          if grep -vqE '^(PASS:|SKIP:)' "$RESULTS_FILE"; then
+            FAILED=$(grep -c '^FAIL:' "$RESULTS_FILE" | wc -l 2>/dev/null)
+            PASSED=$(grep -c '^PASS:' "$RESULTS_FILE" | wc -l 2>/dev/null)
+            echo "$FAILED/$PASSED 💀/🏁" >> $GITHUB_STEP_SUMMARY
+            grep -vE '^(PASS:|SKIP:)' "$RESULTS_FILE" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-
