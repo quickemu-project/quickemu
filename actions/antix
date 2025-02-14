@@ -7,7 +7,7 @@ HOMEPAGE="https://antixlinux.com"
 CREDENTIALS="-"
 
 function releases_() {
-    echo 23.1 23 22 21
+    echo 23.2 23.1 23 22 21
 }
 
 function editions_() {
@@ -15,6 +15,11 @@ function editions_() {
 }
 
 function get_() {
+    local HASH=""
+    local ISO="antiX-${RELEASE}"
+    local README="README"
+    local URL="https://sourceforge.net/projects/antix-linux/files/Final/antiX-${RELEASE}"
+
     # antiX uses a different URL and ISO naming for runit editions
     if [[ "${EDITION}" == *"runit"* ]];then
         ISO+="-runit"
@@ -30,5 +35,6 @@ function get_() {
         full-*) ISO+="_x64-full.iso";;
         net-*)  ISO+="-net_x64-net.iso";;
     esac
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
     echo "${URL}/${ISO} ${HASH}"
 }
