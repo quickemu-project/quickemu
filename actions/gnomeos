@@ -21,6 +21,7 @@ function get_() {
             URL="https://os.gnome.org/download/latest";;
         46.0) ISO="gnome_os_installer_46.iso";;
         3*) ISO="gnome_os_installer.iso";;
+        48.alpha) ISO=$(web_pipe "https://download.gnome.org/gnomeos/48.alpha/" | grep '.iso' | cut -d'"' -f4);;
     esac
     # Process the URL redirections; required for GNOME
     ISO=$(web_redirect "${URL}/${ISO}")
