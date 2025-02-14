@@ -82,10 +82,10 @@ function get_() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
-    appleSession=$(curl -v -H "Host: osrecovery.apple.com" \
+    appleSession=$(curl --disable -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
-    info=$(curl -s -X POST -H "Host: osrecovery.apple.com" \
+    info=$(curl --disable -s -X POST -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" \
                            -b "session=\"${appleSession}\"" \

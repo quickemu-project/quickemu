@@ -394,7 +394,7 @@ function download_windows_server() {
     local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
     echo " - Parsing download page: ${url}"
-    iso_download_page_html="$(curl --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --disable --silent --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -467,7 +467,7 @@ function download_windows_server() {
     # Follow redirect so proceeding log message is useful
     # This is a request we make this Fido doesn't
     # We don't need to set "--max-filesize" here because this is a HEAD request and the output is to /dev/null anyway
-    iso_download_link="$(curl --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
+    iso_download_link="$(curl --disable --silent --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link")" || {
         # This should only happen if the Microsoft servers are down
         handle_curl_error $?
         return $?
@@ -516,7 +516,7 @@ function download_windows_workstation() {
     # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
     # Remove "Accept" header that curl sends by default
     echo " - Parsing download page: ${url}"
-    iso_download_page_html="$(curl --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
+    iso_download_page_html="$(curl --disable --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url")" || {
         handle_curl_error $?
         return $?
     }
@@ -530,7 +530,7 @@ function download_windows_workstation() {
     echo " - Permit Session ID: $session_id"
     # Permit Session ID
     # "org_id" is always the same value
-    curl --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+    curl --disable --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
         # This should only happen if there's been some change to how this API works
         handle_curl_error $?
         return $?
@@ -540,7 +540,7 @@ function download_windows_workstation() {
 
     echo -n " - Getting language SKU ID: "
     # Get language -> skuID association table
-    language_skuid_table_json="$(curl -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" || {
+    language_skuid_table_json="$(curl --disable -s --fail --max-filesize 100K --proto =https --tlsv1.2 --http1.1 "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=${profile}&ProductEditionId=${product_edition_id}&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")" || {
         handle_curl_error $?
         return $?
     }
@@ -552,7 +552,7 @@ function download_windows_workstation() {
     # Get ISO download link
     # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
     # --referer: Required by Microsoft servers to allow request
-    iso_download_link_json="$(curl -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
+    iso_download_link_json="$(curl --disable -s --fail --referer "$url" "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=${profile}&productEditionId=undefined&SKU=${sku_id}&friendlyFileName=undefined&Locale=en-US&sessionID=${session_id}")"
 
     local failed=0
 
@@ -591,7 +591,7 @@ function download_windows_workstation() {
     web_get "${iso_download_link}" "${VM_PATH}" "${FILE_NAME}"
 }
 
-function get_windows() {
+function get_() {
     if [ "${OS}" == "windows-server" ]; then
         download_windows_server "windows-server-${RELEASE}"
     else
