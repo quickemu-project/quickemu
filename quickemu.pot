@@ -1,0 +1,570 @@
+#: quickemu:5
+msgid "Sorry, you need bash 4.0 or newer to run this script."
+msgstr ""
+#: quickemu:18
+msgid "ERROR! /etc/modprobe.d was not found, I don't know how to configure this system."
+msgstr ""
+#: quickemu:30
+msgid " - MSR:      WARNING! Ignoring unhandled Model-Specific Registers is disabled."
+msgstr ""
+#: quickemu:34
+msgid "             If you are unable to run macOS or Windows VMs then run the above 👆"
+msgstr ""
+#: quickemu:35
+msgid "             This will enable ignoring of unhandled MSRs until you reboot the host."
+msgstr ""
+#: quickemu:36
+msgid "             You can make this change permanent by running: 'quickemu --ignore-msrs-always'"
+msgstr ""
+#: quickemu:45
+msgid " - Deleted ${SHORTCUT_DIR}/${VMNAME}.desktop"
+msgstr ""
+#: quickemu:50
+msgid "Deleting ${VMNAME} virtual hard disk"
+msgstr ""
+#: quickemu:56
+msgid " - Deleted ${disk_img}"
+msgstr ""
+#: quickemu:59
+msgid " - ${disk_img} not found. Doing nothing."
+msgstr ""
+#: quickemu:64
+msgid "Deleting ${VMNAME} completely"
+msgstr ""
+#: quickemu:68
+msgid " - Deleted ${VM} and ${VMDIR}/"
+msgstr ""
+#: quickemu:71
+msgid " - ${VMDIR} not found. Doing nothing."
+msgstr ""
+#: quickemu:76
+msgid "Killing ${VMNAME}"
+msgstr ""
+#: quickemu:78
+msgid " - ${VMNAME} is not running."
+msgstr ""
+#: quickemu:82
+msgid " - ${VMNAME} (${VM_PID}) killed."
+msgstr ""
+#: quickemu:85
+msgid " - ${VMNAME} (${VM_PID}) was not killed."
+msgstr ""
+#: quickemu:88
+msgid " - ${VMNAME} has no ${VMDIR}/${VMNAME}.pid"
+msgstr ""
+#: quickemu:93
+msgid "Snapshot apply to ${disk_img}"
+msgstr ""
+#: quickemu:96
+msgid " - ERROR! No snapshot tag provided."
+msgstr ""
+#: quickemu:102
+msgid " - Applied snapshot '${TAG}' to ${disk_img}"
+msgstr ""
+#: quickemu:104
+msgid " - ERROR! Failed to apply snapshot '${TAG}' to ${disk_img}"
+msgstr ""
+#: quickemu:107
+msgid " - NOTE! ${disk_img} not found. Doing nothing."
+msgstr ""
+#: quickemu:112
+msgid "Snapshotting ${disk_img}"
+msgstr ""
+#: quickemu:115
+msgid "- ERROR! No snapshot tag provided."
+msgstr ""
+#: quickemu:121
+msgid " - Created snapshot '${TAG}' for ${disk_img}"
+msgstr ""
+#: quickemu:123
+msgid " - ERROR! Failed to create snapshot '${TAG}' for ${disk_img}"
+msgstr ""
+#: quickemu:126
+msgid " - NOTE! ${disk_img} not found. Doing nothing."
+msgstr ""
+#: quickemu:131
+msgid "Snapshot removal ${disk_img}"
+msgstr ""
+#: quickemu:134
+msgid " - ERROR! No snapshot tag provided."
+msgstr ""
+#: quickemu:140
+msgid " - Deleted snapshot '${TAG}' from ${disk_img}"
+msgstr ""
+#: quickemu:142
+msgid " - ERROR! Failed to delete snapshot '${TAG}' from ${disk_img}"
+msgstr ""
+#: quickemu:145
+msgid " - NOTE! ${disk_img} not found. Doing nothing."
+msgstr ""
+#: quickemu:181
+msgid " - USB:      Host pass-through requested:"
+msgstr ""
+#: quickemu:189
+msgid "             ! USB device ${VENDOR_ID}:${PRODUCT_ID} not found. Check your configuration"
+msgstr ""
+#: quickemu:192
+msgid "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
+msgstr ""
+#: quickemu:194
+msgid "             x ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} needs permission changes:"
+msgstr ""
+#: quickemu:202
+msgid "               ERROR! USB permission changes are required 👆"
+msgstr ""
+#: quickemu:215
+msgid "ERROR! Unable to determine the number of processing units."
+msgstr ""
+#: quickemu:236
+msgid "ERROR! Could not find macOS translation for ${INFO_NAME}"
+msgstr ""
+#: quickemu:314
+msgid "ERROR! ${VARS_IN} was not found. Please install edk2."
+msgstr ""
+#: quickemu:377
+msgid "ERROR! Intel VT-x support is required."
+msgstr ""
+#: quickemu:382
+msgid "ERROR! AMD SVM support is required."
+msgstr ""
+#: quickemu:424
+msgid "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
+msgstr ""
+#: quickemu:425
+msgid "       Try macOS Monterey or Big Sur."
+msgstr ""
+#: quickemu:435
+msgid "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
+msgstr ""
+#: quickemu:445
+msgid "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
+msgstr ""
+#: quickemu:550
+msgid " - CPU:      ${HOST_CPU_MODEL}"
+msgstr ""
+#: quickemu:551
+msgid " - CPU VM:   ${CPU_MODEL%%,*}, ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
+msgstr ""
+#: quickemu:583
+msgid " - RAM VM:   ${RAM_VM} RAM"
+msgstr ""
+#: quickemu:598
+msgid "             ERROR! The guest virtual machine has been allocated insufficient RAM to run ${OS_PRETTY_NAME}."
+msgstr ""
+#: quickemu:599
+msgid "             You can override the guest RAM allocation by adding 'ram=${min_ram}G' to ${VM}"
+msgstr ""
+#: quickemu:602
+msgid "             WARNING! You have allocated less than the recommended amount of RAM to run ${OS_PRETTY_NAME}."
+msgstr ""
+#: quickemu:631
+msgid "ERROR! macOS ${MAC_MISSING} was not found."
+msgstr ""
+#: quickemu:632
+msgid "       Use 'quickget' to download the required files."
+msgstr ""
+#: quickemu:703
+msgid "ERROR! SecureBoot was requested but no SecureBoot capable firmware was found."
+msgstr ""
+#: quickemu:705
+msgid "ERROR! EFI boot requested but no EFI firmware found."
+msgstr ""
+#: quickemu:707
+msgid "       Please install OVMF firmware."
+msgstr ""
+#: quickemu:712
+msgid " - EFI:      ERROR! EFI_EXTRA_VARS file ${EFI_EXTRA_VARS} does not exist."
+msgstr ""
+#: quickemu:720
+msgid " - EFI:      ERROR! ${EFI_VARS} is not a regular file or not writeable."
+msgstr ""
+#: quickemu:721
+msgid "             Deleting ${EFI_VARS}. Please re-run quickemu."
+msgstr ""
+#: quickemu:728
+msgid " - EFI:      WARNING! ${EFI_CODE} is a symlink."
+msgstr ""
+#: quickemu:740
+msgid " - BOOT:     ${BOOT_STATUS}"
+msgstr ""
+#: quickemu:796
+msgid " - Disk:     ${disk_img} (${disk_size})"
+msgstr ""
+#: quickemu:802
+msgid "ERROR! ${preallocation} is an unsupported disk preallocation option."
+msgstr ""
+#: quickemu:814
+msgid "ERROR! Failed to create ${disk_img} using ${disk_format} format."
+msgstr ""
+#: quickemu:819
+msgid "ERROR! You haven't specified a .iso or .img image to boot from."
+msgstr ""
+#: quickemu:822
+msgid "             Just created, booting from ${iso}${img}"
+msgstr ""
+#: quickemu:829
+msgid "             Failed to get \\\"write\\\" lock. Is another process using the disk?"
+msgstr ""
+#: quickemu:834
+msgid "             Disk integrity check failed. Please run qemu-img check --help."
+msgstr ""
+#: quickemu:845
+msgid "             Looks unused, booting from ${iso}${img}"
+msgstr ""
+#: quickemu:847
+msgid "ERROR! You haven't specified a .iso or .img image to boot from."
+msgstr ""
+#: quickemu:867
+msgid "             Existing disk state will be preserved, no writes will be committed."
+msgstr ""
+#: quickemu:872
+msgid " - Boot ISO: ${iso}"
+msgstr ""
+#: quickemu:874
+msgid " - Recovery: ${img}"
+msgstr ""
+#: quickemu:878
+msgid " - CD-ROM:   ${fixed_iso}"
+msgstr ""
+#: quickemu:950
+msgid " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+msgstr ""
+#: quickemu:952
+msgid " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
+msgstr ""
+#: quickemu:997
+msgid " - Sound:    ${sound_card} (${sound_duplex})"
+msgstr ""
+#: quickemu:1011
+msgid " - ssh:      On host:  ssh user@localhost -p ${ssh_port}"
+msgstr ""
+#: quickemu:1013
+msgid " - ssh:      All ssh ports have been exhausted."
+msgstr ""
+#: quickemu:1018
+msgid " - PORTS:    Port forwards requested:"
+msgstr ""
+#: quickemu:1055
+msgid " - SPICE:    All SPICE ports have been exhausted."
+msgstr ""
+#: quickemu:1057
+msgid "             ERROR! Requested SPICE display, but no SPICE ports are free."
+msgstr ""
+#: quickemu:1062
+msgid " - SPICE:    Enabled"
+msgstr ""
+#: quickemu:1083
+msgid " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
+msgstr ""
+#: quickemu:1084
+msgid " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
+msgstr ""
+#: quickemu:1086
+msgid " - WebDAV:   On guest: dav://localhost:9843/"
+msgstr ""
+#: quickemu:1091
+msgid " - 9P:       On guest: "
+msgstr ""
+#: quickemu:1099
+msgid " - 9P:       On host:  chmod 777 ${PUBLIC}"
+msgstr ""
+#: quickemu:1100
+msgid "             Required for macOS integration 👆"
+msgstr ""
+#: quickemu:1110
+msgid " - smbd:     On guest: smb://10.0.2.4/qemu"
+msgstr ""
+#: quickemu:1127
+msgid " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
+msgstr ""
+#: quickemu:1180
+msgid "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
+msgstr ""
+#: quickemu:1181
+msgid " - Host:     ${OS_RELEASE} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+msgstr ""
+#: quickemu:1259
+msgid " - WARNING!  ${QEMU} or SPICE was not compiled with support for smartcard devices"
+msgstr ""
+#: quickemu:1274
+msgid " - WARNING!  Unknown usb-controller value: '${usb_controller}'"
+msgstr ""
+#: quickemu:1289
+msgid " - WARNING!  Unknown keyboard value: '${keyboard}'; Fallback to ps2"
+msgstr ""
+#: quickemu:1306
+msgid " - WARNING!  ${QEMU} does not support -chardev braille "
+msgstr ""
+#: quickemu:1325
+msgid " - WARNING!  Unknown mouse value: '${mouse}'; Falling back to ps2"
+msgstr ""
+#: quickemu:1340
+msgid " - Network:  Disabled"
+msgstr ""
+#: quickemu:1343
+msgid " - Network:  Restricted (${NET_DEVICE})"
+msgstr ""
+#: quickemu:1348
+msgid " - Network:  Bridged (${network})"
+msgstr ""
+#: quickemu:1359
+msgid " - Network:  User (${NET_DEVICE})"
+msgstr ""
+#: quickemu:1476
+msgid " - Monitor:  (off)"
+msgstr ""
+#: quickemu:1481
+msgid " - Monitor:  All Monitor-Telnet ports have been exhausted."
+msgstr ""
+#: quickemu:1486
+msgid " - Monitor:  On host:  telnet ${monitor_telnet_host} ${monitor_telnet_port}"
+msgstr ""
+#: quickemu:1493
+msgid " - Monitor:  On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
+msgstr ""
+#: quickemu:1495
+msgid " - Monitor:  On host:  nc -U \\\"${SOCKET_MONITOR}\\\""
+msgstr ""
+#: quickemu:1498
+msgid "ERROR! \\\"${monitor}\\\" is an unknown monitor option."
+msgstr ""
+#: quickemu:1504
+msgid " - Serial:   (off)"
+msgstr ""
+#: quickemu:1509
+msgid " - Serial:   All Serial Telnet ports have been exhausted."
+msgstr ""
+#: quickemu:1514
+msgid " - Serial:   On host:  telnet ${serial_telnet_host} ${serial_telnet_port}"
+msgstr ""
+#: quickemu:1521
+msgid " - Serial:   On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
+msgstr ""
+#: quickemu:1523
+msgid " - Serial:   On host:  nc -U \\\"${SOCKET_SERIAL}\\\""
+msgstr ""
+#: quickemu:1526
+msgid "ERROR! \\\"${serial}\\\" is an unknown serial option."
+msgstr ""
+#: quickemu:1550
+msgid " - Process:  Started ${VM} as ${VMNAME} (${VM_PID})"
+msgstr ""
+#: quickemu:1552
+msgid " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
+msgstr ""
+#: quickemu:1568
+msgid " - Viewer:   ${viewer} --title \\\"${VMNAME}\\\" --spice-shared-dir \\\"${PUBLIC}\\\" ${FULLSCREEN} \\\"spice://localhost:${spice_port}\\\" >/dev/null 2>&1 &"
+msgstr ""
+#: quickemu:1572
+msgid " - Viewer:   ${viewer} --title \\\"${VMNAME}\\\" ${FULLSCREEN} \\\"spice://localhost:${spice_port}\\\" >/dev/null 2>&1 &"
+msgstr ""
+#: quickemu:1579
+msgid " - Viewer:   ${viewer} --title \\\"${VMNAME}\\\" --port \\\"${spice_port}\\\" --spice-shared-dir \\\"${PUBLIC}\\\" \\\"${FULLSCREEN}\\\" >/dev/null 2>&1 &"
+msgstr ""
+#: quickemu:1583
+msgid " - Viewer:   ${viewer} --title \\\"${VMNAME}\\\" --port \\\"${spice_port}\\\" \\\"${FULLSCREEN}\\\" >/dev/null 2>&1 &"
+msgstr ""
+#: quickemu:1589
+msgid "WARNING! Could not start viewer (${viewer}) Err: ${errno}"
+msgstr ""
+#: quickemu:1598
+msgid "Creating ${VMNAME} desktop shortcut file"
+msgstr ""
+#: quickemu:1613
+msgid " - ${filename} created."
+msgstr ""
+#: quickemu:1622
+msgid "    |_| v${VERSION}, using qemu ${QEMU_VER_LONG}"
+msgstr ""
+#: quickemu:1624
+msgid " Project - https://github.com/quickemu-project/quickemu"
+msgstr ""
+#: quickemu:1628
+msgid "Usage"
+msgstr ""
+#: quickemu:1629
+msgid "  ${LAUNCHER} --vm ubuntu.conf <arguments>"
+msgstr ""
+#: quickemu:1631
+msgid "Arguments"
+msgstr ""
+#: quickemu:1632
+msgid "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
+msgstr ""
+#: quickemu:1633
+msgid "  --braille                         : Enable braille support. Requires SDL."
+msgstr ""
+#: quickemu:1634
+msgid "  --delete-disk                     : Delete the disk image and EFI variables"
+msgstr ""
+#: quickemu:1635
+msgid "  --delete-vm                       : Delete the entire VM and its configuration"
+msgstr ""
+#: quickemu:1636
+msgid "  --display                         : Select display backend. 'sdl' (default), 'cocoa', 'gtk', 'none', 'spice' or 'spice-app'"
+msgstr ""
+#: quickemu:1637
+msgid "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
+msgstr ""
+#: quickemu:1638
+msgid "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
+msgstr ""
+#: quickemu:1639
+msgid "  --kill                            : Kill the VM process if it is running"
+msgstr ""
+#: quickemu:1640
+msgid "  --offline                         : Override all network settings and start the VM offline"
+msgstr ""
+#: quickemu:1641
+msgid "  --shortcut                        : Create a desktop shortcut"
+msgstr ""
+#: quickemu:1642
+msgid "  --snapshot apply <tag>            : Apply/restore a snapshot."
+msgstr ""
+#: quickemu:1643
+msgid "  --snapshot create <tag>           : Create a snapshot."
+msgstr ""
+#: quickemu:1644
+msgid "  --snapshot delete <tag>           : Delete a snapshot."
+msgstr ""
+#: quickemu:1645
+msgid "  --snapshot info                   : Show disk/snapshot info."
+msgstr ""
+#: quickemu:1646
+msgid "  --status-quo                      : Do not commit any changes to disk/snapshot."
+msgstr ""
+#: quickemu:1647
+msgid "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+msgstr ""
+#: quickemu:1648
+msgid "  --width <width>                   : Set VM screen width; requires '--height'"
+msgstr ""
+#: quickemu:1649
+msgid "  --height <height>                 : Set VM screen height; requires '--width'"
+msgstr ""
+#: quickemu:1650
+msgid "  --ssh-port <port>                 : Set SSH port manually"
+msgstr ""
+#: quickemu:1651
+msgid "  --spice-port <port>               : Set SPICE port manually"
+msgstr ""
+#: quickemu:1652
+msgid "  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
+msgstr ""
+#: quickemu:1653
+msgid "  --monitor <type>                  : Set monitor connection type. @Options: 'socket' (default), 'telnet', 'none'"
+msgstr ""
+#: quickemu:1654
+msgid "  --monitor-telnet-host <ip/host>   : Set telnet host for monitor. (default: 'localhost')"
+msgstr ""
+#: quickemu:1655
+msgid "  --monitor-telnet-port <port>      : Set telnet port for monitor. (default: '4440')"
+msgstr ""
+#: quickemu:1656
+msgid "  --monitor-cmd <cmd>               : Send command to monitor if available. (Example: system_powerdown)"
+msgstr ""
+#: quickemu:1657
+msgid "  --serial <type>                   : Set serial connection type. @Options: 'socket' (default), 'telnet', 'none'"
+msgstr ""
+#: quickemu:1658
+msgid "  --serial-telnet-host <ip/host>    : Set telnet host for serial. (default: 'localhost')"
+msgstr ""
+#: quickemu:1659
+msgid "  --serial-telnet-port <port>       : Set telnet port for serial. (default: '6660')"
+msgstr ""
+#: quickemu:1660
+msgid "  --keyboard <type>                 : Set keyboard. @Options: 'usb' (default), 'ps2', 'virtio'"
+msgstr ""
+#: quickemu:1661
+msgid "  --keyboard_layout <layout>        : Set keyboard layout: 'en-us' (default)"
+msgstr ""
+#: quickemu:1662
+msgid "  --mouse <type>                    : Set mouse. @Options: 'tablet' (default), 'ps2', 'usb', 'virtio'"
+msgstr ""
+#: quickemu:1663
+msgid "  --usb-controller <type>           : Set usb-controller. @Options: 'ehci' (default), 'xhci', 'none'"
+msgstr ""
+#: quickemu:1664
+msgid "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'usb-audio', 'none'"
+msgstr ""
+#: quickemu:1665
+msgid "  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)"
+msgstr ""
+#: quickemu:1666
+msgid "  --extra_args <arguments>          : Pass additional arguments to qemu"
+msgstr ""
+#: quickemu:1667
+msgid "  --version                         : Print version"
+msgstr ""
+#: quickemu:1678
+msgid "ERROR! Requested output '${display}' but only 'cocoa' and 'none' are avalible on macOS."
+msgstr ""
+#: quickemu:1683
+msgid "ERROR! Requested output '${display}' is not recognised."
+msgstr ""
+#: quickemu:1711
+msgid "ERROR: ssh_port must be a number!"
+msgstr ""
+#: quickemu:1716
+msgid "ERROR: spice_port must be a number!"
+msgstr ""
+#: quickemu:1721
+msgid "ERROR: telnet port must be a number!"
+msgstr ""
+#: quickemu:1726
+msgid "ERROR: serial port must be a number!"
+msgstr ""
+#: quickemu:1733
+msgid "ERROR! Requested sound card '${sound_card}' is not recognised."
+msgstr ""
+#: quickemu:1746
+msgid "ERROR! Requested sound duplex '${sound_duplex}' is not recognised."
+msgstr ""
+#: quickemu:1755
+msgid "ERROR! TPM is enabled, but swtpm was not found."
+msgstr ""
+#: quickemu:1767
+msgid "ERROR! Requested viewer '${viewer}' is not recognised."
+msgstr ""
+#: quickemu:1771
+msgid "ERROR! Requested 'spicy' as viewer, but 'spicy' is not installed."
+msgstr ""
+#: quickemu:1774
+msgid "ERROR! Requested 'remote-viewer' as viewer, but 'remote-viewer' is not installed."
+msgstr ""
+#: quickemu:1794
+msgid " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
+msgstr ""
+#: quickemu:1837
+msgid "WARNING! Send to QEMU-Monitor: Message empty!"
+msgstr ""
+#: quickemu:1849
+msgid "WARNING! No qemu-monitor channel available - Couldn't send message to monitor!"
+msgstr ""
+#: quickemu:1930
+msgid "ERROR! QEMU not found. Please make sure 'qemu-system-${ARCH_VM}' and 'qemu-img' are installed."
+msgstr ""
+#: quickemu:1948
+msgid "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
+msgstr ""
+#: quickemu:1994
+msgid "ERROR! '--snapshot' needs an action to perform."
+msgstr ""
+#: quickemu:1999
+msgid "ERROR! '--snapshot ${SNAPSHOT_ACTION}' needs a tag."
+msgstr ""
+#: quickemu:2104
+msgid "ERROR! \\\"${1}\\\" is not a supported parameter."
+msgstr ""
+#: quickemu:2166
+msgid "Snapshot information ${disk_img}"
+msgstr ""
+#: quickemu:2170
+msgid "ERROR! \\\"${SNAPSHOT_ACTION}\\\" is not a supported snapshot action."
+msgstr ""
+#: quickemu:2176
+msgid "ERROR! Virtual machine configuration not found."
+msgstr ""
+#: quickemu:2201
+msgid " - Process:  Already running ${VM} as ${VMNAME} (${VM_PID})"
+msgstr ""

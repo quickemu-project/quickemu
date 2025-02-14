@@ -3,6 +3,14 @@
 #  - https://www.shellcheck.net/wiki/SC2317
 #  - Disable globally because many functions are called indirectly
 # shellcheck disable=SC2317
+
+export TEXTDOMAIN=quickget
+if [[ -n $Q_DEBUG ]]; then
+    export TEXTDOMAINDIR="${PWD}/locale"
+else
+    export TEXTDOMAINDIR=/usr/share/locale
+fi
+
 export LC_ALL=C
 
 function cleanup() {
@@ -16,13 +24,13 @@ function show_os_info() {
     . "public/${1}"
     echo
     echo " ${PRETTY}"
-    echo "    Website: ${HOMEPAGE}"
-    echo "   Based of: ${BASEDOF}"
-    echo "Description: ${DESCRIPTION}"
-    echo "Credentials: ${CREDENTIALS}"
-    echo "Releases: ${RELEASES}" | fmt -w 80
+    echo $"    Website: ${HOMEPAGE}"
+    echo $"   Based of: ${BASEDOF}"
+    echo $"Description: ${DESCRIPTION}"
+    echo $"Credentials: ${CREDENTIALS}"
+    echo $"Releases: ${RELEASES}" | fmt -w 80
     if [[ $(type -t "editions_") == function ]]; then
-        echo -n "Editions: ${EDITIONS}" | fmt -w 80
+        echo -n $"Editions: ${EDITIONS}" | fmt -w 80
     fi
 }
 
@@ -37,16 +45,16 @@ function os_support() {
 }
 
 function error_specify_os() {
-    echo "ERROR! You must specify an operating system."
-    echo "- Supported Operating Systems:"
+    echo $"ERROR! You must specify an operating system."
+    echo $"- Supported Operating Systems:"
     os_support | fmt -w 80
-    echo -e "\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
+    echo -e $"\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
 }
 
 function os_supported() {
     if [[ ! "$(os_support)" =~ ${OS} ]]; then
-        echo -e "ERROR! ${OS} is not a supported OS.\n"
+        echo -e $"ERROR! ${OS} is not a supported OS.\n"
         os_support | fmt -w 80
         exit 1
     fi
@@ -54,22 +62,22 @@ function os_supported() {
 
 function error_specify_release() {
     show_os_info "${OS}"
-    echo -e "\nERROR! You must specify a release."
+    echo -e $"\nERROR! You must specify a release."
     exit 1
 }
 
 function error_not_supported_release() {
     if [[ ! "${RELEASES[*]}" =~ ${RELEASE} ]]; then
-        echo -e "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
-        echo -n ' - Supported releases: '
+        echo -e $"ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\n"
+        echo -n $' - Supported releases: '
         releases_
         exit 1
     fi
 }
 
 function error_not_supported_lang() {
-    echo -e "ERROR! ${I18N} is not a supported ${PRETTY} language\n"
-    echo -n ' - Editions: '
+    echo -e $"ERROR! ${I18N} is not a supported ${PRETTY} language\n"
+    echo -n $' - Editions: '
     for I18N in "${I18NS[@]}"; do
         echo -n "${I18N} "
     done
@@ -77,9 +85,19 @@ function error_not_supported_lang() {
 }
 
 function error_not_supported_argument() {
-    echo "ERROR! Not supported argument"
-    echo "To see all possible arguments, use:"
+    echo $"ERROR! Not supported argument"
+    echo $"To see all possible arguments, use:"
     echo "   quickget -h  or  quickget --help"
+    exit 1
+}
+
+function error_unable_to_create_dir() {
+    echo $"ERROR! Unable to create directory ${DIR}"
+    exit 1
+}
+
+function error_not_supported_image() {
+    echo $"ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
     exit 1
 }
 
@@ -105,8 +123,8 @@ function handle_missing() {
                 NRELEASE="${RELEASE}"
             fi
             if [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Onyx" ]] || [[ "${NRELEASE}" -lt 40 && "${EDITION}" == "Sericea" ]]; then
-                echo "ERROR! Unsupported combination"
-                echo "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+                echo $"ERROR! Unsupported combination"
+                echo $"       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
                 exit 1
             fi;;
     esac
@@ -205,7 +223,7 @@ list_isos() {
                     if [ -n "${URL}" ]; then
                         echo "${OS}|${RELEASE}|${OPTION}|"
                     else
-                        echo "${OS}|${RELEASE}|${OPTION}|Strange!"
+                        echo "${OS}|${RELEASE}|${OPTION}|Strange!" #TODO
                     fi
                 done
             elif [[ "${OS}" == "macos" ]]; then
@@ -338,6 +356,7 @@ function test_all() {
                 fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
+            . "actions/${OS}"
             languages_
             for I18N in "${I18NS[@]}"; do
                 validate_release releases_
@@ -385,16 +404,16 @@ function check_hash() {
         40) hash_algo=sha1sum;;
         64) hash_algo=sha256sum;;
         128) hash_algo=sha512sum;;
-        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+        *) echo $"WARNING! Can't guess hash algorithm, not checking ${iso} hash."
             return;;
     esac
-    echo -n "Checking ${iso} with ${hash_algo}... "
+    echo -n $"Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
-        echo "ERROR!"
-        echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+        echo $"ERROR!"
+        echo $"${iso} doesn't match ${hash}. Try running 'quickget' again."
         exit 1
     else
-        echo "Good!"
+        echo $"Good!"
     fi
 }
 
@@ -449,17 +468,16 @@ function web_get() {
     fi
 
     if [ "${DIR}" != "$(pwd)" ] && ! mkdir -p "${DIR}" 2>/dev/null; then
-        echo "ERROR! Unable to create directory ${DIR}"
-        exit 1
+        error_unable_to_create_dir
     fi
 
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
-        echo "Downloading ${PRETTY} ${RELEASE} ${EDITION}"
-        echo "- URL: ${URL}"
+        echo $"Downloading ${PRETTY} ${RELEASE} ${EDITION}"
+        echo $"- URL: ${URL}"
     fi
 
     if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
-        echo "ERROR! Failed to download ${URL} with curl."
+        echo $"ERROR! Failed to download ${URL} with curl."
         rm -f "${DIR}/${FILE}"
     fi
 }
@@ -516,13 +534,12 @@ function zsync_get() {
         fi
 
         if ! mkdir -p "${DIR}" 2>/dev/null; then
-            echo "ERROR! Unable to create directory ${DIR}"
-            exit 1
+            error_unable_to_create_dir
         fi
-        echo "Downloading ${PRETTY} ${RELEASE} ${EDITION} from ${URL}"
+        echo $"Downloading ${PRETTY} ${RELEASE} ${EDITION} from ${URL}"
         # Only force http for zsync - not earlier because we might fall through here
         if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
-            echo "ERROR! Failed to download ${URL/https/http}.zsync"
+            echo $"ERROR! Failed to download ${URL/https/http}.zsync"
             exit 1
         fi
 
@@ -530,7 +547,7 @@ function zsync_get() {
             rm "${DIR}/${OUT}.zs-old"
         fi
     else
-        echo "INFO: zsync not found, falling back to curl"
+        echo $"INFO: zsync not found, falling back to curl"
         if [ -n "${3}" ]; then
             web_get "${1}" "${2}" "${3}"
         else
@@ -617,14 +634,14 @@ function make_vm_config() {
     CONF_FILE="${VM_PATH}.conf"
 
     if [ ! -e "${CONF_FILE}" ]; then
-        echo "Making ${CONF_FILE}"
+        echo $"Making ${CONF_FILE}"
         cat << EOF > "${CONF_FILE}"
 #!${QUICKEMU} --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
-        echo " - Setting ${CONF_FILE} executable"
+        echo $" - Setting ${CONF_FILE} executable"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
             echo "fixed_iso=\"${VM_PATH}/${ISO_FILE}\"" >> "${CONF_FILE}"
@@ -724,12 +741,12 @@ EOF
         fi
         if [ "${OPERATION}" == ui ]; then
             echo
-            gum confirm "Run new ${OS} VM?" && quickemu --vm "${CONF_FILE}"
+            gum confirm $"Run new ${OS} VM?" && quickemu --vm "${CONF_FILE}"
         fi
     fi
-    echo -e "\nTo start your ${PRETTY} virtual machine run:"
+    echo -e $"\nTo start your ${PRETTY} virtual machine run:"
     if [ "${OS}" == "slint" ]; then
-        echo -e "    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+        echo -e $"    quickemu --vm ${CONF_FILE}\nTo start Slint with braille support run:\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
     else
         echo "    quickemu --vm ${CONF_FILE}"
     fi
@@ -792,7 +809,7 @@ function create_vm() {
             fi;;
         kolibrios)
             if [[ ${ISO} = *".7z" ]]; then
-                if [ -z "$(command -v 7z)" ]; then echo "ERROR! '7zip' needs installing. Unable to extract file."
+                if [ -z "$(command -v 7z)" ]; then echo $"ERROR! '7zip' needs installing. Unable to extract file."
                 else
                     7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
                     rm -f "${VM_PATH}/${ISO}"
@@ -815,7 +832,7 @@ function create_vm() {
                 if [[ ${ISO} =~ ".img" ]]; then
                     QEMU_IMG=$(command -v qemu-img)
                     if [ ! -x "${QEMU_IMG}" ]; then
-                        echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+                        echo $"ERROR! qemu-img not found. Please make sure qemu-img is installed."
                         exit 1
                     fi
                     qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
@@ -835,7 +852,7 @@ function create_config() {
 
     OS="custom"
     if ! mkdir "${VM_PATH}" 2>/dev/null; then
-        echo "WARNING! This will overwrite content of directory: ${VM_PATH}"
+        echo $"WARNING! This will overwrite content of directory: ${VM_PATH}"
     fi
     if [[ "${INPUT}" == "http://"* ]] || [[ "${INPUT}" == "https://"* ]]; then
         INPUT="$(web_redirect "${INPUT}")"
@@ -843,30 +860,30 @@ function create_config() {
             web_get "${INPUT}" "${VM_PATH}"
             INPUT="${INPUT##*/}"
         else
-            echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
-            exit 1
+            error_not_supported_image
         fi
     fi
-
+    function moving_image() {
+        echo $"Moving image to VM dir"
+    }
     if [ ! -f "${INPUT}" ]; then
-        echo "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
+        echo $"ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
         echo "#TODO exit 1"
     elif [[ "${INPUT}" == *".iso" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        moving_image && mv "${INPUT}" "${VM_PATH}"
         CUSTOM_IMAGE_TYPE="iso"
     elif [[ "${INPUT}" == *".img" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}"
+        moving_image && mv "${INPUT}" "${VM_PATH}"
         CUSTOM_IMAGE_TYPE="img"
     elif [[ "${INPUT}" == *".qcow2" ]]; then
-        echo "Moving image to VM dir" && mv "${INPUT}" "${VM_PATH}/disk.qcow2"
+        moving_image && mv "${INPUT}" "${VM_PATH}/disk.qcow2"
         CUSTOM_IMAGE_TYPE="qcow2"
     else
-        echo "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
-        exit 1
+        error_not_supported_image
     fi
     INPUT="$(basename "${INPUT}")"
 
-    echo "Creating custom VM config for ${INPUT##*/}."
+    echo $"Creating custom VM config for ${INPUT##*/}."
     case "${INPUT,,}" in
         *freebsd*) CUSTOM_OS="freebsd";;
         *kolibrios*) CUSTOM_OS="kolibrios";;
@@ -876,9 +893,9 @@ function create_config() {
             CUSTOM_OS="windows"
             # Older windows 10 ISOs use the year followed by the month rather than the year & half). Match any text for language.
             if [ "${3}" != "--disable-unattended" ] && ( [ "${3}" == "--unattended" ] || grep -E -q 'Win(10|11)_([0-9]{2}H(1|2)|[0-9]{4})_[^.]*?(x64|x32)(v[0-9])?.iso' <<< "${INPUT}" ); then
-                echo "Creating unattended Windows installation files. To disable, pass --disable-unattended"
+                echo $"Creating unattended Windows installation files. To disable, pass --disable-unattended"
                 echo
-                echo "Downloading VirtIO drivers..."
+                echo $"Downloading VirtIO drivers..."
                 web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
                 FIXED_ISO="virtio-win.iso"
                 rm -f "${VM_PATH}/unattended.iso"
@@ -887,7 +904,7 @@ function create_config() {
             ;;
         *) CUSTOM_OS="linux";;
     esac
-    echo -e "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\n"
+    echo -e $"Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\n"
     make_vm_config "${INPUT}" "${FIXED_ISO}"
 }
 
@@ -898,7 +915,7 @@ function resolve_quickemu() {
     if [ -x "./quickemu" ]; then
         echo "$(pwd)/quickemu"
     else
-        echo "quickemu not found" >&2
+        echo $"quickemu not found" >&2
         exit 1
     fi
 }
@@ -924,8 +941,8 @@ run_itself() {
             if [ -n "${3}" ]; then
                 EDITION="${3}"
                 if [[ ! "${EDITIONS[*]}" = *"${EDITION}"* ]]; then
-                    echo -e "ERROR! ${EDITION} is not a supported ${PRETTY} edition\n"
-                    echo -n ' - Supported editions: '
+                    echo -e $"ERROR! ${EDITION} is not a supported ${PRETTY} edition\n"
+                    echo -n $' - Supported editions: '
                     for EDITION in "${EDITIONS[@]}"; do
                         echo -n "${EDITION} "
                     done
@@ -934,7 +951,7 @@ run_itself() {
                 fi
             else
                 show_os_info "${OS}"
-                echo -e "\nERROR! You must specify an edition."
+                echo -e $"\nERROR! You must specify an edition."
                 exit 1
             fi
             handle_missing
@@ -955,7 +972,7 @@ run_itself() {
             get_
         elif [[ "${OS}" == "windows"* ]]; then
             I18N="English International"
-            languages_
+            languages_"${OS}"
             if [ -n "${3}" ]; then
                 I18N="${3}"
                 if [[ ! "${I18NS[*]}" = *"${I18N}"* ]]; then
@@ -977,7 +994,7 @@ run_itself() {
 # shellcheck disable=SC2046
 function run_ui() {
     if ! command -v gum &> /dev/null; then
-        echo "gum could not be found, please install it first"
+        echo $"gum could not be found, please install it first"
         exit 1
     fi
     OS=$(gum filter --height=17 --header="Select an OS:" $(os_support))
@@ -1043,7 +1060,7 @@ Supported Operating Systems:\n\n' "$(${QUICKEMU} --version)" "${CURL_VERSION}"
 trap cleanup EXIT
 
 if ((BASH_VERSINFO[0] < 4)); then
-    echo "Sorry, you need bash 4.0 or newer to run this script."
+    echo $"Sorry, you need bash 4.0 or newer to run this script."
     exit 1
 fi
 
@@ -1052,7 +1069,7 @@ I18NS=()
 OPERATION=""
 CURL=$(command -v curl)
 if [ ! -x "${CURL}" ]; then
-    echo "ERROR! curl not found. Please install curl"
+    echo $"ERROR! curl not found. Please install curl"
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)

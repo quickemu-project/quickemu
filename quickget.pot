@@ -1,0 +1,162 @@
+#: quickget:19
+msgid "    Website: ${HOMEPAGE}"
+msgstr ""
+#: quickget:20
+msgid "   Based of: ${BASEDOF}"
+msgstr ""
+#: quickget:21
+msgid "Description: ${DESCRIPTION}"
+msgstr ""
+#: quickget:22
+msgid "Credentials: ${CREDENTIALS}"
+msgstr ""
+#: quickget:23
+msgid "Releases: ${RELEASES}"
+msgstr ""
+#: quickget:25
+msgid "Editions: ${EDITIONS}"
+msgstr ""
+#: quickget:40
+msgid "ERROR! You must specify an operating system."
+msgstr ""
+#: quickget:41
+msgid "- Supported Operating Systems:"
+msgstr ""
+#: quickget:43
+msgid "\\nTo see all possible arguments, use:\\n   quickget -h  or  quickget --help"
+msgstr ""
+#: quickget:49
+msgid "ERROR! ${OS} is not a supported OS.\\n"
+msgstr ""
+#: quickget:57
+msgid "\\nERROR! You must specify a release."
+msgstr ""
+#: quickget:63
+msgid "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\\n"
+msgstr ""
+#: quickget:71
+msgid "ERROR! ${I18N} is not a supported ${PRETTY} language\\n"
+msgstr ""
+#: quickget:80
+msgid "ERROR! Not supported argument"
+msgstr ""
+#: quickget:81
+msgid "To see all possible arguments, use:"
+msgstr ""
+#: quickget:108
+msgid "ERROR! Unsupported combination"
+msgstr ""
+#: quickget:109
+msgid "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+msgstr ""
+#: quickget:389
+msgid "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+msgstr ""
+#: quickget:392
+msgid "Checking ${iso} with ${hash_algo}... "
+msgstr ""
+#: quickget:394
+msgid "ERROR!"
+msgstr ""
+#: quickget:395
+msgid "${iso} doesn't match ${hash}. Try running 'quickget' again."
+msgstr ""
+#: quickget:398
+msgid "Good!"
+msgstr ""
+#: quickget:453
+msgid "ERROR! Unable to create directory ${DIR}"
+msgstr ""
+#: quickget:458
+msgid "Downloading ${PRETTY} ${RELEASE} ${EDITION}"
+msgstr ""
+#: quickget:459
+msgid "- URL: ${URL}"
+msgstr ""
+#: quickget:463
+msgid "ERROR! Failed to download ${URL} with curl."
+msgstr ""
+#: quickget:520
+msgid "ERROR! Unable to create directory ${DIR}"
+msgstr ""
+#: quickget:523
+msgid "Downloading ${PRETTY} ${RELEASE} ${EDITION} from ${URL}"
+msgstr ""
+#: quickget:526
+msgid "ERROR! Failed to download ${URL/https/http}.zsync"
+msgstr ""
+#: quickget:534
+msgid "INFO: zsync not found, falling back to curl"
+msgstr ""
+#: quickget:621
+msgid "Making ${CONF_FILE}"
+msgstr ""
+#: quickget:628
+msgid " - Setting ${CONF_FILE} executable"
+msgstr ""
+#: quickget:728
+msgid "Run new ${OS} VM?"
+msgstr ""
+#: quickget:731
+msgid "\\nTo start your ${PRETTY} virtual machine run:"
+msgstr ""
+#: quickget:733
+msgid "    quickemu --vm ${CONF_FILE}\\nTo start Slint with braille support run:\\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+msgstr ""
+#: quickget:796
+msgid "ERROR! '7zip' needs installing. Unable to extract file."
+msgstr ""
+#: quickget:819
+msgid "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+msgstr ""
+#: quickget:839
+msgid "WARNING! This will overwrite content of directory: ${VM_PATH}"
+msgstr ""
+#: quickget:847
+msgid "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+msgstr ""
+#: quickget:853
+msgid "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
+msgstr ""
+#: quickget:856
+msgid "Moving image to VM dir"
+msgstr ""
+#: quickget:859
+msgid "Moving image to VM dir"
+msgstr ""
+#: quickget:862
+msgid "Moving image to VM dir"
+msgstr ""
+#: quickget:865
+msgid "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+msgstr ""
+#: quickget:870
+msgid "Creating custom VM config for ${INPUT##*/}."
+msgstr ""
+#: quickget:880
+msgid "Creating unattended Windows installation files. To disable, pass --disable-unattended"
+msgstr ""
+#: quickget:882
+msgid "Downloading VirtIO drivers..."
+msgstr ""
+#: quickget:891
+msgid "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\\n"
+msgstr ""
+#: quickget:902
+msgid "quickemu not found"
+msgstr ""
+#: quickget:928
+msgid "ERROR! ${EDITION} is not a supported ${PRETTY} edition\\n"
+msgstr ""
+#: quickget:938
+msgid "\\nERROR! You must specify an edition."
+msgstr ""
+#: quickget:981
+msgid "gum could not be found, please install it first"
+msgstr ""
+#: quickget:1047
+msgid "Sorry, you need bash 4.0 or newer to run this script."
+msgstr ""
+#: quickget:1056
+msgid "ERROR! curl not found. Please install curl"
+msgstr ""

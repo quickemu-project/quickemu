@@ -1,0 +1,150 @@
+#: quickget:27
+msgid "    Website: ${HOMEPAGE}"
+msgstr ""
+#: quickget:28
+msgid "   Based of: ${BASEDOF}"
+msgstr ""
+#: quickget:29
+msgid "Description: ${DESCRIPTION}"
+msgstr ""
+#: quickget:30
+msgid "Credentials: ${CREDENTIALS}"
+msgstr ""
+#: quickget:31
+msgid "Releases: ${RELEASES}"
+msgstr ""
+#: quickget:33
+msgid "Editions: ${EDITIONS}"
+msgstr ""
+#: quickget:48
+msgid "ERROR! You must specify an operating system."
+msgstr ""
+#: quickget:49
+msgid "- Supported Operating Systems:"
+msgstr ""
+#: quickget:51
+msgid "\\nTo see all possible arguments, use:\\n   quickget -h  or  quickget --help"
+msgstr ""
+#: quickget:57
+msgid "ERROR! ${OS} is not a supported OS.\\n"
+msgstr ""
+#: quickget:65
+msgid "\\nERROR! You must specify a release."
+msgstr ""
+#: quickget:71
+msgid "ERROR! ${DISPLAY_NAME} ${RELEASE} is not a supported release.\\n"
+msgstr ""
+#: quickget:79
+msgid "ERROR! ${I18N} is not a supported ${PRETTY} language\\n"
+msgstr ""
+#: quickget:88
+msgid "ERROR! Not supported argument"
+msgstr ""
+#: quickget:89
+msgid "To see all possible arguments, use:"
+msgstr ""
+#: quickget:95
+msgid "ERROR! Unable to create directory ${DIR}"
+msgstr ""
+#: quickget:100
+msgid "ERROR! Only ISO,IMG and QCOW2 file types are supported for --create-config"
+msgstr ""
+#: quickget:126
+msgid "ERROR! Unsupported combination"
+msgstr ""
+#: quickget:127
+msgid "       Fedora ${RELEASE} ${EDITION} is not available, please choose another Release or Edition"
+msgstr ""
+#: quickget:407
+msgid "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+msgstr ""
+#: quickget:410
+msgid "Checking ${iso} with ${hash_algo}... "
+msgstr ""
+#: quickget:412
+msgid "ERROR!"
+msgstr ""
+#: quickget:413
+msgid "${iso} doesn't match ${hash}. Try running 'quickget' again."
+msgstr ""
+#: quickget:416
+msgid "Good!"
+msgstr ""
+#: quickget:475
+msgid "Downloading ${PRETTY} ${RELEASE} ${EDITION}"
+msgstr ""
+#: quickget:476
+msgid "- URL: ${URL}"
+msgstr ""
+#: quickget:480
+msgid "ERROR! Failed to download ${URL} with curl."
+msgstr ""
+#: quickget:539
+msgid "Downloading ${PRETTY} ${RELEASE} ${EDITION} from ${URL}"
+msgstr ""
+#: quickget:542
+msgid "ERROR! Failed to download ${URL/https/http}.zsync"
+msgstr ""
+#: quickget:550
+msgid "INFO: zsync not found, falling back to curl"
+msgstr ""
+#: quickget:637
+msgid "Making ${CONF_FILE}"
+msgstr ""
+#: quickget:644
+msgid " - Setting ${CONF_FILE} executable"
+msgstr ""
+#: quickget:744
+msgid "Run new ${OS} VM?"
+msgstr ""
+#: quickget:747
+msgid "\\nTo start your ${PRETTY} virtual machine run:"
+msgstr ""
+#: quickget:749
+msgid "    quickemu --vm ${CONF_FILE}\\nTo start Slint with braille support run:\\n    quickemu --vm --braille --display sdl ${CONF_FILE}"
+msgstr ""
+#: quickget:812
+msgid "ERROR! '7zip' needs installing. Unable to extract file."
+msgstr ""
+#: quickget:835
+msgid "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+msgstr ""
+#: quickget:855
+msgid "WARNING! This will overwrite content of directory: ${VM_PATH}"
+msgstr ""
+#: quickget:867
+msgid "Moving image to VM dir"
+msgstr ""
+#: quickget:870
+msgid "ERROR! The input must be a valid URL or path to an ISO, IMG, or QCOW2 file."
+msgstr ""
+#: quickget:886
+msgid "Creating custom VM config for ${INPUT##*/}."
+msgstr ""
+#: quickget:896
+msgid "Creating unattended Windows installation files. To disable, pass --disable-unattended"
+msgstr ""
+#: quickget:898
+msgid "Downloading VirtIO drivers..."
+msgstr ""
+#: quickget:907
+msgid "Selecting OS: ${CUSTOM_OS}. If this is incorrect, please modify the config file to include the correct OS.\\n"
+msgstr ""
+#: quickget:918
+msgid "quickemu not found"
+msgstr ""
+#: quickget:944
+msgid "ERROR! ${EDITION} is not a supported ${PRETTY} edition\\n"
+msgstr ""
+#: quickget:954
+msgid "\\nERROR! You must specify an edition."
+msgstr ""
+#: quickget:997
+msgid "gum could not be found, please install it first"
+msgstr ""
+#: quickget:1063
+msgid "Sorry, you need bash 4.0 or newer to run this script."
+msgstr ""
+#: quickget:1072
+msgid "ERROR! curl not found. Please install curl"
+msgstr ""
