@@ -19,8 +19,8 @@ function get_() {
     local ISO=""
     local URL="https://download.bazzite.gg"
     case ${EDITION} in
-        gnome) ISO="bazzite-gnome-stable.iso";;
-        kde)  ISO="bazzite-stable.iso";;
+        gnome) ISO="bazzite-gnome-stable-amd64.iso";;
+        kde)  ISO="bazzite-stable-amd64.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
