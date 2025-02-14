@@ -87,10 +87,10 @@ jobs:
       - name: "results"
         run: |
           for file in results/*.txt; do
-            cat "$file" | tee -a ../results
+            cat "$file" | tee -a ../result
           done
-          PASSED=$(grep -c '^PASS:' results | wc -l 2>/dev/null)
-          FAILED=$(grep -c '^FAIL:' results | wc -l 2>/dev/null)
-          SKIPPED=$(grep -c '^SKIP:' results | wc -l 2>/dev/null)
+          PASSED=$(grep -c '^PASS:' result | wc -l)
+          FAILED=$(grep -c '^FAIL:' result | wc -l 2>/dev/null | echo '0')
+          SKIPPED=$(grep -c '^SKIP:' result | wc -l)
           echo "$PASSED/$FAILED 🏁 / 💀" >> $GITHUB_STEP_SUMMARY
           echo "$SKIPPED Skipped" >> $GITHUB_STEP_SUMMARY
