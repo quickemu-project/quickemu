@@ -1,0 +1,9 @@
+# Template file for 'miyo'
+OSNAME="miyolinux"
+PRETTY="MiyoLinux"
+BASEDOF="Devuan"
+DESCRIPTION="Very minimal Linux OS based on Devuan and various Window Managers. "
+HOMEPAGE="https://sourceforge.net/projects/miyolinux/"
+CREDENTIALS="-"
+RELEASES="2022"
+EDITIONS="Openbox MATE Kwin JWM Deboot-Ceres"
