@@ -1,0 +1,9 @@
+# Template file for 'pbpuppy'
+OSNAME="pbpuppy"
+PRETTY="PeaBee's Puppy Linux"
+BASEDOF="Void,Ubuntu,Debian,Slackware"
+DESCRIPTION="Puppy Linux releases from Github. Brought to you by: peabee"
+HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
+CREDENTIALS="-"
+RELEASES="ghtest 250201 250101 241201"
+EDITIONS="VoidPup64 S15Pup64 BookwormPup64"
