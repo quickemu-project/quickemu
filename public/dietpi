@@ -1,0 +1,9 @@
+# Template file for 'dietpi'
+OSNAME="dietpi"
+PRETTY="DietPi"
+BASEDOF="Debian"
+DESCRIPTION="Highly optimised minimal Debian OS"
+HOMEPAGE="https://dietpi.com"
+CREDENTIALS="-"
+RELEASES="uefi bios"
+EDITIONS="bullseye-installer bullseye bookworm-installer bookworm"
