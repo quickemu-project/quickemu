@@ -1,0 +1,9 @@
+# Template file for 'cereus'
+OSNAME="cereus"
+PRETTY="Cereus Linux"
+BASEDOF="Void"
+DESCRIPTION="Void-based distribution focused on give an user-friendly experience."
+HOMEPAGE="https://sourceforge.net/projects/cereus-linux"
+CREDENTIALS="-"
+RELEASES="latest"
+EDITIONS="xfce musl-xfce musl-lxqt musl-base lxqt base"
