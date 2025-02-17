@@ -1,0 +1,23 @@
+# Template file for 'agarimos'
+OSNAME=agarimos
+PRETTY="AgarimOS"
+BASEDOF="Void"
+DESCRIPTION="Includes a minimum set of applications so you can build your system on your own."
+HOMEPAGE="https://sourceforge.net/projects/agarimos"
+CREDENTIALS="anon:voidlinux,root:voidlinux"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo plasma xfce4 cinnamon lxqt-kwin gnome
+}
+
+function get_() {
+    local REL=$(echo "${EDITION}" | tr '[:lower:]' '[:upper:]')
+    local ISOS=$(web_pipe "https://sourceforge.net/projects/agarimos/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '.iso')
+    local URL="https://sourceforge.net/projects/agarimos/files/${REL}"
+    local ISO=$(echo "${ISOS}" | grep "${REL}" | cut -d'/' -f3)
+    echo "${URL}/${ISO}"
+}

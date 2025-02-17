@@ -1,0 +1,9 @@
+# Template file for 'agarimos'
+OSNAME="agarimos"
+PRETTY="AgarimOS"
+BASEDOF="Void"
+DESCRIPTION="Includes a minimum set of applications so you can build your system on your own."
+HOMEPAGE="https://sourceforge.net/projects/agarimos"
+CREDENTIALS="anon:voidlinux,root:voidlinux"
+RELEASES="latest"
+EDITIONS="xfce4 plasma lxqt-kwin gnome cinnamon"
