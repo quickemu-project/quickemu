@@ -6,6 +6,8 @@ HOMEPAGE="https://www.apple.com/macos"
 DESCRIPTION="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance."
 CREDENTIALS="-"
 RELEASES="mojave catalina big-sur monterey ventura sonoma"
+GUEST="macos"
+IMAGE_TYPE="img"
 
 function releases_() {
     echo mojave catalina big-sur monterey ventura sonoma
@@ -137,4 +139,13 @@ function get_() {
         fi
     fi
     make_vm_config RecoveryImage.img
+}
+
+function specific_tweaks() {
+    echo "disk_size=\"128G\"" >> "${CONF_FILE}"
+    echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
+    # https://github.com/quickemu-project/quickemu/issues/438
+    if [ "${RELEASE}" == "monterey" ]; then
+        echo "cpu_cores=2" >> "${CONF_FILE}"
+    fi
 }
