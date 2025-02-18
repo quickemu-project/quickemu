@@ -576,9 +576,6 @@ function make_vm_config() {
         easyos)
             GUEST="linux"
             IMAGE_TYPE="img";;
-        freebsd|ghostbsd)
-            GUEST="freebsd"
-            IMAGE_TYPE="iso";;
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;

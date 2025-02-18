@@ -5,6 +5,7 @@ BASEDOF="FreeBSD"
 HOMEPAGE="https://www.ghostbsd.org"
 DESCRIPTION="Simple, elegant desktop BSD Operating System"
 CREDENTIALS="-"
+GUEST="freebsd"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005

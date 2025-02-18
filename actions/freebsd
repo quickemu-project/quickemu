@@ -5,6 +5,7 @@ BASEDOF="-"
 HOMEPAGE="https://www.freebsd.org"
 DESCRIPTION="Operating system used to power modern servers, desktops, and embedded platforms"
 CREDENTIALS="-"
+GUEST="freebsd"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
