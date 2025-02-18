@@ -5,6 +5,7 @@ BASEDOF="-"
 HOMEPAGE="https://reactos.org"
 DESCRIPTION="Imagine running your favorite Windows applications and drivers in an open-source environment you can trust"
 CREDENTIALS="-"
+GUEST="reactos"
 
 function releases_() {
     echo latest
@@ -15,4 +16,19 @@ function get_() {
     local URL=""
     URL="$(web_redirect "https://sourceforge.net/projects/reactos/files/latest/download")"
     echo "${URL} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".zip"* ]]; then
+        unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+        rm -f "${VM_PATH}/${ISO}"
+        ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+        ISO="$(basename "${ISO}")"
+    fi
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"12G\"" >> "${CONF_FILE}"
+    echo "ram=\"2048M\"" >> "${CONF_FILE}"
 }

@@ -600,9 +600,6 @@ function make_vm_config() {
         openindiana)
             GUEST="solaris"
             IMAGE_TYPE="iso";;
-        reactos)
-            GUEST="reactos"
-            IMAGE_TYPE="iso";;
         truenas*)
             GUEST="truenas"
             IMAGE_TYPE="iso";;
@@ -695,11 +692,6 @@ EOF
                 case ${EDITION} in
                     education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
                 esac;;
-            reactos)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"12G\"" >> "${CONF_FILE}"
-                echo "ram=\"2048M\"" >> "${CONF_FILE}"
-                ;;
             macos)
                 echo "disk_size=\"128G\"" >> "${CONF_FILE}"
                 echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"
@@ -793,13 +785,6 @@ function create_vm() {
                     ISO="$(ls -1 "${VM_PATH}/"*.iso)"
                     ISO="$(basename "${ISO}")"
                 fi
-            fi;;
-        reactos)
-            if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
-                rm -f "${VM_PATH}/${ISO}"
-                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
-                ISO="$(basename "${ISO}")"
             fi;;
         #TODO
         redox-os)
