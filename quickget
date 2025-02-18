@@ -591,9 +591,6 @@ function make_vm_config() {
         openindiana)
             GUEST="solaris"
             IMAGE_TYPE="iso";;
-        truenas*)
-            GUEST="truenas"
-            IMAGE_TYPE="iso";;
         ubuntu*)
             GUEST="linux"
             IMAGE_TYPE="iso"
@@ -642,13 +639,6 @@ EOF
                 ;;
             slint)
                 echo "disk_size=\"50G\"" >> "${CONF_FILE}"
-                ;;
-            truenas-scale|truenas-core)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                # the rest is non-functional
-                # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
-                # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
-                # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
                 ;;
             ubuntu-server)
                 # 22.04+ fails on LVM build if disk size is < 10G
