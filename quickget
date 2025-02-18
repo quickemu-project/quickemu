@@ -562,21 +562,24 @@ function make_vm_config() {
     local CONF_FILE=""
     local IMAGE_FILE=""
     local ISO_FILE=""
-    local IMAGE_TYPE=""
-    local GUEST=""
+    #local IMAGE_TYPE=""
+    #local GUEST=""
     if [ "${OPERATION}" == "download" ]; then
         exit 0
     fi
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
-    case "${OS}" in
-        custom)
-            GUEST="${CUSTOM_OS}"
-            IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
-        *)
-            GUEST="linux"
-            IMAGE_TYPE="iso";;
-    esac
+
+    if [ "${OS}" == 'custom' ]; then
+        GUEST="${CUSTOM_OS}"
+        IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}"
+    fi
+    if [ -z "$GUEST" ]; then
+        GUEST="linux"
+    fi
+    if [ -z "${IMAGE_TYPE}" ]; then
+        IMAGE_TYPE="iso"
+    fi
 
     CONF_FILE="${VM_PATH}.conf"
 
@@ -595,9 +598,7 @@ EOF
         fi
 
         # OS specific tweaks
-        case ${OS} in
-        esac
-
+        specific_tweaks || echo $"#TODO: Nothing special"
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
             # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
             echo "disk_size=\"32G\"" >> "${CONF_FILE}"
@@ -624,6 +625,7 @@ EOF
         echo "    quickemu --vm ${CONF_FILE}"
     fi
     echo
+    unset GUEST IMAGE_TYPE
     exit 0
 }
 
@@ -655,8 +657,7 @@ function create_vm() {
     fi
 
     # shellcheck disable=SC2076
-    case "${OS}" in
-    esac
+    distro_specific || echo $"#TODO: Nothing special"
     make_vm_config "${ISO}"
 }
 
