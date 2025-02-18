@@ -582,9 +582,6 @@ function make_vm_config() {
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;
-        freedos)
-            GUEST="freedos"
-            IMAGE_TYPE="iso";;
         kolibrios)
             GUEST="kolibrios"
             IMAGE_TYPE="iso";;
@@ -645,11 +642,6 @@ EOF
             deepin)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
                 echo "ram=\"4G\"" >> "${CONF_FILE}"
-                ;;
-            freedos)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-                echo "ram=\"256M\"" >> "${CONF_FILE}"
                 ;;
             kolibrios)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -747,13 +739,6 @@ function create_vm() {
             if [[ ${ISO} = *".img"* ]]; then
                 ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
                 ISO="${ISO/.img/}"
-            fi;;
-        freedos)
-            if [[ ${ISO} = *".zip"* ]]; then
-                unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
-                rm -f "${VM_PATH}/${ISO}"
-                ISO="$(ls -1 "${VM_PATH}/"*.iso)"
-                ISO="$(basename "${ISO}")"
             fi;;
         kolibrios)
             if [[ ${ISO} = *".7z" ]]; then
