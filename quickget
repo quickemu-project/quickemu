@@ -688,10 +688,6 @@ EOF
                 ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
                 ;;
-            zorin)
-                case ${EDITION} in
-                    education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-                esac;;
             macos)
                 echo "disk_size=\"128G\"" >> "${CONF_FILE}"
                 echo "macos_release=\"${RELEASE}\"" >> "${CONF_FILE}"

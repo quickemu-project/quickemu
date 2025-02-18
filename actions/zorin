@@ -22,3 +22,9 @@ function get_() {
     URL=$(web_redirect "https://zrn.co/${RELEASE}${EDITION}")
     echo "${URL} ${HASH}"
 }
+
+function specific_tweaks() {
+    case ${EDITION} in
+        education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+    esac
+}
