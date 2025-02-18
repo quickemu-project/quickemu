@@ -6,6 +6,7 @@ HOMEPAGE="https://www.microsoft.com/en-us/windows"
 DESCRIPTION="Whether you’re gaming, studying, running a business, or running a household, Windows helps you get it done"
 CREDENTIALS="-"
 RELEASES="11 10"
+GUEST="windows"
 
 function releases_() {
     echo 11 10

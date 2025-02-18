@@ -610,9 +610,6 @@ function make_vm_config() {
                 fi
             fi
             ;;
-        windows)
-            GUEST="windows"
-            IMAGE_TYPE="iso";;
         *)
             GUEST="linux"
             IMAGE_TYPE="iso";;
