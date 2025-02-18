@@ -606,10 +606,6 @@ EOF
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
-            proxmox-ve)
-                echo "disk_size=\"20G\"" >> "${CONF_FILE}"
-                echo "ram=\"4G\"" >> "${CONF_FILE}"
-                ;;
         esac
 
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
