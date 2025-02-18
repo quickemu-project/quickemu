@@ -27,3 +27,7 @@ function get_() {
     HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
