@@ -3,6 +3,8 @@
 #  - https://www.shellcheck.net/wiki/SC2317
 #  - Disable globally because many functions are called indirectly
 # shellcheck disable=SC2317
+# Latest cherrypick (or not) commit. Start from here...
+# https://github.com/quickemu-project/quickemu/tree/3da9edc9953340622db23be4661aefa4cd0632f2
 
 export TEXTDOMAIN=quickget
 if [[ -n $Q_DEBUG ]]; then
