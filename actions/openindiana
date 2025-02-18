@@ -5,6 +5,7 @@ BASEDOF="Solaris OPenSolaris"
 HOMEPAGE="https://www.openindiana.org"
 DESCRIPTION="Community supported illumos-based operating system"
 CREDENTIALS="-"
+GUEST="solaris"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
@@ -23,4 +24,9 @@ function get_() {
     ISO="OI-hipster-${EDITION}-${RELEASE}.iso"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" |cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"32G\"" >> "${CONF_FILE}"
 }
