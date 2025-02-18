@@ -6,6 +6,7 @@ HOMEPAGE="https://www.microsoft.com/en-us/windows-server"
 DESCRIPTION="Platform for building an infrastructure of connected applications, networks, and web services"
 CREDENTIALS="-"
 RELEASES="2022 2019 2016"
+GUEST="windows-server"
 
 function releases_() {
     echo 2022 2019 2016
