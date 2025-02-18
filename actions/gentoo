@@ -25,3 +25,7 @@ function get_() {
     HASH=$(web_pipe "${URL}/${ISO}.DIGESTS" | grep -A 1 SHA512 | grep iso | grep -v CONTENTS | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}

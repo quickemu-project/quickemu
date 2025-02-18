@@ -34,3 +34,7 @@ function get_() {
     ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}

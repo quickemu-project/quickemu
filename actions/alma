@@ -21,3 +21,7 @@ function get_() {
     HASH="$(web_pipe "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+    echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}

@@ -22,3 +22,7 @@ function get_() {
     HASH=$(web_pipe "https://api.pop-os.org/builds/${RELEASE}/${EDITION}" | jq -r .sha_sum)
     echo "${URL} ${HASH}"
 }
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}

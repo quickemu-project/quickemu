@@ -596,8 +596,6 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-            alma|athenaos|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
-                echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
         esac
