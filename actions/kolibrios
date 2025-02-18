@@ -5,6 +5,7 @@ BASEDOF="-"
 HOMEPAGE="http://kolibrios.org"
 DESCRIPTION="Tiny yet incredibly powerful and fast operating system"
 CREDENTIALS="-"
+GUEST="kolibrios"
 
 function releases_() {
     echo latest
@@ -19,4 +20,22 @@ function get_() {
     local ISO="latest-iso.7z"
     local URL="http://builds.kolibrios.org/${EDITION}"
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".7z" ]]; then
+        if [ -z "$(command -v 7z)" ]; then echo $"ERROR! '7zip' needs installing. Unable to extract file."
+        else
+            7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+            rm -f "${VM_PATH}/${ISO}"
+            ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+            ISO="$(basename "${ISO}")"
+        fi
+    fi
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+    echo "ram=\"128M\"" >> "${CONF_FILE}"
 }

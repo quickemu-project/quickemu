@@ -582,9 +582,6 @@ function make_vm_config() {
         haiku)
             GUEST="haiku"
             IMAGE_TYPE="iso";;
-        kolibrios)
-            GUEST="kolibrios"
-            IMAGE_TYPE="iso";;
         netbsd)
             GUEST="netbsd"
             IMAGE_TYPE="iso";;
@@ -642,11 +639,6 @@ EOF
             deepin)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
                 echo "ram=\"4G\"" >> "${CONF_FILE}"
-                ;;
-            kolibrios)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"2G\"" >> "${CONF_FILE}"
-                echo "ram=\"128M\"" >> "${CONF_FILE}"
                 ;;
             slint)
                 echo "disk_size=\"50G\"" >> "${CONF_FILE}"
@@ -739,16 +731,6 @@ function create_vm() {
             if [[ ${ISO} = *".img"* ]]; then
                 ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
                 ISO="${ISO/.img/}"
-            fi;;
-        kolibrios)
-            if [[ ${ISO} = *".7z" ]]; then
-                if [ -z "$(command -v 7z)" ]; then echo $"ERROR! '7zip' needs installing. Unable to extract file."
-                else
-                    7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
-                    rm -f "${VM_PATH}/${ISO}"
-                    ISO="$(ls -1 "${VM_PATH}/"*.iso)"
-                    ISO="$(basename "${ISO}")"
-                fi
             fi;;
         #TODO
         redox-os)
