@@ -24,3 +24,8 @@ function get_() {
     HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+    echo "ram=\"4G\"" >> "${CONF_FILE}"
+}
