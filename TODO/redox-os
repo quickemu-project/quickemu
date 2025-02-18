@@ -24,3 +24,21 @@ function get_() {
     HASH="$(echo "${DATA}" | cut_1)"
     echo "${URL}/${ISO} ${HASH}"
 }
+
+function distro_specific() {
+    if [[ ${ISO} =~ ".zst" ]]; then
+        zstd -d  "${VM_PATH}/${ISO}"
+        ISO="${ISO/.zst/}"
+        if [[ ${ISO} =~ ".img" ]]; then
+            QEMU_IMG=$(command -v qemu-img)
+            if [ ! -x "${QEMU_IMG}" ]; then
+                echo $"ERROR! qemu-img not found. Please make sure qemu-img is installed."
+                exit 1
+            fi
+            qemu-img convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+            ISO="${ISO/.img/}"
+        else
+            ISO="${ISO/.zst/}"
+        fi
+    fi
+}
