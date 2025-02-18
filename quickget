@@ -573,9 +573,6 @@ function make_vm_config() {
         custom)
             GUEST="${CUSTOM_OS}"
             IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
-        openbsd)
-            GUEST="openbsd"
-            IMAGE_TYPE="iso";;
         *)
             GUEST="linux"
             IMAGE_TYPE="iso";;
