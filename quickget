@@ -671,11 +671,6 @@ EOF
             slint)
                 echo "disk_size=\"50G\"" >> "${CONF_FILE}"
                 ;;
-            slitaz)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                echo "disk_size=\"4G\"" >> "${CONF_FILE}"
-                echo "ram=\"512M\"" >> "${CONF_FILE}"
-                ;;
             truenas-scale|truenas-core)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
                 # the rest is non-functional

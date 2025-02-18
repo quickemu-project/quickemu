@@ -18,3 +18,9 @@ function get_() {
     HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
     echo "${URL}/${ISO}.iso ${HASH}"
 }
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+    echo "ram=\"512M\"" >> "${CONF_FILE}"
+}
