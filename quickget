@@ -639,10 +639,6 @@ EOF
                     echo "tpm=\"on\"" >> "${CONF_FILE}"
                 fi
                 ;;
-            vanillaos)
-                ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
-                echo "disk_size=\"64G\"" >> "${CONF_FILE}"
-                ;;
             proxmox-ve)
                 echo "disk_size=\"20G\"" >> "${CONF_FILE}"
                 echo "ram=\"4G\"" >> "${CONF_FILE}"

@@ -20,3 +20,8 @@ function get_() {
     HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
     echo "${ISO} ${HASH}"
 }
+
+function specific_tweaks() {
+    ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
+    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+}
