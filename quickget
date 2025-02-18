@@ -573,9 +573,6 @@ function make_vm_config() {
         custom)
             GUEST="${CUSTOM_OS}"
             IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
-        easyos)
-            GUEST="linux"
-            IMAGE_TYPE="img";;
         netbsd)
             GUEST="netbsd"
             IMAGE_TYPE="iso";;
@@ -684,11 +681,6 @@ function create_vm() {
 
     # shellcheck disable=SC2076
     case "${OS}" in
-        easyos)
-            if [[ ${ISO} = *".img"* ]]; then
-                ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
-                ISO="${ISO/.img/}"
-            fi;;
         #TODO
         redox-os)
             if [[ ${ISO} =~ ".zst" ]]; then

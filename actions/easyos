@@ -5,6 +5,7 @@ BASEDOF="-"
 HOMEPAGE="https://easyos.org"
 DESCRIPTION="Experimental distribution designed from scratch to support containers"
 CREDENTIALS="-"
+IMAGE_TYPE="img"
 
 function releases_() {
     local ALL_RELEASES=""
@@ -32,4 +33,11 @@ function get_() {
         fi
     done
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".img"* ]]; then
+        ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
+        ISO="${ISO/.img/}"
+    fi
 }
