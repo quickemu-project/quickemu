@@ -573,9 +573,6 @@ function make_vm_config() {
         custom)
             GUEST="${CUSTOM_OS}"
             IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
-        netbsd)
-            GUEST="netbsd"
-            IMAGE_TYPE="iso";;
         openbsd)
             GUEST="openbsd"
             IMAGE_TYPE="iso";;

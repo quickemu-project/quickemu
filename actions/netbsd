@@ -5,6 +5,7 @@ BASEDOF="-"
 HOMEPAGE="https://www.netbsd.org"
 DESCRIPTION="Free, fast, secure, and highly portable Unix-like Open Source operating system. It is available for a wide range of platforms, from large-scale servers and powerful desktop systems to handheld and embedded devices"
 CREDENTIALS="-"
+GUEST="netbsd"
 
 function releases_() {
     # V8 is EOL so filter it out
@@ -18,4 +19,8 @@ function get_() {
     local URL="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${RELEASE}/images"
     HASH=$(web_pipe "${URL}/MD5" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
 }
