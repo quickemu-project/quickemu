@@ -89,6 +89,14 @@ case "${OS}" in
     CREDENTIALS="-";;
 esac
 
+# If there is a point in the release, check if it is less than 16.04
+if [[ "${RELEASE}" != *"daily"* ]]; then
+    if [ "${RELEASE//./}" -lt 1604 ]; then
+        GUEST="linux_old"
+    fi
+fi
+
+
 function releases_() {
     local VERSION_DATA=""
     local SUPPORTED_VERSIONS=()

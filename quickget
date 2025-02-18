@@ -585,16 +585,6 @@ function make_vm_config() {
         openindiana)
             GUEST="solaris"
             IMAGE_TYPE="iso";;
-        ubuntu*)
-            GUEST="linux"
-            IMAGE_TYPE="iso"
-            # If there is a point in the release, check if it is less than 16.04
-            if [[ "${RELEASE}" != *"daily"* ]]; then
-                if [ "${RELEASE//./}" -lt 1604 ]; then
-                    GUEST="linux_old"
-                fi
-            fi
-            ;;
         *)
             GUEST="linux"
             IMAGE_TYPE="iso";;
