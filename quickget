@@ -570,9 +570,6 @@ function make_vm_config() {
     IMAGE_FILE="${1}"
     ISO_FILE="${2}"
     case "${OS}" in
-        batocera)
-            GUEST="batocera"
-            IMAGE_TYPE="img";;
         custom)
             GUEST="${CUSTOM_OS}"
             IMAGE_TYPE="${CUSTOM_IMAGE_TYPE}";;
@@ -656,8 +653,6 @@ EOF
             openindiana)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-            batocera)
-                echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
             bazzite)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
@@ -785,11 +780,6 @@ function create_vm() {
 
     # shellcheck disable=SC2076
     case "${OS}" in
-        batocera)
-            if [[ ${ISO} = *".gz"* ]]; then
-                gzip -d "${VM_PATH}/${ISO}"
-                ISO="${ISO/.gz/}"
-            fi;;
         dragonflybsd)
             #  Could be other OS iso files compressed with bzip2 or gzip
             #  but for now we'll keep this to know cases
