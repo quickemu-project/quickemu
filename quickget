@@ -610,8 +610,6 @@ EOF
             openindiana)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
-            bazzite)
-                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             proxmox-ve)
