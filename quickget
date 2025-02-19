@@ -598,6 +598,10 @@ EOF
         fi
 
         # OS specific tweaks
+        . "actions/${OS}"
+        if [ ! "specific_tweaks" 2>/dev/null ]; then
+            echo $"#TODO: Nothing special"
+        fi
         specific_tweaks || echo $"#TODO: Nothing special"
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
             # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
@@ -657,7 +661,10 @@ function create_vm() {
     fi
 
     # shellcheck disable=SC2076
-    distro_specific || echo $"#TODO: Nothing special"
+    . "actions/${OS}"
+    if [ ! "distro_specific" 2>/dev/null ]; then
+        echo $"#TODO: Nothing special"
+    fi
     make_vm_config "${ISO}"
 }
 
