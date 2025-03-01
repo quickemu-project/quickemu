@@ -7,12 +7,12 @@ function write_output() {
     # Load the list of RELEASES
     RELEASES=$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f2 | sort -ur | paste -sd ' ')
     # Check if 'edition' function exists and load it if present
-    if grep -q 'GUEST=' "actions/${OS}"; then
-	GUEST=$(printf 'GUEST="%s"\n')
+    if grep -q 'GUEST' "actions/${OS}"; then
+      	GUEST=$(printf 'GUEST="%s"\n' "$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f3 | sort -ur | paste -sd ' ')")
     else
         GUEST=$(echo -e "\n")
     fi
-    if grep -q 'IMAGE_TYPE=' "actions/${OS}"; then
+    if grep -q 'IMAGE_TYPE' "actions/${OS}"; then
 	IMAGE_TYPE=$(printf 'IMAGE_TYPE="%s"\n')
     else
 	IMAGE_TYPE=$(echo -e "\n")
