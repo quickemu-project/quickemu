@@ -818,9 +818,9 @@ function run_ui() {
     #os_info "${OS}" > "$TMPFILE"
     # shellcheck source=actions/alpine
     . "public/${OS}"
-    RELEASE=$(gum filter --height=5 --header="Select $OS release:" ${RELEASES})
+    RELEASE=$(gum filter --height=9 --header="Select $OS release:" ${RELEASES})
     if declare -F editions_ > /dev/null; then
-        EDITION=$(gum filter --height=5 --header="Select $OS  $RELEASE edition:" ${EDITIONS})
+        EDITION=$(gum filter --height=9 --header="Select $OS  $RELEASE edition:" ${EDITIONS})
         echo ''
         run_itself "${OS}" "${RELEASE}" "${EDITION}"
     else
