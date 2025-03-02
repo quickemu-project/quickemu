@@ -5,5 +5,19 @@ BASEDOF="Void"
 DESCRIPTION="F-Void (Fork of Void) is a mild modification of Void Linux"
 HOMEPAGE="https://sourceforge.net/projects/f-void"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local URL="https://sourceforge.net/projects/f-void/files"
+    REST=$(web_pipe "https://sourceforge.net/projects/f-void/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | head -1)
+    echo "${URL}${REST}"
+}
 

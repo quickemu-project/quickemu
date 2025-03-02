@@ -5,5 +5,40 @@ BASEDOF="-"
 DESCRIPTION="DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems"
 HOMEPAGE="https://freedos.org"
 CREDENTIALS="-"
+GUEST="dvd1 disc1"
+
 RELEASES="1.3 1.2"
+
+
+function releases_() {
+    echo 1.3 1.2
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    case ${RELEASE} in
+        1.2) ISO="FD12CD.iso"
+             HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
+        1.3) ISO="FD13-LiveCD.zip"
+             HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
+    esac
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".zip"* ]]; then
+        unzip -qo "${VM_PATH}/${ISO}" -d "${VM_PATH}"
+        rm -f "${VM_PATH}/${ISO}"
+        ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+        ISO="$(basename "${ISO}")"
+    fi
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"4G\"" >> "${CONF_FILE}"
+    echo "ram=\"256M\"" >> "${CONF_FILE}"
+}
 

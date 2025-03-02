@@ -5,5 +5,32 @@ BASEDOF="-"
 DESCRIPTION="Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently"
 HOMEPAGE="https://batocera.org"
 CREDENTIALS="-"
+GUEST="xfce-s6 xfce-runit xfce-openrc xfce-dinit plasma-s6 plasma-runit plasma-openrc plasma-dinit mate-s6 mate-runit mate-openrc mate-dinit lxqt-s6 lxqt-runit lxqt-openrc lxqt-dinit lxde-s6 lxde-runit lxde-openrc lxde-dinit community-qt community-gtk cinnamon-s6 cinnamon-runit cinnamon-openrc cinnamon-dinit base-s6 base-runit base-openrc base-dinit"
+IMAGE_TYPE=""
 RELEASES="41 40 39 38 37"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirrors.o2switch.fr/batocera/x86_64/stable/" | grep ^\<a | cut -d'"' -f2 | cut -d '/' -f1 | grep -v '\.' | sort -ru | tail -n +2 | head -n 5)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.o2switch.fr/batocera/x86_64/stable/${RELEASE}"
+    ISO="$(web_pipe "${URL}/" | grep -e 'batocera.*img.gz'| cut -d'"' -f2)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".gz"* ]]; then
+        gzip -d "${VM_PATH}/${ISO}"
+        ISO="${ISO/.gz/}"
+    fi
+}
+
+function specific_tweaks() {
+    echo "disk_size=\"8G\"" >> "${CONF_FILE}"
+}
 

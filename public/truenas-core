@@ -5,5 +5,29 @@ BASEDOF="FreeBSD"
 DESCRIPTION="World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs"
 HOMEPAGE="https://www.truenas.com/truenas-core"
 CREDENTIALS="-"
+GUEST="sugar mate lxde kde"
+
 RELEASES="13"
+
+
+function releases_() {
+    echo 13
+}
+
+function get_() {
+    local ISO=""
+    local URL=""
+    local DLINFO="https://www.truenas.com/download-truenas-core/"
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}".sha256 | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    # the rest is non-functional
+    # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+    # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+    # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+}
 

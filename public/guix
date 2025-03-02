@@ -5,5 +5,19 @@ BASEDOF="-"
 DESCRIPTION="Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users"
 HOMEPAGE="https://guix.gnu.org"
 CREDENTIALS="-"
+
+
 RELEASES="1.4.0 1.3.0"
+
+
+function releases_() {
+    echo 1.4.0 1.3.0
+}
+
+function get_() {
+    local HASH=""
+    local ISO="guix-system-install-${RELEASE}.x86_64-linux.iso"
+    local URL="https://ftpmirror.gnu.org/gnu/guix/"
+    echo "${URL}/${ISO} ${HASH}"
+}
 

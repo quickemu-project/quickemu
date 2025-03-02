@@ -5,5 +5,20 @@ BASEDOF="Void"
 DESCRIPTION="Tool to create bootable USB drive for ISO/WIM/IMG/VHD(x)/EFI files. "
 HOMEPAGE="https://www.ventoy.net"
 CREDENTIALS="-"
-RELEASES="1.1.02 1.1.01 1.1.00 1.0.99 1.0.98 1.0.97 1.0.96 1.0.95 1.0.94 1.0.93 1.0.91 1.0.90 1.0.89 1.0.88 1.0.87 1.0.86 1.0.85 1.0.84"
+
+
+RELEASES="1.1.05 1.1.04 1.1.02 1.1.01 1.1.00 1.0.99 1.0.98 1.0.97 1.0.96 1.0.95 1.0.94 1.0.93 1.0.91 1.0.90 1.0.89 1.0.88 1.0.87 1.0.86 1.0.85"
+
+
+function releases_() {
+    echo $(web_pipe "https://sourceforge.net/projects/ventoy/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '.iso' | cut -d'-' -f2)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="ventoy-${RELEASE}-livecd.iso"
+    local URL="https://github.com/ventoy/Ventoy/releases/download/v${RELEASE}"
+    HASH="$(wget -q -O- "${URL}/sha256.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${ISO} ${HASH}"
+}
 

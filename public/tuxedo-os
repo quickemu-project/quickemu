@@ -5,5 +5,21 @@ BASEDOF="Ubuntu"
 DESCRIPTION="KDE Ubuntu LTS designed to go with their Linux hardware"
 HOMEPAGE="https://www.tuxedocomputers.com"
 CREDENTIALS="-"
+
+
 RELEASES="current"
+
+
+function releases_() {
+    echo current
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://os.tuxedocomputers.com"
+    ISO="$(web_pipe "https://os.tuxedocomputers.com/" | grep -m 1 current.iso | cut -d '=' -f 4 | cut -d '"' -f 2)"
+    HASH="$(web_pipe "https://os.tuxedocomputers.com/checksums/${ISO}.sha256" | cut -d ' ' -f 1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
 

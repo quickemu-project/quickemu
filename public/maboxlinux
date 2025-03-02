@@ -5,5 +5,20 @@ BASEDOF="Manjaro"
 DESCRIPTION="Lightweight, functional and easy to customize Openbox desktop"
 HOMEPAGE="https://maboxlinux.org"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local URL=""
+    URL="https://sourceforge.net/projects/mabox-linux/files/${RELEASE}/download"
+    URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    echo "${URL} ${HASH}"
+}
 

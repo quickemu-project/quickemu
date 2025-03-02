@@ -5,5 +5,20 @@ BASEDOF="Arch"
 DESCRIPTION="Aiming to make Arch Linux as user friendly as possible by providing interface solutions to things you normally have to do in a terminal"
 HOMEPAGE="https://rebornos.org"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
+    HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    echo "${ISO} ${HASH}"
+}
 

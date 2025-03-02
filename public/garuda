@@ -5,5 +5,29 @@ BASEDOF="Arch"
 DESCRIPTION="Feature rich and easy to use Linux distribution"
 HOMEPAGE="https://garudalinux.org"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
 EDITIONS="xfce wayfire sway qtile mate lxqt-kwin kde-lite kde-git i3 gnome dr460nized-gaming dr460nized cinnamon"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.builds.garudalinux.org/iso/latest/garuda"
+    ISO=${EDITION}/latest.iso
+    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}
+

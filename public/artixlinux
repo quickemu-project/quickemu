@@ -5,5 +5,27 @@ BASEDOF="Arch"
 DESCRIPTION="The Art of Linux. Simple. Fast. Systemd-free"
 HOMEPAGE="https://artixlinux.org"
 CREDENTIALS="-"
+
+
 RELEASES="20240823"
 EDITIONS="xfce-s6 xfce-runit xfce-openrc xfce-dinit plasma-s6 plasma-runit plasma-openrc plasma-dinit mate-s6 mate-runit mate-openrc mate-dinit lxqt-s6 lxqt-runit lxqt-openrc lxqt-dinit lxde-s6 lxde-runit lxde-openrc lxde-dinit community-qt community-gtk cinnamon-s6 cinnamon-runit cinnamon-openrc cinnamon-dinit base-s6 base-runit base-openrc base-dinit"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f 4 | sort -ru | tail -n 1)
+}
+
+function editions_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://iso.artixlinux.org/iso"
+    ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/sha256sums" | grep "${ISO}")
+    echo "${URL}/${ISO} ${HASH}"
+}
+

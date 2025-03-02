@@ -5,5 +5,31 @@ BASEDOF="Ubuntu"
 DESCRIPTION="Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting"
 HOMEPAGE="https://zorin.com/os"
 CREDENTIALS="-"
+
+
 RELEASES="17 16"
 EDITIONS="lite64 education64 core64"
+
+function releases_() {
+    echo 17 16
+}
+
+function editions_() {
+    echo core64 lite64 education64
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    # Process the URL redirections; required for Zorin
+    URL=$(web_redirect "https://zrn.co/${RELEASE}${EDITION}")
+    echo "${URL} ${HASH}"
+}
+
+function specific_tweaks() {
+    case ${EDITION} in
+        education64|edulite64) echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+    esac
+}
+

@@ -5,5 +5,25 @@ BASEDOF="Debian Ubuntu"
 DESCRIPTION="Latest and greatest of KDE community software packaged on a rock-solid base"
 HOMEPAGE="https://neon.kde.org"
 CREDENTIALS="-"
+
+
 RELEASES="user unstable testing developer"
+
+
+function releases_() {
+    echo user testing unstable developer
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://files.kde.org/neon/images/${RELEASE}/current"
+    if [ "$RELEASE" == 'developer' ]; then
+        ISO=$(web_pipe "${URL}/neon-unstable-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    else
+        ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    fi
+    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 

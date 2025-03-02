@@ -5,5 +5,21 @@ BASEDOF="Arch"
 DESCRIPTION="Arch Linux ISO with nwg-shell for sway and Hyprland"
 HOMEPAGE="https://nwg-piotr.github.io/nwg-shell"
 CREDENTIALS="-"
-RELEASES="2025.01.01"
+
+
+RELEASES="2025.02.23"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep 'url=' | grep '64.iso' | cut -d'/' -f12 | cut -d'-' -f3)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="nwg-live-${RELEASE}-x86_64.iso"
+    local URL="https://sourceforge.net/projects/nwg-iso/files"
+    HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n 1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
 

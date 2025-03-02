@@ -5,5 +5,46 @@ BASEDOF="Arch"
 DESCRIPTION="Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware"
 HOMEPAGE="https://manjaro.org"
 CREDENTIALS="-"
+
+
 RELEASES="xfce sway plasma i3 gnome cinnamon"
 EDITIONS="minimal full"
+
+function releases_() {
+    echo xfce gnome plasma cinnamon i3 sway
+}
+
+function editions_() {
+    echo full minimal
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local MANIFEST=""
+    local URL=""
+    local TYPE="official"
+    MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    case "${RELEASE}" in
+        sway)
+            MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)"
+            TYPE="sway"
+            ;;
+        cinnamon|i3) TYPE="community";;
+    esac
+
+    if [ "${EDITION}" == "minimal" ] && [ "${TYPE}" != "sway" ]; then
+        EDITION=".minimal"
+    else
+        EDITION=""
+    fi
+
+    if [ "${RELEASE}" == "sway" ]; then
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | .url')
+    else
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}.${RELEASE}${EDITION}".image)"
+    fi
+    HASH=$(web_pipe "${URL}.sha512" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+

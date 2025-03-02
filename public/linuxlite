@@ -5,5 +5,20 @@ BASEDOF="Debian Ubuntu"
 DESCRIPTION="Your first simple, fast and free stop in the world of Linux"
 HOMEPAGE="https://www.linuxliteos.com"
 CREDENTIALS="-"
+
+
 RELEASES="6.6 6.4 6.2 6.0"
+
+
+function releases_() {
+    echo 6.6 6.4 6.2 6.0
+}
+
+function get_() {
+    local HASH=""
+    local ISO="linux-lite-${RELEASE}-64bit.iso"
+    local URL="https://sourceforge.net/projects/linux-lite/files/${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 

@@ -5,5 +5,27 @@ BASEDOF="Arch"
 DESCRIPTION="Is all about becoming an expert in linux"
 HOMEPAGE="https://arcolinux.com"
 CREDENTIALS="-"
-RELEASES="v25.02.04 v25.01.05 v25.01.01 v24.12.02 v24.11.01"
+
+
+RELEASES="v25.03.05 v25.02.04 v25.01.05 v25.01.01 v24.12.02"
 EDITIONS="pro plasma net"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
+}
+
+function editions_() {
+    echo net plasma pro
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
+    ISO="arco${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+

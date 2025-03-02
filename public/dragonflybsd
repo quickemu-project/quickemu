@@ -5,5 +5,36 @@ BASEDOF="FreeBSD"
 DESCRIPTION="Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series"
 HOMEPAGE="https://www.dragonflybsd.org"
 CREDENTIALS="-"
+GUEST="bullseye-installer bullseye bookworm-installer bookworm"
+
 RELEASES="6.4.0 6.2.2 6.2.1 6.0.1 6.0.0 5.8.3 5.8.2 5.8.1 5.8.0 5.6.3 5.6.2 5.6.1 5.6.0 5.4.3 5.4.2 5.4.1 5.4.0 5.2.2 5.2.1 5.2.0 5.0.2 5.0.1 5.0.0"
+
+
+function releases_() {
+    # If you remove "".bz2" from the end of the searched URL, you will get only the current release - currently 6.4.0
+    # We could add a variable so this behaviour is optional/switchable (maybe from option or env)
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror-master.dragonflybsd.org/iso-images/" | grep -E -o '"dfly-x86_64-.*_REL.iso.bz2"' | grep -o -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
+}
+
+function get_() {
+    local HASH=""
+    local ISO="dfly-x86_64-${RELEASE}_REL.iso.bz2"
+    local URL="http://mirror-master.dragonflybsd.org/iso-images"
+    HASH=$(web_pipe "${URL}/md5.txt" | grep "(${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    #  Could be other OS iso files compressed with bzip2 or gzip
+    #  but for now we'll keep this to know cases
+    if [[ ${ISO} = *".bz2"* ]]; then
+        bzip2 -d  "${VM_PATH}/${ISO}"
+        ISO="${ISO/.bz2/}"
+    fi
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
 

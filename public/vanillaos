@@ -5,5 +5,28 @@ BASEDOF="Ubuntu"
 DESCRIPTION="Designed to be a reliable and productive operating system for your daily work"
 HOMEPAGE="https://vanillaos.org"
 CREDENTIALS="-"
+
+
 RELEASES="22.10-r8 22.10-r7.5 22.10-r7 22.10-r6 22.10-r5 22.10-r4 22.10-r3 22.10-r2 22.10-r1 22.10 2.0"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
+}
+
+function get_() {
+    local HASH=""
+    local HASH_URL=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n 1 | cut -d'"' -f4)
+    HASH_URL="${ISO//.iso/.sha256.txt}"
+    HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
+    echo "${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
+    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+}
 

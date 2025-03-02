@@ -5,5 +5,21 @@ BASEDOF="-"
 DESCRIPTION="Lightweight and flexible Linux® distribution that tries to Keep It Simple"
 HOMEPAGE="https://archlinux.org"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirror.rackspace.com/archlinux"
+    ISO=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
+    HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha256_sum')
+    echo "${URL}${ISO} ${HASH}"
+}
 

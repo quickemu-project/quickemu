@@ -5,5 +5,27 @@ BASEDOF="Debian"
 DESCRIPTION="Distribution of GNU/Linux focused on low resource consumption."
 HOMEPAGE="https://loc-os.com"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
 EDITIONS="xfce lxde kde"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo lxde xfce kde
+}
+
+function get_() {
+    local HASH=""
+    local REL=$(echo "${EDITION}" | tr '[:lower:]' '[:upper:]')
+    URL="https://sourceforge.net/projects/loc-os/files"
+    REST_URL=$(web_pipe "https://sourceforge.net/projects/loc-os/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '64\.iso' | grep "${REL}" | head -1)
+    REST="Loc-OS%2023"
+    URL="${URL}/${REST}"
+    ISO=$(echo "${REST_URL}" | cut -d'/' -f3)
+    echo "${URL}/${ISO}"
+}
+

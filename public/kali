@@ -5,5 +5,25 @@ BASEDOF="Debian"
 DESCRIPTION="The most advanced Penetration Testing Distribution"
 HOMEPAGE="https://www.kali.org"
 CREDENTIALS="-"
+
+
 RELEASES="kali-weekly current"
+
+
+function releases_() {
+    echo current kali-weekly
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://cdimage.kali.org/${RELEASE}"
+    ISO=$(web_pipe "${URL}/?C=M;O=D" | grep -o ">kali-linux-.*-installer-amd64.iso" | head -n 1 | cut -c 2-)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}
 

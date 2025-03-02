@@ -5,5 +5,34 @@ BASEDOF="-"
 DESCRIPTION="Highly modular based system with community build extensions"
 HOMEPAGE="http://www.tinycorelinux.net"
 CREDENTIALS="-"
+
+
 RELEASES="15 14"
 EDITIONS="TinyCorePure64 TinyCore CorePure64 CorePlus Core"
+
+function releases_() {
+    echo 15 14
+}
+
+function editions_() {
+    echo Core TinyCore CorePlus CorePure64 TinyCorePure64
+}
+
+function get_() {
+    local ARCH="x86"
+    local HASH=""
+    local ISO="${EDITION}-${RELEASE}.0.iso"
+    case "${EDITION}" in
+        *Pure*) ARCH+="_64";;
+    esac
+    # tinycorelinux.net not stable enough
+    #local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
+    local URL="https://distro.ibiblio.org/tinycorelinux/${RELEASE}.x/${ARCH}/release"
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
+

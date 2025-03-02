@@ -5,5 +5,32 @@ BASEDOF="Void"
 DESCRIPTION="Brings the necessary software to satisfy the daily needs of an end user in a simple and aesthetically pleasing desktop environment."
 HOMEPAGE="https://sourceforge.net/projects/gabeeoslinux/"
 CREDENTIALS="anon:voidlinux,root:voidlinux"
+
+
 RELEASES="release beta"
 EDITIONS="Qtile Openbox"
+
+function releases_() {
+    echo release beta
+}
+
+function editions_() {
+    echo Openbox Qtile
+}
+
+function get_() {
+    local HASH=""
+    case "${RELEASE}" in
+        release)
+            REL="Release-2024"
+            ;;
+        beta)
+            REL="beta"
+            ;;
+    esac
+    ISO="gabeeOSLinux-Openbox-Cherry-x86_64-6.1.25_1-20230502.iso"
+    URL="https://sourceforge.net/projects/gabeeoslinux/files/Distro/${EDITION}/${REL}"
+    ISO="$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f5 | grep "${EDITION}" | head -1)"
+    echo "${URL}/${ISO}"
+}
+

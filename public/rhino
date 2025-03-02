@@ -5,5 +5,20 @@ BASEDOF="Ubuntu"
 DESCRIPTION="Re-invents the Ubuntu experience as a rolling-release distribution built on a stable desktop environment. With Pacstall & XFCE"
 HOMEPAGE="https://rhinolinux.org/"
 CREDENTIALS="-"
+
+
 RELEASES="2025.1"
+
+
+function releases_() {
+    echo 2025.1
+}
+
+function get_() {
+    local HASH=""
+    local ISO="Rhino-Linux-${RELEASE}-amd64.iso"
+    local URL="https://sourceforge.net/projects/rhino-linux-builder/files/${RELEASE}"
+    HASH="$(web_pipe "${URL}/${ISO}.sha256/download" | grep "(${ISO}" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
 

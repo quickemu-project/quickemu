@@ -5,5 +5,60 @@ BASEDOF="Debian"
 DESCRIPTION="Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available"
 HOMEPAGE="https://ubuntu.com/server"
 CREDENTIALS="-"
+
+
 RELEASES="daily-live 24.10 24.04 22.04 20.04 18.04 16.04 14.04"
+
+
+function releases_() {
+    local ALL_VERSIONS=()
+    # shellcheck disable=SC2207
+    ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
+    echo daily-live "${ALL_VERSIONS[@]}"
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local NAME="live-server"
+    local URL=""
+
+    if [[ "${RELEASE}" == "daily"* ]]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    else
+        URL="https://releases.ubuntu.com/${RELEASE}"
+    fi
+
+    case "${RELEASE}" in
+        14*|16*) NAME="server";;
+    esac
+
+    if web_check "${URL}/SHA256SUMS"; then
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
+    else
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        ISO=$(cut -d' ' -f3 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
+    fi
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
+}
+
+function specific_tweaks() {
+    # 22.04+ fails on LVM build if disk size is < 10G
+    # 22.04.1 fails on auto-install if TPM is disabled
+    echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+    echo "ram=\"4G\"" >> "${CONF_FILE}"
+    if [[ "${RELEASE}" == *"22.04"* ]]; then
+        echo "tpm=\"on\"" >> "${CONF_FILE}"
+    fi
+}
 

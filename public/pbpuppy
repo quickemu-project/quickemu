@@ -5,5 +5,25 @@ BASEDOF="Void,Ubuntu,Debian,Slackware"
 DESCRIPTION="Puppy Linux releases from Github. Brought to you by: peabee"
 HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
 CREDENTIALS="-"
-RELEASES="ghtest 250201 250101 241201"
+
+
+RELEASES="ghtest 250301 250201 250101"
 EDITIONS="VoidPup64 S15Pup64 BookwormPup64"
+
+function releases_() {
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | cut -d'.' -f1 | uniq)
+}
+
+
+function editions_() {
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | cut -d'-' -f1 | uniq)
+}
+
+function get_() {
+    local HASH=""
+    local URL="https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release"
+    ISO="VoidPup64-22.02-${RELEASE}.iso"
+    HASH=$(web_pipe "${URL}"/SHA512checksums.txt | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+

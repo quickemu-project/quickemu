@@ -5,5 +5,20 @@ BASEDOF="iPXE"
 DESCRIPTION="Your favorite operating systems in one place"
 HOMEPAGE="https://netboot.xyz"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local ISO="netboot.xyz.iso"
+    local URL="https://boot.netboot.xyz/ipxe"
+    HASH=$(web_pipe "${URL}/netboot.xyz-sha256-checksums.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 

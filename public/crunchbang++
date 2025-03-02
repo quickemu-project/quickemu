@@ -5,5 +5,20 @@ BASEDOF="Debian"
 DESCRIPTION="The classic minimal crunchbang feel, now with debian 12 bookworm"
 HOMEPAGE="https://www.crunchbangplusplus.org"
 CREDENTIALS="-"
+
+
 RELEASES="9.0 12.0 11.2 10.1"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
+    echo "${ISO} ${HASH}"
+}
 

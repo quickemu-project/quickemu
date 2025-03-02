@@ -5,5 +5,24 @@ BASEDOF="Debian Ubuntu"
 DESCRIPTION="Powered by Debian, KDE Plasma and Frameworks, and AppImages"
 HOMEPAGE="https://nxos.org"
 CREDENTIALS="-"
+
+
 RELEASES="latest"
+
+
+function releases_() {
+    echo latest
+}
+
+function get_() {
+    local HASH=""
+    local URLBASE=""
+    local URL=""
+    local ISO=""
+    URLBASE="https://sourceforge.net/projects/nitruxos/files/Release"
+    URL="${URLBASE}/ISO"
+    ISO=$(web_pipe 'https://sourceforge.net/projects/nitruxos/rss?path=/Release/ISO' | grep '.iso' | head -n 1 | cut -d']' -f1 | cut -d '/' -f4)
+    HASH=$(web_pipe "${URLBASE}/MD5/${ISONAME}.md5sum" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
 
