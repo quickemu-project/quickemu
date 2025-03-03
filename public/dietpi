@@ -8,14 +8,14 @@ CREDENTIALS="-"
 
 
 RELEASES="uefi bios"
-EDITIONS="bullseye-installer bullseye bookworm-installer bookworm"
+EDITIONS="Trixie Bullseye Bookworm"
 
 function releases_() {
     echo bios uefi
 }
 
 function editions_() {
-    echo bookworm bookworm-installer bullseye bullseye-installer
+    echo $(web_pipe "https://dietpi.com/downloads/images/" | grep '\.iso"' | cut -d'"' -f2 | grep '_VM-UEFI' | cut -d'-' -f4 | cut -d'_' -f1)
 }
 
 function get_() {
@@ -23,33 +23,12 @@ function get_() {
     local ISO=""
     local URL="https://dietpi.com/downloads/images"
     if [ "${RELEASE}" == 'bios' ]; then
-        case ${EDITION} in
-            bookworm )
-                local ISO="DietPi_NativePC-BIOS-x86_64-Bookworm.7z";;
-            bullseye )
-                local ISO="DietPi_NativePC-BIOS-x86_64-Bullseye.7z";;
-            'bookworm-installer' )
-                local ISO="DietPi_NativePC-BIOS-x86_64-Bookworm_Installer.7z";;
-            'bullseye-installer' )
-                local ISO="DietPi_NativePC-BIOS-x86_64-Bullseye_Installer.7z";;
-        esac
+        local ISO="DietPi_VM-x86_64-${EDITION}_Installer.iso"
     elif [ "${RELEASE}" == 'uefi' ]; then
-        case ${EDITION} in
-            'bookworm-installer' )
-                local ISO="DietPi_NativePC-UEFI-x86_64-Bookworm_Installer.7z";;
-            'bullseye-installer' )
-                local ISO="DietPi_NativePC-UEFI-x86_64-Bullseye_Installer.7z";;
-        esac
+        local ISO="DietPi_VM-UEFI-x86_64-${EDITION}_Installer.iso"
     fi
     HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
-}
-
-function distro_specific() {
-    if [[ "${ISO}" =~ ".7z" ]]; then
-        7zip x -o${VM_PATH} ${VM_PATH}/${ISO}
-        ISO=$(ls ${VM_PATH} | grep -i '.iso')
-    fi
 }
 
 function specific_tweaks() {
