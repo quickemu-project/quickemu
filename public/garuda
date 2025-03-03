@@ -8,14 +8,14 @@ CREDENTIALS="-"
 
 
 RELEASES="latest"
-EDITIONS="xfce wayfire sway qtile mate lxqt-kwin kde-lite kde-git i3 gnome dr460nized-gaming dr460nized cinnamon"
+EDITIONS="xfce sway kde-lite i3 gnome dr460nized-gaming dr460nized cinnamon"
 
 function releases_() {
     echo latest
 }
 
 function editions_() {
-    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+    echo $(web_pipe "https://iso.builds.garudalinux.org/iso/latest/garuda/" | grep -oP '(?<=href=")[^"]*' | tail --lines +2 | cut -d'/' -f1)
 }
 
 function get_() {
