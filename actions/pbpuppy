@@ -7,17 +7,21 @@ HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
 CREDENTIALS="-"
 
 function releases_() {
-    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | cut -d'.' -f1 | sort | uniq)
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | grep -oP '\d{6}(?=\.iso)' | sort -u)
 }
 
 function editions_() {
-    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | cut -d'-' -f1 | sort | uniq)
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f2 | cut -d'_' -f1 | sort -u)
 }
 
 function get_() {
     local HASH=""
     local URL="https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release"
-    ISO="VoidPup64-22.02-${RELEASE}.iso"
+    if [ "${RELEASE}" == 'ghtest' ]; then
+      ISO=$(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | grep "${RELEASE}" | grep "${EDITION}")
+    else
+      ISO="VoidPup64-22.02-${RELEASE}.iso"
+    fi
     HASH=$(web_pipe "${URL}"/SHA512checksums.txt | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
