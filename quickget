@@ -345,7 +345,13 @@ function test_all() {
 
     for RELEASE in $(releases_); do
         . "actions/${OS}"
-        if [[ $(type -t editions_) == function ]]; then
+        if [ "${OS}" == 'rebornos" ]; then
+          if curl -I "https://cdn.soulharsh007.dev/RebornOS-ISO/${ISO}"
+            test_result "${OS} ${RELEASE} ${URL} PASS"
+          else
+            test_result "${OS} ${RELEASE} ${URL} FAIL"
+          fi
+        elif [[ $(type -t editions_) == function ]]; then
             . "actions/${OS}"
             for EDITION in $(editions_); do
                 validate_release releases_
