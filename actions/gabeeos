@@ -7,25 +7,24 @@ HOMEPAGE="https://sourceforge.net/projects/gabeeoslinux/"
 CREDENTIALS="anon:voidlinux,root:voidlinux"
 
 function releases_() {
-    echo release beta
+    echo latest
 }
 
 function editions_() {
-    echo Openbox Qtile
+    echo $(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f3 | sort | uniq)
 }
 
 function get_() {
     local HASH=""
-    case "${RELEASE}" in
-        release)
-            REL="Release-2024"
-            ;;
-        beta)
-            REL="beta"
-            ;;
-    esac
-    ISO="gabeeOSLinux-Openbox-Cherry-x86_64-6.1.25_1-20230502.iso"
-    URL="https://sourceforge.net/projects/gabeeoslinux/files/Distro/${EDITION}/${REL}"
-    ISO="$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f5 | grep "${EDITION}" | head -1)"
+    if [ "${EDITION}" == 'i3-gaps' ]; then
+        REL=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f2,3)
+        ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f4)
+    else
+        REL=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f2,3,4)
+        ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f5)
+    fi
+    URL="https://sourceforge.net/projects/gabeeoslinux/files/${REL}"
+    #ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f5 | grep "${EDITION}" | head -1)
+    # No hash provided
     echo "${URL}/${ISO}"
 }
