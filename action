@@ -3,30 +3,30 @@
 #
 
 function write_output() {
+  . "actions/${OS}"
+  # Load the list of RELEASES
+  RELEASES=$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f2 | sort -ur | paste -sd ' ')
+  # Check if 'edition' function exists and load it if present
+  if grep -q 'GUEST' "actions/${OS}"; then
+    GUEST=$(printf 'GUEST="%s"\n' "$(grep 'GUEST' < "actions/${OS}" | cut -d'"' -f2)")
+  else
+    GUEST=$(echo -e "\n")
+  fi
+  if grep -q 'IMAGE_TYPE' "actions/${OS}"; then
+    IMAGE_TYPE=$(printf 'IMAGE_TYPE="%s"\n')
+  else
+    IMAGE_TYPE=$(echo -e "\n")
+  fi
+  if grep -q 'function edition' "actions/${OS}"; then
     . "actions/${OS}"
-    # Load the list of RELEASES
-    RELEASES=$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f2 | sort -ur | paste -sd ' ')
-    # Check if 'edition' function exists and load it if present
-    if grep -q 'GUEST' "actions/${OS}"; then
-      	GUEST=$(printf 'GUEST="%s"\n' "$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f3 | sort -ur | paste -sd ' ')")
-    else
-        GUEST=$(echo -e "\n")
-    fi
-    if grep -q 'IMAGE_TYPE' "actions/${OS}"; then
-	IMAGE_TYPE=$(printf 'IMAGE_TYPE="%s"\n')
-    else
-	IMAGE_TYPE=$(echo -e "\n")
-    fi
-    if grep -q 'function edition' "actions/${OS}"; then
-        . "actions/${OS}"
-        EDITIONS=$(printf 'EDITIONS="%s"\n' "$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f3 | sort -ur | paste -sd ' ')")
-    else
-        EDITIONS=$(echo -e "\n")
-    fi
-    echo
-    REST=$(sed -n '/^function releases_()/,$p' "actions/${OS}")
-    # Create and save the template with all collected information
-    printf '# Template file for '\''%s'\''
+    EDITIONS=$(printf 'EDITIONS="%s"\n' "$(cut -d: -f1 < "public/tmp_${OS}" | cut -d' ' -f3 | sort -ur | paste -sd ' ')")
+  else
+    EDITIONS=$(echo -e "\n")
+  fi
+  echo
+  REST=$(sed -n '/^function releases_()/,$p' "actions/${OS}")
+  # Create and save the template with all collected information
+  printf '# Template file for '\''%s'\''
 OSNAME="%s"
 PRETTY="%s"
 BASEDOF="%s"
@@ -41,10 +41,10 @@ RELEASES="%s"
 %s
 
 ' "$OS" "$OSNAME" "$PRETTY" "$BASEDOF" "$DESCRIPTION" "$HOMEPAGE" "$CREDENTIALS" "$GUEST" "$IMAGE_TYPE" "$RELEASES" "$EDITIONS" "$REST" | tee -a "public/${OS}"
-    # Append content from tmp_${OS} to TODO/all and remove the temporary file
-    cat "public/tmp_${OS}" >> TODO/all
-    rm "public/tmp_${OS}"
-    echo
+  # Append content from tmp_${OS} to TODO/all and remove the temporary file
+  cat "public/tmp_${OS}" >> TODO/all
+  #rm "public/tmp_${OS}"
+  echo
 }
 
 function test_result() {
