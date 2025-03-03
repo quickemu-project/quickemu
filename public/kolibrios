@@ -20,7 +20,12 @@ function editions_() {
 
 function get_() {
     local HASH=""
-    local ISO="latest-iso.7z"
+    if [ "${EDITION}" == 'it_IT' ]; then
+        # The it_IT build was disabled because nobody maintained it
+        local ISO="kolibrios-0.7.7.0%2B8797-9f5dd6c-iso.7z"
+    else
+      local ISO="latest-iso.7z"
+    fi
     local URL="http://builds.kolibrios.org/${EDITION}"
     echo "${URL}/${ISO} ${HASH}"
 }
