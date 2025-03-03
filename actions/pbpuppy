@@ -7,12 +7,11 @@ HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
 CREDENTIALS="-"
 
 function releases_() {
-    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | cut -d'.' -f1 | uniq)
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | cut -d'.' -f1 | sort | uniq)
 }
 
-
 function editions_() {
-    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | cut -d'-' -f1 | uniq)
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | cut -d'-' -f1 | sort | uniq)
 }
 
 function get_() {
