@@ -22,3 +22,4 @@
 *.xml
 *.zs-old
 .direnv/
+void
