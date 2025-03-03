@@ -345,7 +345,7 @@ function test_all() {
 
     for RELEASE in $(releases_); do
         . "actions/${OS}"
-        if [ "${OS}" == 'rebornos" ]; then
+        if [ "${OS}" == 'rebornos' ]; then
           if curl -I "https://cdn.soulharsh007.dev/RebornOS-ISO/${ISO}"
             test_result "${OS} ${RELEASE} ${URL} PASS"
           else
