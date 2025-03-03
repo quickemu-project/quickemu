@@ -16,21 +16,9 @@ function releases_() {
 
 function get_() {
     local JSON ISO HASH
-    JSON=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json") || return 1
-    
-    echo "DEBUG: JSON response:" >&2
-    echo "$JSON" >&2
-    jq --version
-
-    # Ověření validního JSONu
-    if ! echo "$JSON" | jq . > /dev/null 2>&1; then
-        echo "JSON not valid!" >&2
-        return 1
-    fi
-
+    JSON=$(web_pipe_json "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json") || return 1
     ISO=$(echo "$JSON" | jq -r ".url")
     HASH=$(echo "$JSON" | jq -r ".md5")
-
     echo "${ISO} ${HASH}"
 }
 

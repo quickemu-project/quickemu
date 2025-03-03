@@ -12,7 +12,7 @@ function releases_() {
 
 function get_() {
     local JSON ISO HASH
-    JSON=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json") || return 1
+    JSON=$(web_pipe_json "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json") || return 1
     ISO=$(echo "$JSON" | jq -r ".url")
     HASH=$(echo "$JSON" | jq -r ".md5")
     echo "${ISO} ${HASH}"
