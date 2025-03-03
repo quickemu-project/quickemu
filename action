@@ -545,7 +545,7 @@ if [ -z "${1}" ]; then
     get_releases "${OS}"
     #test_all "${OS}"
     write_output "${OS}"
-  done
+  done &
 elif [ -n "${1}" ]; then
   test_all "${1}"
   write_output "${1}"
