@@ -5,7 +5,7 @@ BASEDOF="Debian"
 DESCRIPTION="Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data"
 HOMEPAGE="https://www.truenas.com/truenas-scale"
 CREDENTIALS="-"
-GUEST="sugar mate lxde kde"
+GUEST="truenas"
 
 RELEASES="24"
 

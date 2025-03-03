@@ -5,7 +5,7 @@ BASEDOF="FreeBSD"
 DESCRIPTION="World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs"
 HOMEPAGE="https://www.truenas.com/truenas-core"
 CREDENTIALS="-"
-GUEST="sugar mate lxde kde"
+GUEST="truenas"
 
 RELEASES="13"
 

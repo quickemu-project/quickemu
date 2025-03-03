@@ -5,7 +5,7 @@ BASEDOF="Debian"
 DESCRIPTION="Complete desktop Linux operating system, freely available with both community and professional support"
 HOMEPAGE="https://ubuntu.com"
 CREDENTIALS="-"
-GUEST="sugar mate lxde kde"
+GUEST="linux_old"
 
 RELEASES="daily-live 24.10 24.04 22.04 20.04 18.04 16.04 14.04"
 

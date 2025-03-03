@@ -5,7 +5,7 @@ BASEDOF="-"
 DESCRIPTION="Platform for building an infrastructure of connected applications, networks, and web services"
 HOMEPAGE="https://www.microsoft.com/en-us/windows-server"
 CREDENTIALS="-"
-GUEST="xfce-musl xfce-glibc musl glibc"
+GUEST="windows-server"
 
 RELEASES="2022 2019 2016"
 

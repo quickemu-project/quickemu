@@ -5,7 +5,7 @@ BASEDOF="-"
 DESCRIPTION="Imagine running your favorite Windows applications and drivers in an open-source environment you can trust"
 HOMEPAGE="https://reactos.org"
 CREDENTIALS="-"
-GUEST="plasma gnome"
+GUEST="reactos"
 
 RELEASES="latest"
 

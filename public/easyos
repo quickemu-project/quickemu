@@ -6,7 +6,7 @@ DESCRIPTION="Experimental distribution designed from scratch to support containe
 HOMEPAGE="https://easyos.org"
 CREDENTIALS="-"
 
-IMAGE_TYPE=""
+IMAGE_TYPE="img"
 RELEASES="5.8.5"
 
 
