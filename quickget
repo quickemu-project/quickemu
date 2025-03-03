@@ -30,9 +30,9 @@ function show_os_info() {
     echo $"   Based of: ${BASEDOF}"
     echo $"Description: ${DESCRIPTION}"
     echo $"Credentials: ${CREDENTIALS}"
-    echo $"Releases: ${RELEASES}" | fmt -w 80
+    echo $"Releases: ${RELEASES}" | fmt -w $(tput cols)
     if [[ $(type -t "editions_") == function ]]; then
-        echo -n $"Editions: ${EDITIONS}" | fmt -w 80
+        echo -n $"Editions: ${EDITIONS}" | fmt -w $(tput cols)
     fi
 }
 
@@ -49,7 +49,7 @@ function os_support() {
 function error_specify_os() {
     echo $"ERROR! You must specify an operating system."
     echo $"- Supported Operating Systems:"
-    os_support | fmt -w 80
+    os_support | fmt -w $(tput cols)
     echo -e $"\nTo see all possible arguments, use:\n   quickget -h  or  quickget --help"
     exit 1
 }
@@ -57,7 +57,7 @@ function error_specify_os() {
 function os_supported() {
     if [[ ! "$(os_support)" =~ ${OS} ]]; then
         echo -e $"ERROR! ${OS} is not a supported OS.\n"
-        os_support | fmt -w 80
+        os_support | fmt -w $(tput cols)
         exit 1
     fi
 }
