@@ -15,10 +15,10 @@ function releases_() {
 }
 
 function get_() {
-    local HASH=""
-    local ISO=""
-    ISO=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".url")
-    HASH=$(web_pipe "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json" | jq -r ".md5")
+    local JSON ISO HASH
+    JSON=$(curl -s "https://meta.cdn.soulharsh007.dev/RebornOS-ISO?format=json") || return 1
+    ISO=$(echo "$JSON" | jq -r ".url")
+    HASH=$(echo "$JSON" | jq -r ".md5")
     echo "${ISO} ${HASH}"
 }
 
