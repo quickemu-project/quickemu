@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: '0 */6 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   get:
     runs-on: ubuntu-latest
@@ -17,6 +20,11 @@ jobs:
 
     - name: Get latest ISOs links
       run: curl -s https://distrowatch.com | grep 'News".*\.iso' | cut -d '"' -f6 | tee -a ISOs.list
+
+    - name: "Git Config"
+      run: |
+        git config --global user.name "${{ github.repository_owner }}"
+        git config --global user.email "noreply@github.com"
 
     - name: Update list
       run: |
