@@ -1,0 +1,25 @@
+# This is a basic workflow that is manually triggered
+
+name: Get latest ISOs links
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+
+jobs:
+  get:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get latest ISOs links
+      run: curl -s https://distrowatch.com | grep 'News".*\.iso' | cut -d '"' -f6 | tee -a ISOs.list
+
+    - name: Update list
+      run: |
+        git add ISOs.list
+        git commit -m "update ISOs list"
+        git push
