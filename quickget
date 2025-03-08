@@ -261,14 +261,9 @@ function csv_data() {
     fi
 
     for OS in $(os_support); do
+        . "actions/${OS}"
         local EDITIONS=""
         DISPLAY_NAME="${PRETTY}"
-
-        case ${OS} in
-            *ubuntu-server*) FUNC="ubuntu-server";;
-            *ubuntu*) FUNC="ubuntu";;
-            *) FUNC="${OS}";;
-        esac
 
         PNG="https://quickemu-project.github.io/quickemu-icons/png/${FUNC}/${FUNC}-quickemu-white-pinkbg.png"
         SVG="https://quickemu-project.github.io/quickemu-icons/svg/${FUNC}/${FUNC}-quickemu-white-pinkbg.svg"
