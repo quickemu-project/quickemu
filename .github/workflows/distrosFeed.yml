@@ -1,9 +1,5 @@
-# This is a basic workflow that is manually triggered
-
 name: Get latest ISOs links
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   workflow_dispatch:
   schedule:
@@ -19,15 +15,17 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Get latest ISOs links
-      run: curl -s https://distrowatch.com | grep 'News".*\.iso' | cut -d '"' -f4,6 | sed 's/"/ /g' | column --table | tee -a ISOs.list
-
-    - name: "Git Config"
       run: |
-        git config --global user.name "${{ github.repository_owner }}"
-        git config --global user.email "noreply@github.com"
+        curl -s https://distrowatch.com | grep 'News".*\.iso' | awk -F'"' '{print $4, $6}' | column --table > ISOs.tmp
+        sort -u ISOs.tmp -o ISOs.tmp
+        mv ISOs.tmp ISOs.list
+
+    - name: Git Config
+      run: |
+        git config --local user.name "${{ github.repository_owner }}"
+        git config --local user.email "noreply@github.com"
 
     - name: Update list
       run: |
         git add ISOs.list
-        git commit -m "update ISOs list"
-        git push
+        git diff --cached --quiet || (git commit -m "update ISOs list" && git push)
