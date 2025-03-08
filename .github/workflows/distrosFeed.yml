@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Get latest ISOs links
-      run: curl -s https://distrowatch.com | grep 'News".*\.iso' | cut -d '"' -f6 | tee -a ISOs.list
+      run: curl -s https://distrowatch.com | grep 'News".*\.iso' | cut -d '"' -f4,6 | sed 's/"/ /g' | column --table | tee -a ISOs.list
 
     - name: "Git Config"
       run: |
