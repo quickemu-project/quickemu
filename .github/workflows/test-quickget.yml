@@ -33,10 +33,10 @@ jobs:
           ./quickget --check | tee results/check.txt
       - name: "Display results 📊"
         run: |
-          WINDOWS=$(grep -c "windows-" results/check.txt)
-          FAILED=$(grep -c ^FAIL results/check.txt)
-          SKIPPED=$(grep -c ^SKIP results/check.txt)
-          PASSED=$(grep -c ^PASS results/check.txt)
+          WINDOWS=$(grep -c "windows-" results/check.txt || echo 0)
+          FAILED=$(grep -c ^FAIL results/check.txt || echo 0)
+          SKIPPED=$(grep -c ^SKIP results/check.txt || echo 0)
+          PASSED=$(grep -c ^PASS results/check.txt || echo 0)
           CHECKED=$((WINDOWS + FAILED + SKIPPED + PASSED))
           echo -e "\nResults:"
           echo -e "- CHECKED:\t${CHECKED}"
@@ -44,8 +44,8 @@ jobs:
           echo -e "- SKIPPED:\t${SKIPPED}\t(of which ${WINDOWS} are Windows)"
           echo -e "- FAILED:\t${FAILED}\n"
           grep ^FAIL results/check.txt | tee results/failed.txt
-          VARIATIONS=$(wc -l results/list.txt | cut -d' ' -f 1)
-          DOWNLOADS=$(wc -l results/check.txt | cut -d' ' -f 1)
+          VARIATIONS=$(wc -l results/list.txt | cut -d' ' -f1 || echo 0)
+          DOWNLOADS=$(wc -l results/check.txt | cut -d' ' -f1 || echo 0)
           echo
           echo "Compare OS variations with downloads:"
           echo -e "- Variations:\t${VARIATIONS}"
