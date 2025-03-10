@@ -1,4 +1,4 @@
-name: Get latest ISOs links
+name: Get latest ISOs links from DistroWatch
 
 on:
   workflow_dispatch:
@@ -19,6 +19,8 @@ jobs:
         curl -s https://distrowatch.com | grep 'News".*\.iso' | awk -F'"' '{print $4, $6}' | column --table > ISOs.tmp
         sort -u ISOs.tmp -o ISOs.tmp
         mv ISOs.tmp ISOs.list
+        echo 'on DW are:' >> $GITHUB_STEP_SUMMARY
+        cat ISOs.list >> $GITHUB_STEP_UMMARY
 
     - name: Git Config
       run: |
