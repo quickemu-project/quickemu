@@ -21,7 +21,7 @@ jobs:
         mv ISOs.tmp ISOs.list
         echo "on DW are:" >> $GITHUB_STEP_SUMMARY
         NEW=$(cat ISOs.list)
-        echo "${NEW}" >> $GITHUB_STEP_UMMARY
+        echo "${NEW}" >> $GITHUB_STEP_SUMMARY
 
     - name: Git Config
       run: |
