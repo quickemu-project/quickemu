@@ -20,7 +20,8 @@ jobs:
         sort -u ISOs.tmp -o ISOs.tmp
         mv ISOs.tmp ISOs.list
         echo "on DW are:" >> $GITHUB_STEP_SUMMARY
-        cat ISOs.list >> $GITHUB_STEP_UMMARY
+        NEW=$(cat ISOs.list)
+        echo "${NEW}" >> $GITHUB_STEP_UMMARY
 
     - name: Git Config
       run: |
