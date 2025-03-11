@@ -5,9 +5,11 @@ dynfi       https://dynfi.com/files/firewall/dynfi_installer_vga_4.04-20250305-0
 extix       https://downloads.sourceforge.net/extix/extix-25.3-64bit-kde-waydroid-2910mb-250305.iso
 freebsd     https://download.freebsd.org/releases/ISO-IMAGES/13.5/FreeBSD-13.5-RELEASE-amd64-disc1.iso
 garuda      https://downloads.sourceforge.net/garuda-linux/garuda-dr460nized-linux-zen-250308.iso
+ipfire      https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfire-2.29-core192-x86_64.iso
 kumander    https://dl.kumander.org/kumander-linux-2.0-live-amd64.iso
 max         https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 peropesis   https://peropesis.org/peropesis/Peropesis-2.9-live.iso
 rosa        https://mirror.rosa.ru/rosa/rosa13/iso/ROSA.FRESH.13/plasma6/ROSA.FRESH.PLASMA6.13.0.x86_64.iso
 sparky      https://downloads.sourceforge.net/sparkylinux/sparkylinux-2025.03-x86_64-lxqt.iso
 tails       https://download.tails.net/tails/stable/tails-amd64-6.13/tails-amd64-6.13.iso
+univention  https://updates.software-univention.de/download/ucs-cds/ucs5.2-1/UCS_5.2-1-amd64.iso
