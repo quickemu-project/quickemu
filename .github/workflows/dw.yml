@@ -13,15 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
     - name: Get latest ISOs links
       run: |
         curl -s https://distrowatch.com | grep 'News".*\.iso' | awk -F'"' '{print $4, $6}' | column --table > ISOs.tmp
-        sort -u ISOs.tmp -o ISOs.tmp
-        mv ISOs.tmp ISOs.list
+        sort -u ISOs.tmp -o ISOs.list
         echo "on DW are:" >> $GITHUB_STEP_SUMMARY
-        NEW=$(cat ISOs.list)
-        echo "${NEW}" >> $GITHUB_STEP_SUMMARY
+        cat ISOs.tmp >> $GITHUB_STEP_SUMMARY
 
     - name: Git Config
       run: |
@@ -30,5 +27,8 @@ jobs:
 
     - name: Update list
       run: |
-        git add ISOs.list
-        git diff --cached --quiet || (git commit -m "update ISOs list" && git push)
+        if ! git diff --exit-code --quiet ISOs.list; then
+          git add ISOs.list
+          git commit -m "update ISOs list"
+          git push
+        fi
