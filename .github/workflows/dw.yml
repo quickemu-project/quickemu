@@ -16,9 +16,12 @@ jobs:
     - name: Get latest ISOs links
       run: |
         curl -s https://distrowatch.com | grep 'News".*\.iso' | awk -F'"' '{print $4, $6}' | column --table > ISOs.tmp
-        sort -u ISOs.tmp -o ISOs.list
-        echo "on DW are:" >> $GITHUB_STEP_SUMMARY
+        echo "### on DW are:" >> $GITHUB_STEP_SUMMARY
         cat ISOs.tmp >> $GITHUB_STEP_SUMMARY
+        if [ -f ISOs.list ]; then
+          cat ISOs.list >> ISOs.tmp
+        fi
+        sort -u ISOs.tmp -o ISOs.list
 
     - name: Git Config
       run: |
