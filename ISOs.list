@@ -1,6 +1,5 @@
-artix       https://download.artixlinux.org/iso/artix-base-openrc-20250303-x86_64.iso
-smoothwall  https://downloads.sourceforge.net/smoothwall/Express-3.1-SP6-x86_64.iso
 ac          https://downloads.sourceforge.net/accessible-coconut/Accessible-Coconut-24.04-beta-desktop-amd64.iso
+artix       https://download.artixlinux.org/iso/artix-base-openrc-20250303-x86_64.iso
 centos      https://ftp.udx.icscoe.jp/Linux/CentOS-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250303.3-x86_64-dvd1.iso
 clonezilla  https://downloads.sourceforge.net/clonezilla/clonezilla-live-3.2.1-9-amd64.iso
 dynfi       https://dynfi.com/files/firewall/dynfi_installer_vga_4.04-20250305-075641.iso.bz2
@@ -13,6 +12,7 @@ kumander    https://dl.kumander.org/kumander-linux-2.0-live-amd64.iso
 max         https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 peropesis   https://peropesis.org/peropesis/Peropesis-2.9-live.iso
 rosa        https://mirror.rosa.ru/rosa/rosa13/iso/ROSA.FRESH.13/plasma6/ROSA.FRESH.PLASMA6.13.0.x86_64.iso
+smoothwall  https://downloads.sourceforge.net/smoothwall/Express-3.1-SP6-x86_64.iso
 sparky      https://downloads.sourceforge.net/sparkylinux/sparkylinux-2025.03-x86_64-lxqt.iso
 tails       https://download.tails.net/tails/stable/tails-amd64-6.13/tails-amd64-6.13.iso
 univention  https://updates.software-univention.de/download/ucs-cds/ucs5.2-1/UCS_5.2-1-amd64.iso
