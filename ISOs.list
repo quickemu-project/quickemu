@@ -2,6 +2,7 @@ ac          https://downloads.sourceforge.net/accessible-coconut/Accessible-Coco
 artix       https://download.artixlinux.org/iso/artix-base-openrc-20250303-x86_64.iso
 artix       https://download.artixlinux.org/iso/artix-xfce-s6-20250310-x86_64.iso
 bluestar    https://downloads.sourceforge.net/bluestarlinux/bslx-6.13.6-3-2025.03.11-x86_64.iso
+calculate   https://mirror.calculate-linux.org/release/cld-20250313-x86_64.iso
 centos      https://ftp.udx.icscoe.jp/Linux/CentOS-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250303.3-x86_64-dvd1.iso
 clonezilla  https://downloads.sourceforge.net/clonezilla/clonezilla-live-3.2.1-9-amd64.iso
 dynfi       https://dynfi.com/files/firewall/dynfi_installer_vga_4.04-20250305-075641.iso.bz2
