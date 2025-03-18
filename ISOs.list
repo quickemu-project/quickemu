@@ -11,6 +11,7 @@ clonezilla  https://downloads.sourceforge.net/clonezilla/clonezilla-live-3.2.1-9
 debian        https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.10.0-amd64-DVD-1.iso
 dynfi       https://dynfi.com/files/firewall/dynfi_installer_vga_4.04-20250305-075641.iso.bz2
 extix       https://downloads.sourceforge.net/extix/extix-25.3-64bit-kde-waydroid-2910mb-250305.iso
+fedora        https://mirror.us.leaseweb.net/fedora/linux/releases/test/42_Beta/Workstation/x86_64/iso/Fedora-Workstation-Live-42_Beta-1.4.x86_64.iso
 freebsd     https://download.freebsd.org/releases/ISO-IMAGES/13.5/FreeBSD-13.5-RELEASE-amd64-disc1.iso
 funos       https://downloads.sourceforge.net/funos/funos-24.04.2-stable.20250303.iso
 garuda      https://downloads.sourceforge.net/garuda-linux/garuda-dr460nized-linux-zen-250308.iso
