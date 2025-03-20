@@ -22,12 +22,14 @@ ipfire        https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfi
 ipfire      https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfire-2.29-core192-x86_64.iso
 kali          https://cdimage.kali.org/kali-2025.1a/kali-linux-2025.1a-installer-amd64.iso
 kdeneon       https://files.kde.org/neon/images/user/20250314-2153/neon-user-20250314-2153.iso
+kdeneon       https://files.kde.org/neon/images/user/20250320-1319/neon-user-20250320-1319.iso
 kdeneon     https://files.kde.org/neon/images/user/20250314-2153/neon-user-20250314-2153.iso
 kumander    https://dl.kumander.org/kumander-linux-2.0-live-amd64.iso
 linuxfx       https://downloads.sourceforge.net/linuxfxdevil/linuxfx-11.25.03.1-noble-lts.iso
 max           https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 max         https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 openmamba     https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250312.x86_64.iso
+openmamba     https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250320.x86_64.iso
 openmamba   https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250312.x86_64.iso
 peropesis     https://peropesis.org/peropesis/Peropesis-2.9-live.iso
 peropesis   https://peropesis.org/peropesis/Peropesis-2.9-live.iso
@@ -43,3 +45,4 @@ truenas       https://download.sys.truenas.net/TrueNAS-SCALE-Fangtooth-RC/25.04-
 truenas     https://download.sys.truenas.net/TrueNAS-SCALE-Fangtooth-RC/25.04-RC.1/TrueNAS-SCALE-25.04-RC.1.iso
 univention    https://updates.software-univention.de/download/ucs-cds/ucs5.2-1/UCS_5.2-1-amd64.iso
 univention  https://updates.software-univention.de/download/ucs-cds/ucs5.2-1/UCS_5.2-1-amd64.iso
+voyager       https://downloads.sourceforge.net/voyagerlive/Voyager-25.04-alpha6-amd64.iso
