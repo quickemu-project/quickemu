@@ -78,6 +78,7 @@ function os_info() {
         opensuse)         INFO="openSUSE|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
         oraclelinux)      INFO="Oracle Linux|-|https://www.oracle.com/linux/|Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge.";;
         parrotsec)        INFO="Parrot Security|parrot:parrot|https://www.parrotsec.org/|Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way.";;
+        pclinuxos)        INFO="PCLinuxOS|-|https://www.pclinuxos.com/|PCLinuxOS is a free easy to use Linux-based Operating System for x86_64 desktops or laptops.";;
         peppermint)       INFO="PeppermintOS|-|https://peppermintos.com/|Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box.";;
         popos)            INFO="Pop!_OS|-|https://pop.system76.com/|Operating system for STEM and creative professionals who use their computer as a tool to discover and create.";;
         porteus)          INFO="Porteus|-|http://www.porteus.org/|Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media.";;
@@ -471,6 +472,7 @@ function os_support() {
     opensuse \
     oraclelinux \
     parrotsec \
+    pclinuxos \
     peppermint \
     popos \
     porteus \
@@ -918,6 +920,14 @@ function releases_parrotsec() {
 
 function editions_parrotsec() {
     echo home htb security
+}
+
+function releases_pclinuxos() {
+    echo $(web_pipe https://ftp.fau.de/pclinuxos/pclinuxos/iso | grep -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' | head -n 1 )
+}
+
+function editions_pclinuxos() {
+    echo kde kde-darkstar mate xfce
 }
 
 function releases_peppermint() {
@@ -2315,6 +2325,13 @@ function get_parrotsec() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_pclinuxos() {
+    local HASH="$(web_pipe "${URL}/pclinuxos64-${EDITION}-${RELEASE}.md5sum" | head -c 32)"
+    local ISO="pclinuxos64-${EDITION}-${RELEASE}.iso"
+    local URL="https://ftp.nluug.nl/os/Linux/distr/pclinuxos/pclinuxos/iso/"
+    echo "${URL}/${ISO} ${HASH}"
+}
+    
 function get_peppermint() {
     local HASH=""
     local ISO=""
