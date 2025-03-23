@@ -19,9 +19,9 @@ jobs:
         echo "### on DW are:" >> $GITHUB_STEP_SUMMARY
         cat ISOs.tmp >> $GITHUB_STEP_SUMMARY
         if [ -f ISOs.list ]; then
-          cat ISOs.list >> ISOs.tmp
+          cat ISOs.list | column --table >> ISOs.tmp
         fi
-        sort -u ISOs.tmp -o ISOs.list
+        cat ISOs.tmp | column --table | sort -u -o ISOs.list
 
     - name: Git Config
       run: |
