@@ -14,6 +14,10 @@ else
 fi
 
 export LC_ALL=C
+#TODO: config file
+TOshare="/usr/share/quickget"
+TOpublic="$TOshare/public"
+TOactions="$TOshare/actions"
 
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
@@ -23,7 +27,7 @@ function cleanup() {
 
 function show_os_info() {
     # shellcheck source=public/alpine
-    . "public/${1}"
+    . "${TOpublic}/${1}"
     echo
     echo " ${PRETTY}"
     echo $"    Website: ${HOMEPAGE}"
@@ -37,7 +41,7 @@ function show_os_info() {
 }
 
 function os_support() {
-    DIR="actions"
+    DIR="${TOactions}"
     for file in "$DIR"/*; do
         if [[ -f "$file" ]]; then
             filename="${file##*/}"
@@ -261,7 +265,7 @@ function csv_data() {
     fi
 
     for OS in $(os_support); do
-        . "actions/${OS}"
+        . "${TOactions}/${OS}"
         local EDITIONS=""
         DISPLAY_NAME="${PRETTY}"
 
@@ -336,10 +340,10 @@ function test_all() {
         FUNC="ubuntu"
     fi
     local URL=""
-    . "actions/${OS}"
+    . "${TOactions}/${OS}"
 
     for RELEASE in $(releases_); do
-        . "actions/${OS}"
+        . "${TOactions}/${OS}"
         if [ "${OS}" == 'rebornos' ]; then
           if curl -I "https://cdn.soulharsh007.dev/RebornOS-ISO/${ISO}"; then
             test_result "${OS} ${RELEASE} ${URL} PASS"
@@ -347,7 +351,7 @@ function test_all() {
             test_result "${OS} ${RELEASE} ${URL} FAIL"
           fi
         elif [[ $(type -t editions_) == function ]]; then
-            . "actions/${OS}"
+            . "${TOactions}/${OS}"
             for EDITION in $(editions_); do
                 validate_release releases_
                 URL=$(get_ | cut -d' ' -f1 | head -n 1)
@@ -359,7 +363,7 @@ function test_all() {
                 fi
             done
         elif [[ "${OS}" == "windows"* ]]; then
-            . "actions/${OS}"
+            . "${TOactions}/${OS}"
             languages_
             for I18N in "${I18NS[@]}"; do
                 validate_release releases_
@@ -599,7 +603,7 @@ EOF
         fi
 
         # OS specific tweaks
-        #. "actions/${OS}"
+        #. "${TOactions}/${OS}"
         #specific_tweaks 2>/dev/null
         if [ "${OS}" == "ubuntu" ] && [[ ${RELEASE} == *"daily"*  ]]; then
             # Minimum to install lobster testing is 18GB but 32GB are allocated for headroom
@@ -658,7 +662,7 @@ function create_vm() {
         check_hash "${ISO}" "${HASH}"
     fi
     # shellcheck disable=SC2076
-    . "actions/${OS}"
+    . "${TOactions}/${OS}"
     "distro_specific" 2>/dev/null
     make_vm_config "${ISO}"
 }
@@ -747,7 +751,7 @@ run_itself() {
 
     os_supported
     # shellcheck source=actions/alpine
-    . "actions/${OS}"
+    . "${TOactions}/${OS}"
 
     if [ -n "${2}" ]; then
         RELEASE="${2}"
@@ -818,7 +822,7 @@ function run_ui() {
     OS=$(gum filter --height=17 --header="Select an OS:" $(os_support))
     #os_info "${OS}" > "$TMPFILE"
     # shellcheck source=actions/alpine
-    . "public/${OS}"
+    . "${TOpublic}/${OS}"
     RELEASE=$(gum filter --height=9 --header="Select $OS release:" ${RELEASES})
     if declare -F editions_ > /dev/null; then
         EDITION=$(gum filter --height=9 --header="Select $OS  $RELEASE edition:" ${EDITIONS})
