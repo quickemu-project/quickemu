@@ -27,6 +27,7 @@ ipfire        https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfi
 kali          https://cdimage.kali.org/kali-2025.1a/kali-linux-2025.1a-installer-amd64.iso
 kdeneon       https://files.kde.org/neon/images/user/20250314-2153/neon-user-20250314-2153.iso
 kdeneon       https://files.kde.org/neon/images/user/20250320-1319/neon-user-20250320-1319.iso
+kdeneon       https://files.kde.org/neon/images/user/20250327-1319/neon-user-20250327-1319.iso
 kumander      https://dl.kumander.org/kumander-linux-2.0-live-amd64.iso
 linuxfx       https://downloads.sourceforge.net/linuxfxdevil/linuxfx-11.25.03.1-noble-lts.iso
 max           https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
