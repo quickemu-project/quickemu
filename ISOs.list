@@ -13,6 +13,7 @@ clonezilla      https://downloads.sourceforge.net/clonezilla/clonezilla-live-3.2
 debian          https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.10.0-amd64-DVD-1.iso
 deepin          http://ftp.snt.utwente.nl/pub/os/linux/deepin-cd/25-alpha/amd64/deepin-desktop-community-25-alpha-amd64.iso
 dragonos        https://downloads.sourceforge.net/dragonos-focal/DragonOS_Noble_R1.iso
+drparted        https://downloads.sourceforge.net/dr-parted-live/Dr.Parted-Live25.04-amd64.iso
 dynfi           https://dynfi.com/files/firewall/dynfi_installer_vga_4.04-20250305-075641.iso.bz2
 edubuntu        https://cdimage.ubuntu.com/edubuntu/releases/25.04/beta/edubuntu-25.04-beta-desktop-amd64.iso
 elementary      https://nyc3.dl.elementary.io/download/MTc0MjM0NTQ2Ng==/elementaryos-8.0-stable.20250314rc.iso
@@ -25,6 +26,7 @@ finnix          https://www.finnix.org/releases/250/finnix-250.iso
 freebsd         https://download.freebsd.org/releases/ISO-IMAGES/13.5/FreeBSD-13.5-RELEASE-amd64-disc1.iso
 funos           https://downloads.sourceforge.net/funos/funos-24.04.2-stable.20250303.iso
 garuda          https://downloads.sourceforge.net/garuda-linux/garuda-dr460nized-linux-zen-250308.iso
+gobo            https://gobolinux.neonsys.org/017.01-ISO/GoboLinux-017.01-x86_64.iso
 ipfire          https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfire-2.29-core192-x86_64.iso
 kali            https://cdimage.kali.org/kali-2025.1a/kali-linux-2025.1a-installer-amd64.iso
 kaos            https://downloads.sourceforge.net/kaosx/KaOS-2025.03-x86_64.iso
