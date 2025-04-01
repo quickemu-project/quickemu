@@ -1,0 +1,30 @@
+name: "update supported"
+
+on:
+  schedule:
+    - cron: '0/180 * * * *'
+  push:
+    branches: [ "master-patched" ]
+  pull_request:
+    branches: [ "master-patched" ]
+  workflow_dispatch:
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: fill
+        run: |
+          chmod a+x action
+          ./action
+          git config --global user.name "${{ github.repository_owner }}"
+          git config --global user.email "noreply@github.com"
+          git add public
+          git add TODO
+          git add actions
+          git commit -m "update supported"
+          git push
+          git status
