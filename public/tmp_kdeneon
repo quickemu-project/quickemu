@@ -1,0 +1,8 @@
+kdeneon user x86_64
+kdeneon user x86_gcc2h
+kdeneon testing x86_64
+kdeneon testing x86_gcc2h
+kdeneon unstable x86_64
+kdeneon unstable x86_gcc2h
+kdeneon developer x86_64
+kdeneon developer x86_gcc2h

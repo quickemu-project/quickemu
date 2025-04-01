@@ -7,7 +7,7 @@ HOMEPAGE="https://voidlinux.org"
 CREDENTIALS="anon:voidlinux root:voidlinux"
 
 
-RELEASES="20250202 20240314 20230628"
+RELEASES="20250401 20250202 20240314"
 EDITIONS="xfce-musl xfce-glibc musl glibc"
 
 function releases_() {

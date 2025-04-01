@@ -7,7 +7,7 @@ HOMEPAGE="https://arcolinux.com"
 CREDENTIALS="-"
 
 
-RELEASES="v25.03.05 v25.02.04 v25.01.05 v25.01.01 v24.12.02"
+RELEASES="v25.04.01 v25.03.05 v25.02.04 v25.01.05 v25.01.01"
 EDITIONS="pro plasma net"
 
 function releases_() {

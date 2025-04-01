@@ -7,8 +7,8 @@ HOMEPAGE="https://www.fedoraproject.org"
 CREDENTIALS="-"
 
 
-RELEASES="41 40 39"
-EDITIONS="i3 Xfce Workstation Sway Silverblue Server Sericea Onyx MiracleWM Mate LXQt LXDE Kinoite KDE_Mobile KDE Cinnamon Budgie"
+RELEASES="42_Beta 41 40 39"
+EDITIONS="i3 Xfce Workstation Sway Silverblue Server Sericea Onyx MiracleWM Mate LXQt LXDE Kinoite KDE_Mobile KDE Cinnamon COSMIC Budgie"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005

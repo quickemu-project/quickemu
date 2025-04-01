@@ -1,0 +1,9 @@
+nixos unstable minimal
+nixos unstable plasma
+nixos unstable gnome
+nixos 24.11 minimal
+nixos 24.11 plasma
+nixos 24.11 gnome
+nixos 24.05 minimal
+nixos 24.05 plasma
+nixos 24.05 gnome

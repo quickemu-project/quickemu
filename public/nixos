@@ -7,7 +7,7 @@ HOMEPAGE="https://nixos.org"
 CREDENTIALS="-"
 
 
-RELEASES="unstable 24.05 23.05"
+RELEASES="unstable 24.11 24.05"
 EDITIONS="plasma minimal gnome"
 
 function releases_() {

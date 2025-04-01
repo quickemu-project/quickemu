@@ -8,7 +8,7 @@ CREDENTIALS="-"
 
 
 RELEASES="latest"
-EDITIONS="xfce sway kde-lite i3 gnome dr460nized-gaming dr460nized cinnamon"
+EDITIONS="xfce sway mokka kde-lite i3 hyprland gnome dr460nized-gaming dr460nized cinnamon"
 
 function releases_() {
     echo latest

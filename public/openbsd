@@ -7,7 +7,7 @@ HOMEPAGE="https://www.openbsd.org"
 CREDENTIALS="-"
 GUEST="openbsd"
 
-RELEASES="7.6 7.5 7.4 7.3 7.2 7.1 7.0 6.9 6.8"
+RELEASES="7.6 7.5"
 
 
 function releases_() {

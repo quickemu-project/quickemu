@@ -1,0 +1,8 @@
+windows 11 glibc
+windows 11 musl
+windows 11 xfce-glibc
+windows 11 xfce-musl
+windows 10 glibc
+windows 10 musl
+windows 10 xfce-glibc
+windows 10 xfce-musl

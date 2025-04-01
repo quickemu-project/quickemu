@@ -14,7 +14,7 @@ function releases_() {
     echo 2022 2019 2016
 }
 
-function languages_windows-server() {
+function languages_() {
     I18NS=("English (United States)" "Chinese (Simplified)" "French" "German" "Italian" "Japanese" "Russian" "Spanish")
 }
 

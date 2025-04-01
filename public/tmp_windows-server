@@ -1,0 +1,12 @@
+windows-server 2022 glibc
+windows-server 2022 musl
+windows-server 2022 xfce-glibc
+windows-server 2022 xfce-musl
+windows-server 2019 glibc
+windows-server 2019 musl
+windows-server 2019 xfce-glibc
+windows-server 2019 xfce-musl
+windows-server 2016 glibc
+windows-server 2016 musl
+windows-server 2016 xfce-glibc
+windows-server 2016 xfce-musl

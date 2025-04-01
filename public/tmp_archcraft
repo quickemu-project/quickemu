@@ -1,0 +1,8 @@
+archcraft latest net-sysv
+archcraft latest core-sysv
+archcraft latest base-sysv
+archcraft latest full-sysv
+archcraft latest net-runit
+archcraft latest core-runit
+archcraft latest base-runit
+archcraft latest full-runit

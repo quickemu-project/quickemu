@@ -7,8 +7,8 @@ HOMEPAGE="https://www.openindiana.org"
 CREDENTIALS="-"
 solaris
 
-RELEASES="20241026 20240426 20231027 20230502 20230421"
-EDITIONS="text minimal gui"
+RELEASES=""
+EDITIONS=""
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
