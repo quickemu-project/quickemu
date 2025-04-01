@@ -23,8 +23,12 @@ jobs:
           ./action | tee /dev/null
           git config --global user.name "${{ github.repository_owner }}"
           git config --global user.email "noreply@github.com"
-          #git add .
-          git add --all
-          git commit -m "update supported"
-          git push
+
+      - name: push
+        run: |
+          git status
+          git add . || echo "add . failed"
+          git add --all || echo "add --all failed"
+          git commit -m "update supported" || echo "commit failed"
+          git push || echo "push failed"
           git status
