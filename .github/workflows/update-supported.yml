@@ -24,7 +24,7 @@ jobs:
           git config --global user.email "noreply@github.com"
           git add public
           git add TODO
-          git add actions
+          git add --all
           git commit -m "update supported"
           git push
           git status
