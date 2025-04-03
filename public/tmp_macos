@@ -20,17 +20,17 @@ macos monterey:                      http://oscdn.apple.com/content/downloads/59
 macos monterey lxde
 macos monterey:                      http://oscdn.apple.com/content/downloads/59/11/012-51692/z29q5x5plswit63bvyxmubthavua9gbxic/RecoveryImage/BaseSystem.dmg
 macos monterey xfce
-macos monterey:                      
+macos monterey:                      http://oscdn.apple.com/content/downloads/59/11/012-51692/z29q5x5plswit63bvyxmubthavua9gbxic/RecoveryImage/BaseSystem.dmg
 macos monterey kde
-macos ventura:                       
+macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura lxde
-macos ventura:                       
+macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura xfce
-macos ventura:                       
+macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura kde
-macos sonoma:                        
+macos sonoma:                        http://oscdn.apple.com/content/downloads/14/00/082-01323/qbdhdewwbxiq2ppow3kyduslzd9c0ql0eu/RecoveryImage/BaseSystem.dmg
 macos sonoma lxde
-macos sonoma:                        
+macos sonoma:                        http://oscdn.apple.com/content/downloads/14/00/082-01323/qbdhdewwbxiq2ppow3kyduslzd9c0ql0eu/RecoveryImage/BaseSystem.dmg
 macos sonoma xfce
 macos sonoma:                        http://oscdn.apple.com/content/downloads/14/00/082-01323/qbdhdewwbxiq2ppow3kyduslzd9c0ql0eu/RecoveryImage/BaseSystem.dmg
 macos sonoma kde
