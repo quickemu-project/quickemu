@@ -7,7 +7,7 @@ HOMEPAGE="https://www.netbsd.org"
 CREDENTIALS="-"
 GUEST="netbsd"
 
-RELEASES=""
+RELEASES="9.4 9.3 10.1 10.0"
 
 
 function releases_() {
