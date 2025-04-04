@@ -7,8 +7,8 @@ HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
 CREDENTIALS="-"
 
 
-RELEASES="250402 250314 250301"
-EDITIONS="VoidPup64 S15Pup64 BookwormPup64-ghtest"
+RELEASES="250402"
+EDITIONS="VoidPup64 S15Pup64"
 
 function releases_() {
     echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | grep -oP '\d{6}(?=\.iso)' | sort -u)
