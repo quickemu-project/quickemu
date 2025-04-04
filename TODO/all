@@ -892,7 +892,7 @@ macos monterey:                      http://oscdn.apple.com/content/downloads/59
 macos monterey kde
 macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura lxde
-macos ventura:                       
+macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura xfce
 macos ventura:                       http://oscdn.apple.com/content/downloads/60/43/042-01871/sbembiob0hs1o92jfofalts02ux0x8rsra/RecoveryImage/BaseSystem.dmg
 macos ventura kde
@@ -1042,8 +1042,21 @@ parrotsec 6.2 security
 parrotsec 6.1 home
 parrotsec 6.1 htb
 parrotsec 6.1 security
+pbpuppy 250201 BookwormPup64-ghtest
+pbpuppy 250201 S15Pup64
+pbpuppy 250201 VoidPup64
+pbpuppy 250301 BookwormPup64-ghtest
+pbpuppy 250301 S15Pup64
+pbpuppy 250301 VoidPup64
+pbpuppy 250314 BookwormPup64-ghtest
+pbpuppy 250314 S15Pup64
+pbpuppy 250314 VoidPup64
+pbpuppy 250402 BookwormPup64-ghtest
 pbpuppy 250402 S15Pup64
 pbpuppy 250402 VoidPup64
+pbpuppy 250404 BookwormPup64-ghtest
+pbpuppy 250404 S15Pup64
+pbpuppy 250404 VoidPup64
 peppermint latest devuan-xfce
 peppermint latest devuan-gnome
 peppermint latest debian-xfce
