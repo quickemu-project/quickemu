@@ -7,7 +7,7 @@ HOMEPAGE="https://vanillaos.org"
 CREDENTIALS="-"
 
 
-RELEASES="22.10-r8 22.10-r7.5 22.10-r7 22.10-r6 22.10-r5 22.10-r4 22.10-r3 22.10-r2 22.10-r1 22.10 2.0"
+RELEASES=""
 
 
 function releases_() {
