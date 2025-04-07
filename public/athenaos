@@ -7,7 +7,7 @@ HOMEPAGE="https://athenaos.org"
 CREDENTIALS="-"
 
 
-RELEASES=""
+RELEASES="v23.11 v23.06.23"
 
 
 function releases_() {
