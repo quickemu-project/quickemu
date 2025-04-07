@@ -8,7 +8,7 @@ CREDENTIALS="-"
 GUEST="linux_old
 linux_old"
 
-RELEASES="daily-live"
+RELEASES="daily-live 24.10 24.04 22.04 20.04 18.04"
 
 
 function releases_() {
