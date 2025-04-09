@@ -1,6 +1,7 @@
 # Template file for 'openbsd'
 OSNAME="openbsd"
 PRETTY="OpenBSD"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.openbsd.org"
 DESCRIPTION="Free, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography"

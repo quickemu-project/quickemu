@@ -1,6 +1,7 @@
 # Template file for 'chimeralinux'
 OSNAME="chimeralinux"
 PRETTY="Chimera Linux"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://chimera-linux.org"
 DESCRIPTION="Modern, general-purpose non-GNU Linux distribution"

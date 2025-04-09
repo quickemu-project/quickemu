@@ -1,6 +1,7 @@
 # Template file for 'loc-os'
 OSNAME="loc-os"
 PRETTY="Loc-OS Linux"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://loc-os.com"
 DESCRIPTION="Distribution of GNU/Linux focused on low resource consumption."

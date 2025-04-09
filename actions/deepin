@@ -1,6 +1,7 @@
 # Template file for 'deepin'
 OSNAME="deepin"
 PRETTY="Deepin"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.deepin.org"
 DESCRIPTION="Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home"

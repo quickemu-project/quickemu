@@ -1,6 +1,7 @@
 # Template file for 'cachyos'
 OSNAME="cachyos"
 PRETTY="CachyOS"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://cachyos.org"
 DESCRIPTION="Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it"

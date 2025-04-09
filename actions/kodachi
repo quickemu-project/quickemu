@@ -1,7 +1,7 @@
-#!/usr/bin/bash
 # Template file for 'kodachi'
 OSNAME="kodachi"
 PRETTY="Kodachi"
+ICON=""
 BASEDOF="Ubuntu"
 HOMEPAGE="https://www.digi77.com/linux-kodachi/"
 DESCRIPTION="Provide you with a secure, anti forensic, and anonymous operating system considering all features that a person who is concerned about privacy would need to have in order to be secure"

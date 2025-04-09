@@ -1,6 +1,7 @@
 # Template file for 'manjaro'
 OSNAME="manjaro"
 PRETTY="Manjaro"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://manjaro.org"
 DESCRIPTION="Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware"

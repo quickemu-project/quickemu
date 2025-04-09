@@ -1,6 +1,7 @@
 # Template file for 'crunchbang++'
 OSNAME="crunchbang++"
 PRETTY="Crunchbangplusplus"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.crunchbangplusplus.org"
 DESCRIPTION="The classic minimal crunchbang feel, now with debian 12 bookworm"

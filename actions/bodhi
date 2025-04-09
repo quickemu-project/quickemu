@@ -1,6 +1,7 @@
 # Template file for 'bodhi'
 OSNAME="bodhi"
 PRETTY="Bodhi Linux"
+ICON=""
 BASEDOF="Debian Ubuntu"
 HOMEPAGE="https://www.bodhilinux.com"
 DESCRIPTION="Lightweight distribution featuring the fast & fully customizable Moksha Desktop"

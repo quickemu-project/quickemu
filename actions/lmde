@@ -1,6 +1,7 @@
 # Template file for 'lmde'
 OSNAME="lmde"
 PRETTY="Linux Mint Debian Edition"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.linuxmint.com/download_lmde.php"
 DESCRIPTION="Aims to be as similar as possible to Linux Mint, but without using Ubuntu. The package base is provided by Debian instead"

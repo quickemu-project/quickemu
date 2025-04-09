@@ -1,6 +1,7 @@
 # Template file for 'arcolinux'
 OSNAME="arcolinux"
 PRETTY="Arco Linux"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://arcolinux.com"
 DESCRIPTION="Is all about becoming an expert in linux"

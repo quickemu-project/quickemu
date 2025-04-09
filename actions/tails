@@ -1,6 +1,7 @@
 # Template file for 'tails'
 OSNAME="tails"
 PRETTY="Tails"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://tails.net"
 DESCRIPTION="Portable operating system that protects against surveillance and censorship"

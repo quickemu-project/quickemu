@@ -1,6 +1,7 @@
 # Template file for 'ghostbsd'
 OSNAME="ghostbsd"
 PRETTY="GhostBSD"
+ICON=""
 BASEDOF="FreeBSD"
 HOMEPAGE="https://www.ghostbsd.org"
 DESCRIPTION="Simple, elegant desktop BSD Operating System"

@@ -1,6 +1,7 @@
 # Template file for 'netboot'
 OSNAME="netboot"
 PRETTY="netboot.xyz"
+ICON=""
 BASEDOF="iPXE"
 HOMEPAGE="https://netboot.xyz"
 DESCRIPTION="Your favorite operating systems in one place"

@@ -1,6 +1,7 @@
 # Template file for 'bazzite'
 OSNAME="bazzite"
 PRETTY="bazzite"
+ICON=""
 BASEDOF="Fedora SteamOS"
 HOMEPAGE="https://bazzite.gg"
 DESCRIPTION="Container native gaming and a ready-to-game SteamOS like"

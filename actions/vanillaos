@@ -1,6 +1,7 @@
 # Template file for 'vanillaos'
 OSNAME="vanillaos"
 PRETTY="Vanilla OS"
+ICON=""
 BASEDOF="Ubuntu"
 HOMEPAGE="https://vanillaos.org"
 DESCRIPTION="Designed to be a reliable and productive operating system for your daily work"

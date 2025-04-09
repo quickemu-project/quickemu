@@ -1,6 +1,7 @@
 # Template file for 'gnomeos'
 OSNAME="gnomeos"
 PRETTY="GNOME OS"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://os.gnome.org"
 DESCRIPTION="Alpha nightly bleeding edge distro of GNOME"

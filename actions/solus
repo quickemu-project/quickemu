@@ -1,6 +1,7 @@
 # Template file for 'solus'
 OSNAME="solus"
 PRETTY="Solus"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://getsol.us"
 DESCRIPTION="Designed for home computing. Every tweak enables us to deliver a cohesive computing experience"

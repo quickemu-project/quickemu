@@ -1,6 +1,7 @@
 # Template file for 'haiku'
 OSNAME="haiku"
 PRETTY="Haiku"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.haiku-os.org"
 DESCRIPTION="Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful"

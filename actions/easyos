@@ -1,6 +1,7 @@
 # Template file for 'easyos'
 OSNAME="easyos"
 PRETTY="EasyOS"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://easyos.org"
 DESCRIPTION="Experimental distribution designed from scratch to support containers"

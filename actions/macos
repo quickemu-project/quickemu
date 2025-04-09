@@ -1,6 +1,7 @@
 # Template file for 'macos'
 OSNAME="macos"
 PRETTY="MacOS"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.apple.com/macos"
 DESCRIPTION="Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance."

@@ -1,6 +1,7 @@
 # Template file for 'maboxlinux'
 OSNAME="maboxlinux"
 PRETTY="Mabox Linux"
+ICON=""
 BASEDOF="Manjaro"
 HOMEPAGE="https://maboxlinux.org"
 DESCRIPTION="Lightweight, functional and easy to customize Openbox desktop"

@@ -1,6 +1,7 @@
 # Template file for 'windows-server'
 OSNAME="windows-server"
 PRETTY="Windows Server"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.microsoft.com/en-us/windows-server"
 DESCRIPTION="Platform for building an infrastructure of connected applications, networks, and web services"

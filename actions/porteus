@@ -1,6 +1,7 @@
 # Template file for 'porteus'
 OSNAME="porteus"
 PRETTY="Porteus"
+ICON=""
 BASEDOF="Slackware"
 HOMEPAGE="http://www.porteus.org"
 DESCRIPTION="Complete linux operating system that is optimized to run from CD, USB flash drive, hard drive, or other bootable storage media"

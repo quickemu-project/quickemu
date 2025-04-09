@@ -1,6 +1,7 @@
 # Template file for 'rhino'
 OSNAME="rhino"
 PRETTY="Rhino Linux"
+ICON=""
 BASEDOF="Ubuntu"
 DESCRIPTION="Re-invents the Ubuntu experience as a rolling-release distribution built on a stable desktop environment. With Pacstall & XFCE"
 HOMEPAGE="https://rhinolinux.org/"

@@ -1,6 +1,7 @@
 # Template file for 'alma'
 OSNAME=alma
 PRETTY=AlmaLinux
+ICON=""
 BASEDOF="Fedora RedHat"
 DESCRIPTION="Community distribution, focused on long-term stability, providing a robust production-grade platform. Binary compatible with RHEL®"
 HOMEPAGE="https://almalinux.org/"

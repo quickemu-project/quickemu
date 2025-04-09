@@ -1,6 +1,7 @@
 # Template file for 'parrotsec'
 OSNAME="parrotsec"
 PRETTY="Parrot Security"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.parrotsec.org"
 DESCRIPTION="Provides a huge arsenal of tools, utilities and libraries that IT and security professionals can use to test and assess the security of their assets in a reliable, compliant and reproducible way"

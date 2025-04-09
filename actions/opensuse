@@ -1,6 +1,7 @@
 # Template file for 'opensuse'
 OSNAME="opensuse"
 PRETTY="openSUSE"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.opensuse.org"
 DESCRIPTION="The makers choice for sysadmins, developers and desktop users"

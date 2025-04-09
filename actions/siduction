@@ -1,6 +1,7 @@
 # Template file for 'siduction'
 OSNAME="siduction"
 PRETTY="siduction"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://siduction.org"
 DESCRIPTION="Operating system based on the Linux kernel and the GNU project. In addition, there are applications and libraries from Debian"

@@ -1,6 +1,7 @@
 # Template file for 'linuxmint'
 OSNAME="linuxmint"
 PRETTY="Linux Mint"
+ICON=""
 BASEDOF="Ubuntu"
 HOMEPAGE="https://linuxmint.com"
 DESCRIPTION="Designed to work out of the box and comes fully equipped with the apps most people need"

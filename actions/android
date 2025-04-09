@@ -1,6 +1,7 @@
 # Template file for 'android'
 OSNAME="android"
 PRETTY="Android x86"
+ICON=""
 BASEDOF="-"
 DESCRIPTION="Port Android Open Source Project to x86 platform"
 HOMEPAGE="https://www.android-x86.org"

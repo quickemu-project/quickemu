@@ -1,6 +1,7 @@
 # Template file for 'zorin'
 OSNAME=zorin
 PRETTY="Zorin OS"
+ICON=""
 BASEDOF="Ubuntu"
 DESCRIPTION="Alternative to Windows and macOS designed to make your computer faster, more powerful, secure, and privacy-respecting"
 HOMEPAGE="https://zorin.com/os"

@@ -1,6 +1,7 @@
 # Template file for 'popos'
 OSNAME="popos"
 PRETTY="Pop!_OS"
+ICON=""
 BASEDOF="Ubuntu"
 HOMEPAGE="https://pop.system76.com"
 DESCRIPTION="Operating system for STEM and creative professionals who use their computer as a tool to discover and create"

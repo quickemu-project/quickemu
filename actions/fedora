@@ -1,6 +1,7 @@
 # Template file for 'fedora'
 OSNAME="fedora"
 PRETTY="Fedora"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.fedoraproject.org"
 DESCRIPTION="Innovative platform for hardware, clouds, and containers, built with love by you"

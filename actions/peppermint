@@ -1,6 +1,7 @@
 # Template file for 'peppermint'
 OSNAME="peppermint"
 PRETTY="PeppermintOS"
+ICON=""
 BASEDOF="Devuan"
 HOMEPAGE="https://peppermintos.com"
 DESCRIPTION="Provides a user with the opportunity to build the system that best fits their needs. While at the same time providing a functioning OS with minimum hassle out of the box"

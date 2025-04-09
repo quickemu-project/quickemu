@@ -1,6 +1,7 @@
 # Template file for 'void'
 OSNAME="void"
 PRETTY="Void Linux"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://voidlinux.org"
 DESCRIPTION="General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources"

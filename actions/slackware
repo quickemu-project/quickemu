@@ -1,6 +1,7 @@
 # Template file for 'slackware'
 OSNAME="slackware"
 PRETTY="slackware"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="http://www.slackware.com"
 DESCRIPTION="Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities"

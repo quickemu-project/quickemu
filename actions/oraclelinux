@@ -1,6 +1,7 @@
 # Template file for 'oraclelinux'
 OSNAME="oraclelinux"
 PRETTY="Oracle Linux"
+ICON=""
 BASEDOF="RedHar"
 HOMEPAGE="https://www.oracle.com/linux"
 DESCRIPTION="Linux with everything required to deploy, optimize, and manage applications on-premises, in the cloud, and at the edge"

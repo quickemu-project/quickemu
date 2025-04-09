@@ -1,6 +1,7 @@
 # Template file for 'truenas-scale'
 OSNAME="truenas-scale"
 PRETTY="TrueNAS Scale"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.truenas.com/truenas-scale"
 DESCRIPTION="Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data"

@@ -1,6 +1,7 @@
 # Template file for 'pbpuppy'
 OSNAME=pbpuppy
 PRETTY="PeaBee's Puppy Linux"
+ICON=""
 BASEDOF="Void,Ubuntu,Debian,Slackware"
 DESCRIPTION="Puppy Linux releases from Github. Brought to you by: peabee"
 HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"

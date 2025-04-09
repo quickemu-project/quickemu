@@ -1,6 +1,7 @@
 # Template file for 'truenas-core'
 OSNAME="truenas-core"
 PRETTY="TrueNAS Core"
+ICON=""
 BASEDOF="FreeBSD"
 HOMEPAGE="https://www.truenas.com/truenas-core"
 DESCRIPTION="World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs"

@@ -1,6 +1,7 @@
 # Template file for 'spirallinux'
 OSNAME="spirallinux"
 PRETTY="Spiral Linux"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://spirallinux.github.io"
 DESCRIPTION="Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments"

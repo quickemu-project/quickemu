@@ -1,6 +1,7 @@
 # Template file for 'mageia'
 OSNAME="mageia"
 PRETTY="Mageia"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.mageia.org"
 DESCRIPTION="Stable, secure operating system for desktop & server"

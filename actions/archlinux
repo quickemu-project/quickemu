@@ -1,6 +1,7 @@
 # Template file for ''
 OSNAME="archlinux"
 PRETTY="Arch Linux"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://archlinux.org"
 DESCRIPTION="Lightweight and flexible Linux® distribution that tries to Keep It Simple"

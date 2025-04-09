@@ -1,6 +1,7 @@
 # Template file for 'alpine'
 OSNAME=alpine
 PRETTY="Alpine Linux"
+ICON=""
 BASEDOF="-"
 DESCRIPTION="Security-oriented, lightweight Linux distribution based on musl libc and busybox"
 HOMEPAGE="https://alpinelinux.org/"

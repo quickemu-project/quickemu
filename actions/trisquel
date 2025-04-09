@@ -1,6 +1,7 @@
 # Template file for 'trisquel'
 OSNAME="trisquel"
 PRETTY="Trisquel"
+ICON=""
 BASEDOF="Ubuntu"
 HOMEPAGE="https://trisquel.info"
 DESCRIPTION="Fully free operating system for home users, small enterprises and educational centers"

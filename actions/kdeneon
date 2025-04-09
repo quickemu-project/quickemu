@@ -1,6 +1,7 @@
 # Template file for 'kdeneon'
 OSNAME="kdeneon"
 PRETTY="KDE Neon"
+ICON=""
 BASEDOF="Debian Ubuntu"
 HOMEPAGE="https://neon.kde.org"
 DESCRIPTION="Latest and greatest of KDE community software packaged on a rock-solid base"

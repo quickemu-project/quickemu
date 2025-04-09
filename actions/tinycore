@@ -1,6 +1,7 @@
 # Template file for 'tinycore'
 OSNAME="tinycore"
 PRETTY="Tiny Core Linux"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="http://www.tinycorelinux.net"
 DESCRIPTION="Highly modular based system with community build extensions"

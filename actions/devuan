@@ -1,6 +1,7 @@
 # Template file for 'devuan'
 OSNAME="devuan"
 PRETTY="Devuan"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.devuan.org"
 DESCRIPTION="Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom"

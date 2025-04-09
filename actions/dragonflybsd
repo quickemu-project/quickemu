@@ -1,6 +1,7 @@
 # Template file for 'dragonflybsd'
 OSNAME="dragonflybsd"
 PRETTY="DragonFlyBSD"
+ICON=""
 BASEDOF="FreeBSD"
 HOMEPAGE="https://www.dragonflybsd.org"
 DESCRIPTION="Provides an opportunity for the BSD base to grow in an entirely different direction from the one taken in the FreeBSD, NetBSD, and OpenBSD series"

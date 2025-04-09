@@ -1,6 +1,7 @@
 # Template file for 'fvoid'
 OSNAME=fvoid
 PRETTY="F-Void"
+ICON=""
 BASEDOF="Void"
 DESCRIPTION="F-Void (Fork of Void) is a mild modification of Void Linux"
 HOMEPAGE="https://sourceforge.net/projects/f-void"

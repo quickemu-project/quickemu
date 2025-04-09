@@ -1,6 +1,7 @@
 # Template file for 'kolibrios'
 OSNAME="kolibrios"
 PRETTY="KolibriOS"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="http://kolibrios.org"
 DESCRIPTION="Tiny yet incredibly powerful and fast operating system"

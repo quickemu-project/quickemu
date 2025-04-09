@@ -1,6 +1,7 @@
 # Template file for 'nitrux'
 OSNAME="nitrux"
 PRETTY="Nitrux"
+ICON=""
 BASEDOF="Debian Ubuntu"
 HOMEPAGE="https://nxos.org"
 DESCRIPTION="Powered by Debian, KDE Plasma and Frameworks, and AppImages"

@@ -1,6 +1,7 @@
 # Template file for 'debian'
 OSNAME="debian"
 PRETTY="Debian"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.debian.org"
 DESCRIPTION="Complete Free Operating System with perfect level of ease of use and stability"

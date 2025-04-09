@@ -1,6 +1,7 @@
 # Template file for 'dietpi'
 OSNAME=dietpi
 PRETTY="DietPi"
+ICON=""
 BASEDOF="Debian"
 DESCRIPTION="Highly optimised minimal Debian OS"
 HOMEPAGE="https://dietpi.com"

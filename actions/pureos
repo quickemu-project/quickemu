@@ -1,6 +1,7 @@
 # Template file for 'pureos'
 OSNAME="pureos"
 PRETTY="PureOS"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://www.pureos.net"
 DESCRIPTION="Fully free/libre and open source GNU/Linux operating system, endorsed by the Free Software Foundation"

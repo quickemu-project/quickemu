@@ -1,6 +1,7 @@
 # Template file for 'slitaz'
 OSNAME="slitaz"
 PRETTY="SliTaz"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://www.slitaz.org"
 DESCRIPTION="Simple, fast and low resource Linux OS for servers & desktops"

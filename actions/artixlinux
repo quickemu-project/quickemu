@@ -1,6 +1,7 @@
 # Template file for 'artixlinux'
 OSNAME="artixlinux"
 PRETTY="Artix Linux"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://artixlinux.org"
 DESCRIPTION="The Art of Linux. Simple. Fast. Systemd-free"

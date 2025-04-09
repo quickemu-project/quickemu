@@ -1,6 +1,7 @@
 # Template file for 'guix'
 OSNAME="guix"
 PRETTY="Guix"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://guix.gnu.org"
 DESCRIPTION="Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users"

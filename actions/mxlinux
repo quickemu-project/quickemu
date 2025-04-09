@@ -1,6 +1,7 @@
 # Template file for 'mxlinux'
 OSNAME="mxlinux"
 PRETTY="MX Linux"
+ICON=""
 BASEDOF="Debian Antix"
 HOMEPAGE="https://mxlinux.org"
 DESCRIPTION="Designed to combine elegant and efficient desktops with high stability and solid performance"

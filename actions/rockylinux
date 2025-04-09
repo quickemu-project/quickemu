@@ -1,6 +1,7 @@
 # Template file for 'rockylinux'
 OSNAME="rockylinux"
 PRETTY="Rocky Linux"
+ICON=""
 BASEDOF="RedHat"
 HOMEPAGE="https://rockylinux.org"
 DESCRIPTION="Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux"

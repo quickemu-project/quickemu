@@ -1,6 +1,7 @@
 # Template file for 'endeavouros'
 OSNAME="endeavouros"
 PRETTY="EndeavourOS"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://endeavouros.com"
 DESCRIPTION="Provides an Arch experience without the hassle of installing it manually for both x86_64 and ARM systems"

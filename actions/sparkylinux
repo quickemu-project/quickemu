@@ -1,6 +1,7 @@
 # Template file for 'sparkylinux'
 OSNAME="sparkylinux"
 PRETTY="SparkyLinux"
+ICON=""
 BASEDOF="Debian"
 HOMEPAGE="https://sparkylinux.org"
 DESCRIPTION="Fast, lightweight and fully customizable operating system which offers several versions for different use cases"

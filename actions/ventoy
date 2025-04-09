@@ -1,6 +1,7 @@
 # Template file for 'ventoy'
 OSNAME=ventoy
 PRETTY="Ventoy"
+ICON=""
 BASEDOF="Void"
 DESCRIPTION="Tool to create bootable USB drive for ISO/WIM/IMG/VHD(x)/EFI files. "
 HOMEPAGE="https://www.ventoy.net"

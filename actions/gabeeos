@@ -1,6 +1,7 @@
 # Template file for 'gabeeos'
 OSNAME=gabeeos
 PRETTY="GabeeOSLinux"
+ICON=""
 BASEDOF="Void"
 DESCRIPTION="Brings the necessary software to satisfy the daily needs of an end user in a simple and aesthetically pleasing desktop environment."
 HOMEPAGE="https://sourceforge.net/projects/gabeeoslinux/"

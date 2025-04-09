@@ -1,6 +1,7 @@
 # Template file for 'openindiana'
 OSNAME="openindiana"
 PRETTY="OpenIndiana"
+ICON=""
 BASEDOF="Solaris OPenSolaris"
 HOMEPAGE="https://www.openindiana.org"
 DESCRIPTION="Community supported illumos-based operating system"

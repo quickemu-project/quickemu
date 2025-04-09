@@ -1,6 +1,7 @@
 # Template file for 'blendos'
 OSNAME="blendos"
 PRETTY="BlendOS"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://blendos.co"
 DESCRIPTION="A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android"

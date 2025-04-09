@@ -1,6 +1,7 @@
 # Template file for 'linuxlite'
 OSNAME="linuxlite"
 PRETTY="Linux Lite"
+ICON=""
 BASEDOF="Debian Ubuntu"
 HOMEPAGE="https://www.linuxliteos.com"
 DESCRIPTION="Your first simple, fast and free stop in the world of Linux"

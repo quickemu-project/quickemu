@@ -1,6 +1,7 @@
 # Template file for 'dsl'
 OSNAME="dsl"
 PRETTY="Damn Small Linux"
+ICON=""
 BASEDOF="Antix"
 HOMEPAGE="https://www.damnsmalllinux.org/"
 DESCRIPTION="Goal of DSL is to pack as much usable desktop distribution into an image small enough to fit on a single CD"

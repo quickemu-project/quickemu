@@ -1,6 +1,7 @@
 # Template file for 'miyolinux'
 OSNAME=miyolinux
 PRETTY="MiyoLinux"
+ICON=""
 BASEDOF="Devuan"
 DESCRIPTION="Very minimal Linux OS based on Devuan and various Window Managers. "
 HOMEPAGE="https://sourceforge.net/projects/miyolinux/"

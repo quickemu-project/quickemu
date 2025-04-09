@@ -1,6 +1,7 @@
 # Template file for 'garuda'
 OSNAME="garuda"
 PRETTY="Garuda Linux"
+ICON=""
 BASEDOF="Arch"
 HOMEPAGE="https://garudalinux.org"
 DESCRIPTION="Feature rich and easy to use Linux distribution"

@@ -1,6 +1,7 @@
 # Template file for 'vxlinux'
 OSNAME="vxlinux"
 PRETTY="VX Linux"
+ICON=""
 BASEDOF="Void"
 HOMEPAGE="https://vxlinux.org"
 DESCRIPTION="Pre-configured, secure systemd-free Plasma desktop with focus on convenience, performance and simplicity. Based on the excellent Void Linux"

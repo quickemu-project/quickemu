@@ -1,6 +1,7 @@
 # Template file for 'freedos'
 OSNAME="freedos"
 PRETTY="FreeDOS"
+ICON=""
 BASEDOF="-"
 HOMEPAGE="https://freedos.org"
 DESCRIPTION="DOS-compatible operating system that you can use to play classic DOS games, run legacy business software, or develop embedded systems"
