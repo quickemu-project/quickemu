@@ -23,6 +23,7 @@ jobs:
           git status
           chmod a+x action
           ./action | tee /dev/null
+          sort -u < TODO/all | tee TODO/all
           git config --global user.name "${{ github.repository_owner }}"
           git config --global user.email "noreply@github.com"
 
