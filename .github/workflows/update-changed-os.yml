@@ -10,7 +10,7 @@ on:
     branches: [ "master-patched" ]
     paths: 'actions/**'
   workflow_dispatch:
-  repository_dispatch: [ check ]
+  #repository_dispatch: [ check ]
 
 jobs:
   fill:
