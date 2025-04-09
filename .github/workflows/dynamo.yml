@@ -1,19 +1,19 @@
-name: "Test supported 💿️"
+name: "Test all 💿️"
 
 on:
   workflow_dispatch:
 
-  push:
-    branches:
-      - '**'
-    paths:
-      - actions/**
+  #push:
+    #branches:
+      #- '**'
+    #paths:
+      #- actions/**
 
-  pull_request:
-    branches:
-      - '**'
-    paths:
-      - actions/**
+  #pull_request:
+    #branches:
+      #- '**'
+    #paths:
+      #- actions/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
