@@ -1,5 +1,6 @@
 ac              https://downloads.sourceforge.net/accessible-coconut/Accessible-Coconut-24.04-beta-desktop-amd64.iso
 alma            https://repo.almalinux.org/almalinux/9.6-beta/isos/x86_64/AlmaLinux-9.6-beta-1-x86_64-dvd.iso
+archbang        https://downloads.sourceforge.net/archbang/archbang-0904-x86_64.iso
 arco            https://downloads.sourceforge.net/arconetpro/arcopro-v25.04.01-x86_64.iso
 artix           https://download.artixlinux.org/iso/artix-base-openrc-20250303-x86_64.iso
 artix           https://download.artixlinux.org/iso/artix-xfce-s6-20250310-x86_64.iso
@@ -31,6 +32,7 @@ funos           https://downloads.sourceforge.net/funos/funos-24.04.2-stable.202
 garuda          https://downloads.sourceforge.net/garuda-linux/garuda-dr460nized-linux-zen-250308.iso
 gobo            https://gobolinux.neonsys.org/017.01-ISO/GoboLinux-017.01-x86_64.iso
 ipfire          https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core192/ipfire-2.29-core192-x86_64.iso
+ipfire          https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core193/ipfire-2.29-core193-x86_64.iso
 kali            https://cdimage.kali.org/kali-2025.1a/kali-linux-2025.1a-installer-amd64.iso
 kaos            https://downloads.sourceforge.net/kaosx/KaOS-2025.03-x86_64.iso
 kdeneon         https://files.kde.org/neon/images/user/20250314-2153/neon-user-20250314-2153.iso
@@ -47,9 +49,11 @@ max             https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-versio
 nitrux          https://downloads.sourceforge.net/nitruxos/nitrux-nx-desktop-plasma-cf782a84-amd64.iso
 openmamba       https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250312.x86_64.iso
 openmamba       https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250320.x86_64.iso
+pardus          https://indir.pardus.org.tr/ISO/Pardus23/Pardus-23.4-GNOME-amd64.iso
 peropesis       https://peropesis.org/peropesis/Peropesis-2.9-live.iso
 porteus         https://mirror.yandex.ru/mirrors/porteus/x86_64/Porteus-v5.1/Porteus-LXQT-v5.1-alpha2-x86_64.iso
 porteux         https://github.com/porteux/porteux/releases/download/v2.0/porteux-v2.0-current-gnome-48.0-x86_64.iso
+proxmox         https://enterprise.proxmox.com/iso/proxmox-ve_8.4-1.iso
 q4os            https://downloads.sourceforge.net/q4os/q4os-5.8-x64.r1.iso
 rebornos        https://downloads.sourceforge.net/rebornos/rebornos_iso-2025.03.04-x86_64.iso
 regata          https://downloads.sourceforge.net/regataos/Regata_OS_25_en-US.x86_64-25.0.0.iso
