@@ -40,6 +40,7 @@ jobs:
           for os in ${changed_os}; do
             ./action $os | tee /dev/null
           done
+          sort -u < TODO/all | tee TODO/all
           git config --global user.name "${{ github.repository_owner }}"
           git config --global user.email "noreply@github.com"
 
