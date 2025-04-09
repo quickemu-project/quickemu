@@ -14,6 +14,12 @@ on:
     paths:
       - actions/**
   workflow_dispatch:
+    inputs:
+      what_test:
+        description: "test OS: (space between)"
+        required: false
+        default: ""
+        type: string
 
 jobs:
   fill:
@@ -26,7 +32,11 @@ jobs:
         run: |
           git status
           chmod a+x action
-          changed_os=$(git diff --name-only | grep 'actions/' | cut -d'/' -f2)
+          if [ ! -z "${{ github.event.inputs.what_test }}" ]; then
+            changed_os="${{ github.event.inputs.what_test }}"
+          else
+            changed_os=$(git diff --name-only | grep 'actions/' | cut -d'/' -f2)
+          fi
           for os in ${changed_os}; do
             ./action $os | tee /dev/null
           done
