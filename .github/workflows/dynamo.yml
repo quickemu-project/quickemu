@@ -61,6 +61,8 @@ jobs:
         run: |
           #mkdir -p results
           #./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
+          chmod a+x action
+          ./action ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
           #if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
             #grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             #exit 1
