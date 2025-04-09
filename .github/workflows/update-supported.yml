@@ -5,6 +5,8 @@ on:
     - cron: '0/180 * * * *'
   push:
     branches: [ "master-patched" ]
+    paths:
+      - .github/workflows/update-supported.yml
   pull_request:
     branches: [ "master-patched" ]
   workflow_dispatch:
