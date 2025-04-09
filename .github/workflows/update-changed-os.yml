@@ -1,0 +1,35 @@
+name: "update changed OS"
+
+on:
+  schedule:
+    - cron: '0/180 * * * *'
+  push:
+    branches: [ "master-patched" ]
+    paths: 'actions/**'
+  pull_request:
+    branches: [ "master-patched" ]
+  workflow_dispatch:
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: fill
+        run: |
+          git status
+          chmod a+x action
+          git diff --name-only | xargs -n1 ./action | tee /dev/null
+          git config --global user.name "${{ github.repository_owner }}"
+          git config --global user.email "noreply@github.com"
+
+      - name: push
+        run: |
+          git status
+          git add . || echo "add . failed"
+          git add --all || echo "add --all failed"
+          git commit -m "update supported" || echo "commit failed"
+          git push || echo "push failed"
+          git status
