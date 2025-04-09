@@ -4,7 +4,7 @@ PRETTY="nwg-shell"
 BASEDOF="Arch"
 HOMEPAGE="https://nwg-piotr.github.io/nwg-shell"
 DESCRIPTION="Arch Linux ISO with nwg-shell for sway and Hyprland"
-CREDENTIALS="-"
+CREDENTIALS="nwg:nwg"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
