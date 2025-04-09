@@ -14,8 +14,6 @@ on:
     paths:
       - actions/**
   workflow_dispatch:
-  repository_dispatch:
-    - check
 
 jobs:
   fill:
