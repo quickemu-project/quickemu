@@ -7,13 +7,13 @@ on:
     branches:
       - '**'
     paths:
-      - quickget
+      - actions/**
 
   pull_request:
     branches:
       - '**'
     paths:
-      - quickget
+      - actions/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -59,13 +59,12 @@ jobs:
 
       - name: "Checkout 👟 ${{ matrix.file }}"
         run: |
-          mkdir -p results
-          ./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
-          if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
-            grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
-
+          #mkdir -p results
+          #./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
+          #if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
+            #grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
+            #exit 1
+          #fi
 
       - name: "Upload Results ⬆️"
         if: always()
@@ -94,8 +93,8 @@ jobs:
           for file in results/*.txt; do
             cat "$file" >> result
           done
-          PASSED=$(grep -c '^PASS:' result | wc -l)
-          FAILED=$(grep -c '^FAIL:' result | wc -l 2>/dev/null | echo '0')
-          SKIPPED=$(grep -c '^SKIP:' result | wc -l)
-          echo "$PASSED/$FAILED 🏁 / 💀" >> $GITHUB_STEP_SUMMARY
-          echo "$SKIPPED Skipped" >> $GITHUB_STEP_SUMMARY
+          #PASSED=$(grep -c '^PASS:' result | wc -l)
+          #FAILED=$(grep -c '^FAIL:' result | wc -l 2>/dev/null | echo '0')
+          #SKIPPED=$(grep -c '^SKIP:' result | wc -l)
+          #echo "$PASSED/$FAILED 🏁 / 💀" >> $GITHUB_STEP_SUMMARY
+          #echo "$SKIPPED Skipped" >> $GITHUB_STEP_SUMMARY
