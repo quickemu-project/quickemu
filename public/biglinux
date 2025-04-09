@@ -7,8 +7,8 @@ HOMEPAGE="https://www.biglinux.com.br"
 CREDENTIALS="-"
 
 
-RELEASES="2025-03-15"
-EDITIONS="k66 k613 k612"
+RELEASES="2025-04-08"
+EDITIONS="k66 k614 k612"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
