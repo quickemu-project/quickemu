@@ -21,7 +21,7 @@ jobs:
         run: |
           git status
           chmod a+x action
-          git diff --name-only | xargs -n1 ./action | tee /dev/null
+          git diff --name-only | grep 'actions/' | cut -d'/' -f2 | xargs -n1 ./action | tee /dev/null
           git config --global user.name "${{ github.repository_owner }}"
           git config --global user.email "noreply@github.com"
 
