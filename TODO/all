@@ -1562,3 +1562,12 @@ zorin 17 education64
 zorin 16 core64
 zorin 16 lite64
 zorin 16 education64
+parrotsec 6.3.2 home:                https://download.parrot.sh/parrot/iso/6.3.2/Parrot-home-6.3.2_amd64.iso
+parrotsec 6.3.2 htb:                 https://download.parrot.sh/parrot/iso/6.3.2/Parrot-htb-6.3.2_amd64.iso
+parrotsec 6.3.2 security:            https://download.parrot.sh/parrot/iso/6.3.2/Parrot-security-6.3.2_amd64.iso
+parrotsec 6.2 home:                  https://download.parrot.sh/parrot/iso/6.2/Parrot-home-6.2_amd64.iso
+parrotsec 6.2 htb:                   https://download.parrot.sh/parrot/iso/6.2/Parrot-htb-6.2_amd64.iso
+parrotsec 6.2 security:              https://download.parrot.sh/parrot/iso/6.2/Parrot-security-6.2_amd64.iso
+parrotsec 6.1 home:                  https://download.parrot.sh/parrot/iso/6.1/Parrot-home-6.1_amd64.iso
+parrotsec 6.1 htb:                   https://download.parrot.sh/parrot/iso/6.1/Parrot-htb-6.1_amd64.iso
+parrotsec 6.1 security:              https://download.parrot.sh/parrot/iso/6.1/Parrot-security-6.1_amd64.iso

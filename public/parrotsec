@@ -12,7 +12,6 @@ EDITIONS="security htb home"
 
 function releases_() {
     #shellcheck disable=SC2046,SC2005
-    #echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -E 'href="[[:digit:]]+(\.[[:digit:]]+)+' | sort -Vr | head -n 3 | cut -d\" -f 2)
     echo $(web_pipe "https://download.parrot.sh/parrot/iso/" | grep -o -E 'href="([[:digit:]]+\.)+[[:digit:]]+/' | sort -nr | head -n 3 | cut -d\" -f 2 | cut -d'/' -f 1)
 }
 
