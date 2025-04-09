@@ -59,7 +59,7 @@ jobs:
 
       - name: "Checkout 👟 ${{ matrix.file }}"
         run: |
-          #mkdir -p results
+          mkdir -p results
           #./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
           chmod a+x action
           ./action ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
