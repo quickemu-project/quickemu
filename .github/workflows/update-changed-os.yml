@@ -35,7 +35,7 @@ jobs:
           if [ ! -z "${{ github.event.inputs.what_test }}" ]; then
             changed_os="${{ github.event.inputs.what_test }}"
           else
-            changed_os=$(git diff --name-only | grep 'actions/' | cut -d'/' -f2)
+            changed_os=$(git diff --name-only HEAD^ HEAD | grep '^actions/')
           fi
           for os in ${changed_os}; do
             ./action $os | tee /dev/null
@@ -49,6 +49,9 @@ jobs:
           git status
           git add . || echo "add . failed"
           git add TODO/all || echo "add TODO/all failed"
+          git add actions || echo "add actions failed"
+          git rm public/tmp_*
+          git add public || echo "add public failed"
           git add --all || echo "add --all failed"
           git commit -m "update supported" || echo "commit failed"
           git push || echo "push failed"
