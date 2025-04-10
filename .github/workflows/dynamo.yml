@@ -63,7 +63,7 @@ jobs:
           #./quickget --check ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
           chmod a+x action
           ./action ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
-          sort -u < TODO/all | tee TODO/all
+          git add public/${{ matrix.file }}
           #if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
             #grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             #exit 1
@@ -101,6 +101,7 @@ jobs:
           git config --global user.email "noreply@github.com"
           git status
           git add . || echo "add . failed"
+          sort -u < TODO/all | tee TODO/all
           git add TODO/all || echo "add TODO/all failed"
           git add --all || echo "add --all failed"
           git commit -m "update supported" || echo "commit failed"
