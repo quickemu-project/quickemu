@@ -1,0 +1,49 @@
+dietpi
+
+dietpi bios Bookworm:                https://dietpi.com/downloads/images/DietPi_VM-x86_64-Bookworm_Installer.iso
+dietpi bios Bullseye:                https://dietpi.com/downloads/images/DietPi_VM-x86_64-Bullseye_Installer.iso
+dietpi bios Trixie:                  https://dietpi.com/downloads/images/DietPi_VM-x86_64-Trixie_Installer.iso
+dietpi uefi Bookworm:                https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Bookworm_Installer.iso
+dietpi uefi Bullseye:                https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Bullseye_Installer.iso
+dietpi uefi Trixie:                  https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Trixie_Installer.iso
+
+# Template file for 'dietpi'
+OSNAME="dietpi"
+PRETTY="DietPi"
+BASEDOF="Debian"
+DESCRIPTION="Highly optimised minimal Debian OS"
+HOMEPAGE="https://dietpi.com"
+CREDENTIALS="-"
+
+
+RELEASES="uefi bios"
+EDITIONS="Trixie Bullseye Bookworm"
+
+function releases_() {
+    echo bios uefi
+}
+
+function editions_() {
+    echo $(web_pipe "https://dietpi.com/downloads/images/" | grep '\.iso"' | cut -d'"' -f2 | grep '_VM-UEFI' | cut -d'-' -f4 | cut -d'_' -f1)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://dietpi.com/downloads/images"
+    if [ "${RELEASE}" == 'bios' ]; then
+        local ISO="DietPi_VM-x86_64-${EDITION}_Installer.iso"
+    elif [ "${RELEASE}" == 'uefi' ]; then
+        local ISO="DietPi_VM-UEFI-x86_64-${EDITION}_Installer.iso"
+    fi
+    HASH=$(wget -q -O- "${URL}/SHASUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    if [[ "${RELEASE}" == 'bios' ]]; then
+        echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    fi
+}
+
+
