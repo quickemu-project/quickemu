@@ -103,6 +103,8 @@ jobs:
           git add . || echo "add . failed"
           sort -u < TODO/all | tee TODO/all
           git add TODO/all || echo "add TODO/all failed"
+          git rm public/tmp_*
+          git add public || echo "add public failed"
           git add --all || echo "add --all failed"
           git commit -m "update supported" || echo "commit failed"
           git push || echo "push failed"
