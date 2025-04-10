@@ -1,6 +1,6 @@
 archcraft
 
-archcraft latest:                    https://cfhcable.dl.sourceforge.net/project/archcraft/v25.01/archcraft-2025.01.03-x86_64.iso
+archcraft latest:                    https://gigenet.dl.sourceforge.net/project/archcraft/v25.01/archcraft-2025.01.03-x86_64.iso
 
 # Template file for 'archcraft'
 OSNAME="archcraft"
