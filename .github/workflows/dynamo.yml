@@ -64,19 +64,10 @@ jobs:
           chmod a+x action
           ./action ${{ matrix.file }} | tee results/${{ matrix.file }}.txt
           sort -u < TODO/all | tee TODO/all
-          git config --global user.name "${{ github.repository_owner }}"
-          git config --global user.email "noreply@github.com"
           #if grep -vqE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt; then
             #grep -vE '^(PASS:|SKIP:)' results/${{ matrix.file }}.txt >> $GITHUB_STEP_SUMMARY
             #exit 1
           #fi
-          git status
-          git add . || echo "add . failed"
-          git add TODO/all || echo "add TODO/all failed"
-          git add --all || echo "add --all failed"
-          git commit -m "update supported" || echo "commit failed"
-          git push || echo "push failed"
-          git status
 
       - name: "Upload Results ⬆️"
         if: always()
@@ -100,11 +91,21 @@ jobs:
           path: results
           merge-multiple: true
 
-      - name: "Display results 📊"
+      - name: "Display and push results 📊"
         run: |
           for file in results/*.txt; do
             cat "$file" >> result
           done
+          sort -u < TODO/all | tee TODO/all
+          git config --global user.name "web-flow"
+          git config --global user.email "noreply@github.com"
+          git status
+          git add . || echo "add . failed"
+          git add TODO/all || echo "add TODO/all failed"
+          git add --all || echo "add --all failed"
+          git commit -m "update supported" || echo "commit failed"
+          git push || echo "push failed"
+          git status
           #PASSED=$(grep -c '^PASS:' result | wc -l)
           #FAILED=$(grep -c '^FAIL:' result | wc -l 2>/dev/null | echo '0')
           #SKIPPED=$(grep -c '^SKIP:' result | wc -l)
