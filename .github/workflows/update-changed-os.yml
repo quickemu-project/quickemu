@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: '10'
 
       - name: fill
         run: |
