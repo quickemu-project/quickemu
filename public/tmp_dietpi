@@ -1,6 +1,6 @@
-dietpi bios Bookworm:                https://dietpi.com/downloads/images/DietPi_VM-x86_64-Bookworm_Installer.iso
-dietpi bios Bullseye:                https://dietpi.com/downloads/images/DietPi_VM-x86_64-Bullseye_Installer.iso
-dietpi bios Trixie:                  https://dietpi.com/downloads/images/DietPi_VM-x86_64-Trixie_Installer.iso
-dietpi uefi Bookworm:                https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Bookworm_Installer.iso
-dietpi uefi Bullseye:                https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Bullseye_Installer.iso
-dietpi uefi Trixie:                  https://dietpi.com/downloads/images/DietPi_VM-UEFI-x86_64-Trixie_Installer.iso
+dietpi bios Bookworm
+dietpi bios Bullseye
+dietpi bios Trixie
+dietpi uefi Bookworm
+dietpi uefi Bullseye
+dietpi uefi Trixie
