@@ -1,0 +1,52 @@
+tinycore
+
+tinycore 15 Core:                    https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/Core-15.0.iso
+tinycore 15 TinyCore:                https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/TinyCore-15.0.iso
+tinycore 15 CorePlus:                https://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.0.iso
+tinycore 15 CorePure64:              https://distro.ibiblio.org/tinycorelinux/15.x/x86_64/release/CorePure64-15.0.iso
+tinycore 15 TinyCorePure64:          https://distro.ibiblio.org/tinycorelinux/15.x/x86_64/release/TinyCorePure64-15.0.iso
+tinycore 14 Core:                    https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/Core-14.0.iso
+tinycore 14 TinyCore:                https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/TinyCore-14.0.iso
+tinycore 14 CorePlus:                https://distro.ibiblio.org/tinycorelinux/14.x/x86/release/CorePlus-14.0.iso
+tinycore 14 CorePure64:              https://distro.ibiblio.org/tinycorelinux/14.x/x86_64/release/CorePure64-14.0.iso
+tinycore 14 TinyCorePure64:          https://distro.ibiblio.org/tinycorelinux/14.x/x86_64/release/TinyCorePure64-14.0.iso
+
+# Template file for 'tinycore'
+OSNAME="tinycore"
+PRETTY="Tiny Core Linux"
+BASEDOF="-"
+DESCRIPTION="Highly modular based system with community build extensions"
+HOMEPAGE="http://www.tinycorelinux.net"
+CREDENTIALS="-"
+
+
+RELEASES="15 14"
+EDITIONS="TinyCorePure64 TinyCore CorePure64 CorePlus Core"
+
+function releases_() {
+    echo 15 14
+}
+
+function editions_() {
+    echo Core TinyCore CorePlus CorePure64 TinyCorePure64
+}
+
+function get_() {
+    local ARCH="x86"
+    local HASH=""
+    local ISO="${EDITION}-${RELEASE}.0.iso"
+    case "${EDITION}" in
+        *Pure*) ARCH+="_64";;
+    esac
+    # tinycorelinux.net not stable enough
+    #local URL="http://www.tinycorelinux.net/${RELEASE}.x/${ARCH}/release"
+    local URL="https://distro.ibiblio.org/tinycorelinux/${RELEASE}.x/${ARCH}/release"
+    HASH=$(web_pipe "${URL}/${ISO}.md5.txt" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
+
+

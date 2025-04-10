@@ -1,0 +1,58 @@
+kolibrios
+
+kolibrios latest en_US:              http://builds.kolibrios.org/en_US/latest-iso.7z
+kolibrios latest ru_RU:              http://builds.kolibrios.org/ru_RU/latest-iso.7z
+kolibrios latest it_IT:              http://builds.kolibrios.org/it_IT/kolibrios-0.7.7.0%2B8797-9f5dd6c-iso.7z
+kolibrios latest es_ES:              http://builds.kolibrios.org/es_ES/latest-iso.7z
+
+# Template file for 'kolibrios'
+OSNAME="kolibrios"
+PRETTY="KolibriOS"
+BASEDOF="-"
+DESCRIPTION="Tiny yet incredibly powerful and fast operating system"
+HOMEPAGE="http://kolibrios.org"
+CREDENTIALS="-"
+kolibrios
+
+RELEASES="latest"
+EDITIONS="ru_RU it_IT es_ES en_US"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo en_US ru_RU it_IT es_ES
+}
+
+function get_() {
+    local HASH=""
+    if [ "${EDITION}" == 'it_IT' ]; then
+        # The it_IT build was disabled because nobody maintained it
+        local ISO="kolibrios-0.7.7.0%2B8797-9f5dd6c-iso.7z"
+    else
+      local ISO="latest-iso.7z"
+    fi
+    local URL="http://builds.kolibrios.org/${EDITION}"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function distro_specific() {
+    if [[ ${ISO} = *".7z" ]]; then
+        if [ -z "$(command -v 7z)" ]; then echo $"ERROR! '7zip' needs installing. Unable to extract file."
+        else
+            7z e "${VM_PATH}/${ISO}" -o"${VM_PATH}" >/dev/null 2>&1
+            rm -f "${VM_PATH}/${ISO}"
+            ISO="$(ls -1 "${VM_PATH}/"*.iso)"
+            ISO="$(basename "${ISO}")"
+        fi
+    fi
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    echo "disk_size=\"2G\"" >> "${CONF_FILE}"
+    echo "ram=\"128M\"" >> "${CONF_FILE}"
+}
+
+

@@ -1,0 +1,76 @@
+ubuntu-server
+
+ubuntu-server daily-live:            https://cdimage.ubuntu.com/ubuntu-server/daily-live/current/plucky-live-server-amd64.iso
+ubuntu-server 24.10:                 https://releases.ubuntu.com/24.10/ubuntu-24.10-live-server-amd64.iso
+ubuntu-server 24.04:                 https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso
+ubuntu-server 22.04:                 https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso
+ubuntu-server 20.04:                 https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso
+ubuntu-server 18.04:                 https://releases.ubuntu.com/18.04/ubuntu-18.04.6-live-server-amd64.iso
+ubuntu-server 16.04:                 https://releases.ubuntu.com/16.04/ubuntu-16.04.7-server-amd64.iso
+ubuntu-server 14.04:                 https://releases.ubuntu.com/14.04/ubuntu-14.04.6-server-amd64.iso
+
+# Template file for 'ubuntu-server'
+OSNAME="ubuntu-server"
+PRETTY="Ubuntu Server"
+BASEDOF="Debian"
+DESCRIPTION="Brings economic and technical scalability to your datacentre, public or private. Whether you want to deploy an OpenStack cloud, a Kubernetes cluster or a 50,000-node render farm, Ubuntu Server delivers the best value scale-out performance available"
+HOMEPAGE="https://ubuntu.com/server"
+CREDENTIALS="-"
+
+
+RELEASES=""
+
+
+function releases_() {
+    local ALL_VERSIONS=()
+    # shellcheck disable=SC2207
+    ALL_VERSIONS=($(IFS=$'\n' web_pipe http://releases.ubuntu.com/streams/v1/com.ubuntu.releases:ubuntu-server.json | jq -r '.products[] | select(.arch=="amd64") | .version' | sort -rV))
+    echo daily-live "${ALL_VERSIONS[@]}"
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local NAME="live-server"
+    local URL=""
+
+    if [[ "${RELEASE}" == "daily"* ]]; then
+        URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    else
+        URL="https://releases.ubuntu.com/${RELEASE}"
+    fi
+
+    case "${RELEASE}" in
+        14*|16*) NAME="server";;
+    esac
+
+    if web_check "${URL}/SHA256SUMS"; then
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        ISO=$(cut -d'*' -f2 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
+    else
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        ISO=$(cut -d' ' -f3 <<<"${DATA}")
+        HASH=$(cut -d' ' -f1 <<<"${DATA}")
+    fi
+    if [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
+        zsync_get "${URL}/${ISO}" "${VM_PATH}" "${OS}-devel.iso"
+        make_vm_config "${OS}-devel.iso"
+    else
+        web_get "${URL}/${ISO}" "${VM_PATH}"
+        check_hash "${ISO}" "${HASH}"
+        make_vm_config "${ISO}"
+    fi
+}
+
+function specific_tweaks() {
+    # 22.04+ fails on LVM build if disk size is < 10G
+    # 22.04.1 fails on auto-install if TPM is disabled
+    echo "disk_size=\"10G\"" >> "${CONF_FILE}"
+    echo "ram=\"4G\"" >> "${CONF_FILE}"
+    if [[ "${RELEASE}" == *"22.04"* ]]; then
+        echo "tpm=\"on\"" >> "${CONF_FILE}"
+    fi
+}
+
+

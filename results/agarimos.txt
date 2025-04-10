@@ -1,0 +1,37 @@
+agarimos
+
+agarimos latest plasma:              https://sourceforge.net/projects/agarimos/files/PLASMA/AgarimOS-Plasma-Catppuccin-Live-x86_64-6.12.16_1-20250228.iso
+agarimos latest xfce4:               https://sourceforge.net/projects/agarimos/files/XFCE4/AgarimOS-XFCE4-Catppuccin-Live-x86_64-6.12.21_1-20250406.iso
+agarimos latest cinnamon:            https://sourceforge.net/projects/agarimos/files/CINNAMON/AgarimOS-Cinnamon-Catppuccin-x86_64-6.12.21_1-20250404.iso
+agarimos latest lxqt-kwin:           https://sourceforge.net/projects/agarimos/files/LXQT-KWIN/AgarimOS-LXQT-KWIN-Dracula-Live-x86_64-6.12.21_1-20250402.iso
+agarimos latest gnome:               https://sourceforge.net/projects/agarimos/files/GNOME/AgarimOS-Gnome-Catppuccin-Live-x86_64-6.12.21_1-20250405.iso
+
+# Template file for 'agarimos'
+OSNAME="agarimos"
+PRETTY="AgarimOS"
+BASEDOF="Void"
+DESCRIPTION="Includes a minimum set of applications so you can build your system on your own."
+HOMEPAGE="https://sourceforge.net/projects/agarimos"
+CREDENTIALS="anon:voidlinux,root:voidlinux"
+
+
+RELEASES="latest"
+EDITIONS="xfce4 plasma lxqt-kwin gnome cinnamon"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo plasma xfce4 cinnamon lxqt-kwin gnome
+}
+
+function get_() {
+    local REL=$(echo "${EDITION}" | tr '[:lower:]' '[:upper:]')
+    local ISOS=$(web_pipe "https://sourceforge.net/projects/agarimos/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '.iso')
+    local URL="https://sourceforge.net/projects/agarimos/files/${REL}"
+    local ISO=$(echo "${ISOS}" | grep "${REL}" | cut -d'/' -f3)
+    echo "${URL}/${ISO}"
+}
+
+

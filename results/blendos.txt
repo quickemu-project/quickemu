@@ -1,0 +1,29 @@
+blendos
+
+blendos latest:                      https://git.blendos.co/api/v4/projects/32/jobs/artifacts/main/raw/blendOS.iso?job=build-job
+
+# Template file for 'blendos'
+OSNAME="blendos"
+PRETTY="BlendOS"
+BASEDOF="Arch"
+DESCRIPTION="A seamless blend of all Linux distributions. Allows you to have an immutable, atomic and declarative Arch Linux system, with application support from several Linux distributions & Android"
+HOMEPAGE="https://blendos.co"
+CREDENTIALS="-"
+
+
+RELEASES="latest"
+
+
+function releases_() {
+    # there is now just a single latest iso
+    echo latest
+}
+
+function get_() {
+    local HASH=$(web_pipe "https://git.blendos.co/api/v4/projects/32/jobs/artifacts/main/raw/checksum?job=build-job | cut -d' ' -f1")
+    local ISO="blendOS.iso"
+    local URL="https://git.blendos.co/api/v4/projects/32/jobs/artifacts/main/raw/${ISO}?job=build-job"
+    echo "${URL} ${HASH}"
+}
+
+

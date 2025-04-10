@@ -1,0 +1,52 @@
+void
+
+void 20250401 glibc:                 https://repo-default.voidlinux.org/live/20250401/void-live-x86_64-20250401-base.iso
+void 20250401 musl:                  https://repo-default.voidlinux.org/live/20250401/void-live-x86_64-musl-20250401-base.iso
+void 20250401 xfce-glibc:            https://repo-default.voidlinux.org/live/20250401/void-live-x86_64-20250401-xfce.iso
+void 20250401 xfce-musl:             https://repo-default.voidlinux.org/live/20250401/void-live-x86_64-musl-20250401-xfce.iso
+void 20250202 glibc:                 https://repo-default.voidlinux.org/live/20250202/void-live-x86_64-20250202-base.iso
+void 20250202 musl:                  https://repo-default.voidlinux.org/live/20250202/void-live-x86_64-musl-20250202-base.iso
+void 20250202 xfce-glibc:            https://repo-default.voidlinux.org/live/20250202/void-live-x86_64-20250202-xfce.iso
+void 20250202 xfce-musl:             https://repo-default.voidlinux.org/live/20250202/void-live-x86_64-musl-20250202-xfce.iso
+void 20240314 glibc:                 https://repo-default.voidlinux.org/live/20240314/void-live-x86_64-20240314-base.iso
+void 20240314 musl:                  https://repo-default.voidlinux.org/live/20240314/void-live-x86_64-musl-20240314-base.iso
+void 20240314 xfce-glibc:            https://repo-default.voidlinux.org/live/20240314/void-live-x86_64-20240314-xfce.iso
+void 20240314 xfce-musl:             https://repo-default.voidlinux.org/live/20240314/void-live-x86_64-musl-20240314-xfce.iso
+
+# Template file for 'void'
+OSNAME="void"
+PRETTY="Void Linux"
+BASEDOF="-"
+DESCRIPTION="General purpose operating system. Its package system allows you to quickly install, update and remove software; software is provided in binary packages or can be built directly from sources"
+HOMEPAGE="https://voidlinux.org"
+CREDENTIALS="anon:voidlinux root:voidlinux"
+
+
+RELEASES="20250401 20250202 20240314"
+EDITIONS="xfce-musl xfce-glibc musl glibc"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
+}
+
+function editions_() {
+    echo glibc musl xfce-glibc xfce-musl
+}
+
+function get_() {
+    local DATE=""
+    local HASH=""
+    local ISO=""
+    local URL="https://repo-default.voidlinux.org/live"
+    case ${EDITION} in
+        glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
+        musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
+        xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+    esac
+    HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
+    echo "${URL}/${RELEASE}/${ISO} ${HASH}"
+}
+
+

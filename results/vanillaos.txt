@@ -1,0 +1,47 @@
+vanillaos
+
+vanillaos 22.10-r8:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r8/VanillaOS-22.10-all.20230226.iso
+vanillaos 22.10-r7.5:                https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r7.5/VanillaOS-22.10-all.20230214.iso
+vanillaos 22.10-r7:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r7.5/VanillaOS-22.10-all.20230214.iso
+vanillaos 22.10-r6:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r6/VanillaOS-22.10-all.20230123.iso
+vanillaos 22.10-r5:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r5/VanillaOS-22.10-all.20230116.iso
+vanillaos 22.10-r4:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r4/VanillaOS-22.10-all.20230115.iso
+vanillaos 22.10-r3:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r3/VanillaOS-22.10-all.20230105.iso
+vanillaos 22.10-r2:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r2/VanillaOS-22.10-all.20221231.iso
+vanillaos 22.10-r1:                  https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r1/VanillaOS-22.10-all.20221230.iso
+vanillaos 22.10:                     https://github.com/Vanilla-OS/live-iso/releases/download/22.10-r8/VanillaOS-22.10-all.20230226.iso
+vanillaos 2.0:                       https://github.com/Vanilla-OS/live-iso/releases/download/2.0/VanillaOS-2-stable.20250220.iso
+
+# Template file for 'vanillaos'
+OSNAME="vanillaos"
+PRETTY="Vanilla OS"
+BASEDOF="Ubuntu"
+DESCRIPTION="Designed to be a reliable and productive operating system for your daily work"
+HOMEPAGE="https://vanillaos.org"
+CREDENTIALS="-"
+
+
+RELEASES="22.10-r8 22.10-r7.5 22.10-r7 22.10-r6 22.10-r5 22.10-r4 22.10-r3 22.10-r2 22.10-r1 22.10 2.0"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | cut -d'/' -f8 | sort -ru)
+}
+
+function get_() {
+    local HASH=""
+    local HASH_URL=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/Vanilla-OS/live-iso/releases" | grep 'download_url' | grep "${RELEASE}" | head -n 1 | cut -d'"' -f4)
+    HASH_URL="${ISO//.iso/.sha256.txt}"
+    HASH=$(web_pipe "${HASH_URL}" | cut -d' ' -f1)
+    echo "${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    ## Minimum is 50G for abroot, but a 64GB is allocated to give some headroom
+    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+}
+
+

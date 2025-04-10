@@ -1,0 +1,66 @@
+manjaro
+
+manjaro xfce full:                   https://download.manjaro.org/xfce/24.2.1/manjaro-xfce-24.2.1-241216-linux612.iso
+manjaro xfce minimal:                https://download.manjaro.org/xfce/24.2.1/manjaro-xfce-24.2.1-minimal-241216-linux612.iso
+manjaro gnome full:                  https://download.manjaro.org/gnome/24.2.1/manjaro-gnome-24.2.1-241216-linux612.iso
+manjaro gnome minimal:               https://download.manjaro.org/gnome/24.2.1/manjaro-gnome-24.2.1-minimal-241216-linux612.iso
+manjaro plasma full:                 https://download.manjaro.org/kde/24.2.1/manjaro-kde-24.2.1-241216-linux612.iso
+manjaro plasma minimal:              https://download.manjaro.org/kde/24.2.1/manjaro-kde-24.2.1-minimal-241216-linux612.iso
+manjaro cinnamon full:               https://download.manjaro.org/cinnamon/24.0.5/manjaro-cinnamon-24.0.5-240729-linux69.iso
+manjaro cinnamon minimal:            https://download.manjaro.org/cinnamon/24.0.5/manjaro-cinnamon-24.0.5-minimal-240729-linux69.iso
+manjaro i3 full:                     https://download.manjaro.org/i3/24.0.5/manjaro-i3-24.0.5-240729-linux69.iso
+manjaro i3 minimal:                  https://download.manjaro.org/i3/24.0.5/manjaro-i3-24.0.5-minimal-240729-linux69.iso
+manjaro sway full:                   https://manjaro-sway.download/download?file=manjaro-sway-24.1.1-250202-linux66.iso
+manjaro sway minimal:                https://manjaro-sway.download/download?file=manjaro-sway-24.1.1-250202-linux66.iso
+
+# Template file for 'manjaro'
+OSNAME="manjaro"
+PRETTY="Manjaro"
+BASEDOF="Arch"
+DESCRIPTION="Versatile, free, and open-source Linux operating system designed with a strong focus on safeguarding user privacy and offering extensive control over hardware"
+HOMEPAGE="https://manjaro.org"
+CREDENTIALS="-"
+
+
+RELEASES="xfce sway plasma i3 gnome cinnamon"
+EDITIONS="minimal full"
+
+function releases_() {
+    echo xfce gnome plasma cinnamon i3 sway
+}
+
+function editions_() {
+    echo full minimal
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local MANIFEST=""
+    local URL=""
+    local TYPE="official"
+    MANIFEST="$(web_pipe https://gitlab.manjaro.org/web/iso-info/-/raw/master/file-info.json)"
+    case "${RELEASE}" in
+        sway)
+            MANIFEST="$(web_pipe https://mirror.manjaro-sway.download/manjaro-sway/release.json)"
+            TYPE="sway"
+            ;;
+        cinnamon|i3) TYPE="community";;
+    esac
+
+    if [ "${EDITION}" == "minimal" ] && [ "${TYPE}" != "sway" ]; then
+        EDITION=".minimal"
+    else
+        EDITION=""
+    fi
+
+    if [ "${RELEASE}" == "sway" ]; then
+        URL=$(echo "${MANIFEST}" | jq -r '.[] | select(.name|test("^manjaro-sway-.*[.]iso$")) | .url')
+    else
+        URL="$(echo "${MANIFEST}" | jq -r ."${TYPE}.${RELEASE}${EDITION}".image)"
+    fi
+    HASH=$(web_pipe "${URL}.sha512" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
+

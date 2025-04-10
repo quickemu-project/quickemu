@@ -1,0 +1,80 @@
+rockylinux
+
+rockylinux 9.5 minimal:              https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-minimal.iso
+rockylinux 9.5 dvd:                  https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-dvd.iso
+rockylinux 9.5 boot:                 https://dl.rockylinux.org/vault/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-boot.iso
+rockylinux 9.4 minimal:              https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-minimal.iso
+rockylinux 9.4 dvd:                  https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-dvd.iso
+rockylinux 9.4 boot:                 https://dl.rockylinux.org/vault/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-boot.iso
+rockylinux 9.3 minimal:              https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-minimal.iso
+rockylinux 9.3 dvd:                  https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-dvd.iso
+rockylinux 9.3 boot:                 https://dl.rockylinux.org/vault/rocky/9.3/isos/x86_64/Rocky-9.3-x86_64-boot.iso
+rockylinux 9.2 minimal:              https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-minimal.iso
+rockylinux 9.2 dvd:                  https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-dvd.iso
+rockylinux 9.2 boot:                 https://dl.rockylinux.org/vault/rocky/9.2/isos/x86_64/Rocky-9.2-x86_64-boot.iso
+rockylinux 9.1 minimal:              https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-minimal.iso
+rockylinux 9.1 dvd:                  https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-dvd.iso
+rockylinux 9.1 boot:                 https://dl.rockylinux.org/vault/rocky/9.1/isos/x86_64/Rocky-9.1-x86_64-boot.iso
+rockylinux 9.0 minimal:              https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-minimal.iso
+rockylinux 9.0 dvd:                  https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-dvd.iso
+rockylinux 9.0 boot:                 https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64/Rocky-9.0-x86_64-boot.iso
+rockylinux 8.9 minimal:              https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-minimal.iso
+rockylinux 8.9 dvd:                  https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-dvd1.iso
+rockylinux 8.9 boot:                 https://dl.rockylinux.org/vault/rocky/8.9/isos/x86_64/Rocky-8.9-x86_64-boot.iso
+rockylinux 8.8 minimal:              https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-minimal.iso
+rockylinux 8.8 dvd:                  https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-dvd1.iso
+rockylinux 8.8 boot:                 https://dl.rockylinux.org/vault/rocky/8.8/isos/x86_64/Rocky-8.8-x86_64-boot.iso
+rockylinux 8.7 minimal:              https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-minimal.iso
+rockylinux 8.7 dvd:                  https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-dvd1.iso
+rockylinux 8.7 boot:                 https://dl.rockylinux.org/vault/rocky/8.7/isos/x86_64/Rocky-8.7-x86_64-boot.iso
+rockylinux 8.6 minimal:              https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-minimal.iso
+rockylinux 8.6 dvd:                  https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-dvd1.iso
+rockylinux 8.6 boot:                 https://dl.rockylinux.org/vault/rocky/8.6/isos/x86_64/Rocky-8.6-x86_64-boot.iso
+rockylinux 8.5 minimal:              https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-minimal.iso
+rockylinux 8.5 dvd:                  https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-dvd1.iso
+rockylinux 8.5 boot:                 https://dl.rockylinux.org/vault/rocky/8.5/isos/x86_64/Rocky-8.5-x86_64-boot.iso
+rockylinux 8.4 minimal:              https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-minimal.iso
+rockylinux 8.4 dvd:                  https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-dvd1.iso
+rockylinux 8.4 boot:                 https://dl.rockylinux.org/vault/rocky/8.4/isos/x86_64/Rocky-8.4-x86_64-boot.iso
+rockylinux 8.3 minimal:              https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-minimal.iso
+rockylinux 8.3 dvd:                  https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-dvd1.iso
+rockylinux 8.3 boot:                 https://dl.rockylinux.org/vault/rocky/8.3/isos/x86_64/Rocky-8.3-x86_64-boot.iso
+
+# Template file for 'rockylinux'
+OSNAME="rockylinux"
+PRETTY="Rocky Linux"
+BASEDOF="RedHat"
+DESCRIPTION="Open-source enterprise operating system designed to be 100% bug-for-bug compatible with Red Hat Enterprise Linux"
+HOMEPAGE="https://rockylinux.org"
+CREDENTIALS="-"
+
+
+RELEASES="9.5 9.4 9.3 9.2 9.1 9.0 8.9 8.8 8.7 8.6 8.5 8.4 8.3"
+EDITIONS="minimal dvd boot"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | sort -ru)
+}
+
+function editions_() {
+    echo minimal dvd boot
+}
+
+function get_() {
+    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]; then
+        EDITION="dvd1"
+    fi
+    local HASH=""
+    local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
+    local URL=""
+    URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
+    HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}
+
+

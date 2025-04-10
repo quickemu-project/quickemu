@@ -1,0 +1,42 @@
+gabeeos
+
+gabeeos latest Openbox:              https://sourceforge.net/projects/gabeeoslinux/files/Distro/Openbox/gabeeOSLinux-Openbox-x86_64-6.12.19_1-20250317.iso/
+gabeeos latest Qtile:                https://sourceforge.net/projects/gabeeoslinux/files/Distro/Qtile/Release-2025/gabeeOSLinux-Qtile-x86_64-6.12.18_1-20250314.iso
+gabeeos latest i3-gaps:              https://sourceforge.net/projects/gabeeoslinux/files/Distro/i3-gaps/gabeeOSLinux-i3-WM-x86_64-6.12.19_1-20250317.iso
+
+# Template file for 'gabeeos'
+OSNAME="gabeeos"
+PRETTY="GabeeOSLinux"
+BASEDOF="Void"
+DESCRIPTION="Brings the necessary software to satisfy the daily needs of an end user in a simple and aesthetically pleasing desktop environment."
+HOMEPAGE="https://sourceforge.net/projects/gabeeoslinux/"
+CREDENTIALS="anon:voidlinux,root:voidlinux"
+
+
+RELEASES="latest"
+EDITIONS="i3-gaps Qtile Openbox"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo $(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f3 | sort | uniq)
+}
+
+function get_() {
+    local HASH=""
+    if [ "${EDITION}" == 'i3-gaps' ]; then
+        REL=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f2,3)
+        ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f4)
+    else
+        REL=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f2,3,4)
+        ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/Distro/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1 | cut -d'/' -f5)
+    fi
+    URL="https://sourceforge.net/projects/gabeeoslinux/files/${REL}"
+    #ISO=$(web_pipe "https://sourceforge.net/projects/gabeeoslinux/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | cut -d'/' -f5 | grep "${EDITION}" | head -1)
+    # No hash provided
+    echo "${URL}/${ISO}"
+}
+
+

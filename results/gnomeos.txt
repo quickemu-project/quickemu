@@ -1,0 +1,70 @@
+gnomeos
+
+gnomeos nightly:                     https://1270333429.rsc.cdn77.org/nightly/823600/gnome_os_installer_823600.iso
+gnomeos 48.rc:                       https://download.gnome.org/gnomeos/48.rc/gnome_os_installer_48.rc.iso
+gnomeos 48.beta:                     https://download.gnome.org/gnomeos/48.beta/gnome_os_installer_48.beta.iso
+gnomeos 48.alpha:                    https://download.gnome.org/gnomeos/48.alpha/gnome_os_installer_48.alpha.8.iso
+gnomeos 48.0:                        https://download.gnome.org/gnomeos/48.0/gnome_os_installer_48.0.iso
+gnomeos 47.rc:                       https://download.gnome.org/gnomeos/47.rc/gnome_os_installer_47.rc.iso
+gnomeos 47.beta:                     https://download.gnome.org/gnomeos/47.beta/gnome_os_installer_47.beta.iso
+gnomeos 47.alpha:                    https://download.gnome.org/gnomeos/47.alpha/gnome_os_installer_47.alpha.iso
+gnomeos 47.0:                        https://download.gnome.org/gnomeos/47.0/gnome_os_installer_47.0.iso
+gnomeos 46.rc:                       https://download.gnome.org/gnomeos/46.rc/gnome_os_installer_46.rc.iso
+gnomeos 46.beta:                     https://download.gnome.org/gnomeos/46.beta/gnome_os_installer_46.beta.iso
+gnomeos 46.alpha:                    https://download.gnome.org/gnomeos/46.alpha/gnome_os_installer_46.alpha.iso
+gnomeos 46.0:                        https://download.gnome.org/gnomeos/46.0/gnome_os_installer_46.iso
+gnomeos 45.rc:                       https://download.gnome.org/gnomeos/45.rc/gnome_os_installer_45.rc.iso
+gnomeos 45.beta:                     https://download.gnome.org/gnomeos/45.beta/gnome_os_installer_45.beta.iso
+gnomeos 44.rc:                       https://download.gnome.org/gnomeos/44.rc/gnome_os_installer_44.rc.iso
+gnomeos 44.beta:                     https://download.gnome.org/gnomeos/44.beta/gnome_os_installer_44.beta.iso
+gnomeos 44.0:                        https://download.gnome.org/gnomeos/44.0/gnome_os_installer_44.0.iso
+gnomeos 43.beta:                     https://download.gnome.org/gnomeos/43.beta/gnome_os_installer_43.beta.iso
+gnomeos 43.alpha:                    https://download.gnome.org/gnomeos/43.alpha/gnome_os_installer_43.alpha.iso
+gnomeos 43.0:                        https://download.gnome.org/gnomeos/43.0/gnome_os_installer_43.0.iso
+gnomeos 42.rc:                       https://download.gnome.org/gnomeos/42.rc/gnome_os_installer_42.rc.iso
+gnomeos 42.beta:                     https://download.gnome.org/gnomeos/42.beta/gnome_os_installer_42.beta.iso
+gnomeos 42.0:                        https://download.gnome.org/gnomeos/42.0/gnome_os_installer_42.0.iso
+gnomeos 41.rc:                       https://download.gnome.org/gnomeos/41.rc/gnome_os_installer_41.rc.iso
+gnomeos 41.beta:                     https://download.gnome.org/gnomeos/41.beta/gnome_os_installer_41.beta.iso
+gnomeos 41.0:                        https://download.gnome.org/gnomeos/41.0/gnome_os_installer_41.0.iso
+gnomeos 40.rc:                       https://download.gnome.org/gnomeos/40.rc/gnome_os_installer_40.rc.iso
+gnomeos 40.beta:                     https://download.gnome.org/gnomeos/40.beta/gnome_os_installer_40.beta.iso
+gnomeos 40.0:                        https://download.gnome.org/gnomeos/40.0/gnome_os_installer_40.0.iso
+gnomeos 3.38.1:                      https://download.gnome.org/gnomeos/3.38.1/gnome_os_installer.iso
+gnomeos 3.38.0:                      https://download.gnome.org/gnomeos/3.38.0/gnome_os_installer.iso
+
+# Template file for 'gnomeos'
+OSNAME="gnomeos"
+PRETTY="GNOME OS"
+BASEDOF="-"
+DESCRIPTION="Alpha nightly bleeding edge distro of GNOME"
+HOMEPAGE="https://os.gnome.org"
+CREDENTIALS="-"
+
+
+RELEASES="nightly 48.rc 48.beta 48.alpha 48.0 47.rc 47.beta 47.alpha 47.0 46.rc 46.beta 46.alpha 46.0 45.rc 45.beta 44.rc 44.beta 44.0 43.beta 43.alpha 43.0 42.rc 42.beta 42.0 41.rc 41.beta 41.0 40.rc 40.beta 40.0 3.38.1 3.38.0"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep "title=" | awk -F'"' '{print $4}' | tr -d '/' | sort -nr)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="gnome_os_installer_${RELEASE}.iso"
+    local URL="https://download.gnome.org/gnomeos/${RELEASE}"
+    case ${RELEASE} in
+        nightly)
+            ISO="gnome_os_installer.iso"
+            URL="https://os.gnome.org/download/latest";;
+        46.0) ISO="gnome_os_installer_46.iso";;
+        3*) ISO="gnome_os_installer.iso";;
+        48.alpha) ISO=$(web_pipe "https://download.gnome.org/gnomeos/48.alpha/" | grep '.iso' | cut -d'"' -f4);;
+    esac
+    # Process the URL redirections; required for GNOME
+    ISO=$(web_redirect "${URL}/${ISO}")
+    echo "${ISO} ${HASH}"
+}
+
+

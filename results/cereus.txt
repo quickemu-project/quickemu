@@ -1,0 +1,45 @@
+cereus
+
+cereus latest base:                  https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+cereus latest musl-base:             https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+cereus latest lxqt:                  https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+cereus latest musl-lxqt:             https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+cereus latest xfce:                  https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+cereus latest musl-xfce:             https://sourceforge.net/projects/cereus-linux/files/isos/beta/2023.02.19/base/cereus-beta-live-x86_64-musl-base-2023.02.17.iso
+
+# Template file for 'cereus'
+OSNAME="cereus"
+PRETTY="Cereus Linux"
+BASEDOF="Void"
+DESCRIPTION="Void-based distribution focused on give an user-friendly experience."
+HOMEPAGE="https://sourceforge.net/projects/cereus-linux"
+CREDENTIALS="-"
+
+
+RELEASES="latest"
+EDITIONS="xfce musl-xfce musl-lxqt musl-base lxqt base"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo base musl-base lxqt musl-lxqt xfce musl-xfce
+}
+
+function get_() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local DATE=""
+    local ISO=""
+    local URL="https://sourceforge.net/projects/cereus-linux/files"
+    REST=$(web_pipe "https://sourceforge.net/projects/cereus-linux/rss?path=/isos/beta" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep "${EDITION}" | head -1)
+    ISO=$(echo ${REST} | cut -d'/' -f5)
+    case ${EDITION} in
+        base) HASH=$(wget -q -O- "${URL}/SHA256SUM" | grep "${ISO}" | cut -d' ' -f1);;
+        *) HASH=$(wget -q -O- "${URL}/SHA256" | grep "${ISO}" | cut -d' ' -f1);;
+    esac
+    echo "${URL}${REST} ${HASH}"
+}
+
+

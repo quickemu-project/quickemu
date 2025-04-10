@@ -1,0 +1,54 @@
+endless
+
+endless 6.0.4 base:                  https://images-dl.endlessm.com/release/6.0.4/eos-amd64-amd64/base/eos-eos6.0-amd64-amd64.241023-183516.base.iso
+endless 6.0.4 en:                    https://images-dl.endlessm.com/release/6.0.4/eos-amd64-amd64/en/eos-eos6.0-amd64-amd64.241023-200926.en.iso
+endless 6.0.4 fr:                    https://images-dl.endlessm.com/release/6.0.4/eos-amd64-amd64/fr/eos-eos6.0-amd64-amd64.241023-191212.fr.iso
+endless 6.0.4 pt_BR:                 https://images-dl.endlessm.com/release/6.0.4/eos-amd64-amd64/pt_BR/eos-eos6.0-amd64-amd64.241023-191427.pt_BR.iso
+endless 6.0.4 es:                    https://images-dl.endlessm.com/release/6.0.4/eos-amd64-amd64/es/eos-eos6.0-amd64-amd64.241023-184649.es.iso
+
+# Template file for 'endless'
+OSNAME="endless"
+PRETTY="Endless OS"
+BASEDOF="Debian"
+DESCRIPTION="Completely Free, User-Friendly Operating System Packed with Educational Tools, Games, and More"
+HOMEPAGE="https://www.endlessos.org/os"
+CREDENTIALS="-"
+
+
+RELEASES="6.0.4"
+EDITIONS="pt_BR fr es en base"
+
+function releases_() {
+    echo 6.0.4
+}
+
+function editions_() {
+    echo base en fr pt_BR es
+}
+
+function get_() {
+    local HASH="" # No hash - there is a signature in .asc signed by
+    #https://d1anzknqnc1kmb.cloudfront.net/eos-image-keyring.gpg
+    # (4096R: CB50 0F7B C923 3FAD 32B4 E720 9E0C 1250 587A 279C)
+    local FILE_TS=""
+    # https://support.endlessos.org/en/installation/direct-download gives the info but computes the URLS in js
+    # so parsing out the useful info is not happening tonight
+    # Endless edition names are "base" for the small minimal one or the Language for the large full release
+    # The isos are stamped as they are finished so ....
+    case ${EDITION} in
+        base)  FILE_TS="241023-183516";;
+        en)    FILE_TS="241023-200926";;
+        es)    FILE_TS="241023-184649";;
+        fr)    FILE_TS="241023-191212";;
+        pt_BR) FILE_TS="241023-191427";;
+    esac
+    URL="https://images-dl.endlessm.com/release/${RELEASE}/eos-amd64-amd64/${EDITION}"
+    ISO="eos-eos${RELEASE:0:3}-amd64-amd64.${FILE_TS}.${EDITION}.iso"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+  echo "disk_size=\"32G\"" >> "${CONF_FILE}"
+}
+
+

@@ -1,0 +1,32 @@
+linuxlite
+
+linuxlite 6.6:                       https://sourceforge.net/projects/linux-lite/files/6.6/linux-lite-6.6-64bit.iso
+linuxlite 6.4:                       https://sourceforge.net/projects/linux-lite/files/6.4/linux-lite-6.4-64bit.iso
+linuxlite 6.2:                       https://sourceforge.net/projects/linux-lite/files/6.2/linux-lite-6.2-64bit.iso
+linuxlite 6.0:                       https://sourceforge.net/projects/linux-lite/files/6.0/linux-lite-6.0-64bit.iso
+
+# Template file for 'linuxlite'
+OSNAME="linuxlite"
+PRETTY="Linux Lite"
+BASEDOF="Debian Ubuntu"
+DESCRIPTION="Your first simple, fast and free stop in the world of Linux"
+HOMEPAGE="https://www.linuxliteos.com"
+CREDENTIALS="-"
+
+
+RELEASES="6.6 6.4 6.2 6.0"
+
+
+function releases_() {
+    echo 6.6 6.4 6.2 6.0
+}
+
+function get_() {
+    local HASH=""
+    local ISO="linux-lite-${RELEASE}-64bit.iso"
+    local URL="https://sourceforge.net/projects/linux-lite/files/${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

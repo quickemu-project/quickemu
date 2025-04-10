@@ -1,0 +1,51 @@
+pbpuppy
+
+pbpuppy 250201 BookwormPup64-ghtest: https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250201.iso
+pbpuppy 250201 S15Pup64:             https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250201.iso
+pbpuppy 250201 VoidPup64:            https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250201.iso
+pbpuppy 250301 BookwormPup64-ghtest: https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250301.iso
+pbpuppy 250301 S15Pup64:             https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250301.iso
+pbpuppy 250301 VoidPup64:            https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250301.iso
+pbpuppy 250314 BookwormPup64-ghtest: https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250314.iso
+pbpuppy 250314 S15Pup64:             https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250314.iso
+pbpuppy 250314 VoidPup64:            https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250314.iso
+pbpuppy 250402 BookwormPup64-ghtest: https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250402.iso
+pbpuppy 250402 S15Pup64:             https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250402.iso
+pbpuppy 250402 VoidPup64:            https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250402.iso
+pbpuppy 250404 BookwormPup64-ghtest: https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250404.iso
+pbpuppy 250404 S15Pup64:             https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250404.iso
+pbpuppy 250404 VoidPup64:            https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release/VoidPup64-22.02-250404.iso
+
+# Template file for 'pbpuppy'
+OSNAME="pbpuppy"
+PRETTY="PeaBee's Puppy Linux"
+BASEDOF="Void,Ubuntu,Debian,Slackware"
+DESCRIPTION="Puppy Linux releases from Github. Brought to you by: peabee"
+HOMEPAGE="https://sourceforge.net/projects/pb-gh-releases"
+CREDENTIALS="-"
+
+
+RELEASES="250404 250402 250314 250301 250201"
+EDITIONS="VoidPup64 S15Pup64 BookwormPup64-ghtest"
+
+function releases_() {
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'-' -f3 | grep -oP '\d{6}(?=\.iso)' | sort -u)
+}
+
+function editions_() {
+    echo $(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f2 | cut -d'_' -f1 | sort -u)
+}
+
+function get_() {
+    local HASH=""
+    local URL="https://sourceforge.net/projects/pb-gh-releases/files/VoidPup64_release"
+    if [ "${RELEASE}" == 'ghtest' ]; then
+      ISO=$(web_pipe "https://sourceforge.net/projects/pb-gh-releases/rss?path=/" | grep 'title><!\[CDATA' | cut -d'[' -f3 | cut -d']' -f1 | grep '\.iso' | grep '64' | cut -d'/' -f3 | grep "${RELEASE}" | grep "${EDITION}")
+    else
+      ISO="VoidPup64-22.02-${RELEASE}.iso"
+    fi
+    HASH=$(web_pipe "${URL}"/SHA512checksums.txt | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

@@ -1,0 +1,46 @@
+trisquel
+
+trisquel 11.0 mate:                  https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel_11.0_amd64.iso
+trisquel 11.0 lxde:                  https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel-mini_11.0_amd64.iso
+trisquel 11.0 kde:                   https://mirrors.ocf.berkeley.edu/trisquel-images/triskel_11.0_amd64.iso
+trisquel 11.0 sugar:                 https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel-sugar_11.0_amd64.iso
+trisquel 10.0.1 mate:                https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel_10.0.1_amd64.iso
+trisquel 10.0.1 lxde:                https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel-mini_10.0.1_amd64.iso
+trisquel 10.0.1 kde:                 https://mirrors.ocf.berkeley.edu/trisquel-images/triskel_10.0.1_amd64.iso
+trisquel 10.0.1 sugar:               https://mirrors.ocf.berkeley.edu/trisquel-images/trisquel-sugar_10.0.1_amd64.iso
+
+# Template file for 'trisquel'
+OSNAME="trisquel"
+PRETTY="Trisquel"
+BASEDOF="Ubuntu"
+DESCRIPTION="Fully free operating system for home users, small enterprises and educational centers"
+HOMEPAGE="https://trisquel.info"
+CREDENTIALS="-"
+
+
+RELEASES="11.0 10.0.1"
+EDITIONS="sugar mate lxde kde"
+
+function releases_() {
+    echo 11.0 10.0.1
+}
+
+function editions_() {
+    echo mate lxde kde sugar
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://mirrors.ocf.berkeley.edu/trisquel-images"
+    case ${EDITION} in
+        mate) ISO="trisquel_${RELEASE}_amd64.iso";;
+        lxde) ISO="trisquel-mini_${RELEASE}_amd64.iso";;
+        kde) ISO="triskel_${RELEASE}_amd64.iso";;
+        sugar) ISO="trisquel-sugar_${RELEASE}_amd64.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

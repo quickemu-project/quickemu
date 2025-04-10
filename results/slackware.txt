@@ -1,0 +1,38 @@
+slackware
+
+slackware 15.0:                      https://slackware.nl/slackware/slackware-iso/slackware64-15.0-iso/slackware64-15.0-install-dvd.iso
+slackware 14.2:                      https://slackware.nl/slackware/slackware-iso/slackware64-14.2-iso/slackware64-14.2-install-dvd.iso
+slackware 14.1:                      https://slackware.nl/slackware/slackware-iso/slackware64-14.1-iso/slackware64-14.1-install-dvd.iso
+slackware 14.0:                      https://slackware.nl/slackware/slackware-iso/slackware64-14.0-iso/slackware64-14.0-install-dvd.iso
+slackware 13.37:                     https://slackware.nl/slackware/slackware-iso/slackware64-13.37-iso/slackware64-13.37-install-dvd.iso
+
+# Template file for 'slackware'
+OSNAME="slackware"
+PRETTY="slackware"
+BASEDOF="-"
+DESCRIPTION="Advanced Linux operating system, designed with the twin goals of ease of use and stability as top priorities"
+HOMEPAGE="http://www.slackware.com"
+CREDENTIALS="-"
+
+
+RELEASES="15.0 14.2 14.1 14.0 13.37"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://slackware.nl/slackware/slackware-iso/" | grep "slackware-" | cut -d'<' -f7 | cut -d'-' -f2 | sort -ru | head -n 5)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="slackware64-${RELEASE}-install-dvd.iso"
+    local URL="https://slackware.nl/slackware/slackware-iso/slackware64-${RELEASE}-iso"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
+
+

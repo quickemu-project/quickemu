@@ -1,0 +1,46 @@
+slax
+
+slax latest debian:                  https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x/slax-64bit-debian-12.2.0.iso
+slax latest slackware:               https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x/slax-64bit-slackware-15.0.4.iso
+
+# Template file for 'slax'
+OSNAME="slax"
+PRETTY="Slax"
+BASEDOF="Debian Slackware"
+DESCRIPTION="Compact, fast, and modern Linux operating system that combines sleek design with modular approach. With the ability to run directly from a USB flash drive without the need for installation, Slax is truly portable and fits easily in your pocket"
+HOMEPAGE="https://www.slax.org"
+CREDENTIALS="-"
+
+
+RELEASES="latest"
+EDITIONS="slackware debian"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo debian slackware
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    case ${EDITION} in
+        debian)
+            URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-12.x"
+            ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1);;
+        slackware)
+            URL="https://ftp.fi.muni.cz/pub/linux/slax/Slax-15.x"
+            ISO=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f3 | tail -n1);;
+    esac
+    HASH=$(web_pipe "${URL}/md5.txt" | grep '64bit-' | cut -d' ' -f1 | tail -n1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+}
+
+

@@ -1,0 +1,41 @@
+freebsd
+
+freebsd 14.2 disc1:                  https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/14.2/FreeBSD-14.2-RELEASE-amd64-disc1.iso
+freebsd 14.2 dvd1:                   https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/14.2/FreeBSD-14.2-RELEASE-amd64-dvd1.iso
+freebsd 14.1 disc1:                  https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/14.1/FreeBSD-14.1-RELEASE-amd64-disc1.iso
+freebsd 14.1 dvd1:                   https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/14.1/FreeBSD-14.1-RELEASE-amd64-dvd1.iso
+freebsd 13.5 disc1:                  https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/13.5/FreeBSD-13.5-RELEASE-amd64-disc1.iso
+freebsd 13.5 dvd1:                   https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/13.5/FreeBSD-13.5-RELEASE-amd64-dvd1.iso
+freebsd 13.4 disc1:                  https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/13.4/FreeBSD-13.4-RELEASE-amd64-disc1.iso
+freebsd 13.4 dvd1:                   https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/13.4/FreeBSD-13.4-RELEASE-amd64-dvd1.iso
+
+# Template file for 'freebsd'
+OSNAME="freebsd"
+PRETTY="FreeBSD"
+BASEDOF="-"
+DESCRIPTION="Operating system used to power modern servers, desktops, and embedded platforms"
+HOMEPAGE="https://www.freebsd.org"
+CREDENTIALS="-"
+freebsd
+
+RELEASES="14.2 14.1 13.5 13.4"
+EDITIONS="dvd1 disc1"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://download.freebsd.org/ftp/releases/amd64/amd64/" | grep -Eo "href=\"[0-9\.]+-RELEASE" | grep -oE '[0-9\.]+' | sort -r)
+}
+
+function editions_() {
+    echo disc1 dvd1
+}
+
+function get_() {
+    local HASH=""
+    local ISO="FreeBSD-${RELEASE}-RELEASE-amd64-${EDITION}.iso"
+    local URL="https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/${RELEASE}"
+    HASH=$(web_pipe "${URL}/CHECKSUM.SHA256-FreeBSD-${RELEASE}-RELEASE-amd64" | grep "${ISO}" | grep -v ".xz" | cut -d' ' -f4)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

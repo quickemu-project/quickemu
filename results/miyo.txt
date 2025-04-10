@@ -1,0 +1,44 @@
+miyo
+
+miyo 2022 Kwin:                      https://sourceforge.net/projects/miyolinux/files/2022-Release//
+miyo 2022 Deboot-Ceres:              https://sourceforge.net/projects/miyolinux/files/2022-Release//
+miyo 2022 JWM:                       https://sourceforge.net/projects/miyolinux/files/2022-Release//
+miyo 2022 Openbox:                   https://sourceforge.net/projects/miyolinux/files/2022-Release//
+miyo 2022 MATE:                      https://sourceforge.net/projects/miyolinux/files/2022-Release//
+
+# Template file for 'miyo'
+OSNAME="miyolinux"
+PRETTY="MiyoLinux"
+BASEDOF="Devuan"
+DESCRIPTION="Very minimal Linux OS based on Devuan and various Window Managers. "
+HOMEPAGE="https://sourceforge.net/projects/miyolinux/"
+CREDENTIALS="-"
+
+
+RELEASES="2022"
+EDITIONS="Openbox MATE Kwin JWM Deboot-Ceres"
+
+function releases_() {
+    echo 2022
+}
+
+function editions_() {
+    echo Kwin Deboot-Ceres JWM Openbox MATE
+}
+
+function get_() {
+    local EDITION="${1:-}"
+    local HASH=""
+    local URL="https://sourceforge.net/projects/miyolinux/files/${RELEASE}-Release/${EDITION}"
+    case ${EDITION} in
+        Kwin) ISO="miyo-kwin-x86_64-BIOS-20220526.iso";;
+        Deboot-Ceres) ISO="Deboot-Ceres-x86-64-BIOS-20220415.iso";;
+        JWM) ISO="miyolinux-jwm-x86_64-BIOS-20220226.iso";;
+        Openbox) ISO="MiyoLinux-x86_64-BIOS-20220129.iso";;
+        MATE) ISO="mate-minimal-x86_64-BIOS-20220107.iso";;
+    esac
+    HASH=$(wget -q -O- "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

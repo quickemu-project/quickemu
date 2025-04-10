@@ -1,0 +1,42 @@
+bazzite
+
+bazzite latest gnome:                https://download.bazzite.gg/bazzite-gnome-stable-amd64.iso
+bazzite latest kde:                  https://download.bazzite.gg/bazzite-stable-amd64.iso
+
+# Template file for 'bazzite'
+OSNAME="bazzite"
+PRETTY="bazzite"
+BASEDOF="Fedora SteamOS"
+DESCRIPTION="Container native gaming and a ready-to-game SteamOS like"
+HOMEPAGE="https://bazzite.gg"
+CREDENTIALS="-"
+
+
+RELEASES="latest"
+EDITIONS="kde gnome"
+
+function releases_() {
+    echo latest
+}
+
+function editions_() {
+    echo gnome kde
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://download.bazzite.gg"
+    case ${EDITION} in
+        gnome) ISO="bazzite-gnome-stable-amd64.iso";;
+        kde)  ISO="bazzite-stable-amd64.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "disk_size=\"64G\"" >> "${CONF_FILE}"
+}
+
+

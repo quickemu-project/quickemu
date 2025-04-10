@@ -1,0 +1,37 @@
+kdeneon
+
+kdeneon user:                        https://files.kde.org/neon/images/user/current/neon-user-20250406-0747.iso
+kdeneon testing:                     https://files.kde.org/neon/images/testing/current/neon-testing-20250408-0431.iso
+kdeneon unstable:                    https://files.kde.org/neon/images/unstable/current/neon-unstable-20250406-1146.iso
+kdeneon developer:                   https://files.kde.org/neon/images/developer/current/neon-unstable-developer-20250407-0038.iso
+
+# Template file for 'kdeneon'
+OSNAME="kdeneon"
+PRETTY="KDE Neon"
+BASEDOF="Debian Ubuntu"
+DESCRIPTION="Latest and greatest of KDE community software packaged on a rock-solid base"
+HOMEPAGE="https://neon.kde.org"
+CREDENTIALS="-"
+
+
+RELEASES="user unstable testing developer"
+
+
+function releases_() {
+    echo user testing unstable developer
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL="https://files.kde.org/neon/images/${RELEASE}/current"
+    if [ "$RELEASE" == 'developer' ]; then
+        ISO=$(web_pipe "${URL}/neon-unstable-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    else
+        ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
+    fi
+    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

@@ -1,0 +1,37 @@
+biglinux
+
+biglinux 2025-04-08 k614:            https://iso.biglinux.com.br/biglinux_2025-04-08_k614.iso
+biglinux 2025-04-08 k612:            https://iso.biglinux.com.br/biglinux_2025-04-08_k612.iso
+biglinux 2025-04-08 k66:             https://iso.biglinux.com.br/biglinux_2025-04-08_k66.iso
+
+# Template file for 'biglinux'
+OSNAME="biglinux"
+PRETTY="BigLinux"
+BASEDOF="Manjaro"
+DESCRIPTION="Is the right choice if you want to have an easy and enriching experience with Linux. It has been perfected over more than 19 years, following our motto: 'In search of the perfect system'"
+HOMEPAGE="https://www.biglinux.com.br"
+CREDENTIALS="-"
+
+
+RELEASES="2025-04-08"
+EDITIONS="k66 k614 k612"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo 'biglinux_[0-9]{4}(-[0-9]{2}){2}_k[0-9]{2,3}.iso' | cut -d'_' -f2 | sort -ru | head -n 1)
+}
+
+function editions_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://iso.biglinux.com.br" | grep -Eo "biglinux_$(releases_)_k[0-9]{2,3}.iso" | cut -d'_' -f3 | cut -d'.' -f1 | sort -Vru)
+}
+
+function get_() {
+    local HASH=""
+    local ISO="biglinux_${RELEASE}_${EDITION}.iso"
+    local URL="https://iso.biglinux.com.br"
+    HASH=$(web_pipe "${URL}/${ISO}.md5" | grep -Eo '[[:alnum:]]{32}')
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

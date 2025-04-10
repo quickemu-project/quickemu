@@ -1,0 +1,50 @@
+arco
+
+arco v25.04.01 net:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.04.01/arconet-v25.04.01-x86_64.iso
+arco v25.04.01 plasma:               https://mirror.accum.se/mirror/arcolinux.info/iso/v25.04.01/arcoplasma-v25.04.01-x86_64.iso
+arco v25.04.01 pro:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.04.01/arcopro-v25.04.01-x86_64.iso
+arco v25.03.05 net:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.03.05/arconet-v25.03.05-x86_64.iso
+arco v25.03.05 plasma:               https://mirror.accum.se/mirror/arcolinux.info/iso/v25.03.05/arcoplasma-v25.03.05-x86_64.iso
+arco v25.03.05 pro:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.03.05/arcopro-v25.03.05-x86_64.iso
+arco v25.02.04 net:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.02.04/arconet-v25.02.04-x86_64.iso
+arco v25.02.04 plasma:               https://mirror.accum.se/mirror/arcolinux.info/iso/v25.02.04/arcoplasma-v25.02.04-x86_64.iso
+arco v25.02.04 pro:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.02.04/arcopro-v25.02.04-x86_64.iso
+arco v25.01.05 net:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.05/arconet-v25.01.05-x86_64.iso
+arco v25.01.05 plasma:               https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.05/arcoplasma-v25.01.05-x86_64.iso
+arco v25.01.05 pro:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.05/arcopro-v25.01.05-x86_64.iso
+arco v25.01.01 net:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.01/arconet-v25.01.01-x86_64.iso
+arco v25.01.01 plasma:               https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.01/arcoplasma-v25.01.01-x86_64.iso
+arco v25.01.01 pro:                  https://mirror.accum.se/mirror/arcolinux.info/iso/v25.01.01/arcopro-v25.01.01-x86_64.iso
+
+# Template file for 'arco'
+OSNAME="arcolinux"
+PRETTY="Arco Linux"
+BASEDOF="Arch"
+DESCRIPTION="Is all about becoming an expert in linux"
+HOMEPAGE="https://arcolinux.com"
+CREDENTIALS="-"
+
+
+RELEASES="v25.04.01 v25.03.05 v25.02.04 v25.01.05 v25.01.01"
+EDITIONS="pro plasma net"
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://mirror.accum.se/mirror/arcolinux.info/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
+}
+
+function editions_() {
+    echo net plasma pro
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    URL="https://mirror.accum.se/mirror/arcolinux.info/iso/${RELEASE}"
+    ISO="arco${EDITION}-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

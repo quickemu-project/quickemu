@@ -1,0 +1,89 @@
+antix
+
+antix 23.2 net-sysv:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2-net_x64-net.iso
+antix 23.2 core-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-core.iso
+antix 23.2 base-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-base.iso
+antix 23.2 full-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/antiX-23.2_x64-full.iso
+antix 23.2 net-runit:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit-net_x64-net.iso
+antix 23.2 core-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-core.iso
+antix 23.2 base-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-base.iso
+antix 23.2 full-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.2/runit-antiX-23.2/antiX-23.2-runit_x64-full.iso
+antix 23.1 net-sysv:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1-net_x64-net.iso
+antix 23.1 core-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-core.iso
+antix 23.1 base-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-base.iso
+antix 23.1 full-sysv:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/antiX-23.1_x64-full.iso
+antix 23.1 net-runit:                https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit-net_x64-net.iso
+antix 23.1 core-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-core.iso
+antix 23.1 base-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-base.iso
+antix 23.1 full-runit:               https://sourceforge.net/projects/antix-linux/files/Final/antiX-23.1/runit-antiX-23.1/antiX-23.1-runit_x64-full.iso
+antix 23 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23-net_x64-net.iso
+antix 23 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-core.iso
+antix 23 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-base.iso
+antix 23 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/antiX-23_x64-full.iso
+antix 23 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit-net_x64-net.iso
+antix 23 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-core.iso
+antix 23 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-base.iso
+antix 23 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-23/runit-antiX-23/antiX-23-runit_x64-full.iso
+antix 22 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22-net_x64-net.iso
+antix 22 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-core.iso
+antix 22 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-base.iso
+antix 22 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/antiX-22_x64-full.iso
+antix 22 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit-net_x64-net.iso
+antix 22 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-core.iso
+antix 22 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-base.iso
+antix 22 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-22/runit-antiX-22/antiX-22-runit_x64-full.iso
+antix 21 net-sysv:                   https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21-net_x64-net.iso
+antix 21 core-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-core.iso
+antix 21 base-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-base.iso
+antix 21 full-sysv:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/antiX-21_x64-full.iso
+antix 21 net-runit:                  https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit-net_x64-net.iso
+antix 21 core-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-core.iso
+antix 21 base-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-base.iso
+antix 21 full-runit:                 https://sourceforge.net/projects/antix-linux/files/Final/antiX-21/runit-bullseye/antiX-21-runit_x64-full.iso
+
+# Template file for 'antix'
+OSNAME="antix"
+PRETTY="Antix"
+BASEDOF="Debian"
+DESCRIPTION="Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems"
+HOMEPAGE="https://antixlinux.com"
+CREDENTIALS="-"
+
+
+RELEASES="23.2 23.1 23 22 21"
+EDITIONS="net-sysv net-runit full-sysv full-runit core-sysv core-runit base-sysv base-runit"
+
+function releases_() {
+    echo 23.2 23.1 23 22 21
+}
+
+function editions_() {
+    echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+}
+
+function get_() {
+    local HASH=""
+    local ISO="antiX-${RELEASE}"
+    local README="README"
+    local URL="https://sourceforge.net/projects/antix-linux/files/Final/antiX-${RELEASE}"
+
+    # antiX uses a different URL and ISO naming for runit editions
+    if [[ "${EDITION}" == *"runit"* ]];then
+        ISO+="-runit"
+        README="README2"
+        case ${RELEASE} in
+            21) URL+="/runit-bullseye";;
+            *)  URL+="/runit-antiX-${RELEASE}";;
+        esac
+    fi
+    case ${EDITION} in
+        base-*) ISO+="_x64-base.iso";;
+        core-*) ISO+="_x64-core.iso";;
+        full-*) ISO+="_x64-full.iso";;
+        net-*)  ISO+="-net_x64-net.iso";;
+    esac
+    HASH=$(web_pipe "${URL}/${README}.txt" | grep "${ISO}" | cut -d' ' -f1 | head -n 1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+

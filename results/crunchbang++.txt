@@ -1,0 +1,32 @@
+crunchbang++
+
+crunchbang++ 12.0:                   https://github.com/CBPP/cbpp/releases/download/v12.0/cbpp-12.0-amd64-20230611.iso
+crunchbang++ 11.2:                   https://github.com/CBPP/cbpp/releases/download/v11.2/cbpp-11.2-amd64-20230514.iso
+crunchbang++ 10.1:                   https://github.com/CBPP/cbpp/releases/download/v10/cbpp-10.1-amd64-20190713.iso
+crunchbang++ 9.0:                    https://github.com/CBPP/cbpp/releases/download/v9/cbpp-9.0-amd64-20170621.iso
+
+# Template file for 'crunchbang++'
+OSNAME="crunchbang++"
+PRETTY="Crunchbangplusplus"
+BASEDOF="Debian"
+DESCRIPTION="The classic minimal crunchbang feel, now with debian 12 bookworm"
+HOMEPAGE="https://www.crunchbangplusplus.org"
+CREDENTIALS="-"
+
+
+RELEASES="9.0 12.0 11.2 10.1"
+
+
+function releases_() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
+    echo "${ISO} ${HASH}"
+}
+
+

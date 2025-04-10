@@ -1,0 +1,39 @@
+truenas-scale
+
+truenas-scale 24:                    https://download.sys.truenas.net/TrueNAS-SCALE-ElectricEel/24.10.2.1/TrueNAS-SCALE-24.10.2.1.iso
+
+# Template file for 'truenas-scale'
+OSNAME="truenas-scale"
+PRETTY="TrueNAS Scale"
+BASEDOF="Debian"
+DESCRIPTION="Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data"
+HOMEPAGE="https://www.truenas.com/truenas-scale"
+CREDENTIALS="-"
+GUEST="truenas"
+
+RELEASES="24"
+
+
+function releases_() {
+    echo 24
+}
+
+function get_() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local DLINFO="https://www.truenas.com/download-truenas-scale/"
+    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
+    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
+}
+
+function specific_tweaks() {
+    echo "boot=\"legacy\"" >> "${CONF_FILE}"
+    # the rest is non-functional
+    # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
+    # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
+    # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
+}
+
+
