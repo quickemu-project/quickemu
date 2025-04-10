@@ -3,11 +3,13 @@ alma            https://repo.almalinux.org/almalinux/9.6-beta/isos/x86_64/AlmaLi
 archbang        https://downloads.sourceforge.net/archbang/archbang-0904-x86_64.iso
 arco            https://downloads.sourceforge.net/arconetpro/arcopro-v25.04.01-x86_64.iso
 artix           https://download.artixlinux.org/iso/artix-base-openrc-20250303-x86_64.iso
+artix           https://download.artixlinux.org/iso/artix-cinnamon-openrc-20250407-x86_64.iso
 artix           https://download.artixlinux.org/iso/artix-xfce-s6-20250310-x86_64.iso
 austrumi        https://ftp.linux.edu.lv/austrumi/austrumi64-5.0.3.iso
 bluestar        https://downloads.sourceforge.net/bluestarlinux/bslx-6.13.6-3-2025.03.11-x86_64.iso
 bluestar        https://downloads.sourceforge.net/bluestarlinux/bslx-6.13.8-1-2025.03.24-x86_64.iso
 cachyos         https://downloads.sourceforge.net/cachyos-arch/cachyos-desktop-linux-250330.iso
+calculate       https://mirror.calculate-linux.org/release/20250409/cld-20250409-x86_64.iso
 calculate       https://mirror.calculate-linux.org/release/cld-20250313-x86_64.iso
 calculate       https://mirror.calculate-linux.org/release/cld-20250318-x86_64.iso
 centos          https://ftp.udx.icscoe.jp/Linux/CentOS-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250303.3-x86_64-dvd1.iso
@@ -41,8 +43,10 @@ kdeneon         https://files.kde.org/neon/images/user/20250320-1319/neon-user-2
 kdeneon         https://files.kde.org/neon/images/user/20250327-1319/neon-user-20250327-1319.iso
 kubuntu         https://cdimage.ubuntu.com/kubuntu/releases/25.04/beta/kubuntu-25.04-beta-desktop-amd64.iso
 kumander        https://dl.kumander.org/kumander-linux-2.0-live-amd64.iso
+lernstick       https://releases.lernstick.ch/lernstick12/lernstick_debian12_edu-mini_2025-04-06.iso
 linuxfx         https://downloads.sourceforge.net/linuxfxdevil/linuxfx-11.25.03.1-noble-lts.iso
 linuxfx         https://downloads.sourceforge.net/linuxfxdevil/linuxfx-11.25.04-noble-lts.iso
+linuxfx         https://downloads.sourceforge.net/linuxfxdevil/linuxfx-11.25.04.1-noble-lts.iso
 lite            https://downloads.sourceforge.net/linux-lite/linux-lite-7.4-64bit.iso
 lubuntu         https://cdimage.ubuntu.com/lubuntu/releases/25.04/beta/lubuntu-25.04-beta-desktop-amd64.iso
 mabox           https://downloads.sourceforge.net/mabox-linux/mabox-linux-25.03-Istredd-250331-linux612.iso
@@ -54,6 +58,7 @@ pardus          https://indir.pardus.org.tr/ISO/Pardus23/Pardus-23.4-GNOME-amd64
 peropesis       https://peropesis.org/peropesis/Peropesis-2.9-live.iso
 porteus         https://mirror.yandex.ru/mirrors/porteus/x86_64/Porteus-v5.1/Porteus-LXQT-v5.1-alpha2-x86_64.iso
 porteux         https://github.com/porteux/porteux/releases/download/v2.0/porteux-v2.0-current-gnome-48.0-x86_64.iso
+proxmox         https://enterprise.proxmox.com/iso/proxmox-backup-server_3.4-1.iso
 proxmox         https://enterprise.proxmox.com/iso/proxmox-ve_8.4-1.iso
 q4os            https://downloads.sourceforge.net/q4os/q4os-5.8-x64.r1.iso
 rebornos        https://downloads.sourceforge.net/rebornos/rebornos_iso-2025.03.04-x86_64.iso
