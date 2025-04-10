@@ -48,6 +48,7 @@ jobs:
         run: |
           git status
           git add . || echo "add . failed"
+          git add TODO/all || echo "add TODO/all failed"
           git add --all || echo "add --all failed"
           git commit -m "update supported" || echo "commit failed"
           git push || echo "push failed"
