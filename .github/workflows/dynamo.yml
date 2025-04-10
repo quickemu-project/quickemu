@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   generate-matrix:
-    name: "Generate 💿️ Matrix"
+    name: "💿️ Matrix"
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -77,7 +77,7 @@ jobs:
           path: results/${{ matrix.file }}.txt
 
   end:
-    name: "Finish 🏁"
+    name: "🏁 Finish"
     needs: run-actions
     if: always()
     runs-on: ubuntu-latest
