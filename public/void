@@ -7,12 +7,11 @@ HOMEPAGE="https://voidlinux.org"
 CREDENTIALS="anon:voidlinux root:voidlinux"
 
 
-RELEASES="20250401 20250202 20240314"
+RELEASES="current"
 EDITIONS="xfce-musl xfce-glibc musl glibc"
 
 function releases_() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
+    echo current
 }
 
 function editions_() {
@@ -23,14 +22,15 @@ function get_() {
     local DATE=""
     local HASH=""
     local ISO=""
-    local URL="https://repo-default.voidlinux.org/live"
+    local URL="https://repo-default.voidlinux.org/live/current"
+    DATE=$(web_pipe "$URL" | grep "^<a href=\"void-live-x86_64-" | cut -d'-' -f5 | tail -1)
     case ${EDITION} in
-        glibc) ISO="void-live-x86_64-${RELEASE}-base.iso";;
-        musl) ISO="void-live-x86_64-musl-${RELEASE}-base.iso";;
-        xfce-glibc) ISO="void-live-x86_64-${RELEASE}-xfce.iso";;
-        xfce-musl) ISO="void-live-x86_64-musl-${RELEASE}-xfce.iso";;
+        glibc) ISO="void-live-x86_64-${DATE}-base.iso";;
+        musl) ISO="void-live-x86_64-musl-${DATE}-base.iso";;
+        xfce-glibc) ISO="void-live-x86_64-${DATE}-xfce.iso";;
+        xfce-musl) ISO="void-live-x86_64-musl-${DATE}-xfce.iso";;
     esac
     HASH="$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f4)"
-    echo "${URL}/${RELEASE}/${ISO} ${HASH}"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
