@@ -924,7 +924,7 @@ function editions_parrotsec() {
 
 function releases_pclinuxos() {
 # shellcheck disable=SC2005
-    echo $(web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -m 1 -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' )
+    echo $(web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' | head -n 1)
 }
 
 function editions_pclinuxos() {
