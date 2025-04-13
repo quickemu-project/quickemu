@@ -56,6 +56,7 @@ lubuntu         https://cdimage.ubuntu.com/lubuntu/releases/25.04/beta/lubuntu-2
 mabox           https://downloads.sourceforge.net/mabox-linux/mabox-linux-25.03-Istredd-250331-linux612.iso
 max             https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 midnightbsd     https://discovery.midnightbsd.org/ftp/releases/amd64/ISO-IMAGES/3.2.3/MidnightBSD-3.2.3--amd64-disc1.iso
+mx              https://downloads.sourceforge.net/mx-linux/MX-23.6_x64.iso
 nitrux          https://downloads.sourceforge.net/nitruxos/nitrux-nx-desktop-plasma-cf782a84-amd64.iso
 openmamba       https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250312.x86_64.iso
 openmamba       https://cdn.openmamba.org/pub/openmamba/media/rolling/livedvd/en/openmamba-livedvd-en-snapshot-20250320.x86_64.iso
