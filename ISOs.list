@@ -7,6 +7,7 @@ artix           https://download.artixlinux.org/iso/artix-base-openrc-20250303-x
 artix           https://download.artixlinux.org/iso/artix-cinnamon-openrc-20250407-x86_64.iso
 artix           https://download.artixlinux.org/iso/artix-xfce-s6-20250310-x86_64.iso
 austrumi        https://ftp.linux.edu.lv/austrumi/austrumi64-5.0.3.iso
+austrumi        https://ftp.linux.edu.lv/austrumi/austrumi64-5.0.4.iso
 bluestar        https://downloads.sourceforge.net/bluestarlinux/bslx-6.13.6-3-2025.03.11-x86_64.iso
 bluestar        https://downloads.sourceforge.net/bluestarlinux/bslx-6.13.8-1-2025.03.24-x86_64.iso
 bluestar        https://downloads.sourceforge.net/bluestarlinux/bslx-6.14.1-1-2025.04.09-x86_64.iso
@@ -79,6 +80,7 @@ smoothwall      https://downloads.sourceforge.net/smoothwall/Express-3.1-SP6-x86
 sparky          https://downloads.sourceforge.net/sparkylinux/sparkylinux-2025.03-x86_64-lxqt.iso
 sparky          https://downloads.sourceforge.net/sparkylinux/sparkylinux-7.7-x86_64-lxqt.iso
 systemrescue    https://downloads.sourceforge.net/systemrescuecd/systemrescue-12.00-amd64.iso
+t2              https://dl.t2sde.org/binary/2025/t2-25.4-x86-64-base-wayland-glibc-gcc-nocona.iso
 tails           https://download.tails.net/tails/stable/tails-amd64-6.13/tails-amd64-6.13.iso
 tails           https://download.tails.net/tails/stable/tails-amd64-6.14.1/tails-amd64-6.14.1.iso
 truenas         https://download.sys.truenas.net/TrueNAS-SCALE-Fangtooth-RC/25.04-RC.1/TrueNAS-SCALE-25.04-RC.1.iso
