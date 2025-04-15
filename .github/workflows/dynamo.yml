@@ -93,6 +93,7 @@ jobs:
 
       - name: "Display and push results 📊"
         run: |
+          rm -f result
           for file in results/*.txt; do
             cat "$file" >> result
             rm "$file"
