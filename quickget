@@ -923,8 +923,8 @@ function editions_parrotsec() {
 }
 
 function releases_pclinuxos() {
-# shellcheck disable=SC2005
-    echo $(web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -m 1 -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' )
+# shellcheck disable=SC2046
+    echo $(web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -oP 'pclinuxos64-\K[^\-]+-\K[0-9]+\.[0-9]+' | head -n 1)
 }
 
 function editions_pclinuxos() {
@@ -2328,10 +2328,17 @@ function get_parrotsec() {
 }
 
 function get_pclinuxos() {
-    # shellcheck disable=SC2155
+    case ${EDITION} in
+        mate) RELEASE="${RELEASE//./-}";;
+        # in case an edition is added that uses the mate style and sorts higher
+        kde|kde-darkstar) RELEASE="${RELEASE//-/.}";;
+        xfce) RELEASE="${RELEASE//-/.}";;
+        *) ;;
+    esac
+# shellcheck disable=SC2155
     local HASH="$(web_pipe "${URL}/pclinuxos64-${EDITION}-${RELEASE}.md5sum" | head -c 32)"
     local ISO="pclinuxos64-${EDITION}-${RELEASE}.iso"
-    local URL="https://ftp.nluug.nl/os/Linux/distr/pclinuxos/pclinuxos/iso"
+    local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
     echo "${URL}/${ISO} ${HASH}"
 }
     
