@@ -17,6 +17,7 @@ calculate       https://mirror.calculate-linux.org/release/20250409/cld-20250409
 calculate       https://mirror.calculate-linux.org/release/cld-20250313-x86_64.iso
 calculate       https://mirror.calculate-linux.org/release/cld-20250318-x86_64.iso
 centos          https://ftp.udx.icscoe.jp/Linux/CentOS-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250303.3-x86_64-dvd1.iso
+centos          https://linuxsoft.cern.ch/centos-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250414.0-x86_64-dvd1.iso
 clonezilla      https://downloads.sourceforge.net/clonezilla/clonezilla-live-3.2.1-9-amd64.iso
 crux            https://git.crux.nu/system/iso/releases/download/3.8-rc5/crux-3.8-rc5.iso
 debian          https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.10.0-amd64-DVD-1.iso
@@ -56,6 +57,7 @@ lite            https://downloads.sourceforge.net/linux-lite/linux-lite-7.4-64bi
 liveraizo       https://downloads.sourceforge.net/live-raizo/Live-Raizo-v16.25.04.12i.iso
 lubuntu         https://cdimage.ubuntu.com/lubuntu/releases/25.04/beta/lubuntu-25.04-beta-desktop-amd64.iso
 mabox           https://downloads.sourceforge.net/mabox-linux/mabox-linux-25.03-Istredd-250331-linux612.iso
+manjaro         https://downloads.sourceforge.net/manjarolinux/manjaro-kde-25.0.0-250414-linux612.iso
 max             https://ftp.rediris.es/mirror/MaX-Linux/MaXdesktop/ultima-version/MAX-12.0-FINAL-live-amd64-20250307_1411.iso
 midnightbsd     https://discovery.midnightbsd.org/ftp/releases/amd64/ISO-IMAGES/3.2.3/MidnightBSD-3.2.3--amd64-disc1.iso
 mx              https://downloads.sourceforge.net/mx-linux/MX-23.6_x64.iso
