@@ -52,7 +52,7 @@ jobs:
           git add . || echo "add . failed"
           git add TODO/all || echo "add TODO/all failed"
           git add actions || echo "add actions failed"
-          git rm public/tmp_\*
+          git rm -f public/tmp_\*
           git add public || echo "add public failed"
           git add --all || echo "add --all failed"
           git commit -m "update supported" || echo "commit failed"
