@@ -588,7 +588,7 @@ function releases_bazzite() {
 }
 
 function editions_bazzite() {
-    echo gnome kde
+    echo gnome plasma deck-gnome deck-plasma
 }
 
 function releases_biglinux() {
@@ -1646,8 +1646,10 @@ function get_bazzite() {
     local ISO=""
     local URL="https://download.bazzite.gg"
     case ${EDITION} in
-        gnome) ISO="bazzite-gnome-stable.iso";;
-        kde)  ISO="bazzite-stable.iso";;
+        gnome) ISO="bazzite-gnome-stable-amd64.iso";;
+        plasma)  ISO="bazzite-stable-amd64.iso";;
+        deck-gnome)  ISO="bazzite-deck-gnome-stable-amd64.iso";;
+        deck-plasma)  ISO="bazzite-deck-stable-amd64.iso";;
     esac
     HASH=$(web_pipe "${URL}/${ISO}-CHECKSUM" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
