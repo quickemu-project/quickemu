@@ -52,10 +52,13 @@ jobs:
     steps:
       - name: "Checkout 🥡"
         uses: "actions/checkout@v4"
-      - name: "Install Nix ❄️"
-        uses: "DeterminateSystems/nix-installer-action@v16"
-      - name: "Enable Magic Nix Cache 🪄"
-        uses: "DeterminateSystems/magic-nix-cache-action@v9"
+      - name: "Install Nix"
+        uses: "nixbuild/nix-quick-install-action@v30"
+      - name: "Enable Nix Cache"
+        uses: "nix-community/cache-nix-action@v6"
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}
       - name: "Build & Test .nix ❄️"
         run: |
           nix build .#quickemu

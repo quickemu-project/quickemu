@@ -88,8 +88,11 @@ jobs:
       - uses: "actions/checkout@v4"
         with:
           ref: "${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '' }}"
-      - uses: "DeterminateSystems/nix-installer-action@main"
-      - uses: "DeterminateSystems/magic-nix-cache-action@main"
+      - uses: "nixbuild/nix-quick-install-action@master"
+      - uses: "nix-community/cache-nix-action@main"
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}
       - uses: "DeterminateSystems/flakehub-push@main"
         with:
           visibility: "public"
