@@ -1,0 +1,29 @@
+{
+  "name": "ecriture",
+  "version": "1.0.0",
+  "main": "src/javascript/index.js",
+  "scripts": {
+    "build": "npx webpack",
+    "watch": "npx webpack --mode development --progress --watch --devtool inline-source-map",
+    "less": "npx less src/css/ékrityr-snow.less src/css/ékrityr-snow.css"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "^5.3.6",
+    "dexie": "^4.0.11",
+    "jquery": "^3.7.1",
+    "pdf-lib": "^1.17.1",
+    "quill": "^2.0.3"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "html-loader": "^5.1.0",
+    "less": "^4.3.0",
+    "mini-css-extract-plugin": "^2.9.2",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1"
+  }
+}
