@@ -899,7 +899,7 @@ function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
     #echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
     echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep 'href="./2' | cut -d'/' -f 2 | sort -r |  head -n 5)
-    
+
 }
 
 function editions_openindiana() {
@@ -1034,7 +1034,7 @@ function releases_solus() {
 
 function editions_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(IFS=' '; releases_solus | tail -n1)/" | jq -r '.[].name | select(endswith("iso")) | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -2345,7 +2345,7 @@ function get_pclinuxos() {
     local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
     echo "${URL}/${ISO} ${HASH}"
 }
-    
+
 function get_peppermint() {
     local HASH=""
     local ISO=""
