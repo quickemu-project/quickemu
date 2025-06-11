@@ -882,7 +882,8 @@ function releases_nixos() {
 }
 
 function editions_nixos() {
-    echo minimal plasma gnome
+    # TODO: Remove "plasma" and "gnome" editions and use only "graphical" after 24.11 support ends (expected in NixOS 25.11)
+    echo minimal plasma6 gnome
 }
 
 function releases_nwg-shell() {
@@ -2247,13 +2248,12 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
-    # Adapt the plasma edition according to the NixOS release
+    # NixOS "gnome" and "plasma" ISOs are unified as "graphical" since 25.05
+    # https://github.com/NixOS/nixpkgs/pull/355893
     case "${EDITION}" in
-        plasma)
-            if [ "${RELEASE}" == "23.11" ]; then
-                EDITION+="5"
-            else
-                EDITION+="6"
+        plasma6|gnome)
+            if [[ "${RELEASE}" == "25.05" || "${RELEASE}" == "unstable" ]]; then
+                EDITION="graphical"
             fi
             ;;
     esac
