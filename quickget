@@ -876,14 +876,13 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    # Lists unstable plus the two most recent releases
+    # Lists unstable plus the most recent release
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +1)
 }
 
 function editions_nixos() {
-    # TODO: Remove "plasma" and "gnome" editions and use only "graphical" after 24.11 support ends (expected in NixOS 25.11)
-    echo minimal plasma6 gnome
+    echo minimal graphical
 }
 
 function releases_nwg-shell() {
@@ -2248,15 +2247,6 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
-    # NixOS "gnome" and "plasma" ISOs are unified as "graphical" since 25.05
-    # https://github.com/NixOS/nixpkgs/pull/355893
-    case "${EDITION}" in
-        plasma6|gnome)
-            if [[ "${RELEASE}" == "25.05" || "${RELEASE}" == "unstable" ]]; then
-                EDITION="graphical"
-            fi
-            ;;
-    esac
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
