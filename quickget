@@ -35,6 +35,7 @@ function os_info() {
         cachyos)          INFO="CachyOS|-|https://cachyos.org/|Designed to deliver lightning-fast speeds and stability, ensuring a smooth and enjoyable computing experience every time you use it.";;
         centos-stream)    INFO="CentOS Stream|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
         chimeralinux)     INFO="Chimera Linux|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
+        clearlinux)       INFO="Clear Linux|-|https://www.clearlinux.org/|Clear Linux OS is an open source, rolling release Linux distribution optimized for performance and security, from the Cloud to the Edge, designed for customization, and manageability.";;
         crunchbang++)     INFO="Crunchbangplusplus|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
         debian)           INFO="Debian|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
         deepin)           INFO="Deepin|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
@@ -429,6 +430,7 @@ function os_support() {
     cachyos \
     centos-stream \
     chimeralinux \
+    clearlinux \
     crunchbang++ \
     debian \
     deepin \
@@ -645,6 +647,10 @@ function releases_chimeralinux() {
 
 function editions_chimeralinux() {
     echo base gnome
+}
+
+function releases_clearlinux() {
+    echo latest
 }
 
 function releases_crunchbang++() {
@@ -1446,6 +1452,8 @@ EOF
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
             bazzite)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
+            clearlinux)
+                echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
             dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
@@ -1727,6 +1735,19 @@ function get_chimeralinux() {
     DATE=$(web_pipe "${URL}/sha256sums.txt" | head -n1 | cut -d'-' -f5)
     local ISO="chimera-linux-x86_64-LIVE-${DATE}-${EDITION}.iso"
     HASH=$(web_pipe "${URL}/sha256sums.txt" | grep 'x86_64-LIVE' | grep "${EDITION}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_clearlinux() {
+    local HASH=""
+    local ISO=""
+    local URL=""
+    local RELEASE=""
+
+    RELEASE=$(curl -s https://cdn.download.clearlinux.org/releases/ | grep -oE "[0-9]+" | sort -nr | head -1)
+    ISO="clear-${RELEASE}-live-desktop.iso"
+    URL="https://cdn.download.clearlinux.org/releases/${RELEASE}/clear"
+    HASH=$(web_pipe "${URL}/${ISO}-SHA512SUMS" | grep "${ISO}" | cut -d' ' -f 1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
