@@ -876,13 +876,13 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    # Lists unstable plus the two most recent releases
+    # Lists unstable plus the most recent release
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +1)
 }
 
 function editions_nixos() {
-    echo minimal plasma gnome
+    echo minimal graphical
 }
 
 function releases_nwg-shell() {
@@ -2247,16 +2247,6 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
-    # Adapt the plasma edition according to the NixOS release
-    case "${EDITION}" in
-        plasma)
-            if [ "${RELEASE}" == "23.11" ]; then
-                EDITION+="5"
-            else
-                EDITION+="6"
-            fi
-            ;;
-    esac
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
