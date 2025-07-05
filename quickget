@@ -3287,7 +3287,7 @@ function download_windows_workstation() {
     fi
 
     if echo "$iso_download_link_json" | grep -q "Sentinel marked this request as rejected."; then
-        echo " - WARNING! Microsoft blocked the automated download request based on your IP address."
+        echo " - WARNING! Microsoft blocked the automated download request based on your IP address or IP range."
         failed=1
     fi
 
