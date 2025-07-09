@@ -1,0 +1,13 @@
+diff --git a/quickget b/quickget
+index 99827ce..adc73bc 100755
+--- a/quickget
++++ b/quickget
+@@ -1193,7 +1193,7 @@ function check_hash() {
+             return;;
+     esac
+     echo -n "Checking ${iso} with ${hash_algo}... "
+-    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
++    if ! echo "${hash} ${iso}" | g${hash_algo} --check --status; then
+         echo "ERROR!"
+         echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+         exit 1
