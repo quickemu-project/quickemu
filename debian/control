@@ -22,6 +22,7 @@ Depends:
  procps,
  python3-minimal,
  qemu-system (>= 6.0),
+ base-files (<< 13~) | qemu-system-modules-spice,
  socat,
  spice-client-gtk,
  swtpm,
