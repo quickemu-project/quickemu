@@ -649,6 +649,10 @@ function editions_chimeralinux() {
     echo base gnome
 }
 
+function editions_clearlinux() {
+    echo desktop server
+}
+
 function releases_clearlinux() {
     echo latest
 }
@@ -1745,7 +1749,7 @@ function get_clearlinux() {
     local RELEASE=""
 
     RELEASE=$(curl -s https://cdn.download.clearlinux.org/releases/ | grep -oE "[0-9]+" | sort -nr | head -1)
-    ISO="clear-${RELEASE}-live-desktop.iso"
+    ISO="clear-${RELEASE}-live-${EDITION}.iso"
     URL="https://cdn.download.clearlinux.org/releases/${RELEASE}/clear"
     HASH=$(web_pipe "${URL}/${ISO}-SHA512SUMS" | grep "${ISO}" | cut -d' ' -f 1)
     echo "${URL}/${ISO} ${HASH}"
