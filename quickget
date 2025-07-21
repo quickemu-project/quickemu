@@ -1861,14 +1861,19 @@ function get_fedora() {
     local URL=""
     local VARIANT=""
     case ${EDITION} in
-        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation|KDE) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    # Handle KDE as a proper edition from 42 but a spin prior to 42
+    # Stripping eventual _Beta suffix from the RELEASE variable in the check
+    if [[ "${VARIANT}" == "KDE" && "${RELEASE/_Beta/}" -lt 42 ]]; then
+        VARIANT="Spins"
+    fi
     # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
     # but we need to convert it back to a space for the URL search in the JSON
     #shellcheck disable=SC2086
     # if RELEASE contains an underscore, replace it with a space
-     if [[ "${RELEASE}" == *"_"* ]]; then
+    if [[ "${RELEASE}" == *"_"* ]]; then
         RELEASE="${RELEASE/_/ }"
     fi
 
