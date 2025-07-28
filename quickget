@@ -5,6 +5,9 @@
 # shellcheck disable=SC2317
 export LC_ALL=C
 
+# Detect host OS for checksum tool compatibility
+HOST_OS=$(uname -s)
+
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
@@ -1192,6 +1195,17 @@ function check_hash() {
         *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
             return;;
     esac
+
+    # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
+    if [ "${HOST_OS}" = "Darwin" ]; then
+        case ${hash_algo} in
+            md5sum) hash_algo=gmd5sum;;
+            sha1sum) hash_algo=gsha1sum;;
+            sha256sum) hash_algo=gsha256sum;;
+            sha512sum) hash_algo=gsha512sum;;
+        esac
+    fi
+
     echo -n "Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
         echo "ERROR!"
