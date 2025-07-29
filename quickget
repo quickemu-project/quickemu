@@ -1873,6 +1873,8 @@ function get_fedora() {
 
 
     # shellcheck disable=SC2086
+    # Fedora may promote variants from Spins to Editions, in which case we want to accept either "Spins" or the specific edition name to preserve backwards compatibility
+    # For example, Fedora 42 KDE is now an edition, while previous releases are spins
     JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
