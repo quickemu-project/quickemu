@@ -17,12 +17,6 @@ class QuickemuDev < Formula
   depends_on "usbutils"
   depends_on "zsync"
 
-  # patching for coreutils issue https://github.com/quickemu-project/quickemu/issues/1529
-  patch do
-    url "https://raw.githubusercontent.com/quickemu-project/quickemu/refs/heads/master/Formula/patch_coreutils.diff"
-    sha256 "2d4a6820cc76d5a20cfdda09cf3d4b720055aae1579b4803dc4fa8f024058db9"
-  end
-
   def install
     bin.install "quickemu"
     bin.install "quickget"
