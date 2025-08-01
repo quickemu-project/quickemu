@@ -1628,7 +1628,7 @@ function get_archcraft() {
 function get_archlinux() {
     local HASH=""
     local ISO=""
-    local URL="https://mirror.rackspace.com/archlinux"
+    local URL="https://geo.mirror.pkgbuild.com/"
     ISO=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
     HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha256_sum')
     echo "${URL}${ISO} ${HASH}"
