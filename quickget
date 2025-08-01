@@ -5,6 +5,9 @@
 # shellcheck disable=SC2317
 export LC_ALL=C
 
+# Detect host OS for checksum tool compatibility
+HOST_OS=$(uname -s)
+
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
@@ -743,7 +746,7 @@ function editions_freebsd() {
 }
 
 function releases_freedos() {
-    echo 1.3 1.2
+    echo 1.4 1.3 1.2
 }
 
 function releases_garuda() {
@@ -876,13 +879,13 @@ function releases_nitrux() {
 }
 
 function releases_nixos() {
-    # Lists unstable plus the two most recent releases
+    # Lists unstable plus the most recent release
     #shellcheck disable=SC2046
-    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +2)
+    echo unstable $(web_pipe "https://nix-channels.s3.amazonaws.com/?delimiter=/" | grep -o -E 'nixos-[[:digit:]]+\.[[:digit:]]+' | cut -d- -f2 | sort -nru | head -n +1)
 }
 
 function editions_nixos() {
-    echo minimal plasma gnome
+    echo minimal graphical
 }
 
 function releases_nwg-shell() {
@@ -897,7 +900,9 @@ function releases_openbsd() {
 
 function releases_openindiana() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
+    #echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep link | cut -d'/' -f 1 | cut -d '"' -f4 | sort -r | tail -n +2 | head -n 5)
+    echo $(web_pipe "https://dlc.openindiana.org/isos/hipster/" | grep 'href="./2' | cut -d'/' -f 2 | sort -r |  head -n 5)
+
 }
 
 function editions_openindiana() {
@@ -1032,7 +1037,7 @@ function releases_solus() {
 
 function editions_solus() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(releases_solus | tail -n1)/" | jq -r '.[].name | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
+    echo $(web_pipe_json "https://downloads.getsol.us/isos/$(IFS=' '; releases_solus | tail -n1)/" | jq -r '.[].name | select(endswith("iso")) | sub("Solus-(?<e>.*)-Release-.*"; "\(.e)")' | sort -u)
 }
 
 function releases_sparkylinux() {
@@ -1190,6 +1195,17 @@ function check_hash() {
         *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
             return;;
     esac
+
+    # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
+    if [ "${HOST_OS}" = "Darwin" ]; then
+        case ${hash_algo} in
+            md5sum) hash_algo=gmd5sum;;
+            sha1sum) hash_algo=gsha1sum;;
+            sha256sum) hash_algo=gsha256sum;;
+            sha512sum) hash_algo=gsha512sum;;
+        esac
+    fi
+
     echo -n "Checking ${iso} with ${hash_algo}... "
     if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
         echo "ERROR!"
@@ -1859,21 +1875,28 @@ function get_fedora() {
     local URL=""
     local VARIANT=""
     case ${EDITION} in
-        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation) VARIANT="${EDITION}";;
+        Server|Kinoite|Onyx|Silverblue|Sericea|Workstation|KDE) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
     esac
+    # Handle KDE as a proper edition from 42 but a spin prior to 42
+    # Stripping eventual _Beta suffix from the RELEASE variable in the check
+    if [[ "${VARIANT}" == "KDE" && "${RELEASE/_Beta/}" -lt 42 ]]; then
+        VARIANT="Spins"
+    fi
     # The naming of 41 Beta with a space is problematic so we replaced it with an underscore
     # but we need to convert it back to a space for the URL search in the JSON
     #shellcheck disable=SC2086
     # if RELEASE contains an underscore, replace it with a space
-     if [[ "${RELEASE}" == *"_"* ]]; then
+    if [[ "${RELEASE}" == *"_"* ]]; then
         RELEASE="${RELEASE/_/ }"
     fi
 
 
 
     # shellcheck disable=SC2086
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select(.variant=="'${VARIANT}'" and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
+    # Fedora may promote variants from Spins to Editions, in which case we want to accept either "Spins" or the specific edition name to preserve backwards compatibility
+    # For example, Fedora 42 KDE is now an edition, while previous releases are spins
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -1890,11 +1913,17 @@ function get_freebsd() {
 function get_freedos() {
     local HASH=""
     local ISO=""
-    local URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}/official"
+    local BASE_URL="https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/${RELEASE}"
+    local URL=""
     case ${RELEASE} in
-        1.2) ISO="FD12CD.iso"
+        1.2) URL="${BASE_URL}/official"
+             ISO="FD12CD.iso"
              HASH=$(web_pipe "${URL}/FD12.sha" | grep "${ISO}" | cut -d' ' -f1);;
-        1.3) ISO="FD13-LiveCD.zip"
+        1.3) URL="${BASE_URL}/official"
+             ISO="FD13-LiveCD.zip"
+             HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
+        1.4) URL="${BASE_URL}"
+             ISO="FD14-LiveCD.zip"
              HASH=$(web_pipe "${URL}/verify.txt" | grep -A 8 "sha256sum" | grep "${ISO}" | cut -d' ' -f1);;
     esac
     echo "${URL}/${ISO} ${HASH}"
@@ -2239,16 +2268,6 @@ function get_nitrux() {
 
 function get_nixos() {
     local HASH=""
-    # Adapt the plasma edition according to the NixOS release
-    case "${EDITION}" in
-        plasma)
-            if [ "${RELEASE}" == "23.11" ]; then
-                EDITION+="5"
-            else
-                EDITION+="6"
-            fi
-            ;;
-    esac
     local ISO="latest-nixos-${EDITION}-x86_64-linux.iso"
     local URL="https://channels.nixos.org/nixos-${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
@@ -2343,7 +2362,7 @@ function get_pclinuxos() {
     local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
     echo "${URL}/${ISO} ${HASH}"
 }
-    
+
 function get_peppermint() {
     local HASH=""
     local ISO=""

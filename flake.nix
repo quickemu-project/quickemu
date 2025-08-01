@@ -22,11 +22,11 @@
     schemas = flake-schemas.schemas;
 
     # Define overlays for each supported system
-    overlays = forEachSupportedSystem ({pkgs, system, ...}: {
+    overlays = {
       default = final: prev: {
         quickemu = final.callPackage ./package.nix { };
       };
-    });
+    };
 
     # Define packages for each supported system
     packages = forEachSupportedSystem ({pkgs, system, ...}: rec {
