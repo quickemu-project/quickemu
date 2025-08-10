@@ -2639,11 +2639,11 @@ function get_ubuntu-server() {
     esac
 
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso)
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
         ISO=$(cut -d' ' -f3 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
@@ -2683,11 +2683,11 @@ function get_ubuntu() {
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
         HASH=$(cut -d' ' -f1 <<<"${DATA}" | sed '1q;d')
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac")
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
