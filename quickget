@@ -3010,19 +3010,14 @@ function unattended_windows() {
           <Order>2</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
-          <CommandLine>msiexec /i F:\UsbDk_1.0.22_x64.msi /quiet /passive /qn</CommandLine>
-          <Description>Install usbdk USB sharing agent</Description>
-          <Order>3</Order>
-        </SynchronousCommand>
-        <SynchronousCommand wcm:action="add">
           <CommandLine>msiexec /i F:\spice-vdagent-x64-0.10.0.msi /quiet /passive /qn</CommandLine>
           <Description>Install spice-vdagent SPICE agent</Description>
-          <Order>4</Order>
+          <Order>3</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
           <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
           <Description>Disable Hibernation</Description>
-          <Order>5</Order>
+          <Order>4</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
           <CommandLine>pnputil /add-driver E:\viogpudo\w10\amd64\viogpudo.inf /install</CommandLine>
@@ -3039,7 +3034,6 @@ EOF
 echo "Downloading Spice drivers..."
 web_get https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi "${VM_PATH}/unattended"
 web_get https://www.spice-space.org/download/windows/vdagent/vdagent-win-0.10.0/spice-vdagent-x64-0.10.0.msi "${VM_PATH}/unattended"
-web_get https://www.spice-space.org/download/windows/usbdk/UsbDk_1.0.22_x64.msi "${VM_PATH}/unattended"
 
 echo "Making unattended.iso"
 mkisofs -quiet -J -o "${VM_PATH}/unattended.iso" "${VM_PATH}/unattended/"
