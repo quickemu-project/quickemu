@@ -2243,6 +2243,12 @@ function start_viewer {
         viewer_args+=("${viewer_uri}")
     fi
 
+    # Add extra arguments
+    if [ -n "${viewer_extra_args}" ]; then
+        # shellcheck disable=SC2206
+        viewer_args+=(${viewer_extra_args})
+    fi
+
     # Launch the viewer
     echo " - Viewer:   ${viewer} ${viewer_args[*]} >/dev/null 2>&1 &"
     "${viewer}" "${viewer_args[@]}" >/dev/null 2>&1 &
@@ -2308,6 +2314,7 @@ function usage() {
     echo "  --snapshot info                   : Show disk/snapshot info."
     echo "  --status-quo                      : Do not commit any changes to disk/snapshot."
     echo "  --viewer <viewer>                 : Choose an alternative SPICE viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+    echo "  --viewer-extra-args <arguments>   : Pass extra arguments to the SPICE viewer."
     echo "  --width <width>                   : Set VM screen width; requires '--height'"
     echo "  --height <height>                 : Set VM screen height; requires '--width'"
     echo "  --ssh-port <port>                 : Set SSH port manually"
@@ -2550,6 +2557,7 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 viewer="${viewer:-spicy}"
+viewer_extra_args="${viewer_extra_args:-}"
 width="${width:-}"
 height="${height:-}"
 ssh_port="${ssh_port:-}"
@@ -2707,6 +2715,10 @@ else
             -viewer|--viewer)
                 SHORTCUT_OPTIONS+="--viewer ${2} "
                 viewer="${2}"
+                shift 2;;
+            -viewer-extra-args|--viewer-extra-args)
+                SHORTCUT_OPTIONS+="--viewer-extra-args ${2} "
+                viewer_extra_args="${2}"
                 shift 2;;
             -width|--width)
                 SHORTCUT_OPTIONS+="--width ${2} "
