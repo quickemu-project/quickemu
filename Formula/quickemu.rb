@@ -1,8 +1,18 @@
 class Quickemu < Formula
   desc "Quickly create and run optimised Windows, macOS and Linux virtual machines"
   homepage "https://github.com/quickemu-project/quickemu"
-  url "https://github.com/quickemu-project/quickemu/archive/refs/tags/4.9.7.tar.gz"
-  sha256 "38a93301a2b233bc458c62d1228d310a9c29c63c10d008c2905029ca66188606"
+
+  livecheck do
+    url :stable
+  end
+
+  stable do
+    latest_release = JSON.parse(Utils.safe_popen_read("curl", "-s", "https://api.github.com/repos/quickemu-project/quickemu/releases/latest"))
+    version latest_release["tag_name"]
+    url "https://api.github.com/repos/quickemu-project/quickemu/tarball/#{latest_release["tag_name"]}"
+  end
+
+  head "https://github.com/quickemu-project/quickemu.git"
   license "MIT"
 
   depends_on "bash"
