@@ -1199,7 +1199,7 @@ function releases_rebornos() {
 
 function releases_rockylinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "^<a href" | grep -v full | grep -v RC | grep -v ISO | cut -d'"' -f2 | tr -d / | sort -ru)
+    echo $(web_pipe "http://dl.rockylinux.org/vault/rocky/" | grep "class=\"link" | grep -v -e 'full' -e  'RC' -e  'ISO' -e 'Parent' | cut -d'"' -f4 | tr -d / | sort -ru)
 }
 
 function editions_rockylinux() {
