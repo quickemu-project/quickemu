@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 31, 2025
+date: September 21, 2025
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -135,6 +135,9 @@ You can also pass optional parameters
 
 **--extra_args \<arguments\>**
 :   Pass additional arguments to qemu
+
+**--paranoid**
+:   Disable USB redirection, USB SmartCard, SSH and folder sharing.
 
 **--version**
 :   Print version
@@ -509,7 +512,7 @@ Further information is available from the project
 - `spirallinux` (SpiralLinux)
 - `tails` (Tails)
 - `tinycore` (Tiny Core Linux)
-- `trisquel` (Trisquel-)
+- `trisquel` (Trisquel)
 - `truenas-core` (TrueNAS Core)
 - `truenas-scale` (TrueNAS Scale)
 - `tuxedo-os` (Tuxedo OS)
@@ -791,6 +794,7 @@ Arguments
   --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'usb-audio', 'none'
   --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)
   --extra_args <arguments>          : Pass additional arguments to qemu
+  --paranoid                        : Disable USB redirection, USB SmartCard, SSH and folder sharing.
   --version                         : Print version
 ```
 

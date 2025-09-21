@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 31, 2025
+date: September 21, 2025
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -235,7 +235,7 @@ Further information is available from the project
 - `spirallinux` (SpiralLinux)
 - `tails` (Tails)
 - `tinycore` (Tiny Core Linux)
-- `trisquel` (Trisquel-)
+- `trisquel` (Trisquel)
 - `truenas-core` (TrueNAS Core)
 - `truenas-scale` (TrueNAS Scale)
 - `tuxedo-os` (Tuxedo OS)

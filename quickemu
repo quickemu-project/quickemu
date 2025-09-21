@@ -266,7 +266,7 @@ function configure_usb() {
 
     # Have any USB devices been requested for pass-through?
     if (( ${#usb_devices[@]} )); then
-        echo " - USB:      Host pass-through requested:"
+        echo " - USB:             Host pass-through requested:"
         for DEVICE in "${usb_devices[@]}"; do
             VENDOR_ID=$(echo "${DEVICE}" | cut -d':' -f1)
             PRODUCT_ID=$(echo "${DEVICE}" | cut -d':' -f2)
@@ -274,7 +274,7 @@ function configure_usb() {
             USB_DEV=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f4 | cut -d':' -f1)
             USB_NAME=$(lsusb -d "${VENDOR_ID}:${PRODUCT_ID}" | cut -d' ' -f7-)
             if [ -z "${USB_NAME}" ]; then
-                echo "             ! USB device ${VENDOR_ID}:${PRODUCT_ID} not found. Check your configuration"
+                echo "                    ! USB device ${VENDOR_ID}:${PRODUCT_ID} not found. Check your configuration"
                 continue
             elif [ -w "/dev/bus/usb/${USB_BUS}/${USB_DEV}" ]; then
                 echo "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
@@ -796,8 +796,8 @@ function configure_cpu() {
     fi
 
     SMP="-smp cores=${GUEST_CPU_LOGICAL_CORES},threads=${GUEST_CPU_THREADS},sockets=${HOST_CPU_SOCKETS}"
-    echo " - CPU:      ${HOST_CPU_MODEL}"
-    echo " - CPU VM:   ${CPU_MODEL%%,*}, ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
+    echo " - CPU:             ${HOST_CPU_MODEL}"
+    echo " - CPU VM:          ${CPU_MODEL%%,*}, ${HOST_CPU_SOCKETS} Socket(s), ${GUEST_CPU_LOGICAL_CORES} Core(s), ${GUEST_CPU_THREADS} Thread(s)"
 
     if [ "${guest_os}" == "macos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
         # Display MSRs alert if the guest is macOS or windows
@@ -829,7 +829,7 @@ function configure_ram() {
     else
         RAM_VM="${ram}"
     fi
-    echo " - RAM VM:   ${RAM_VM} RAM"
+    echo " - RAM VM:          ${RAM_VM} RAM"
 
     case "${guest_os}" in
         windows|windows-server)
@@ -1066,7 +1066,7 @@ function configure_bios() {
         MACHINE_TYPE="pc"
     fi
 
-    echo " - BOOT:     ${BOOT_STATUS}"
+    echo " - BOOT:            ${BOOT_STATUS}"
 }
 
 function configure_os_quirks() {
@@ -1134,7 +1134,7 @@ function configure_os_quirks() {
 
 function configure_storage() {
     local create_options=""
-    echo " - Disk:     ${disk_img} (${disk_size})"
+    echo " - Disk:            ${disk_img} (${disk_size})"
     if [ ! -f "${disk_img}" ]; then
         # If there is no disk image, create a new image.
         mkdir -p "${VMDIR}" 2>/dev/null
@@ -1218,13 +1218,13 @@ function configure_storage() {
     fi
 
     if [ -n "${iso}" ] && [ -e "${iso}" ]; then
-        echo " - Boot ISO: ${iso}"
+        echo " - Boot ISO:        ${iso}"
     elif [ -n "${img}" ] && [ -e "${img}" ]; then
-        echo " - Recovery: ${img}"
+        echo " - Recovery:        ${img}"
     fi
 
     if [ -n "${fixed_iso}" ] && [ -e "${fixed_iso}" ]; then
-        echo " - CD-ROM:   ${fixed_iso}"
+        echo " - CD-ROM:          ${fixed_iso}"
     fi
 }
 
@@ -1357,9 +1357,9 @@ function configure_display() {
         if "${QEMU}" -device help 2>&1 | grep -q "\"${GL_DEVICE}\""; then
             DISPLAY_DEVICE="${GL_DEVICE}"
         fi
-        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+        echo -n " - Display:         ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
     else
-        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
+        echo -n " - Display:         ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
     fi
 
     # Build the video configuration
@@ -1415,7 +1415,7 @@ function configure_audio() {
         ac97|es1370|sb16) SOUND="-device ${sound_card},audiodev=audio0";;
         none) SOUND="";;
     esac
-    echo " - Sound:    ${sound_card} (${sound_duplex})"
+    echo " - Sound:           ${sound_card} (${sound_duplex})"
 }
 
 function configure_ports() {
@@ -1425,22 +1425,25 @@ function configure_ports() {
         # Find a free port to expose ssh to the guest
         ssh_port=$(get_port 22220 9)
     fi
-
-    if [ -n "${ssh_port}" ]; then
-        echo "ssh,${ssh_port}" >> "${VMDIR}/${VMNAME}.ports"
-        NET="${NET},hostfwd=tcp::${ssh_port}-:22"
-        echo " - ssh:      On host:  ssh user@localhost -p ${ssh_port}"
+    if [ "${ssh_fwd}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+        if [ -n "${ssh_port}" ]; then
+            echo "ssh,${ssh_port}" >> "${VMDIR}/${VMNAME}.ports"
+            NET="${NET},hostfwd=tcp::${ssh_port}-:22"
+            echo " - ssh:             On host:  ssh user@localhost -p ${ssh_port}"
+        else
+            echo " - ssh:             All ssh ports have been exhausted."
+        fi
     else
-        echo " - ssh:      All ssh ports have been exhausted."
+        echo " - ssh:             SSH forwarding is disabled."
     fi
 
     # Have any port forwards been requested?
     if (( ${#port_forwards[@]} )); then
-        echo " - PORTS:    Port forwards requested:"
+        echo " - PORTS:           Port forwards requested:"
         for FORWARD in "${port_forwards[@]}"; do
             HOST_PORT=$(echo "${FORWARD}" | cut -d':' -f1)
             GUEST_PORT=$(echo "${FORWARD}" | cut -d':' -f2)
-            echo "              - ${HOST_PORT} => ${GUEST_PORT}"
+            echo "                  - ${HOST_PORT} => ${GUEST_PORT}"
             NET="${NET},hostfwd=tcp::${HOST_PORT}-:${GUEST_PORT}"
             NET="${NET},hostfwd=udp::${HOST_PORT}-:${GUEST_PORT}"
         done
@@ -1473,14 +1476,14 @@ function configure_ports() {
         fi
 
         if [ -z "${spice_port}" ]; then
-            echo " - SPICE:    All SPICE ports have been exhausted."
+            echo " - SPICE:           All SPICE ports have been exhausted."
             if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
                 echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
                 exit 1
             fi
         else
             if [ "${display}" == "spice-app" ]; then
-                echo " - SPICE:    Enabled"
+                echo " - SPICE:           Enabled"
             else
                 echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
                 echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
@@ -1501,34 +1504,35 @@ function configure_file_sharing() {
             macos)
                 if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
                     # Reference: https://gitlab.gnome.org/GNOME/phodav/-/issues/5
-                    echo " - WebDAV:   On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
-                    echo " - WebDAV:   On guest: Finder -> Connect to Server -> http://localhost:9843/"
+                    echo " - WebDAV:          On guest: build spice-webdavd (https://gitlab.gnome.org/GNOME/phodav/-/merge_requests/24)"
+                    echo " - WebDAV:          On guest: Finder -> Connect to Server -> http://localhost:9843/"
                 fi;;
-            *) echo " - WebDAV:   On guest: dav://localhost:9843/";;
+            *) echo " - WebDAV:          On guest: dav://localhost:9843/";;
         esac
 
         # 9P
-        if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-            echo -n " - 9P:       On guest: "
-            if [ "${guest_os}" == "linux" ]; then
-                echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
-            elif [ "${guest_os}" == "macos" ]; then
-                # PUBLICSHARE needs to be world writeable for seamless integration with
-                # macOS. Test if it is world writeable, and prompt what to do if not.
-                echo "sudo mount_9p ${PUBLIC_TAG}"
-                if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
-                    echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
-                    echo "             Required for macOS integration 👆"
+        if [ "${FILE_SHARING}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+            if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ]; then
+                echo -n " - 9P:       On guest: "
+                if [ "${guest_os}" == "linux" ]; then
+                    echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+                elif [ "${guest_os}" == "macos" ]; then
+                    # PUBLICSHARE needs to be world writeable for seamless integration with
+                    # macOS. Test if it is world writeable, and prompt what to do if not.
+                    echo "sudo mount_9p ${PUBLIC_TAG}"
+                    if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
+                        echo " - 9P:               On host:  chmod 777 ${PUBLIC}"
+                        echo "                     Required for macOS integration 👆"
+                    fi
                 fi
             fi
         fi
-
         # SMB
         # We need to search in NixOS compatible paths as well as the standard location
         # since /usr/sbin/smbd may not be in the PATH.
         if [ -x "$(command -v smbd)" ] || [ -x "/usr/sbin/smbd" ]; then
             NET+=",smb=${PUBLIC}"
-            echo " - smbd:     On guest: smb://10.0.2.4/qemu"
+            echo " - smbd:            On guest: smb://10.0.2.4/qemu"
         fi
     fi
 }
@@ -1545,7 +1549,7 @@ function configure_tpm() {
             --tpm2)
         echo "${SWTPM} ${tpm_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
         ${SWTPM} "${tpm_args[@]}" >> "${VMDIR}/${VMNAME}.log" &
-        echo " - TPM:      ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
+        echo " - TPM:               ${VMDIR}/${VMNAME}.swtpm-sock (${!})"
         sleep 0.25
     fi
 }
@@ -1630,7 +1634,7 @@ function vm_boot() {
     fi
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
-    echo " - Host:     ${OS_RELEASE} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+    echo " - Host:            ${OS_RELEASE} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
 
     # Force to lowercase.
     boot=${boot,,}
@@ -1640,7 +1644,6 @@ function vm_boot() {
     NET="user,hostname=${VMNAME}"
 
     echo "#!/usr/bin/env bash" > "${VMDIR}/${VMNAME}.sh"
-
     configure_cpu
     configure_ram
     check_macos_tsc_stability
@@ -1650,8 +1653,15 @@ function vm_boot() {
     configure_display
     configure_audio
     configure_ports
-    configure_file_sharing
-    configure_usb
+    if [ "${folder_sharing}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+        configure_file_sharing
+    else
+        echo " - 9P:              Disabled"
+        echo " - smbd:            Disabled"
+    fi
+    if [[ ( "${usb_redir}" == "true" || "${usb_ccid}" == "true" ) && -z "${QUICKEMU_PARANOID}" ]]; then
+        configure_usb
+    fi
     configure_tpm
 
     # Changing process name is not supported on macOS
@@ -1747,23 +1757,32 @@ function vm_boot() {
     # macOS doesn't support SPICE
     if [ "${OS_KERNEL}" == "Linux" ]; then
         # shellcheck disable=SC2054
-        args+=(-device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
-            -chardev spicevmc,id=usbredirchardev1,name=usbredir
-            -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
-            -chardev spicevmc,id=usbredirchardev2,name=usbredir
-            -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
-            -chardev spicevmc,id=usbredirchardev3,name=usbredir
-            -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
-            -device pci-ohci,id=smartpass
-            -device usb-ccid)
-
-        if ${QEMU} -device help | grep -q "passthrough smartcard"; then
-            # shellcheck disable=SC2054
-            args+=(-chardev spicevmc,id=ccid,name=smartcard
-                  -device ccid-card-passthru,chardev=ccid)
+        if [ "${usb_redir}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+        
+            args+=(-device "${USB_HOST_PASSTHROUGH_CONTROLLER}",id=spicepass
+                -chardev spicevmc,id=usbredirchardev1,name=usbredir
+                -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1
+                -chardev spicevmc,id=usbredirchardev2,name=usbredir
+                -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2
+                -chardev spicevmc,id=usbredirchardev3,name=usbredir
+                -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3
+                -device pci-ohci,id=smartpass
+                -device usb-ccid)
         else
-            echo " - WARNING!  ${QEMU} or SPICE was not compiled with support for smartcard devices"
+            echo " - USB Redirection: Disabled"
         fi
+        if [ "${usb_ccid}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+                if ${QEMU} -device help | grep -q "passthrough smartcard"; then
+                    # shellcheck disable=SC2054
+                    args+=(-chardev spicevmc,id=ccid,name=smartcard
+                        -device ccid-card-passthru,chardev=ccid)
+                else
+                    echo " - WARNING!  ${QEMU} or SPICE was not compiled with support for smartcard devices"
+                fi
+            else
+                echo " - SmartCard:       Disabled"
+            fi
+
     fi
 
     # setup usb-controller
@@ -1859,15 +1878,15 @@ function vm_boot() {
 
     if [ "${network}" == "none" ]; then
         # Disable all networking
-        echo " - Network:  Disabled"
+        echo " - Network:         Disabled"
         args+=(-nic none)
     elif [ "${network}" == "restrict" ]; then
-        echo " - Network:  Restricted (${NET_DEVICE})"
+        echo " - Network:         Restricted (${NET_DEVICE})"
         # shellcheck disable=SC2054,SC2206
         args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},restrict=y,id=nic)
     elif [ -n "${network}" ]; then
         # Enable bridge mode networking
-        echo " - Network:  Bridged (${network})"
+        echo " - Network:         Bridged (${network})"
 
         # If a persistent MAC address is provided, use it.
         local MAC=""
@@ -1878,7 +1897,7 @@ function vm_boot() {
         # shellcheck disable=SC2054,SC2206
         args+=(-nic bridge,br=${network},model=${NET_DEVICE}${MAC})
     else
-        echo " - Network:  User (${NET_DEVICE})"
+        echo " - Network:         User (${NET_DEVICE})"
         # shellcheck disable=SC2054,SC2206
         args+=(-device ${NET_DEVICE},netdev=nic -netdev ${NET},id=nic)
     fi
@@ -2040,10 +2059,13 @@ function vm_boot() {
 
     # https://wiki.qemu.org/Documentation/9psetup
     # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
-    if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
-        # shellcheck disable=SC2054
-        args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-            -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+    if [ "${folder_sharing}" == "true" ] && [ -z "${QUICKEMU_PARANOID}" ]; then
+        if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
+            # shellcheck disable=SC2054
+            args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
+                -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+        fi
+        # no need to inform about 9P here, done in configure_file_sharing
     fi
 
     if [ -n "${USB_PASSTHROUGH}" ]; then
@@ -2068,26 +2090,26 @@ function vm_boot() {
 
     if [ "${monitor}" == "none" ]; then
         args+=(-monitor none)
-        echo " - Monitor:  (off)"
+        echo " - Monitor:         (off)"
     elif [ "${monitor}" == "telnet" ]; then
         # Find a free port to expose monitor-telnet to the guest
         TEMP_PORT="$(get_port "${monitor_telnet_port}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
-            echo " - Monitor:  All Monitor-Telnet ports have been exhausted."
+            echo " - Monitor:         All Monitor-Telnet ports have been exhausted."
         else
             monitor_telnet_port="${TEMP_PORT}"
             # shellcheck disable=SC2054
             args+=(-monitor telnet:"${monitor_telnet_host}:${monitor_telnet_port}",server,nowait)
-            echo " - Monitor:  On host:  telnet ${monitor_telnet_host} ${monitor_telnet_port}"
+            echo " - Monitor:         On host:  telnet ${monitor_telnet_host} ${monitor_telnet_port}"
             echo "monitor-telnet,${monitor_telnet_port},${monitor_telnet_host}" >> "${VMDIR}/${VMNAME}.ports"
         fi
     elif [ "${monitor}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-monitor unix:${SOCKET_MONITOR},server,nowait)
         if command -v socat &>/dev/null; then
-            echo " - Monitor:  On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
+            echo " - Monitor:         On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_MONITOR}"
         elif command -v nc &>/dev/null; then
-            echo " - Monitor:  On host:  nc -U \"${SOCKET_MONITOR}\""
+            echo " - Monitor:         On host:  nc -U \"${SOCKET_MONITOR}\""
         fi
     else
         echo "ERROR! \"${monitor}\" is an unknown monitor option."
@@ -2096,26 +2118,26 @@ function vm_boot() {
 
     if [ "${serial}" == "none" ]; then
         args+=(-serial none)
-        echo " - Serial:   (off)"
+        echo " - Serial:          (off)"
     elif [ "${serial}" == "telnet" ]; then
         # Find a free port to expose serial-telnet to the guest
         TEMP_PORT="$(get_port "${serial_telnet_port}" 9)"
         if [ -z "${TEMP_PORT}" ]; then
-            echo " - Serial:   All Serial Telnet ports have been exhausted."
+            echo " - Serial:          All Serial Telnet ports have been exhausted."
         else
             serial_telnet_port="${TEMP_PORT}"
             # shellcheck disable=SC2054,SC2206
             args+=(-serial telnet:${serial_telnet_host}:${serial_telnet_port},server,nowait)
-            echo " - Serial:   On host:  telnet ${serial_telnet_host} ${serial_telnet_port}"
+            echo " - Serial:          On host:  telnet ${serial_telnet_host} ${serial_telnet_port}"
             echo "serial-telnet,${serial_telnet_port},${serial_telnet_host}" >> "${VMDIR}/${VMNAME}.ports"
         fi
     elif [ "${serial}" == "socket" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-serial unix:${SOCKET_SERIAL},server,nowait)
         if command -v socat &>/dev/null; then
-            echo " - Serial:   On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
+            echo " - Serial:          On host:  socat -,echo=0,icanon=0 unix-connect:${SOCKET_SERIAL}"
         elif command -v nc &>/dev/null; then
-            echo " - Serial:   On host:  nc -U \"${SOCKET_SERIAL}\""
+            echo " - Serial:          On host:  nc -U \"${SOCKET_SERIAL}\""
         fi
     else
         echo "ERROR! \"${serial}\" is an unknown serial option."
@@ -2145,7 +2167,7 @@ function vm_boot() {
             echo " - Process:  Started ${VM} as ${VMNAME} (${VM_PID})"
             configure_cpu_pinning
         else
-            echo " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
+            echo " - Process:         ERROR! Failed to start ${VM} as ${VMNAME}"
             rm -f "${VMDIR}/${VMNAME}.pid"
             echo && cat "${VMDIR}/${VMNAME}.log"
             exit 1
@@ -2161,22 +2183,22 @@ function start_viewer {
             if [ "${viewer}" == "remote-viewer" ]; then
                 # show via viewer: remote-viewer
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
+                    echo " - Viewer:          ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
                     ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
+                    echo " - Viewer:          ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
                     ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
                     errno=$?
                 fi
             elif [ "${viewer}" == "spicy" ]; then
                 # show via viewer: spicy
                 if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    echo " - Viewer:          ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
                     ${viewer} --title "${VMNAME}" --port "${spice_port}" --spice-shared-dir "${PUBLIC}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
+                    echo " - Viewer:          ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
                     ${viewer} --title "${VMNAME}" --port "${spice_port}" "${FULLSCREEN}" >/dev/null 2>&1 &
                     errno=$?
                 fi
@@ -2262,6 +2284,7 @@ function usage() {
     echo "  --sound-card <type>               : Set sound card. @Options: 'intel-hda' (default), 'ac97', 'es1370', 'sb16', 'usb-audio', 'virtio-sound-pci', 'none'"
     echo "  --sound-duplex <type>             : Set sound card duplex. @Options: 'hda-micro' (default: speaker/mic), 'hda-duplex' (line-in/line-out), 'hda-output' (output-only)"
     echo "  --extra_args <arguments>          : Pass additional arguments to qemu"
+    echo "  --paranoid                        : Disable USB redirection, USB SmartCard, SSH and folder sharing."
     echo "  --version                         : Print version"
 }
 
@@ -2492,6 +2515,10 @@ keyboard_layout="${keyboard_layout:-en-us}"
 mouse="${mouse:-tablet}"
 sound_card="${sound_card:-intel-hda}"
 sound_duplex="${sound_duplex:-hda-micro}"
+usb_redir="${usb_redir:-true}"
+usb_ccid="${usb_ccid:-true}"
+folder_sharing="${folder_sharing:-true}"
+ssh_fwd="${ssh_fwd:-true}"
 
 ACCESS=""
 ACTIONS=()
@@ -2648,6 +2675,13 @@ else
                 SHORTCUT_OPTIONS+="--spice-port ${2} "
                 spice_port="${2}"
                 shift 2;;
+            -paranoid|--paranoid)
+                SHORTCUT_OPTIONS+="--paranoid "
+                usb_redir="false"
+                usb_ccid="false"
+                folder_sharing="false"
+                ssh_fwd="false"
+                shift;;
             -public-dir|--public-dir)
                 SHORTCUT_OPTIONS+="--public-dir ${2} "
                 PUBLIC="${2}"
@@ -2823,7 +2857,7 @@ if [ -z "${VM_PID}" ]; then
     fi
 else
     echo "${VMNAME}"
-    echo " - Process:  Already running ${VM} as ${VMNAME} (${VM_PID})"
+    echo " - Process:         Already running ${VM} as ${VMNAME} (${VM_PID})"
     parse_ports_from_file
     start_viewer
 fi
