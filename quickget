@@ -2942,18 +2942,15 @@ function unattended_windows() {
           <Path>E:\qxldod\w10\amd64</Path>
         </PathAndCredentials>
         <PathAndCredentials wcm:action="add" wcm:keyValue="7">
-          <Path>E:\viogpudo\w10\amd64</Path>
-        </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
           <Path>E:\viorng\w10\amd64</Path>
         </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
           <Path>E:\NetKVM\w10\amd64</Path>
         </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
+        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
           <Path>E:\viofs\w10\amd64</Path>
         </PathAndCredentials>
-        <PathAndCredentials wcm:action="add" wcm:keyValue="11">
+        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
           <Path>E:\Balloon\w10\amd64</Path>
         </PathAndCredentials>
       </DriverPaths>
@@ -3026,6 +3023,11 @@ function unattended_windows() {
           <CommandLine>Cmd /c POWERCFG -H OFF</CommandLine>
           <Description>Disable Hibernation</Description>
           <Order>5</Order>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>pnputil /add-driver E:\viogpudo\w10\amd64\viogpudo.inf /install</CommandLine>
+          <Description>Install viogpudo driver</Description>
+          <Order>6</Order>
         </SynchronousCommand>
       </FirstLogonCommands>
     </component>
