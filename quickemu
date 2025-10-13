@@ -733,7 +733,7 @@ function configure_bios() {
             # Write destination vars file with correct extension
             # based on source format of the EFI_EXTRA_VARS file
             QCOW2VARS=$(is_firmware_qcow2 "${EFI_EXTRA_VARS}")
-            if "${QCOW2VARS}" == "true"; then
+            if ["${QCOW2VARS}" = "true"]; then
                 EFI_VARS="${VMDIR}/OVMF_VARS.qcow2"
             else
                 EFI_VARS="${VMDIR}/OVMF_VARS.fd"
@@ -1391,14 +1391,14 @@ function vm_boot() {
     # Add the disks
     # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
     if [[ "${boot}" == *"efi"* ]]; then
-        # shellcheck disable=SC2054
         QCOW2CODE=$(is_firmware_qcow2 "${EFI_CODE}")
         QCOW2VARS=$(is_firmware_qcow2 "${EFI_VARS}")
-        if "${QCOW2CODE}" == "true"; then EFI_CODE_FORMAT="qcow2"; else EFI_CODE_FORMAT="raw"; fi
-        if "${QCOW2VARS}" == "true"; then EFI_VARS_FORMAT="qcow2"; else EFI_VARS_FORMAT="raw"; fi
+        if ["${QCOW2CODE}" = "true"]; then EFI_CODE_FORMAT="qcow2"; else EFI_CODE_FORMAT="raw"; fi
+        if ["${QCOW2VARS}" = "true"]; then EFI_VARS_FORMAT="qcow2"; else EFI_VARS_FORMAT="raw"; fi
+        # shellcheck disable=SC2054
         args+=(-global driver=cfi.pflash01,property=secure,value=on
-            -drive if=pflash,format=${EFI_CODE_FORMAT},unit=0,file="${EFI_CODE}",readonly=on
-            -drive if=pflash,format=${EFI_VARS_FORMAT},unit=1,file="${EFI_VARS}")
+            -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+            -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
     fi
 
     if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
