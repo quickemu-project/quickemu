@@ -1823,6 +1823,7 @@ function fileshare_param_check() {
 
         if [ ! -d "${PUBLIC}" ]; then
             echo " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
+            PUBLIC=""
         else
             PUBLIC_TAG="Public-${USER,,}"
             PUBLIC_PERMS=$(${STAT}  -c "%A" "${PUBLIC}")
