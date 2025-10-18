@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: December 30, 2024
+date: July 31, 2025
 footer: quickemu
 header: Quickemu User Manual
 section: 1
@@ -173,7 +173,8 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 # Features
 
 - Host support for **Linux and macOS**
-- **macOS** Sonoma, Ventura, Monterey, Big Sur, Catalina & Mojave
+- **macOS** Sequoia, Sonoma, Ventura, Monterey, Big Sur, Catalina &
+  Mojave
 - **Windows** 10 and 11 including TPM 2.0
 - **Windows Server** 2022 2019 2016
 - [Ubuntu](https://ubuntu.com/desktop) and all the **[official Ubuntu
@@ -198,7 +199,7 @@ Haiku, KolibriOS, OpenIndiana, ReactOS, and more.
 ## As featured on [Linux Matters](https://linuxmatters.sh) podcast!
 
 The presenters of Linux Matters 🐧🎙️ are the creators of each of the
-principle Quickemu projects. We discussed Quickemu's 2024 reboot in
+principal Quickemu projects. We discussed Quickemu's 2024 reboot in
 [Episode 30 - Quickemu Rising From the
 Bashes](https://linuxmatters.sh/30).
 <!-- and in [Episode 32 - Quick, quicker, quickest](https://linuxmatters.sh/32) [Martin](https://github.com/flexiondotorg) unveils macOS host support for [**Quickemu**](https://github.com/quickemu-project/quickemu), [Mark](https://github.com/marxjohnson) explains the origins of the [**Quickgui**](https://github.com/quickemu-project/quickgui) desktop app and upcoming improvements, and [Alan](https://github.com/popey) debuts [**Quicktest**](https://github.com/quickemu-project/quicktest); a framework for automatically testing operating systems via Quickemu -->
@@ -240,7 +241,7 @@ requirements manually:
 - [zsync](http://zsync.moria.org.uk/)
 - [unzip](http://www.info-zip.org/UnZip.html)
 
-For Ubuntu, Arch and NixOS hosts, the
+For Ubuntu, Debian, Fedora, Arch and NixOS hosts the native packaging or
 [ppa](https://launchpad.net/~flexiondotorg/+archive/ubuntu/quickemu),
 [AUR](https://aur.archlinux.org/packages/quickemu) or
 [nix](https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/quickemu)
@@ -252,13 +253,16 @@ These examples may save a little typing:
 
 #### Install requirements on Debian hosts
 
-This also applies to derivatives:
+These should be handled by dependencies in Trixie and later. For earlier
+versions (and their derivatives):
 
 ``` shell
 sudo apt-get install bash coreutils curl genisoimage grep jq mesa-utils ovmf pciutils procps python3 qemu sed socat spice-client-gtk swtpm-tools unzip usbutils util-linux xdg-user-dirs xrandr zsync 
 ```
 
 #### Install requirements on Fedora hosts
+
+These are handled natively for Fedora 41 on. For earlier versions:
 
 ``` shell
 sudo dnf install bash coreutils curl edk2-tools genisoimage grep jq mesa-demos pciutils procps python3 qemu sed socat spice-gtk-tools swtpm unzip usbutils util-linux uuidgen-runtime xdg-user-dirs xrandr zsync
@@ -436,7 +440,6 @@ Further information is available from the project
 - `antix` (Antix)
 - `archcraft` (Archcraft)
 - `archlinux` (Arch Linux)
-- `arcolinux` (Arco Linux)
 - `artixlinux` (Artix Linux)
 - `athenaos` (Athena OS)
 - `batocera` (Batocera)
@@ -487,6 +490,7 @@ Further information is available from the project
 - `opensuse` (openSUSE)
 - `oraclelinux` (Oracle Linux)
 - `parrotsec` (Parrot Security)
+- `pclinuxos` (PCLinuxOS)
 - `peppermint` (PeppermintOS)
 - `popos` (Pop!\_OS)
 - `porteus` (Porteus)
@@ -502,7 +506,6 @@ Further information is available from the project
 - `slint` (Slint)
 - `slitaz` (SliTaz)
 - `solus` (Solus)
-- `sparkylinux` (SparkyLinux)
 - `spirallinux` (SpiralLinux)
 - `tails` (Tails)
 - `tinycore` (Tiny Core Linux)
