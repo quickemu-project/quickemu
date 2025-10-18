@@ -836,7 +836,7 @@ function releases_maboxlinux() {
 }
 
 function releases_macos() {
-    echo mojave catalina big-sur monterey ventura sonoma sequoia
+    echo mojave catalina big-sur monterey ventura sonoma sequoia tahoe
 }
 
 function releases_mageia() {
@@ -2118,6 +2118,8 @@ function get_macos() {
             BOARD_ID="Mac-827FAC58A8FDFA22";;
         sequoia|15)
             BOARD_ID="Mac-53FDB3D8DB8CA971";;
+        tahoe|26)
+            BOARD_ID="Mac-E1008331FDC96864";; # Mac-E1008331FDC96864    is MacBookPro16,1	(16-inch Late 2019)	
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
