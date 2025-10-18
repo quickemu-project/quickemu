@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: December 30, 2024
+date: September 21, 2025
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -166,7 +166,6 @@ Further information is available from the project
 - `antix` (Antix)
 - `archcraft` (Archcraft)
 - `archlinux` (Arch Linux)
-- `arcolinux` (Arco Linux)
 - `artixlinux` (Artix Linux)
 - `athenaos` (Athena OS)
 - `batocera` (Batocera)
@@ -217,6 +216,7 @@ Further information is available from the project
 - `opensuse` (openSUSE)
 - `oraclelinux` (Oracle Linux)
 - `parrotsec` (Parrot Security)
+- `pclinuxos` (PCLinuxOS)
 - `peppermint` (PeppermintOS)
 - `popos` (Pop!\_OS)
 - `porteus` (Porteus)
@@ -236,7 +236,7 @@ Further information is available from the project
 - `spirallinux` (SpiralLinux)
 - `tails` (Tails)
 - `tinycore` (Tiny Core Linux)
-- `trisquel` (Trisquel-)
+- `trisquel` (Trisquel)
 - `truenas-core` (TrueNAS Core)
 - `truenas-scale` (TrueNAS Scale)
 - `tuxedo-os` (Tuxedo OS)
