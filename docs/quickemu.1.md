@@ -75,7 +75,7 @@ You can also pass optional parameters
 :   Do not commit any changes to disk/snapshot.
 
 **--viewer \<viewer\>**
-:   Choose an alternative viewer. @Options: 'spicy' (default),
+:   Choose an alternative SPICE viewer. @Options: 'spicy' (default),
     'remote-viewer', 'none'
 
 **--width \<width\>**
@@ -784,7 +784,7 @@ Arguments
   --snapshot delete <tag>           : Delete a snapshot.
   --snapshot info                   : Show disk/snapshot info.
   --status-quo                      : Do not commit any changes to disk/snapshot.
-  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
+  --viewer <viewer>                 : Choose an alternative SPICE viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'
   --width <width>                   : Set VM screen width; requires '--height'
   --height <height>                 : Set VM screen height; requires '--width'
   --ssh-port <port>                 : Set SSH port manually

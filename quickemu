@@ -2307,7 +2307,7 @@ function usage() {
     echo "  --snapshot delete <tag>           : Delete a snapshot."
     echo "  --snapshot info                   : Show disk/snapshot info."
     echo "  --status-quo                      : Do not commit any changes to disk/snapshot."
-    echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
+    echo "  --viewer <viewer>                 : Choose an alternative SPICE viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
     echo "  --width <width>                   : Set VM screen width; requires '--height'"
     echo "  --height <height>                 : Set VM screen height; requires '--width'"
     echo "  --ssh-port <port>                 : Set SSH port manually"
