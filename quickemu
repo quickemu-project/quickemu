@@ -778,7 +778,7 @@ function configure_os_quirks() {
 
     case ${guest_os} in
         windows-server) NET_DEVICE="e1000";;
-        *bsd|linux*|windows) NET_DEVICE="virtio-net";;
+        *bsd|linux*|windows) NET_DEVICE="virtio-net-pci";;
         freedos) sound_card="sb16"
                  NET_DEVICE="pcnet";;
         *solaris) usb_controller="xhci"
@@ -796,7 +796,7 @@ function configure_os_quirks() {
                 big-sur|monterey|ventura|sonoma|sequoia)
                     BALLOON="-device virtio-balloon"
                     MAC_DISK_DEV="virtio-blk-pci"
-                    NET_DEVICE="virtio-net"
+                    NET_DEVICE="virtio-net-pci"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
                     GUEST_TWEAKS+=" -global nec-usb-xhci.msi=off"
                     sound_card="${sound_card:-usb-audio}"
@@ -1182,7 +1182,7 @@ function vm_boot() {
     MAC_BOOTLOADER=""
     MAC_MISSING=""
     MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
-    NET_DEVICE="${NET_DEVICE:-virtio-net}"
+    NET_DEVICE="${NET_DEVICE:-virtio-net-pci}"
     SOUND=""
     SPICE=""
     SMM="${SMM:-off}"
@@ -1381,7 +1381,7 @@ function vm_boot() {
         fi
 
         # shellcheck disable=SC2054,SC2206
-        args+=(-nic bridge,br=${network},model=virtio-net-pci${MAC})
+        args+=(-nic bridge,br=${network},model=${NET_DEVICE}${MAC})
     else
         echo " - Network:  User (${NET_DEVICE})"
         # shellcheck disable=SC2054,SC2206
