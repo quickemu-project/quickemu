@@ -1169,7 +1169,7 @@ function languages_windows-server() {
 }
 
 function releases_zorin() {
-    echo 17 16
+    echo 18 17 16
 }
 
 function editions_zorin() {
