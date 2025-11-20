@@ -1156,11 +1156,41 @@ function configure_tpm() {
     fi
 }
 
+function configure_cpu_pinning() {
+    if [ -z "${CORE_MAPPING}" ]; then
+        return
+    fi
+
+    GUEST_CPUS=""
+    idx=0
+    for tid_dir in /proc/"${VM_PID}"/task/*; do
+        tid=$(basename "$tid_dir")
+        name=$(cat "$tid_dir/comm")
+
+        if [[ "$name" == CPU* ]]; then
+            # Map per core, if threads are specified pin them to the same core
+            core_idx=$(( idx / GUEST_CPU_THREADS ))
+            host_cpu=${CORE_MAPPING[$core_idx]}
+
+            if (( idx % GUEST_CPU_THREADS == 0 )); then
+                [[ -n "$GUEST_CPUS" ]] && GUEST_CPUS+=","
+                GUEST_CPUS+="$core_idx"
+            fi
+
+            taskset -cp "$host_cpu" "$tid" &>/dev/null
+            idx=$((idx + 1))
+        fi
+    done
+
+    echo " - CPU Pinning: Bind guest cores to host cores (${GUEST_CPUS} -> ${CPU_PINNING})"
+}
+
 function vm_boot() {
     AUDIO_DEV=""
     BALLOON="-device virtio-balloon"
     BOOT_STATUS=""
     CPU=""
+    CORE_MAPPING=""
     DISK_USED=""
     DISPLAY_DEVICE=""
     DISPLAY_RENDER=""
@@ -1231,7 +1261,7 @@ function vm_boot() {
     # Changing process name is not supported on macOS
     if [ "${OS_KERNEL}" == "Linux" ]; then
         # shellcheck disable=SC2054,SC2206,SC2140
-        args+=(-name ${VMNAME},process=${VMNAME})
+        args+=(-name ${VMNAME},process=${VMNAME},debug-threads=on)
     fi
     # shellcheck disable=SC2054,SC2206,SC2140
     args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
@@ -1331,6 +1361,22 @@ function vm_boot() {
             args+=(-usbdevice braille)
         else
             echo " - WARNING!  ${QEMU} does not support -chardev braille "
+        fi
+    fi
+
+    # Validate input of the CPU_PINNING, pinning is not supported on macOS
+    if [ -n "${CPU_PINNING}" ] && [ "${OS_KERNEL}" == "Linux" ]; then
+        if ! [[ "${CPU_PINNING}" =~ ^[0-9]+(,[0-9]+)*$ ]]; then
+            echo " - ERROR!  Couldn't parse CPU pinning: '${CPU_PINNING}', only comma-separated list is supported"
+            exit 1
+        fi
+
+        IFS=',' read -r -a CORE_MAPPING <<< "$CPU_PINNING"
+
+        NUM_CORE_MAPPING=${#CORE_MAPPING[@]}
+        if [ "$NUM_CORE_MAPPING" -ne "$GUEST_CPU_LOGICAL_CORES" ]; then
+            echo " - ERROR!  Number of host cores for pinning should be equal to VM core count ($NUM_CORE_MAPPING != $GUEST_CPU_LOGICAL_CORES)"
+            exit 1
         fi
     fi
 
@@ -1579,6 +1625,7 @@ function vm_boot() {
         sleep 0.25
         if kill -0 "${VM_PID}" 2>/dev/null; then
             echo " - Process:  Started ${VM} as ${VMNAME} (${VM_PID})"
+            configure_cpu_pinning
         else
             echo " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
             rm -f "${VMDIR}/${VMNAME}.pid"
@@ -1662,6 +1709,7 @@ function usage() {
     echo "Arguments"
     echo "  --access                          : Enable remote spice access support. 'local' (default), 'remote', 'clientipaddress'"
     echo "  --braille                         : Enable braille support. Requires SDL."
+    echo "  --cpu-pinning                     : Choose which host cores correspond to which guest cores."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"
     echo "  --delete-vm                       : Delete the entire VM and its configuration"
     echo "  --display                         : Select display backend. 'sdl' (default), 'cocoa', 'gtk', 'none', 'spice' or 'spice-app'"
@@ -1931,6 +1979,7 @@ sound_duplex="${sound_duplex:-hda-micro}"
 ACCESS=""
 ACTIONS=()
 BRAILLE=""
+CPU_PINNING=""
 FULLSCREEN=""
 MONITOR_CMD=""
 PUBLIC=""
@@ -1997,6 +2046,10 @@ else
                 SHORTCUT_OPTIONS+="--braille "
                 BRAILLE="on"
                 shift;;
+            -cpu-pinning|--cpu-pinning)
+                SHORTCUT_OPTIONS+="--cpu-pinning ${2} "
+                CPU_PINNING=${2}
+                shift 2;;
             -delete|--delete|-delete-disk|--delete-disk)
                 ACTIONS+=(delete_disk)
                 shift;;
