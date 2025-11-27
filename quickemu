@@ -370,7 +370,7 @@ function configure_cpu() {
         *) HYPERVISOR="";;
     esac
 
-    if [ -z "${HYPERVISOR}" ]; then
+    if [ -z "${HYPERVISOR}" ] && [ "${QEMU_ACCEL}" != "tcg" ]; then
         # A CPU with Intel VT-x / AMD SVM support is required
         if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
             if ! check_cpu_flag vmx; then
@@ -426,7 +426,12 @@ function configure_cpu() {
             case ${macos_release} in
                 ventura|sonoma|sequoia)
                     # A CPU with AVX2 support is required for >= macOS Ventura
-                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
+                    if [ "${QEMU_ACCEL}" == "tcg" ]; then
+                        # TCG can emulate these features
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+avx2,+sse4.2"
+                        fi
+                    elif check_cpu_flag sse4_2 && check_cpu_flag avx2; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU+=",+avx2,+sse4.2"
                         fi
@@ -437,7 +442,12 @@ function configure_cpu() {
                     fi;;
                 catalina|big-sur|monterey)
                     # A CPU with SSE4.2 support is required for >= macOS Catalina
-                    if check_cpu_flag sse4_2; then
+                    if [ "${QEMU_ACCEL}" == "tcg" ]; then
+                        # TCG can emulate this feature
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.2"
+                        fi
+                    elif check_cpu_flag sse4_2; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU+=",+sse4.2"
                         fi
@@ -447,7 +457,12 @@ function configure_cpu() {
                     fi;;
                 *)
                     # A CPU with SSE4.1 support is required for >= macOS Sierra
-                    if check_cpu_flag sse4_1; then
+                    if [ "${QEMU_ACCEL}" == "tcg" ]; then
+                        # TCG can emulate this feature
+                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                            CPU+=",+sse4.1"
+                        fi
+                    elif check_cpu_flag sse4_1; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                             CPU+=",+sse4.1"
                         fi
