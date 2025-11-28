@@ -32,6 +32,7 @@ function os_info() {
         alpine)           INFO="Alpine Linux|-|https://alpinelinux.org/|Security-oriented, lightweight Linux distribution based on musl libc and busybox.";;
         android)          INFO="Android x86|-|https://www.android-x86.org/|Port Android Open Source Project to x86 platform.";;
         antix)            INFO="Antix|-|https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
+        archboot)         INFO="Archboot|-|https://archboot.com/|Advanced Arch Linux boot/install ISO with aarch64, riscv64, and x86_64 support.";;
         archcraft)        INFO="Archcraft|-|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
         archlinux)        INFO="Arch Linux|-|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
         arcolinux)        INFO="Arco Linux|-|https://arcolinux.com/|Is all about becoming an expert in linux.";;
@@ -426,6 +427,7 @@ function os_support() {
     alpine \
     android \
     antix \
+    archboot \
     archcraft \
     archlinux \
     arcolinux \
@@ -557,6 +559,14 @@ function releases_antix() {
 
 function editions_antix() {
     echo net-sysv core-sysv base-sysv full-sysv net-runit core-runit base-runit full-runit
+}
+
+function releases_archboot() {
+    echo latest
+}
+
+function editions_archboot() {
+    echo default latest local
 }
 
 function releases_archcraft() {
@@ -1445,12 +1455,32 @@ function make_vm_config() {
 
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
+        
+        # Detect architecture from filename or use HOST_ARCH
+        local ARCH_HINT=""
+        if [[ "${IMAGE_FILE}" =~ (aarch64|arm64) ]]; then
+            ARCH_HINT="aarch64"
+        elif [[ "${IMAGE_FILE}" =~ (riscv64) ]]; then
+            ARCH_HINT="riscv64"
+        elif [ "${HOST_ARCH}" == "aarch64" ] && [ "${OS}" != "macos" ] && [ "${OS}" != "windows"* ]; then
+            # Use host architecture for Linux guests when available
+            case "${OS}" in
+                archboot|alpine|debian|fedora|ubuntu*) ARCH_HINT="aarch64";;
+            esac
+        fi
+        
         cat << EOF > "${CONF_FILE}"
 #!${QUICKEMU} --vm
 guest_os="${GUEST}"
 disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
+        
+        # Add architecture if detected
+        if [ -n "${ARCH_HINT}" ]; then
+            echo "arch=\"${ARCH_HINT}\"" >> "${CONF_FILE}"
+        fi
+        
         echo " - Setting ${CONF_FILE} executable"
         chmod u+x "${CONF_FILE}"
         if [ -n "${ISO_FILE}" ]; then
@@ -1625,6 +1655,34 @@ function get_antix() {
     echo "${URL}/${ISO} ${HASH}"
 }
 
+function get_archboot() {
+    local HASH=""
+    local ISO=""
+    local URL="https://release.archboot.com"
+    local LATEST_URL="${URL}/${HOST_ARCH}/latest/iso"
+    local ISO_PATTERN="${EDITION}"
+    
+    # Adjust pattern: "default" edition doesn't have a suffix in filename
+    if [ "${EDITION}" == "default" ]; then
+        ISO_PATTERN="ARCH-aarch64.iso\""
+    else
+        ISO_PATTERN="${EDITION}-${HOST_ARCH}.iso\""
+    fi
+    
+    # Get the ISO filename from the iso directory
+    ISO=$(web_pipe "${LATEST_URL}/" | grep -o 'href="[^"]*\.iso"' | grep "${ISO_PATTERN}" | head -n 1 | cut -d'"' -f2 | sed 's|.*/||')
+    
+    if [ -z "${ISO}" ]; then
+        echo "ERROR! Could not find Archboot ${EDITION} ISO for ${HOST_ARCH}"
+        exit 1
+    fi
+    
+    # Get the b2sum hash from the parent directory's b2sum.txt
+    HASH=$(web_pipe "${URL}/${HOST_ARCH}/latest/b2sum.txt" | grep "iso/${ISO}" | awk '{print $1}')
+    
+    echo "${LATEST_URL}/${ISO} ${HASH}"
+}
+
 function get_archcraft() {
     local HASH=""
     local URL=""
@@ -1762,11 +1820,19 @@ function get_crunchbang++() {
 function get_debian() {
     local DEBCURRENT=""
     local HASH=""
-    local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
-    local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid"
+    local DEBIAN_ARCH="${HOST_ARCH}"
+    
+    # Convert architecture names to Debian's format
+    case "${HOST_ARCH}" in
+        aarch64) DEBIAN_ARCH="arm64";;
+        x86_64) DEBIAN_ARCH="amd64";;
+    esac
+    
+    local ISO="debian-live-${RELEASE}-${DEBIAN_ARCH}-${EDITION}.iso"
+    local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/${DEBIAN_ARCH}/iso-hybrid"
     DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     case "${RELEASE}" in
-        "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+        "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/${DEBIAN_ARCH}/iso-hybrid";;
     esac
     if [ "${EDITION}" == "netinst" ]; then
         URL="${URL/-live/}"

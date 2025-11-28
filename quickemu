@@ -349,8 +349,8 @@ function configure_cpu() {
         # Support to run aarch64 VMs (best guess; untested)
         # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
         case ${ARCH_HOST} in
-            arm64|aarch64) CPU_MODEL="max"
-                           MACHINE_TYPE="virt,highmem=off";;
+            arm64|aarch64) CPU_MODEL="cortex-a72"
+                           MACHINE_TYPE="virt,highmem=on";;
         esac
     elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
         # If the architecture of the VM is different from the host, disable acceleration
@@ -685,38 +685,64 @@ function configure_bios() {
         if [ "${OS_KERNEL}" == "Darwin" ]; then
             # Do not assume brew; quickemu could have been installed via Nix
             if command -v brew &>/dev/null; then
-                SHARE_PATH="$(brew --prefix qemu)/share"
+                # Detect qemu installation by checking the actual binary path
+                local QEMU_PATH="$(command -v qemu-system-x86_64 || command -v qemu-system-aarch64)"
+                if [ -n "${QEMU_PATH}" ]; then
+                    # Extract the Cellar path and find the share directory
+                    SHARE_PATH="$(dirname "$(dirname "${QEMU_PATH}")")/share"
+                else
+                    # Fall back to brew --prefix qemu
+                    SHARE_PATH="$(brew --prefix qemu 2>/dev/null)/share"
+                fi
             fi
         fi
 
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
         # TODO: Check if macOS should use 'edk2-i386-vars.fd'
         if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
-            case ${secureboot} in
-                on) # shellcheck disable=SC2054,SC2140
-                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.ms.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.secboot.fd" \
-                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
-                        "${SHARE_PATH}/qemu/edk2-x86_64-secure-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2/x64/OVMF_CODE.secboot.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.secboot.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.secboot.qcow2"
-                    );;
-                *)  # shellcheck disable=SC2054,SC2140
-                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/OVMF/OVMF_CODE.fd","${SHARE_PATH}/OVMF/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/qemu/ovmf-x86_64-4m-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-4m-vars.bin" \
-                        "${SHARE_PATH}/qemu/edk2-x86_64-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2/x64/OVMF_CODE.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.qcow2"
-                    );;
-            esac
+            # Architecture-specific firmware paths
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                # ARM64/AArch64 firmware (AAVMF)
+                case ${secureboot} in
+                    on) # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/qemu/edk2-aarch64-secure-code.fd","${SHARE_PATH}/qemu/edk2-aarch64-code.fd" \
+                            "${SHARE_PATH}/AAVMF/AAVMF_CODE.secboot.fd","${SHARE_PATH}/AAVMF/AAVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-aarch64/AAVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-aarch64/AAVMF_VARS.fd"
+                        );;
+                    *)  # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/qemu/edk2-aarch64-code.fd","${SHARE_PATH}/qemu/edk2-aarch64-code.fd" \
+                            "${SHARE_PATH}/AAVMF/AAVMF_CODE.fd","${SHARE_PATH}/AAVMF/AAVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-aarch64/AAVMF_CODE.fd","${SHARE_PATH}/edk2-aarch64/AAVMF_VARS.fd"
+                        );;
+                esac
+            else
+                # x86_64 firmware (OVMF)
+                case ${secureboot} in
+                    on) # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.ms.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.secboot.fd" \
+                            "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
+                            "${SHARE_PATH}/qemu/edk2-x86_64-secure-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2/x64/OVMF_CODE.secboot.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.secboot.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.secboot.qcow2"
+                        );;
+                    *)  # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/OVMF/OVMF_CODE.fd","${SHARE_PATH}/OVMF/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/OVMF/x64/OVMF_CODE.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/qemu/ovmf-x86_64-4m-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-4m-vars.bin" \
+                            "${SHARE_PATH}/qemu/edk2-x86_64-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2/x64/OVMF_CODE.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.qcow2"
+                        );;
+                esac
+            fi
             # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
             # when an existing file is found.
             _IFS=$IFS
@@ -921,6 +947,74 @@ function configure_storage() {
     fi
 }
 
+function check_display_gl_support() {
+    local display_backend="${1}"
+    local gl_mode="${2:-on}"
+    
+    # For cocoa backend with gl=es, check if QEMU is built with ANGLE support
+    # ANGLE provides OpenGL ES implementation on macOS via libEGL and libGLESv2
+    if [ "${display_backend}" = "cocoa" ] && [ "${gl_mode}" = "es" ]; then
+        # Method 1: Check for ANGLE library files (fast, reliable)
+        if command -v otool >/dev/null 2>&1; then
+            local qemu_dir=$(dirname "${QEMU}")
+            local qemu_prefix="${qemu_dir%/bin}"
+            
+            # Common ANGLE library locations
+            local angle_paths=(
+                "${qemu_prefix}/lib/libEGL.dylib"
+                "${qemu_prefix}/lib/libGLESv2.dylib"
+                "/opt/homebrew/lib/libEGL.dylib"
+                "/opt/homebrew/lib/libGLESv2.dylib"
+                "/usr/local/lib/libEGL.dylib"
+                "/usr/local/lib/libGLESv2.dylib"
+            )
+            
+            # Also check Homebrew Cellar for libangle
+            if [ -d "/opt/homebrew/Cellar/libangle" ]; then
+                angle_paths+=("/opt/homebrew/Cellar/libangle"/*/lib/libEGL.dylib)
+            fi
+            
+            # If any ANGLE library exists, gl=es is likely supported
+            for lib in "${angle_paths[@]}"; do
+                if [ -f "$lib" ]; then
+                    # Method 2: Confirm with dbus display test (additional verification)
+                    # dbus backend explicitly supports gl= option and can test without spawning windows
+                    # Note: On macOS, dbus may fail with "egl: not available" which is fine - we only
+                    # care if it rejects the gl=es parameter itself
+                    local dbus_test=$("${QEMU}" -M none -display "dbus,gl=es" 2>&1)
+                    if echo "$dbus_test" | grep -qi "Parameter 'gl' does not accept value 'es'"; then
+                        # QEMU explicitly rejects gl=es parameter
+                        return 1
+                    fi
+                    # ANGLE libraries found and gl=es parameter accepted (even if dbus backend fails for other reasons)
+                    return 0
+                fi
+            done
+        fi
+        
+        # If no ANGLE libraries found, gl=es not supported
+        return 1
+    fi
+    
+    # For other GL modes (on, core) or other display backends, test with QEMU
+    # Use dbus display for testing as it doesn't spawn windows
+    local tmpfile=$(mktemp)
+    "${QEMU}" -M none -display "dbus,gl=${gl_mode}" >"$tmpfile" 2>&1 &
+    local qemu_pid=$!
+    
+    sleep 0.1
+    kill -9 $qemu_pid 2>/dev/null
+    wait $qemu_pid 2>/dev/null
+    
+    local test_output=$(cat "$tmpfile" 2>/dev/null)
+    rm -f "$tmpfile"
+    
+    if echo "$test_output" | grep -qi "invalid parameter\|not supported\|does not have opengl\|unrecognized option"; then
+        return 1
+    fi
+    return 0
+}
+
 function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
@@ -956,7 +1050,12 @@ function configure_display() {
         linux)
             case ${display} in
                 none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
-                *) DISPLAY_DEVICE="virtio-vga";;
+                *)  # ARM64 uses virtio-gpu-pci, x86 uses virtio-vga
+                    if [ "${ARCH_VM}" == "aarch64" ]; then
+                        DISPLAY_DEVICE="virtio-gpu-pci"
+                    else
+                        DISPLAY_DEVICE="virtio-vga"
+                    fi;;
             esac;;
         macos)
             # qxl-vga and VGA supports seamless mouse and sane resolutions if only
@@ -979,17 +1078,47 @@ function configure_display() {
         none|spice) DISPLAY_RENDER="none";;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
         spice-app)  DISPLAY_RENDER="${display},gl=${gl}";;
+        cocoa)      # macOS: prefer OpenGL ES (ANGLE) for stability and performance
+                    # https://gist.github.com/akihikodaki/87df4149e7ca87f18dc56807ec5a1bc5
+                    if [ "${gl}" == "on" ]; then
+                        # Check if QEMU was compiled with OpenGL support
+                        if check_display_gl_support "cocoa" "es"; then
+                            DISPLAY_RENDER="${display},gl=es"
+                            gl="es"  # Update gl variable to reflect actual mode
+                        elif check_display_gl_support "cocoa" "on"; then
+                            DISPLAY_RENDER="${display},gl=on"
+                        else
+                            # QEMU not compiled with OpenGL support, disable GL
+                            DISPLAY_RENDER="${display}"
+                            gl="off"
+                        fi
+                    else
+                        DISPLAY_RENDER="${display}"
+                    fi;;
         *)          DISPLAY_RENDER="${display}";;
     esac
 
     # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
-    if [ "${gl}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
-            DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
+    if [ "${gl}" != "off" ] && [[ "${DISPLAY_DEVICE}" =~ ^virtio-(vga|gpu-pci)$ ]]; then
+        # Check if GL variant is available
+        # Note: virtio-gpu-pci becomes virtio-gpu-gl-pci (not virtio-gpu-pci-gl)
+        local GL_DEVICE=""
+        if [ "${DISPLAY_DEVICE}" == "virtio-gpu-pci" ]; then
+            GL_DEVICE="virtio-gpu-gl-pci"
+        else
+            GL_DEVICE="${DISPLAY_DEVICE}-gl"
+        fi
+        
+        if "${QEMU}" -device help 2>&1 | grep -q "\"${GL_DEVICE}\""; then
+            DISPLAY_DEVICE="${GL_DEVICE}"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+        elif [ "${QEMU_VER_SHORT}" -ge 61 ]; then
+            DISPLAY_DEVICE="${GL_DEVICE}"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
         else
             DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
         fi
-        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
     else
         echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
     fi
@@ -998,9 +1127,12 @@ function configure_display() {
     VIDEO="-device ${DISPLAY_DEVICE}"
 
     # Try and coerce the display resolution for Linux guests only.
-    if [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
+    # Check if the device supports xres/yres parameters
+    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|gpu-pci|gpu-gl-pci|vga-gl)|qxl|qxl-vga|bochs-display)$ ]] || [[ "${DISPLAY_DEVICE}" =~ ,virgl=on ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
+    elif [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
+        echo " "
     else
         echo " "
     fi
@@ -1024,8 +1156,8 @@ function configure_display() {
     # https://github.com/quickemu-project/quickemu/issues/222
     VGA="-vga none"
 
-    # Add fullscreen options
-    VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
+    # Add fullscreen options and any extra video devices
+    VIDEO="${VGA} ${VIDEO} ${VIDEO_EXTRA} ${FULLSCREEN}"
 }
 
 function configure_audio() {
@@ -1193,7 +1325,16 @@ function vm_boot() {
     KERNEL_NODE=""
     KERNEL_VER="?"
     OS_RELEASE="Unknown OS"
-    MACHINE_TYPE="${MACHINE_TYPE:-q35}"
+    
+    # Set architecture-specific machine type defaults
+    if [ "${ARCH_VM}" == "aarch64" ]; then
+        MACHINE_TYPE="${MACHINE_TYPE:-virt,highmem=on}"
+    elif [ "${ARCH_VM}" == "riscv64" ]; then
+        MACHINE_TYPE="${MACHINE_TYPE:-virt}"
+    else
+        MACHINE_TYPE="${MACHINE_TYPE:-q35}"
+    fi
+    
     MAC_BOOTLOADER=""
     MAC_MISSING=""
     MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
@@ -1249,10 +1390,18 @@ function vm_boot() {
         args+=(-name ${VMNAME},process=${VMNAME})
     fi
     # shellcheck disable=SC2054,SC2206,SC2140
-    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
-        ${CPU} ${SMP}
-        -m ${RAM_VM} ${BALLOON}
-        -pidfile "${VMDIR}/${VMNAME}.pid")
+    # SMM is x86-only, don't add it for ARM64/RISC-V
+    if [ "${ARCH_VM}" == "x86_64" ] || [ "${ARCH_VM}" == "i386" ]; then
+        args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+            ${CPU} ${SMP}
+            -m ${RAM_VM} ${BALLOON}
+            -pidfile "${VMDIR}/${VMNAME}.pid")
+    else
+        args+=(-machine ${MACHINE_TYPE},accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+            ${CPU} ${SMP}
+            -m ${RAM_VM} ${BALLOON}
+            -pidfile "${VMDIR}/${VMNAME}.pid")
+    fi
 
     if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ] || [ "${guest_os}" == "reactos" ] || [ "${guest_os}" == "freedos" ]; then
         # shellcheck disable=SC2054
@@ -1411,9 +1560,15 @@ function vm_boot() {
         if [ "${QCOW2CODE}" = "true" ]; then EFI_CODE_FORMAT="qcow2"; else EFI_CODE_FORMAT="raw"; fi
         if [ "${QCOW2VARS}" = "true" ]; then EFI_VARS_FORMAT="qcow2"; else EFI_VARS_FORMAT="raw"; fi
         # shellcheck disable=SC2054
-        args+=(-global driver=cfi.pflash01,property=secure,value=on
-            -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
-            -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+        # Only add secure boot flag when explicitly enabled via secureboot="on"
+        if [ "${secureboot}" == "on" ]; then
+            args+=(-global driver=cfi.pflash01,property=secure,value=on
+                -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+                -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+        else
+            args+=(-drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+                -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+        fi
     fi
 
     if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
@@ -1430,6 +1585,20 @@ function vm_boot() {
         # shellcheck disable=SC2054
         args+=(-boot order=d
             -drive if=ide,index=2,media=cdrom,file="${iso}")
+        iso=""
+    elif [ -n "${iso}" ] && [ "${guest_os}" == "linux" ] && [ "${ARCH_VM}" == "aarch64" ]; then
+        # For ARM64 Linux guests with EFI boot, use bootindex to ensure CD-ROM boots first
+        # The -cdrom shorthand with -boot order=d doesn't work reliably when disk is attached
+        # shellcheck disable=SC2054
+        args+=(-device virtio-scsi-pci,id=scsi0
+            -device scsi-cd,bus=scsi0.0,drive=cdrom0,bootindex=1
+            -drive id=cdrom0,if=none,format=raw,readonly=on,file="${iso}")
+        iso=""
+    elif [ -n "${iso}" ] && [ "${guest_os}" == "linux" ]; then
+        # For x86 Linux guests with EFI boot, use -cdrom and explicit boot order
+        # shellcheck disable=SC2054
+        args+=(-cdrom "${iso}"
+            -boot order=d)
         iso=""
     elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
         # Attach the unattended configuration to Windows guests when booting from ISO
@@ -1491,9 +1660,16 @@ function vm_boot() {
             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
 
     else
-        # shellcheck disable=SC2054,SC2206
-        args+=(-device virtio-blk-pci,drive=SystemDisk
-            -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        # For ARM64 Linux with ISO boot, add bootindex=2 to disk so CD-ROM (bootindex=1) boots first
+        if [ "${guest_os}" == "linux" ] && [ "${ARCH_VM}" == "aarch64" ] && [ "${DISK_USED}" != "yes" ]; then
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device virtio-blk-pci,drive=SystemDisk,bootindex=2
+                -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        else
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device virtio-blk-pci,drive=SystemDisk
+                -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        fi
     fi
 
     # https://wiki.qemu.org/Documentation/9psetup
@@ -1744,10 +1920,8 @@ function display_param_check() {
         fi
     fi
 
-    # Disable GL for cocoa
     # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
     case "${display}" in
-        cocoa) gl="off";;
         sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
     esac
 }
@@ -1903,6 +2077,7 @@ function monitor_send_cmd {
 ### MAIN
 
 # Lowercase variables are used in the VM config file only
+arch="${arch:-x86_64}"
 boot="efi"
 cpu_cores=""
 disk_format="${disk_format:-qcow2}"
@@ -1968,8 +2143,8 @@ readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="4.9.8"
 
-# TODO: Make this run the native architecture binary
-ARCH_VM="x86_64"
+# Set VM architecture from config or default to x86_64
+ARCH_VM="${arch}"
 ARCH_HOST=$(uname -m)
 QEMU=$(command -v qemu-system-${ARCH_VM})
 QEMU_IMG=$(command -v qemu-img)
@@ -2159,6 +2334,14 @@ fi
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # shellcheck source=/dev/null
     source "${VM}"
+    
+    # Update ARCH_VM from config if specified
+    ARCH_VM="${arch}"
+    QEMU=$(command -v qemu-system-${ARCH_VM})
+    if [ ! -x "${QEMU}" ]; then
+        echo "ERROR! qemu-system-${ARCH_VM} not found. Please install it for ${ARCH_VM} architecture support."
+        exit 1
+    fi
 
     VMDIR=$(dirname "${disk_img}")          # directory the VM disk and state files are stored
     VMNAME=$(basename "${VM}" .conf)        # name of the VM
