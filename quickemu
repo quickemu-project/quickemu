@@ -349,7 +349,7 @@ function configure_cpu() {
         # Support to run aarch64 VMs (best guess; untested)
         # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
         case ${ARCH_HOST} in
-            arm64|aarch64) CPU_MODEL="cortex-a72"
+            arm64|aarch64) CPU_MODEL="max"
                            MACHINE_TYPE="virt,highmem=on";;
         esac
     elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
