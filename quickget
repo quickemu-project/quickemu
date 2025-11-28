@@ -8,6 +8,14 @@ export LC_ALL=C
 # Detect host OS for checksum tool compatibility
 HOST_OS=$(uname -s)
 
+# Detect host architecture for automatic architecture selection
+HOST_ARCH=$(uname -m)
+# Normalize architecture names
+case "${HOST_ARCH}" in
+    arm64) HOST_ARCH="aarch64";;
+    x86_64|amd64) HOST_ARCH="x86_64";;
+esac
+
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
@@ -730,9 +738,9 @@ function releases_fedora() {
 function editions_fedora() {
     #shellcheck disable=SC2046,SC2005
     if [[ -z ${RELEASE} ]]; then
-          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+          echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"${HOST_ARCH}\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
     else
-        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"x86_64\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
+        echo $(web_pipe "https://getfedora.org/releases.json" | jq -r "map(select(.arch==\"${HOST_ARCH}\" and .version==\"${RELEASE/_/ }\" and .variant!=\"Labs\" and .variant!=\"IoT\" and .variant!=\"Container\" and .variant!=\"Cloud\" and .variant!=\"Everything\"  and .subvariant!=\"Security\" and .subvariant!=\"Server_KVM\" and .subvariant!=\"SoaS\")) | map(.subvariant) | unique | .[]")
     fi
 }
 
@@ -1564,10 +1572,10 @@ function get_alma() {
 function get_alpine() {
     local HASH=""
     local ISO=""
-    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
+    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/${HOST_ARCH}"
     local VERSION=""
     VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
-    ISO="alpine-virt-${VERSION}-x86_64.iso"
+    ISO="alpine-virt-${VERSION}-${HOST_ARCH}.iso"
     HASH=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1896,7 +1904,7 @@ function get_fedora() {
     # shellcheck disable=SC2086
     # Fedora may promote variants from Spins to Editions, in which case we want to accept either "Spins" or the specific edition name to preserve backwards compatibility
     # For example, Fedora 42 KDE is now an edition, while previous releases are spins
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="'"${HOST_ARCH}"'" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -2627,6 +2635,13 @@ function get_ubuntu-server() {
     local ISO=""
     local NAME="live-server"
     local URL=""
+    local UBUNTU_ARCH="${HOST_ARCH}"
+
+    # Convert architecture names to Ubuntu's format
+    case "${HOST_ARCH}" in
+        aarch64) UBUNTU_ARCH="arm64";;
+        x86_64) UBUNTU_ARCH="amd64";;
+    esac
 
     if [[ "${RELEASE}" == "daily"* ]]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
@@ -2639,11 +2654,11 @@ function get_ubuntu-server() {
     esac
 
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep "${UBUNTU_ARCH}" | grep iso | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep "${UBUNTU_ARCH}" | grep iso | tail -n 1 )
         ISO=$(cut -d' ' -f3 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
@@ -2662,6 +2677,13 @@ function get_ubuntu() {
     local HASH=""
     local URL=""
     local DATA=""
+    local UBUNTU_ARCH="${HOST_ARCH}"
+
+    # Convert architecture names to Ubuntu's format
+    case "${HOST_ARCH}" in
+        aarch64) UBUNTU_ARCH="arm64";;
+        x86_64) UBUNTU_ARCH="amd64";;
+    esac
 
     if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
@@ -2683,11 +2705,11 @@ function get_ubuntu() {
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep "${UBUNTU_ARCH}" | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
         HASH=$(cut -d' ' -f1 <<<"${DATA}" | sed '1q;d')
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep "${UBUNTU_ARCH}" | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
