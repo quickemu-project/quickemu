@@ -26,7 +26,6 @@ function os_info() {
         antix)            INFO="Antix|-|https://antixlinux.com/|Fast, lightweight and easy to install systemd-free linux live CD distribution based on Debian Stable for Intel-AMD x86 compatible systems.";;
         archcraft)        INFO="Archcraft|-|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
         archlinux)        INFO="Arch Linux|-|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
-        arcolinux)        INFO="Arco Linux|-|https://arcolinux.com/|Is all about becoming an expert in linux.";;
         artixlinux)       INFO="Artix Linux|-|https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
         athenaos)         INFO="Athena OS|-|https://athenaos.org/|Offer a different experience than the most used pentesting distributions by providing only tools that fit with the user needs and improving the access to hacking resources and learning materials.";;
         batocera)         INFO="Batocera|-|https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
@@ -420,7 +419,6 @@ function os_support() {
     antix \
     archcraft \
     archlinux \
-    arcolinux \
     artixlinux \
     athenaos \
     batocera \
@@ -557,15 +555,6 @@ function releases_archcraft() {
 
 function releases_archlinux() {
     echo latest
-}
-
-function releases_arcolinux() {
-    #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://ant.seedhost.eu/arcolinux/iso/" | grep -o -E -e "v[[:digit:]]{2}.[[:digit:]]{2}.[[:digit:]]{2}" | sort -ru | head -n 5)
-}
-
-function editions_arcolinux() {
-    echo net plasma pro
 }
 
 function releases_artixlinux() {
@@ -1632,16 +1621,6 @@ function get_archlinux() {
     ISO=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].iso_url')
     HASH=$(web_pipe "https://archlinux.org/releng/releases/json/" | jq -r '.releases[0].sha256_sum')
     echo "${URL}${ISO} ${HASH}"
-}
-
-function get_arcolinux() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-    URL="https://ant.seedhost.eu/arcolinux/iso/${RELEASE}"
-    ISO="arco${EDITION}-${RELEASE}-x86_64.iso"
-    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
-    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_artixlinux() {
