@@ -60,6 +60,7 @@ function os_info() {
         holoiso)          INFO="HoloISO|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
         kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
         kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
+        kdelinux)         INFO="KDE Linux|-|https://kde.org/linux/|A free Linux-based operating system built by KDE.";;
         kolibrios)        INFO="KolibriOS|-|https://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
         kubuntu)          INFO="Kubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
         linuxlite)        INFO="Linux Lite|-|https://www.linuxliteos.com/|Your first simple, fast and free stop in the world of Linux.";;
@@ -454,6 +455,7 @@ function os_support() {
     holoiso \
     kali \
     kdeneon \
+    kdelinux \
     kolibrios \
     kubuntu \
     linuxlite \
@@ -801,6 +803,10 @@ function releases_kali() {
 
 function releases_kdeneon() {
     echo user testing unstable developer
+}
+
+function releases_kdelinux() {
+    echo latest
 }
 
 function releases_kolibrios() {
@@ -1476,6 +1482,15 @@ EOF
                 echo "disk_size=\"2G\"" >> "${CONF_FILE}"
                 echo "ram=\"128M\"" >> "${CONF_FILE}"
                 ;;
+            kdelinux)
+                # The installer image is a .raw file
+                echo "#!/usr/local/bin/quickemu --vm" > "${CONF_FILE}"
+                echo "guest_os=\"linux\"" >> "${CONF_FILE}"
+                qemu-img create -f qcow2 kdelinux-latest/disk.qcow2 50G
+                qemu-img convert -O qcow2 kdelinux-latest/kde-linux_* kdelinux-latest/kdelinux-installer.qcow2 # Convert the .raw file to a bootable .qcow2 file
+                echo "disk_img=\"kdelinux-latest/kdelinux-installer.qcow2\"" >> "${CONF_FILE}"
+                echo "extra_args=\"-drive file=kdelinux-latest/disk.qcow2,format=qcow2\"" >> "${CONF_FILE}"
+                ;;
             slint)
                 echo "disk_size=\"50G\"" >> "${CONF_FILE}"
                 ;;
@@ -2015,6 +2030,15 @@ function get_kdeneon() {
     local URL="https://files.kde.org/neon/images/${RELEASE}/current"
     ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
     HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_kdelinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://files.kde.org/kde-linux"
+    ISO=$(curl -s "${URL}/?C=M;O=D" | grep -o 'kde-linux_[0-9]\{12\}\.raw' | head -n1)
+    HASH=$(web_pipe "${URL}/SHA256SUMS" | grep "$ISO" | awk '{print $1}')
     echo "${URL}/${ISO} ${HASH}"
 }
 
