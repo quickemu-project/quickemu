@@ -705,7 +705,7 @@ function releases_easyos() {
 
 
 function releases_elementary() {
-    echo 8.0 7.1 7.0
+    echo 8.1 8.0 7.1 7.0
 }
 
 function releases_endeavouros() {
@@ -1825,12 +1825,18 @@ function get_easyos() {
 
 function get_elementary() {
     local HASH=""
+    local STAMP
     case ${RELEASE} in
-        7.0) STAMP="20230129rc";;
-        7.1) STAMP="20230926rc";;
-        8.0) STAMP="20241122rc";;
+        7.0) STAMP=".20230129rc";;
+        7.1) STAMP=".20230926rc";;
+        8.0) STAMP=".20241122rc";;
+        8.1)
+            STAMP="-amd64.20251211"
+            HASH="eee6cad081664717681bec767fbfe1aa1fd920938fedad6c83b41fd341e8f306"
+            ;;
     esac
-    local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
+
+    local ISO="elementaryos-${RELEASE}-stable${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
 }
