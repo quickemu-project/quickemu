@@ -705,7 +705,7 @@ function releases_easyos() {
 
 
 function releases_elementary() {
-    echo 8.0 7.1 7.0
+    echo 8.1 8.0 7.1 7.0
 }
 
 function releases_endeavouros() {
@@ -1521,6 +1521,13 @@ EOF
                     echo "cpu_cores=2" >> "${CONF_FILE}"
                 fi
                 ;;
+            elementary)
+                case "${RELEASE}" in
+                    8.1)
+                        echo "display=\"spice\"" >> "${CONF_FILE}"
+                        ;;
+                esac
+                ;;
             proxmox-ve)
                 echo "disk_size=\"20G\"" >> "${CONF_FILE}"
                 echo "ram=\"4G\"" >> "${CONF_FILE}"
@@ -1824,13 +1831,21 @@ function get_easyos() {
 }
 
 function get_elementary() {
+    # Hash and ISO filename can be obtained from the below URL
+    # https://elementary.io/docs/installation#verify-your-download
     local HASH=""
+    local STAMP
     case ${RELEASE} in
-        7.0) STAMP="20230129rc";;
-        7.1) STAMP="20230926rc";;
-        8.0) STAMP="20241122rc";;
+        7.0) STAMP=".20230129rc";;
+        7.1) STAMP=".20230926rc";;
+        8.0) STAMP=".20241122rc";;
+        8.1)
+            STAMP="-amd64.20251211"
+            HASH="eee6cad081664717681bec767fbfe1aa1fd920938fedad6c83b41fd341e8f306"
+            ;;
     esac
-    local ISO="elementaryos-${RELEASE}-stable.${STAMP}.iso"
+
+    local ISO="elementaryos-${RELEASE}-stable${STAMP}.iso"
     local URL="https://ams3.dl.elementary.io/download"
     echo "${URL}/$(date +%s | base64)/${ISO} ${HASH}"
 }
