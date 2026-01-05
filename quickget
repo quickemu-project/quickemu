@@ -1521,6 +1521,13 @@ EOF
                     echo "cpu_cores=2" >> "${CONF_FILE}"
                 fi
                 ;;
+            elementary)
+                case "${RELEASE}" in
+                    8.1)
+                        echo "display=\"spice\"" >> "${CONF_FILE}"
+                        ;;
+                esac
+                ;;
             proxmox-ve)
                 echo "disk_size=\"20G\"" >> "${CONF_FILE}"
                 echo "ram=\"4G\"" >> "${CONF_FILE}"
