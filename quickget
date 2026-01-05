@@ -1824,6 +1824,8 @@ function get_easyos() {
 }
 
 function get_elementary() {
+    # Hash and ISO filename can be obtained from the below URL
+    # https://elementary.io/docs/installation#verify-your-download
     local HASH=""
     local STAMP
     case ${RELEASE} in
