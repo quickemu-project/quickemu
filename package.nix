@@ -7,10 +7,10 @@
 , cdrtools
 , curl
 , gawk
-, glxinfo
 , gnugrep
 , gnused
 , jq
+, mesa-demos
 , pciutils
 , procps
 , python3
@@ -51,7 +51,7 @@ let
     OVMF
     OVMFFull
   ] ++ lib.optionals stdenv.isLinux [
-    glxinfo
+    mesa-demos
     usbutils
     xdg-user-dirs
   ];

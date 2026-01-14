@@ -26,7 +26,7 @@ mkShell {
     OVMF
     OVMFFull
   ] ++ lib.optionals stdenv.isLinux [
-    glxinfo
+    mesa-demos
     usbutils
     xdg-user-dirs
   ]);
