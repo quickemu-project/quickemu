@@ -14,39 +14,181 @@ on:
       - quickget
 
 jobs:
-  quickget-tests:
-    name: "Run quickget tests 👟"
+  detect-distros:
+    name: "Detect distros 🔍"
     runs-on: ubuntu-22.04
+    outputs:
+      distros: ${{ steps.get-distros.outputs.distros }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Extract unique distros 📋"
+        id: get-distros
+        run: |
+          # Get unique distros, excluding windows variants
+          DISTROS=$(./quickget --list | tail -n +2 | cut -d' ' -f1 | sort -u | grep -v '^windows$' | grep -v '^windows-server$')
+          # Convert to JSON array
+          JSON=$(echo "$DISTROS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "distros=${JSON}" >> "$GITHUB_OUTPUT"
+          echo "Found $(echo "$DISTROS" | wc -l | tr -d ' ') distros to test"
+
+  test-distro:
+    name: "Test ${{ matrix.distro }} 🧪"
+    needs: detect-distros
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: ${{ fromJson(needs.detect-distros.outputs.distros) }}
     steps:
       - uses: actions/checkout@v6
       - name: "Install dependencies 📦️"
         run: |
           sudo apt-get -y update
           sudo apt-get -y install curl qemu-utils
-      - name: "List OS variants 📃"
+      - name: "Check ${{ matrix.distro }} downloads 💿️"
+        id: check
         run: |
           mkdir -p results
-          ./quickget --list | tail -n +2 | tee results/list.txt
-      - name: "Check OS downloads 💿️"
+          ./quickget --check "${{ matrix.distro }}" | tee results/check.txt
+
+          # Count results (handle grep returning 1 when no matches)
+          PASSED=$(grep -c '^PASS' results/check.txt || echo 0)
+          FAILED=$(grep -c '^FAIL' results/check.txt || echo 0)
+          SKIPPED=$(grep -c '^SKIP' results/check.txt || echo 0)
+
+          echo "passed=${PASSED}" >> "$GITHUB_OUTPUT"
+          echo "failed=${FAILED}" >> "$GITHUB_OUTPUT"
+          echo "skipped=${SKIPPED}" >> "$GITHUB_OUTPUT"
+
+          # Extract failed URLs for reporting
+          grep '^FAIL' results/check.txt > results/failed.txt || true
+
+          echo "Results for ${{ matrix.distro }}: PASS=${PASSED} FAIL=${FAILED} SKIP=${SKIPPED}"
+      - name: "Create result JSON 📝"
         run: |
-          mkdir -p results
-          ./quickget --check | tee results/check.txt
-      - name: "Display results 📊"
+          mkdir -p result
+          jq -n \
+            --arg distro "${{ matrix.distro }}" \
+            --argjson passed "${{ steps.check.outputs.passed }}" \
+            --argjson failed "${{ steps.check.outputs.failed }}" \
+            --argjson skipped "${{ steps.check.outputs.skipped }}" \
+            '{distro: $distro, passed: $passed, failed: $failed, skipped: $skipped}' \
+            > result/result.json
+
+          # Include failed URLs if any
+          if [ -s results/failed.txt ]; then
+            cp results/failed.txt result/failed.txt
+          fi
+
+          cat result/result.json
+      - name: "Upload result artifact 📤"
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ matrix.distro }}
+          path: result/
+          retention-days: 1
+      - name: "Fail if any failures ❌"
+        if: steps.check.outputs.failed != '0'
         run: |
-          WINDOWS=$(grep -c "windows-" results/check.txt)
-          FAILED=$(grep -c ^FAIL results/check.txt)
-          SKIPPED=$(grep -c ^SKIP results/check.txt)
-          PASSED=$(grep -c ^PASS results/check.txt)
-          CHECKED=$((WINDOWS + FAILED + SKIPPED + PASSED))
-          echo -e "\nResults:"
-          echo -e "- CHECKED:\t${CHECKED}"
-          echo -e "- PASSED:\t${PASSED}"
-          echo -e "- SKIPPED:\t${SKIPPED}\t(of which ${WINDOWS} are Windows)"
-          echo -e "- FAILED:\t${FAILED}\n"
-          grep ^FAIL results/check.txt | tee results/failed.txt
-          VARIATIONS=$(wc -l results/list.txt | cut -d' ' -f 1)
-          DOWNLOADS=$(wc -l results/check.txt | cut -d' ' -f 1)
-          echo
-          echo "Compare OS variations with downloads:"
-          echo -e "- Variations:\t${VARIATIONS}"
-          echo -e "- Downloads:\t${DOWNLOADS}"
+          echo "::error::${{ matrix.distro }} has ${{ steps.check.outputs.failed }} failed downloads"
+          exit 1
+
+  report-results:
+    name: "Report results 📊"
+    needs: test-distro
+    runs-on: ubuntu-22.04
+    if: always()
+    steps:
+      - name: "Download all result artifacts 📥"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: result-*
+          merge-multiple: true
+          path: results
+      - name: "Generate summary report 📈"
+        run: |
+          # Aggregate all results
+          TOTAL_PASSED=0
+          TOTAL_FAILED=0
+          TOTAL_SKIPPED=0
+          HAS_FAILURES=false
+
+          # Build per-distro table rows
+          DISTRO_ROWS=""
+
+          for json_file in results/result.json results/*/result.json 2>/dev/null; do
+            [ -f "$json_file" ] || continue
+
+            DISTRO=$(jq -r '.distro' "$json_file")
+            PASSED=$(jq -r '.passed' "$json_file")
+            FAILED=$(jq -r '.failed' "$json_file")
+            SKIPPED=$(jq -r '.skipped' "$json_file")
+
+            TOTAL_PASSED=$((TOTAL_PASSED + PASSED))
+            TOTAL_FAILED=$((TOTAL_FAILED + FAILED))
+            TOTAL_SKIPPED=$((TOTAL_SKIPPED + SKIPPED))
+
+            if [ "$FAILED" -gt 0 ]; then
+              STATUS="❌"
+              HAS_FAILURES=true
+            else
+              STATUS="✅"
+            fi
+
+            DISTRO_ROWS="${DISTRO_ROWS}| ${DISTRO} | ${PASSED} | ${FAILED} | ${SKIPPED} | ${STATUS} |
+          "
+          done
+
+          # Sort distro rows alphabetically
+          DISTRO_ROWS_SORTED=$(echo "$DISTRO_ROWS" | sort)
+
+          # Write summary header
+          cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
+          ## Test Results 📊
+
+          | Metric | Count |
+          |--------|-------|
+          EOF
+
+          echo "| ✅ Passed | ${TOTAL_PASSED} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ❌ Failed | ${TOTAL_FAILED} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ⏭️ Skipped | ${TOTAL_SKIPPED} |" >> "$GITHUB_STEP_SUMMARY"
+
+          # Write per-distro breakdown
+          cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
+
+          ### Per-distro breakdown
+
+          | Distro | Passed | Failed | Skipped | Status |
+          |--------|--------|--------|---------|--------|
+          EOF
+
+          echo "$DISTRO_ROWS_SORTED" >> "$GITHUB_STEP_SUMMARY"
+
+          # Collect and display failed URLs if any
+          if [ "$HAS_FAILURES" = true ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### ❌ Failed URLs" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+            for failed_file in results/failed.txt results/*/failed.txt 2>/dev/null; do
+              [ -f "$failed_file" ] && cat "$failed_file" >> "$GITHUB_STEP_SUMMARY"
+            done
+
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          # Print summary to log as well
+          echo "===== SUMMARY ====="
+          echo "Total Passed:  ${TOTAL_PASSED}"
+          echo "Total Failed:  ${TOTAL_FAILED}"
+          echo "Total Skipped: ${TOTAL_SKIPPED}"
+          echo "=================="
+
+          # Exit with failure if any distro had failures
+          if [ "$HAS_FAILURES" = true ]; then
+            echo "::error::Some distros have failed downloads. Check the summary for details."
+            exit 1
+          fi
