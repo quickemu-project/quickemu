@@ -1198,21 +1198,44 @@ function check_hash() {
     local iso=""
     local hash=""
     local hash_algo=""
+    local hash_prefix=""
     if [ "${OPERATION}" == "download" ]; then
         iso="${1}"
     else
         iso="${VM_PATH}/${1}"
     fi
     hash="${2}"
-    # Guess the hash algorithm by the hash length
-    case ${#hash} in
-        32) hash_algo=md5sum;;
-        40) hash_algo=sha1sum;;
-        64) hash_algo=sha256sum;;
-        128) hash_algo=sha512sum;;
-        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
-            return;;
-    esac
+    if [[ "${hash}" == *":"* ]]; then
+        hash_prefix="${hash%%:*}"
+        hash="${hash#*:}"
+    fi
+    if [ -z "${hash}" ]; then
+        echo "WARNING! Empty hash value, not checking ${iso} hash."
+        return
+    fi
+    if [ -n "${hash_prefix}" ]; then
+        case "${hash_prefix}" in
+            md5) hash_algo=md5sum;;
+            sha1) hash_algo=sha1sum;;
+            sha256) hash_algo=sha256sum;;
+            sha512) hash_algo=sha512sum;;
+            b2sum|blake2|blake2b) hash_algo=b2sum;;
+            *) echo "WARNING! Unknown hash algorithm '${hash_prefix}', not checking ${iso} hash."
+                return;;
+        esac
+    else
+        # Guess the hash algorithm by the hash length
+        # Note: 128-character hashes are assumed to be SHA-512; b2sum hashes
+        # must use an explicit b2sum: prefix to avoid ambiguity.
+        case ${#hash} in
+            32) hash_algo=md5sum;;
+            40) hash_algo=sha1sum;;
+            64) hash_algo=sha256sum;;
+            128) hash_algo=sha512sum;;
+            *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+                return;;
+        esac
+    fi
 
     # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
     if [ "${HOST_OS}" = "Darwin" ]; then
@@ -1221,6 +1244,7 @@ function check_hash() {
             sha1sum) hash_algo=gsha1sum;;
             sha256sum) hash_algo=gsha256sum;;
             sha512sum) hash_algo=gsha512sum;;
+            b2sum) hash_algo=gb2sum;;
         esac
     fi
 
@@ -1680,7 +1704,7 @@ function get_archboot() {
     # Get the b2sum hash from the parent directory's b2sum.txt
     HASH=$(web_pipe "${URL}/${HOST_ARCH}/latest/b2sum.txt" | grep "iso/${ISO}" | awk '{print $1}')
     
-    echo "${LATEST_URL}/${ISO} ${HASH}"
+    echo "${LATEST_URL}/${ISO} b2sum:${HASH}"
 }
 
 function get_archcraft() {
