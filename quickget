@@ -212,6 +212,14 @@ function error_not_supported_argument() {
     exit 1
 }
 
+function require_qemu_img() {
+    QEMU_IMG=$(command -v qemu-img)
+    if [ ! -x "${QEMU_IMG}" ]; then
+        echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
+        exit 1
+    fi
+}
+
 function is_valid_language() {
     local I18N=""
     local PASSED_I18N="${1}"
@@ -2165,6 +2173,7 @@ function get_macos() {
             fi
 
             if [ -e "${VM_PATH}/RecoveryImage.dmg" ] && [ ! -e "${VM_PATH}/RecoveryImage.img" ]; then
+                require_qemu_img
                 echo " - Converting RecoveryImage.dmg"
                 ${QEMU_IMG} convert "${VM_PATH}/RecoveryImage.dmg" -O raw "${VM_PATH}/RecoveryImage.img" 2>/dev/null
             fi
@@ -3388,6 +3397,7 @@ function create_vm() {
             fi;;
         easyos)
             if [[ ${ISO} = *".img"* ]]; then
+                require_qemu_img
                 ${QEMU_IMG} convert -f raw -O qcow2 "${VM_PATH}/${ISO}" "${VM_PATH}/disk.qcow2"
                 ISO="${ISO/.img/}"
             fi;;
@@ -3556,12 +3566,6 @@ if [ ! -x "${CURL}" ]; then
     exit 1
 fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
-
-QEMU_IMG=$(command -v qemu-img)
-if [ ! -x "${QEMU_IMG}" ]; then
-    echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
-    exit 1
-fi
 
 #TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
 case "${1}" in
