@@ -113,8 +113,8 @@ jobs:
           TOTAL_SKIPPED=0
           HAS_FAILURES=false
 
-          # Build per-distro table rows
-          DISTRO_ROWS=""
+          # Temp file for collecting per-distro table rows
+          TEMP_ROWS=$(mktemp)
 
           for json_file in results/result-*/result.json; do
             [ -f "$json_file" ] || continue
@@ -139,11 +139,8 @@ jobs:
               STATUS="✅"
             fi
 
-            DISTRO_ROWS="${DISTRO_ROWS}$(printf '| %s | %s | %s | %s | %s |\n' "${DISTRO}" "${PASSED}" "${FAILED}" "${SKIPPED}" "${STATUS}")"
+            echo "| ${DISTRO} | ${PASSED} | ${FAILED} | ${SKIPPED} | ${STATUS} |" >> "$TEMP_ROWS"
           done
-
-          # Sort distro rows alphabetically
-          DISTRO_ROWS_SORTED=$(echo "$DISTRO_ROWS" | sort)
 
           # Write summary header
           echo "## Test Results 📊" >> "$GITHUB_STEP_SUMMARY"
@@ -160,7 +157,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Distro | Passed | Failed | Skipped | Status |" >> "$GITHUB_STEP_SUMMARY"
           echo "|--------|--------|--------|---------|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo -n "$DISTRO_ROWS_SORTED" >> "$GITHUB_STEP_SUMMARY"
+          sort "$TEMP_ROWS" >> "$GITHUB_STEP_SUMMARY"
 
           # Collect and display failed URLs if any
           if [ "$HAS_FAILURES" = true ]; then
@@ -182,6 +179,9 @@ jobs:
           echo "Total Failed:  ${TOTAL_FAILED}"
           echo "Total Skipped: ${TOTAL_SKIPPED}"
           echo "=================="
+
+          # Clean up temp file
+          rm -f "$TEMP_ROWS"
 
           # Exit with failure if any distro had failures
           if [ "$HAS_FAILURES" = true ]; then
