@@ -318,6 +318,76 @@ function efi_vars() {
 }
 
 function configure_cpu() {
+    local add_cpu_flag
+    add_cpu_flag() {
+        local flag="${1}"
+        # Skip empty flags
+        [[ -z "${flag}" ]] && return
+        # Defensive check: ensure CPU is initialized before appending
+        if [[ -z "${CPU}" ]]; then
+            echo "ERROR: add_cpu_flag called before CPU variable initialization"
+            exit 1
+        fi
+        # Auto-correct flag format by prepending comma if missing
+        if [[ "${flag}" != ,* ]]; then
+            flag=",${flag}"
+        fi
+        local needle="${flag#,}"
+        # Validate flag is not malformed
+        if [[ "${needle}" =~ ^[+-]{2} ]] || [[ "${needle}" == "+" ]] || [[ "${needle}" == "-" ]]; then
+            echo "ERROR: Malformed CPU flag: '${needle}' (empty flag name or multiple prefix characters)"
+            exit 1
+        fi
+        # Check for exact duplicate
+        if [[ ",${CPU}," == *",${needle},"* ]]; then
+            return
+        fi
+        # Check for conflicting flag with opposite prefix (+/-) or unprefixed variant
+        # Strip both prefix (+/-) and value assignment (=...) to get the base flag name
+        local base_flag="${needle#+}"
+        base_flag="${base_flag#-}"
+        base_flag="${base_flag%%=*}"
+        if [[ "${needle}" == +* ]]; then
+            # Check if -flag or unprefixed flag exists
+            if [[ ",${CPU}," == *",-${base_flag}"* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: -${base_flag} already set, ignoring +${base_flag}"
+                return
+            fi
+            if [[ ",${CPU}," == *",${base_flag}"[,=]* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: ${base_flag} already set, ignoring +${base_flag}"
+                return
+            fi
+        elif [[ "${needle}" == -* ]]; then
+            # Check if +flag or unprefixed flag exists
+            if [[ ",${CPU}," == *",+${base_flag}"* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: +${base_flag} already set, ignoring -${base_flag}"
+                return
+            fi
+            if [[ ",${CPU}," == *",${base_flag}"[,=]* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: ${base_flag} already set, ignoring -${base_flag}"
+                return
+            fi
+        else
+            # Unprefixed flag - check if +flag or -flag exists
+            # Also check for conflicting value assignments (e.g., flag=on vs flag=off)
+            local needle_base="${needle%%=*}"
+            if [[ ",${CPU}," == *",+${needle_base}"* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: +${needle_base} already set, ignoring ${needle}"
+                return
+            fi
+            if [[ ",${CPU}," == *",-${needle_base}"* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: -${needle_base} already set, ignoring ${needle}"
+                return
+            fi
+            # Check for value assignment conflicts (e.g., flag=on already exists, trying to add flag=off)
+            if [[ "${needle}" == *=* ]] && [[ ",${CPU}," == *",${needle_base}="* ]]; then
+                echo "WARNING: Conflicting CPU flags detected: ${needle_base}=... already set, ignoring ${needle}"
+                return
+            fi
+        fi
+        CPU+="${flag}"
+    }
+
     HOST_CPU_CORES=$(get_nproc)
     HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
@@ -429,11 +499,13 @@ function configure_cpu() {
                     if [ "${QEMU_ACCEL}" == "tcg" ]; then
                         # TCG can emulate these features
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+avx2,+sse4.2"
+                            add_cpu_flag ",+avx2"
+                            add_cpu_flag ",+sse4.2"
                         fi
                     elif check_cpu_flag sse4_2 && check_cpu_flag avx2; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+avx2,+sse4.2"
+                            add_cpu_flag ",+avx2"
+                            add_cpu_flag ",+sse4.2"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
@@ -445,11 +517,11 @@ function configure_cpu() {
                     if [ "${QEMU_ACCEL}" == "tcg" ]; then
                         # TCG can emulate this feature
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.2"
+                            add_cpu_flag ",+sse4.2"
                         fi
                     elif check_cpu_flag sse4_2; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.2"
+                            add_cpu_flag ",+sse4.2"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
@@ -460,11 +532,11 @@ function configure_cpu() {
                     if [ "${QEMU_ACCEL}" == "tcg" ]; then
                         # TCG can emulate this feature
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.1"
+                            add_cpu_flag ",+sse4.1"
                         fi
                     elif check_cpu_flag sse4_1; then
                         if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.1"
+                            add_cpu_flag ",+sse4.1"
                         fi
                     else
                         echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
@@ -478,7 +550,9 @@ function configure_cpu() {
                             mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
                             rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
                             x2apic xgetbv1 xsave xsaveopt; do
-                    CPU+=$(configure_cpu_flag "${FLAG}")
+                    local cpu_flag="$(configure_cpu_flag "${FLAG}")"
+                    # Only call add_cpu_flag if configure_cpu_flag returned a non-empty result
+                    [[ -n "${cpu_flag}" ]] && add_cpu_flag "${cpu_flag}"
                 done
             fi
 
@@ -512,7 +586,7 @@ function configure_cpu() {
     esac
 
     if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
-        CPU+=",topoext"
+        add_cpu_flag ",+topoext"
     fi
 
     if [ -z "${cpu_cores}" ]; then
@@ -702,7 +776,7 @@ function configure_bios() {
 
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
         # TODO: Check if macOS should use 'edk2-i386-vars.fd'
-        if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
+        if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             # Architecture-specific firmware paths
             if [ "${ARCH_VM}" == "aarch64" ]; then
                 # ARM64/AArch64 firmware (AAVMF)
@@ -1005,9 +1079,17 @@ function check_display_gl_support() {
     "${QEMU}" -M none -display "dbus,gl=${gl_mode}" >"$tmpfile" 2>&1 &
     local qemu_pid=$!
     
-    sleep 0.1
-    kill -9 $qemu_pid 2>/dev/null
-    wait $qemu_pid 2>/dev/null
+    sleep 0.2
+    # Try graceful termination first
+    if kill -0 "$qemu_pid" 2>/dev/null; then
+        kill -TERM "$qemu_pid" 2>/dev/null
+        sleep 0.15
+        # Force kill if still running
+        if kill -0 "$qemu_pid" 2>/dev/null; then
+            kill -KILL "$qemu_pid" 2>/dev/null
+        fi
+    fi
+    wait "$qemu_pid" 2>/dev/null
     
     local test_output=$(cat "$tmpfile" 2>/dev/null)
     rm -f "$tmpfile"
@@ -1131,7 +1213,7 @@ function configure_display() {
 
     # Try and coerce the display resolution for Linux guests only.
     # Check if the device supports xres/yres parameters
-    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|gpu-pci|gpu-gl-pci|vga-gl)|qxl|qxl-vga|bochs-display)$ ]] || [[ "${DISPLAY_DEVICE}" =~ ,virgl=on ]]; then
+    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|gpu-pci|vga-gl|gpu-gl-pci)|qxl|qxl-vga|bochs-display)$ ]] || [[ "${DISPLAY_DEVICE}" =~ ,virgl=on ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
     else
@@ -1347,6 +1429,8 @@ function vm_boot() {
     USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
     VGA=""
     VIDEO=""
+    # Set QEMU_VER_LONG for backward compatibility with user scripts that may reference it
+    QEMU_VER_LONG="${QEMU_VER_RAW}"
 
     KERNEL_NAME="$(uname -s)"
     KERNEL_NODE="$(uname -n | cut -d'.' -f 1)"
@@ -2179,6 +2263,8 @@ if [ -z "${QEMU_VER_MAJOR}" ]; then
 fi
 QEMU_VER_MINOR=${QEMU_VER_MINOR:-0}
 QEMU_VER_SHORT=$((QEMU_VER_MAJOR * 10 + QEMU_VER_MINOR))
+# QEMU_VER_LONG maintained for backward compatibility
+QEMU_VER_LONG="${QEMU_VER_RAW}"
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
     echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_RAW}."
     exit 1
@@ -2376,6 +2462,8 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     fi
     QEMU_VER_MINOR=${QEMU_VER_MINOR:-0}
     QEMU_VER_SHORT=$((QEMU_VER_MAJOR * 10 + QEMU_VER_MINOR))
+    # QEMU_VER_LONG maintained for backward compatibility
+    QEMU_VER_LONG="${QEMU_VER_RAW}"
     if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
         echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_RAW}."
         exit 1

@@ -1205,21 +1205,80 @@ function check_hash() {
         iso="${VM_PATH}/${1}"
     fi
     hash="${2}"
+    # Validate no leading/trailing whitespace in hash parameter
+    if [[ "${hash}" =~ ^[[:space:]] ]] || [[ "${hash}" =~ [[:space:]]$ ]]; then
+        echo "ERROR! Invalid hash format for ${iso}: leading or trailing whitespace detected."
+        echo "       Hash parameter: '${hash}'"
+        exit 1
+    fi
     if [[ "${hash}" == *":"* ]]; then
         hash_prefix="${hash%%:*}"
         hash="${hash#*:}"
+        # Normalize algorithm prefix to lowercase for case-insensitive matching (Bash 3.2 compatible)
+        hash_prefix="$(echo "${hash_prefix}" | tr '[:upper:]' '[:lower:]')"
+        # Validate that prefix is not empty
+        if [ -z "${hash_prefix}" ]; then
+            echo "ERROR! Invalid hash format for ${iso}: empty algorithm prefix (found '${2}')."
+            echo "       Expected format: 'algorithm:hash' (e.g., 'sha256:abc123...')"
+            exit 1
+        fi
+        # Validate no internal whitespace in algorithm prefix
+        if [[ "${hash_prefix}" =~ [[:space:]] ]]; then
+            echo "ERROR! Invalid hash format for ${iso}: algorithm prefix contains whitespace."
+            echo "       Hash parameter: '${2}'"
+            exit 1
+        fi
+        # Validate that the remaining hash does not contain additional colons
+        if [[ "${hash}" == *":"* ]]; then
+            echo "ERROR! Invalid hash format for ${iso}: multiple colons found."
+            exit 1
+        fi
+        # Validate hash is not empty after removing prefix
+        if [ -z "${hash}" ]; then
+            echo "ERROR! Invalid hash format for ${iso}: empty hash value after prefix '${hash_prefix}:'."
+            exit 1
+        fi
     fi
     if [ -z "${hash}" ]; then
         echo "WARNING! Empty hash value, not checking ${iso} hash."
         return
     fi
+    # Validate hash contains only hexadecimal characters (no internal whitespace or invalid chars)
+    if [[ ! "${hash}" =~ ^[0-9a-fA-F]+$ ]]; then
+        echo "ERROR! Invalid hash format for ${iso}: hash contains non-hexadecimal characters."
+        echo "       Hash value: '${hash}'"
+        exit 1
+    fi
+    # Validate hash length matches algorithm
+    local hash_len=${#hash}
     if [ -n "${hash_prefix}" ]; then
         case "${hash_prefix}" in
-            md5) hash_algo=md5sum;;
-            sha1) hash_algo=sha1sum;;
-            sha256) hash_algo=sha256sum;;
-            sha512) hash_algo=sha512sum;;
-            b2sum|blake2|blake2b) hash_algo=b2sum;;
+            md5) hash_algo=md5sum
+                 if [ ${hash_len} -ne 32 ]; then
+                     echo "ERROR! MD5 hash must be 32 characters, got ${hash_len}: ${hash}"
+                     exit 1
+                 fi;;
+            sha1) hash_algo=sha1sum
+                  if [ ${hash_len} -ne 40 ]; then
+                      echo "ERROR! SHA1 hash must be 40 characters, got ${hash_len}: ${hash}"
+                      exit 1
+                  fi;;
+            sha256) hash_algo=sha256sum
+                    if [ ${hash_len} -ne 64 ]; then
+                        echo "ERROR! SHA256 hash must be 64 characters, got ${hash_len}: ${hash}"
+                        exit 1
+                    fi;;
+            sha512) hash_algo=sha512sum
+                    if [ ${hash_len} -ne 128 ]; then
+                        echo "ERROR! SHA512 hash must be 128 characters, got ${hash_len}: ${hash}"
+                        exit 1
+                    fi;;
+            b2sum|blake2|blake2b) hash_algo=b2sum
+                                  # BLAKE2b supports variable lengths from 256-512 bits (64-128 hex chars)
+                                  if [ ${hash_len} -lt 64 ] || [ ${hash_len} -gt 128 ] || [ $((hash_len % 2)) -ne 0 ]; then
+                                      echo "ERROR! BLAKE2b hash must be 64-128 characters (even length), got ${hash_len}: ${hash}"
+                                      exit 1
+                                  fi;;
             *) echo "WARNING! Unknown hash algorithm '${hash_prefix}', not checking ${iso} hash."
                 return;;
         esac
@@ -1239,7 +1298,7 @@ function check_hash() {
 
     case "${hash_algo}" in
         md5sum|sha1sum)
-            echo "WARNING! ${hash_algo} is a weak hash algorithm; prefer sha256, sha512, or b2sum."
+            echo "WARNING! ${hash_algo} is a weak hash algorithm. Prefer sha256, sha512, or b2sum for better security."
             ;;
     esac
 
@@ -1255,7 +1314,7 @@ function check_hash() {
     fi
 
     echo -n "Checking ${iso} with ${hash_algo}... "
-    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+    if ! printf '%s  %s\n' "${hash}" "${iso}" | ${hash_algo} --check --status; then
         echo "ERROR!"
         echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
         exit 1
@@ -1493,7 +1552,8 @@ function make_vm_config() {
         elif [[ "${IMAGE_FILE}" =~ (riscv64) ]]; then
             ARCH_HINT="riscv64"
         elif [[ "${HOST_ARCH}" == "aarch64" && "${OS}" != "macos" && "${OS}" != windows* ]]; then
-            # Use host architecture for Linux guests when available
+            # Use host architecture for Linux guests that support aarch64
+            # Add more distributions to this list as they add aarch64 support
             case "${OS}" in
                 archboot|alpine|debian|fedora|ubuntu*) ARCH_HINT="aarch64";;
             esac
@@ -1692,18 +1752,47 @@ function get_archboot() {
     local LATEST_URL="${URL}/${HOST_ARCH}/latest/iso"
     local ISO_PATTERN="${EDITION}"
     
-    # Adjust pattern: "default" edition doesn't have a suffix in filename
+    # "local" edition is intended for locally available ISOs, not remote downloads
+    if [ "${EDITION}" == "local" ]; then
+        echo "ERROR! Archboot edition 'local' refers to a local ISO and cannot be downloaded."
+        echo "       Valid downloadable editions are: default, latest"
+        echo "       For local ISOs, reference them in your .conf file:"
+        echo "         fixed_iso=\"/path/to/archboot-local-${HOST_ARCH}.iso\""
+        exit 1
+    fi
+
+    # Adjust pattern: match actual archboot filename format with word boundaries
+    # - x86_64 default:  archboot-YYYY.MM.DD-HH.MM-X.XX.X-arch1-1-x86_64.iso
+    # - x86_64 latest:   archboot-YYYY.MM.DD-HH.MM-X.XX.X-arch1-1-latest-x86_64.iso
+    # - aarch64 default: archboot-YYYY.MM.DD-HH.MM-X.XX.X-X-aarch64-ARCH-aarch64.iso
+    # - aarch64 latest:  archboot-YYYY.MM.DD-HH.MM-X.XX.X-X-aarch64-ARCH-latest-aarch64.iso
+    # Use specific patterns to avoid substring matching between editions
     if [ "${EDITION}" == "default" ]; then
-        ISO_PATTERN="ARCH-${HOST_ARCH}.iso\""
+        if [ "${HOST_ARCH}" == "x86_64" ]; then
+            # Match arch1-1-x86_64.iso but not arch1-1-latest-x86_64.iso or arch1-1-local-x86_64.iso
+            ISO_PATTERN="arch1-1-${HOST_ARCH}\.iso\"$"
+        else
+            # aarch64 uses uppercase ARCH in the pattern
+            # Match ARCH-aarch64.iso but not ARCH-latest-aarch64.iso or ARCH-local-aarch64.iso
+            ISO_PATTERN="ARCH-${HOST_ARCH}\.iso\"$"
+        fi
+    elif [ "${EDITION}" == "latest" ]; then
+        if [ "${HOST_ARCH}" == "x86_64" ]; then
+            ISO_PATTERN="arch1-1-latest-${HOST_ARCH}\.iso\"$"
+        else
+            # aarch64 uses uppercase ARCH in the pattern
+            ISO_PATTERN="ARCH-latest-${HOST_ARCH}\.iso\"$"
+        fi
     else
-        ISO_PATTERN="${EDITION}-${HOST_ARCH}.iso\""
+        echo "ERROR! Invalid archboot edition '${EDITION}'. Only 'default' and 'latest' are supported."
+        exit 1
     fi
     
     # Get the ISO filename from the iso directory
-    ISO=$(web_pipe "${LATEST_URL}/" | grep -o 'href="[^"]*\.iso"' | grep "${ISO_PATTERN}" | head -n 1 | cut -d'"' -f2 | sed 's|.*/||')
+    ISO=$(web_pipe "${LATEST_URL}/" | grep -o 'href="[^"]*\.iso"' | grep -E "${ISO_PATTERN}" | head -n 1 | cut -d'"' -f2 | sed 's|.*/||')
     
     if [ -z "${ISO}" ]; then
-        echo "ERROR! Could not find Archboot ${EDITION} ISO for ${HOST_ARCH}"
+        echo "ERROR! Could not find Archboot ${EDITION} ISO for ${HOST_ARCH} at ${LATEST_URL}/"
         exit 1
     fi
     
