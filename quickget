@@ -791,7 +791,7 @@ function releases_kali() {
 }
 
 function releases_kdeneon() {
-    echo user testing unstable developer
+    echo user testing unstable
 }
 
 function releases_kolibrios() {
