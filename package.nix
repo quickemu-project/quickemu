@@ -1,33 +1,34 @@
-{ lib
-, fetchFromGitHub
-, installShellFiles
-, makeWrapper
-, stdenv
-, testers
-, cdrtools
-, curl
-, gawk
-, gnugrep
-, gnused
-, jq
-, mesa-demos
-, pciutils
-, procps
-, python3
-, qemu_full
-, samba
-, socat
-, spice-gtk
-, swtpm
-, unzip
-, usbutils
-, util-linux
-, xdg-user-dirs
-, xrandr
-, zsync
-, OVMF
-, OVMFFull
-, quickemu
+{
+  lib,
+  fetchFromGitHub,
+  installShellFiles,
+  makeWrapper,
+  stdenv,
+  testers,
+  cdrtools,
+  curl,
+  gawk,
+  gnugrep,
+  gnused,
+  jq,
+  mesa-demos,
+  pciutils,
+  procps,
+  python3,
+  qemu_full,
+  samba,
+  socat,
+  spice-gtk,
+  swtpm,
+  unzip,
+  usbutils,
+  util-linux,
+  xdg-user-dirs,
+  xrandr,
+  zsync,
+  OVMF ? null,
+  OVMFFull ? null,
+  quickemu,
 }:
 let
   runtimePaths = [
@@ -48,19 +49,19 @@ let
     util-linux
     xrandr
     zsync
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    mesa-demos
     OVMF
     OVMFFull
-  ] ++ lib.optionals stdenv.isLinux [
-    mesa-demos
     usbutils
     xdg-user-dirs
   ];
-  versionMatches =
-    builtins.match ''
-      .*
-      readonly[[:blank:]]VERSION="([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"
-      .*
-    '' (builtins.readFile ./quickemu);
+  versionMatches = builtins.match ''
+    .*
+    readonly[[:blank:]]VERSION="([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"
+    .*
+  '' (builtins.readFile ./quickemu);
 in
 stdenv.mkDerivation rec {
   pname = "quickemu";
@@ -69,14 +70,21 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     sed -i \
-      -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
-      -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
+      ${
+        lib.optionalString (OVMF != null && OVMFFull != null) ''
+          -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
+          -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
+        ''
+      } \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
       -e 's,\$(command -v smbd),${samba}/bin/smbd,' \
       quickemu
   '';
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -102,6 +110,9 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/quickemu-project/quickemu";
     mainProgram = "quickemu";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ fedx-sudo flexiondotorg ];
+    maintainers = with lib.maintainers; [
+      fedx-sudo
+      flexiondotorg
+    ];
   };
 }
