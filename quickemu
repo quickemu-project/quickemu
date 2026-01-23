@@ -420,19 +420,27 @@ function configure_cpu() {
         # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
         case ${ARCH_HOST} in
             arm64|aarch64) CPU_MODEL="max"
+                           # Use highmem=on to allow aarch64 guests on the "virt" machine type
+                           # to access guest RAM above the 4GB boundary. This is required for
+                           # VMs configured with >4GB RAM and is generally more compatible on
+                           # modern aarch64 systems. Note: This is a behavior change from the
+                           # previous highmem=off setting.
                            MACHINE_TYPE="virt,highmem=on";;
         esac
     elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
         # If the architecture of the VM is different from the host, disable acceleration
+        # and use TCG (Tiny Code Generator) software emulation. TCG emulates the target
+        # architecture in software, allowing cross-architecture virtualization (e.g.,
+        # running x86_64 VMs on ARM hosts). Users can also manually set QEMU_ACCEL="tcg"
+        # in their VM configuration to force software emulation.
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
         QEMU_ACCEL="tcg"
     fi
 
-    # TODO: More robust detection of running in a VM
-    # - macOS check for CPU flag: vmx
-    # - Linux AMD check for CPU flag: svm
-    # - Linux Intel check for CPU flag: vmx
+    # Detect if running inside a VM based on manufacturer detection
+    # Note: Checking CPU flags (vmx/svm) indicates hardware virtualization SUPPORT,
+    # not whether we're inside a VM. Nested virtualization may expose these flags.
     case ${MANUFACTURER,,} in
         qemu|virtualbox) CPU_MODEL="qemu64"
                          QEMU_ACCEL="tcg"
@@ -440,6 +448,8 @@ function configure_cpu() {
         *) HYPERVISOR="";;
     esac
 
+    # Skip hardware virtualization checks when using TCG software emulation
+    # TCG doesn't require VT-x/SVM as it emulates CPU instructions in software
     if [ -z "${HYPERVISOR}" ] && [ "${QEMU_ACCEL}" != "tcg" ]; then
         # A CPU with Intel VT-x / AMD SVM support is required
         if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ]; then
@@ -1196,16 +1206,16 @@ function configure_display() {
         
         if "${QEMU}" -device help 2>&1 | grep -q "\"${GL_DEVICE}\""; then
             DISPLAY_DEVICE="${GL_DEVICE}"
-            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
         elif [ "${QEMU_VER_SHORT}" -ge 61 ]; then
             DISPLAY_DEVICE="${GL_DEVICE}"
-            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
         else
-            DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
-            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
+            DISPLAY_DEVICE="${DISPLAY_DEVICE},gl=${gl}"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
         fi
     else
-        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
+        echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
     fi
 
     # Build the video configuration
@@ -1213,7 +1223,8 @@ function configure_display() {
 
     # Try and coerce the display resolution for Linux guests only.
     # Check if the device supports xres/yres parameters
-    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|gpu-pci|vga-gl|gpu-gl-pci)|qxl|qxl-vga|bochs-display)$ ]] || [[ "${DISPLAY_DEVICE}" =~ ,virgl=on ]]; then
+    # Use (,|$) anchor to match device names with or without additional options
+    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|vga-gl|gpu-pci|gpu-gl-pci)|qxl|qxl-vga|bochs-display)(,|$) ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
     else
@@ -2439,6 +2450,15 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
         echo "ERROR! VM architecture cannot be empty."
         exit 1
     fi
+    
+    # Validate QEMU_ACCEL: If VM arch differs from host, TCG is required
+    # Prevent user config from overriding this safety check
+    if [ "${ARCH_VM}" != "${ARCH_HOST}" ] && [ "${QEMU_ACCEL:-}" != "tcg" ]; then
+        echo "WARNING: Cross-architecture virtualization detected (host: ${ARCH_HOST}, VM: ${ARCH_VM})."
+        echo "         Forcing QEMU_ACCEL=tcg. Hardware acceleration cannot be used."
+        QEMU_ACCEL="tcg"
+    fi
+    
     QEMU=$(command -v qemu-system-${ARCH_VM})
     if [ ! -x "${QEMU}" ]; then
         echo "ERROR! qemu-system-${ARCH_VM} not found. Please install it for ${ARCH_VM} architecture support."

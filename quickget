@@ -1749,10 +1749,10 @@ function get_archboot() {
     local HASH=""
     local ISO=""
     local URL="https://release.archboot.com"
-    local LATEST_URL="${URL}/${HOST_ARCH}/latest/iso"
     local ISO_PATTERN="${EDITION}"
     
     # "local" edition is intended for locally available ISOs, not remote downloads
+    # Check this first to provide clearer error message before architecture validation
     if [ "${EDITION}" == "local" ]; then
         echo "ERROR! Archboot edition 'local' refers to a local ISO and cannot be downloaded."
         echo "       Valid downloadable editions are: default, latest"
@@ -1760,6 +1760,16 @@ function get_archboot() {
         echo "         fixed_iso=\"/path/to/archboot-local-${HOST_ARCH}.iso\""
         exit 1
     fi
+    
+    # Validate architecture support before constructing URL
+    # Archboot supports: x86_64, aarch64, riscv64
+    if [[ "${HOST_ARCH}" != "x86_64" && "${HOST_ARCH}" != "aarch64" && "${HOST_ARCH}" != "riscv64" ]]; then
+        echo "ERROR! Archboot does not support architecture '${HOST_ARCH}'."
+        echo "       Supported architectures: x86_64, aarch64, riscv64"
+        exit 1
+    fi
+    
+    local LATEST_URL="${URL}/${HOST_ARCH}/latest/iso"
 
     # Adjust pattern: match actual archboot filename format with word boundaries
     # - x86_64 default:  archboot-YYYY.MM.DD-HH.MM-X.XX.X-arch1-1-x86_64.iso
