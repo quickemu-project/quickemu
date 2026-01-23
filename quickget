@@ -3016,12 +3016,12 @@ function unattended_windows() {
         <SynchronousCommand wcm:action="add">
           <CommandLine>pnputil /add-driver E:\viogpudo\w10\amd64\viogpudo.inf /install</CommandLine>
           <Description>Install viogpudo driver</Description>
-          <Order>6</Order>
+          <Order>5</Order>
         </SynchronousCommand>
         <SynchronousCommand wcm:action="add">
           <CommandLine>cmd /c net accounts /maxpwage:unlimited</CommandLine>
           <Description>Local account passwords never expire</Description>
-          <Order>7</Order>
+          <Order>6</Order>
         </SynchronousCommand>
       </FirstLogonCommands>
     </component>
