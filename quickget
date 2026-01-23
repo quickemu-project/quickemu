@@ -1165,7 +1165,12 @@ function releases_zorin() {
 }
 
 function editions_zorin() {
-    echo core64 lite64 education64
+    # Lite edition not available for Zorin 18 (Pro-only starting from 18)
+    if [ "${RELEASE}" = "18" ]; then
+        echo core64 education64
+    else
+        echo core64 lite64 education64
+    fi
 }
 
 function check_hash() {
@@ -2712,10 +2717,22 @@ function get_vxlinux() {
 function get_zorin() {
     local HASH=""
     local ISO=""
-    local URL=""
-    # Process the URL redirections; required for Zorin
-    URL=$(web_redirect "https://zrn.co/${RELEASE}${EDITION}")
-    echo "${URL} ${HASH}"
+    local URL="https://plug-mirror.rcac.purdue.edu/zorin-iso/${RELEASE}"
+    local EDITION_NAME=""
+    # Convert edition code to ISO naming
+    case ${EDITION} in
+        core64) EDITION_NAME="Core-64-bit";;
+        lite64) EDITION_NAME="Lite-64-bit";;
+        education64) EDITION_NAME="Education-64-bit";;
+    esac
+    # Find the latest revision (r2, r1, or base)
+    ISO=$(web_pipe "${URL}/" | grep -o "Zorin-OS-[0-9.]*-${EDITION_NAME}[^\"]*\.iso" | grep -v Beta | sort -Vr | head -n 1)
+    if [ -z "${ISO}" ]; then
+        echo ""
+        return
+    fi
+    HASH=$(web_pipe "${URL}/SHA256SUMS.txt" | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function unattended_windows() {
