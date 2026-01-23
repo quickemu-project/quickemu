@@ -770,6 +770,8 @@ function configure_bios() {
         BOOT_STATUS="Legacy BIOS (${guest_os^})"
         boot="legacy"
         secureboot="off"
+        # Legacy BIOS boot requires the i440fx/PIIX3 chipset (pc), not Q35
+        MACHINE_TYPE="pc"
     fi
 
     echo " - BOOT:     ${BOOT_STATUS}"
