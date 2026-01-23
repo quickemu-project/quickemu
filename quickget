@@ -2210,7 +2210,7 @@ function get_mxlinux() {
     local ISO=""
     local URL="https://sourceforge.net/projects/mx-linux/files/Final/${EDITION}"
     case ${EDITION} in
-        Xfce) ISO="MX-${RELEASE}_x64.iso";;
+        Xfce) ISO="MX-${RELEASE}_Xfce_x64.iso";;
         KDE) ISO="MX-${RELEASE}_KDE_x64.iso";;
         Fluxbox) ISO="MX-${RELEASE}_fluxbox_x64.iso";;
     esac
