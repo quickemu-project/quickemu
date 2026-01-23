@@ -52,10 +52,10 @@ jobs:
           mkdir -p results
           ./quickget --check "${{ matrix.distro }}" | tee results/check.txt
 
-          # Count results (handle grep returning 1 when no matches)
-          PASSED=$(grep -c '^PASS' results/check.txt || echo 0)
-          FAILED=$(grep -c '^FAIL' results/check.txt || echo 0)
-          SKIPPED=$(grep -c '^SKIP' results/check.txt || echo 0)
+          # Count results (use wc -l to avoid grep exit code issues)
+          PASSED=$(grep '^PASS' results/check.txt | wc -l | tr -d ' ')
+          FAILED=$(grep '^FAIL' results/check.txt | wc -l | tr -d ' ')
+          SKIPPED=$(grep '^SKIP' results/check.txt | wc -l | tr -d ' ')
 
           echo "passed=${PASSED}" >> "$GITHUB_OUTPUT"
           echo "failed=${FAILED}" >> "$GITHUB_OUTPUT"
