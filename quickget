@@ -1462,7 +1462,7 @@ function make_vm_config() {
             ARCH_HINT="aarch64"
         elif [[ "${IMAGE_FILE}" =~ (riscv64) ]]; then
             ARCH_HINT="riscv64"
-        elif [ "${HOST_ARCH}" == "aarch64" ] && [ "${OS}" != "macos" ] && [ "${OS}" != "windows"* ]; then
+        elif [[ "${HOST_ARCH}" == "aarch64" && "${OS}" != "macos" && "${OS}" != windows* ]]; then
             # Use host architecture for Linux guests when available
             case "${OS}" in
                 archboot|alpine|debian|fedora|ubuntu*) ARCH_HINT="aarch64";;
@@ -1664,7 +1664,7 @@ function get_archboot() {
     
     # Adjust pattern: "default" edition doesn't have a suffix in filename
     if [ "${EDITION}" == "default" ]; then
-        ISO_PATTERN="ARCH-aarch64.iso\""
+        ISO_PATTERN="ARCH-${HOST_ARCH}.iso\""
     else
         ISO_PATTERN="${EDITION}-${HOST_ARCH}.iso\""
     fi
