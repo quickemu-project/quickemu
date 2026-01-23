@@ -748,7 +748,7 @@ function releases_garuda() {
 }
 
 function editions_garuda() {
-    echo cinnamon dr460nized dr460nized-gaming gnome i3 kde-git kde-lite lxqt-kwin mate qtile sway wayfire xfce
+    echo cinnamon dr460nized dr460nized-gaming gnome hyprland i3 kde-lite mokka sway xfce
 }
 
 function releases_gentoo() {
