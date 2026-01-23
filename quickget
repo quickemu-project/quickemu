@@ -679,7 +679,7 @@ function releases_deepin() {
 }
 
 function releases_devuan() {
-    echo daedalus chimaera beowulf
+    echo daedalus chimaera
 }
 
 function releases_dragonflybsd() {
@@ -721,7 +721,8 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r)
+    # Filter out EOL releases (41 and earlier)
+    echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r | grep -v '^41$')
 }
 
 function editions_fedora() {
@@ -773,7 +774,8 @@ function editions_ghostbsd() {
 
 function releases_gnomeos() {
     #shellcheck disable=SC2046,SC2005
-    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep "title=" | awk -F'"' '{print $4}' | tr -d '/' | sort -nr)
+    # Filter out alpha/beta/rc pre-releases, keep only stable versions and nightly
+    echo "nightly" $(web_pipe "https://download.gnome.org/gnomeos/" | grep "title=" | awk -F'"' '{print $4}' | tr -d '/' | grep -E '^[0-9]+\.[0-9]+$' | sort -nr)
 }
 
 function releases_guix() {
@@ -837,7 +839,7 @@ function releases_macos() {
 }
 
 function releases_mageia() {
-    echo 9 8
+    echo 9
 }
 
 function editions_mageia() {
