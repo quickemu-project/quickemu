@@ -927,8 +927,8 @@ function editions_parrotsec() {
 }
 
 function releases_pclinuxos() {
-# shellcheck disable=SC2046
-    echo $(web_pipe "https://ftp.fau.de/pclinuxos/pclinuxos/iso" | grep -o -E 'pclinuxos64-([a-z]+-)+[0-9]{4}\.[0-9]{2}\.iso'| grep -o -E '[0-9]{4}\.[0-9]{2}'| head -n 1)
+    # Use 'latest' as different editions have different release dates
+    echo latest
 }
 
 function editions_pclinuxos() {
@@ -2337,17 +2337,16 @@ function get_parrotsec() {
 }
 
 function get_pclinuxos() {
-    case ${EDITION} in
-        mate) RELEASE="${RELEASE//./-}";;
-        # in case an edition is added that uses the mate style and sorts higher
-        kde|kde-darkstar) RELEASE="${RELEASE//-/.}";;
-        xfce) RELEASE="${RELEASE//-/.}";;
-        *) ;;
-    esac
-# shellcheck disable=SC2155
-    local HASH="$(web_pipe "${URL}/pclinuxos64-${EDITION}-${RELEASE}.md5sum" | head -c 32)"
-    local ISO="pclinuxos64-${EDITION}-${RELEASE}.iso"
     local URL="https://ftp.fau.de/pclinuxos/pclinuxos/iso"
+    local HASH=""
+    local ISO=""
+    # Find the latest ISO for this edition dynamically
+    ISO=$(web_pipe "${URL}/" | grep -o "pclinuxos64-${EDITION}-[0-9.]\+\.iso" | sort -Vr | head -n 1)
+    if [ -z "${ISO}" ]; then
+        echo ""
+        return
+    fi
+    HASH=$(web_pipe "${URL}/${ISO}.md5sum" | head -c 32)
     echo "${URL}/${ISO} ${HASH}"
 }
 
