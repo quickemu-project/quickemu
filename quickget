@@ -2522,8 +2522,15 @@ function get_slitaz() {
 
 function get_solus() {
     local HASH=""
-    local ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
+    local ISO=""
     local URL="https://downloads.getsol.us/isos/${RELEASE}"
+    # Try standard naming first, then beta naming for Xfce (older releases had Xfce as beta)
+    ISO="Solus-${EDITION}-Release-${RELEASE}.iso"
+    if ! web_check "${URL}/${ISO}"; then
+        # Try uppercase XFCE-Beta naming for older releases
+        local EDITION_UPPER="${EDITION^^}"
+        ISO="Solus-${EDITION_UPPER}-Beta-Release-${RELEASE}.iso"
+    fi
     HASH=$(web_pipe "${URL}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
