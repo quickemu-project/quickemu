@@ -56,7 +56,6 @@ function os_info() {
         gnomeos)          INFO="GNOME OS|-|https://os.gnome.org/|Alpha nightly bleeding edge distro of GNOME";;
         guix)             INFO="Guix|-|https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
         haiku)            INFO="Haiku|-|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
-        holoiso)          INFO="HoloISO|-|https://github.com/HoloISO/holoiso|Bring the Steam Decks SteamOS Holo redistribution and provide a close-to-official SteamOS experience.";;
         kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
         kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
         kolibrios)        INFO="KolibriOS|-|https://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
@@ -101,8 +100,6 @@ function os_info() {
         tails)            INFO="Tails|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
         trisquel)         INFO="Trisquel|-|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
-        truenas-core)     INFO="TrueNAS Core|-|https://www.truenas.com/truenas-core/|World’s most popular storage OS because it gives you the power to build your own professional-grade storage system to use in a variety of data-intensive applications without any software costs.";;
-        truenas-scale)    INFO="TrueNAS Scale|-|https://www.truenas.com/truenas-scale/|Open Source Hyperconverged Infrastructure (HCI) solution. In addition to powerful scale-out storage capabilities, SCALE adds Linux Containers and VMs (KVM) so apps run closer to data.";;
         tuxedo-os)        INFO="Tuxedo OS|-|https://www.tuxedocomputers.com/en/|KDE Ubuntu LTS designed to go with their Linux hardware.";;
         ubuntu)           INFO="Ubuntu|-|https://ubuntu.com/|Complete desktop Linux operating system, freely available with both community and professional support.";;
         ubuntu-budgie)    INFO="Ubuntu Budgie|-|https://ubuntubudgie.org/|Community developed distribution, integrating the Budgie Desktop Environment with Ubuntu at its core.";;
@@ -457,7 +454,6 @@ function os_support() {
     gnomeos \
     guix \
     haiku \
-    holoiso \
     kali \
     kdeneon \
     kolibrios \
@@ -502,8 +498,6 @@ function os_support() {
     tails \
     tinycore \
     trisquel \
-    truenas-core \
-    truenas-scale \
     tuxedo-os \
     ubuntu \
     ubuntu-budgie \
@@ -790,10 +784,6 @@ function editions_haiku() {
     echo x86_64 x86_gcc2h
 }
 
-function releases_holoiso() {
-    echo "latest"
-}
-
 function releases_kali() {
     echo current kali-weekly
 }
@@ -1021,7 +1011,7 @@ function editions_slax() {
 }
 
 function releases_slint() {
-    echo "15.0-5"
+    echo "15.0-10"
 }
 
 function releases_slitaz() {
@@ -1082,21 +1072,6 @@ function editions_trisquel() {
     echo mate lxde kde sugar
 }
 
-function releases_truenas() {
-    if [[ ${OS} == truenas ]] ; then
-        echo "ERROR! The supported TrueNAS OS values are truenas-core or truenas-scale"
-        exit 1;
-    fi
-}
-
-function releases_truenas-core() {
-    echo 13
-}
-
-function releases_truenas-scale() {
-    echo 24
-}
-
 function releases_tuxedo-os() {
     echo current
 }
@@ -1135,8 +1110,16 @@ function releases_vanillaos() {
 }
 
 function releases_void() {
+    # List directories that contain standard ISO files (base.iso), not just enterprise editions
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 3)
+    local DIRS=""
+    DIRS=$(web_pipe "https://repo-default.voidlinux.org/live/" | grep "^<a href=\"2" | cut -d'"' -f2 | tr -d '/' | sort -ru | head -n 5)
+    for DIR in ${DIRS}; do
+        # Only include directories that have standard base ISOs
+        if web_pipe "https://repo-default.voidlinux.org/live/${DIR}/" | grep -q "base.iso"; then
+            echo -n "${DIR} "
+        fi
+    done
 }
 
 function editions_void() {
@@ -1408,9 +1391,6 @@ function make_vm_config() {
         reactos)
             GUEST="reactos"
             IMAGE_TYPE="iso";;
-        truenas*)
-            GUEST="truenas"
-            IMAGE_TYPE="iso";;
         ubuntu*)
             GUEST="linux"
             IMAGE_TYPE="iso"
@@ -1482,13 +1462,6 @@ EOF
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
                 echo "disk_size=\"4G\"" >> "${CONF_FILE}"
                 echo "ram=\"512M\"" >> "${CONF_FILE}"
-                ;;
-            truenas-scale|truenas-core)
-                echo "boot=\"legacy\"" >> "${CONF_FILE}"
-                # the rest is non-functional
-                # echo "bootdrive_size=\"5G\"" >> "${CONF_FILE}" # boot drive
-                # echo "1stdrive_size=\"20G\"" >> "${CONF_FILE}" # for testing
-                # echo "2nddrive_size=\"20G\"" >> "${CONF_FILE}" # again, for testing
                 ;;
             ubuntu-server)
                 # 22.04+ fails on LVM build if disk size is < 10G
@@ -1690,8 +1663,10 @@ function get_biglinux() {
 function get_blendos() {
     local HASH=""
     local ISO="blendOS.iso"
-    local URL="https://kc1.mirrors.199693.xyz/blend/isos/testing"
-    echo "${URL}/${ISO} ${HASH}"
+    # Use the official GitLab build server
+    local URL="https://git.blendos.co/api/v4/projects/32/jobs/artifacts/main/raw/blendOS.iso?job=build-job"
+    HASH=$(web_pipe "https://git.blendos.co/api/v4/projects/32/jobs/artifacts/main/raw/checksum?job=build-job" | cut -d' ' -f1)
+    echo "${URL} ${HASH}"
 }
 
 function get_bodhi() {
@@ -1994,14 +1969,6 @@ function get_haiku() {
     local URL="http://mirror.rit.edu/haiku/${RELEASE}"
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | grep "${ISO}" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_holoiso() {
-    local HASH=""
-    local URL=""
-    RELEASE="$(web_pipe "https://github.com/HoloISO/releases/releases" | grep -o -e 'releases/tag/[[:digit:]]\+\(\.[[:digit:]]\+\)*' | head -n 1 | cut -d'/' -f 3)"
-    URL=$(web_pipe "https://api.github.com/repos/HoloISO/releases/releases" | jq -r ".[] | select(.tag_name==\"${RELEASE}\") | .body" | sed -n 's/.*\(https:\/\/[^ ]*holoiso\.ru\.eu\.org\/[^ ]*\.iso\).*/\1/p' | head -n 1)
-    echo "${URL} ${HASH}"
 }
 
 function get_kali() {
@@ -2597,25 +2564,6 @@ function get_trisquel() {
     esac
     HASH=$(web_pipe "${URL}/${ISO}.sha1" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
-}
-
-function get_truenas-scale() {
-    local HASH=""
-    local ISO=""
-    local URL=""
-    local DLINFO="https://www.truenas.com/download-truenas-scale/"
-    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
-    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
-    echo "${URL} ${HASH}"
-}
-
-function get_truenas-core() {
-    local ISO=""
-    local URL=""
-    local DLINFO="https://www.truenas.com/download-truenas-core/"
-    URL=$(web_pipe "${DLINFO}" | grep -o "\"https://.*${RELEASE}.*\.iso\"" | cut -d'"' -f 2)
-    HASH=$(web_pipe "${URL}".sha256 | cut -d' ' -f1)
-    echo "${URL} ${HASH}"
 }
 
 function get_tuxedo-os() {
