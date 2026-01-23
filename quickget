@@ -799,7 +799,7 @@ function releases_kolibrios() {
 }
 
 function editions_kolibrios() {
-    echo en_US  ru_RU  it_IT  es_ES
+    echo en_US ru_RU es_ES
 }
 
 function releases_linuxlite() {
