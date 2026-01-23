@@ -516,6 +516,15 @@ function configure_cpu() {
         GUEST_CPU_CORES="${cpu_cores}"
     fi
 
+    # Windows 11 requires a minimum of 2 CPU cores to install
+    # https://github.com/quickemu-project/quickemu/issues/1423
+    if [ "${guest_os}" == "windows" ] && [[ "${VMNAME}" == *"windows-11"* || "${VMNAME}" == *"win11"* ]]; then
+        if [ "${GUEST_CPU_CORES}" -lt 2 ]; then
+            echo " - CPU:      Adjusting CPU cores from ${GUEST_CPU_CORES} to 2 (Windows 11 minimum requirement)"
+            GUEST_CPU_CORES="2"
+        fi
+    fi
+
     # macOS guests cannot boot with most core counts not powers of 2.
     # Find the nearest but lowest power of 2 using a predefined table
     if [ "${guest_os}" == "macos" ]; then
