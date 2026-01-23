@@ -2214,6 +2214,7 @@ fi
 if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # shellcheck source=/dev/null
     source "${VM}"
+    PUBLIC="${public_dir:-${PUBLIC}}"
 
     VMDIR=$(dirname "${disk_img}")          # directory the VM disk and state files are stored
     VMNAME=$(basename "${VM}" .conf)        # name of the VM
