@@ -1945,7 +1945,7 @@ function get_garuda() {
 function get_gentoo() {
     local HASH=""
     local ISO=""
-    local URL="https://mirror.bytemark.co.uk/gentoo/releases/amd64/autobuilds"
+    local URL="https://mirrors.kernel.org/gentoo/releases/amd64/autobuilds"
     case ${EDITION} in
         minimal) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep install | cut -d' ' -f1);;
         livegui) ISO=$(web_pipe "${URL}/${RELEASE}-iso.txt" | grep livegui | cut -d' ' -f1);;
@@ -2040,7 +2040,7 @@ function get_linuxlite() {
 function get_linuxmint() {
     local HASH=""
     local ISO="linuxmint-${RELEASE}-${EDITION}-64bit.iso"
-    local URL="https://mirror.bytemark.co.uk/linuxmint/stable/${RELEASE}"
+    local URL="https://mirrors.kernel.org/linuxmint/stable/${RELEASE}"
     HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -2048,7 +2048,7 @@ function get_linuxmint() {
 function get_lmde() {
     local HASH=""
     local ISO="lmde-${RELEASE}-${EDITION}-64bit.iso"
-    local URL="https://mirror.bytemark.co.uk/linuxmint/debian"
+    local URL="https://mirrors.kernel.org/linuxmint/debian"
     HASH=$(web_pipe "${URL}/sha256sum.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
