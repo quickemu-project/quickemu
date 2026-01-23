@@ -708,7 +708,7 @@ function editions_endless() {
 
 function releases_fedora() {
     #shellcheck disable=SC2046,SC2005
-    # Filter out EOL releases (41 and earlier)
+    # Filter out EOL release 41
     echo $(web_pipe "https://getfedora.org/releases.json" | jq -r 'map(.version) | unique | .[]' | sed 's/ /_/g' | sort -r | grep -v '^41$')
 }
 
@@ -1152,10 +1152,11 @@ function releases_zorin() {
 
 function editions_zorin() {
     # Lite edition not available for Zorin 18 (Pro-only starting from 18)
-    if [ "${RELEASE}" = "18" ]; then
-        echo core64 education64
-    else
+    # When RELEASE is unset (e.g. csv_data context), return all editions
+    if [ -z "${RELEASE}" ] || [ "${RELEASE}" != "18" ]; then
         echo core64 lite64 education64
+    else
+        echo core64 education64
     fi
 }
 
