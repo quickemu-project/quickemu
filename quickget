@@ -1237,6 +1237,12 @@ function check_hash() {
         esac
     fi
 
+    case "${hash_algo}" in
+        md5sum|sha1sum)
+            echo "WARNING! ${hash_algo} is a weak hash algorithm; prefer sha256, sha512, or b2sum."
+            ;;
+    esac
+
     # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
     if [ "${HOST_OS}" = "Darwin" ]; then
         case ${hash_algo} in

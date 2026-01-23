@@ -686,7 +686,10 @@ function configure_bios() {
             # Do not assume brew; quickemu could have been installed via Nix
             if command -v brew &>/dev/null; then
                 # Detect qemu installation by checking the actual binary path
-                local QEMU_PATH="$(command -v qemu-system-x86_64 || command -v qemu-system-aarch64)"
+                local QEMU_PATH=""
+                if [ -n "${ARCH_VM}" ]; then
+                    QEMU_PATH="$(command -v "qemu-system-${ARCH_VM}" 2>/dev/null || true)"
+                fi
                 if [ -n "${QEMU_PATH}" ]; then
                     # Extract the Cellar path and find the share directory
                     SHARE_PATH="$(dirname "$(dirname "${QEMU_PATH}")")/share"
@@ -1131,8 +1134,6 @@ function configure_display() {
     if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|gpu-pci|gpu-gl-pci|vga-gl)|qxl|qxl-vga|bochs-display)$ ]] || [[ "${DISPLAY_DEVICE}" =~ ,virgl=on ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
-    elif [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
-        echo " "
     else
         echo " "
     fi
@@ -2133,6 +2134,7 @@ SOCKET_MONITOR=""
 SOCKET_SERIAL=""
 STATUS_QUO=""
 USB_PASSTHROUGH=""
+VIDEO_EXTRA=""
 VM=""
 VMDIR=""
 VMNAME=""
@@ -2164,11 +2166,21 @@ if [ "${OS_KERNEL}" == "Darwin" ]; then
     display="cocoa"
 fi
 
-QEMU_VER_LONG=$(${QEMU_IMG} --version | head -n 1 | awk '{print $3}')
-# strip patch version and remove dots. 6.0.0 => 60 / 10.0.0 => 100
-QEMU_VER_SHORT=$(echo "${QEMU_VER_LONG%.*}" | sed 's/\.//g')
+QEMU_VER_LINE=$(${QEMU_IMG} --version | head -n 1)
+QEMU_VER_RAW=$(echo "${QEMU_VER_LINE}" | grep -Eo '[0-9]+(\.[0-9]+){0,2}' | head -n 1)
+if [ -z "${QEMU_VER_RAW}" ]; then
+    echo "ERROR! Unable to determine QEMU version."
+    exit 1
+fi
+IFS=. read -r QEMU_VER_MAJOR QEMU_VER_MINOR QEMU_VER_PATCH <<< "${QEMU_VER_RAW}"
+if [ -z "${QEMU_VER_MAJOR}" ]; then
+    echo "ERROR! Invalid QEMU version detected: ${QEMU_VER_RAW}."
+    exit 1
+fi
+QEMU_VER_MINOR=${QEMU_VER_MINOR:-0}
+QEMU_VER_SHORT=$((QEMU_VER_MAJOR * 10 + QEMU_VER_MINOR))
 if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
-    echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_LONG}."
+    echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_RAW}."
     exit 1
 fi
 
@@ -2337,9 +2349,35 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     
     # Update ARCH_VM from config if specified
     ARCH_VM="${arch}"
+    if [ -z "${ARCH_VM}" ]; then
+        echo "ERROR! VM architecture cannot be empty."
+        exit 1
+    fi
     QEMU=$(command -v qemu-system-${ARCH_VM})
     if [ ! -x "${QEMU}" ]; then
         echo "ERROR! qemu-system-${ARCH_VM} not found. Please install it for ${ARCH_VM} architecture support."
+        exit 1
+    fi
+
+    QEMU_VER_LINE=$(${QEMU} --version | head -n 1)
+    QEMU_VER_RAW=$(echo "${QEMU_VER_LINE}" | grep -Eo '[0-9]+(\.[0-9]+){0,2}' | head -n 1)
+    if [ -z "${QEMU_VER_RAW}" ]; then
+        QEMU_VER_LINE=$(${QEMU_IMG} --version | head -n 1)
+        QEMU_VER_RAW=$(echo "${QEMU_VER_LINE}" | grep -Eo '[0-9]+(\.[0-9]+){0,2}' | head -n 1)
+    fi
+    if [ -z "${QEMU_VER_RAW}" ]; then
+        echo "ERROR! Unable to determine QEMU version."
+        exit 1
+    fi
+    IFS=. read -r QEMU_VER_MAJOR QEMU_VER_MINOR QEMU_VER_PATCH <<< "${QEMU_VER_RAW}"
+    if [ -z "${QEMU_VER_MAJOR}" ]; then
+        echo "ERROR! Invalid QEMU version detected: ${QEMU_VER_RAW}."
+        exit 1
+    fi
+    QEMU_VER_MINOR=${QEMU_VER_MINOR:-0}
+    QEMU_VER_SHORT=$((QEMU_VER_MAJOR * 10 + QEMU_VER_MINOR))
+    if [ "${QEMU_VER_SHORT}" -lt 60 ]; then
+        echo "ERROR! QEMU 6.0.0 or newer is required, detected ${QEMU_VER_RAW}."
         exit 1
     fi
 
