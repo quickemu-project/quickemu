@@ -566,7 +566,8 @@ function releases_artixlinux() {
 
 function editions_artixlinux() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | cut -d'-' -f2-3 | sort -u)
+    # Extract edition-init combinations (e.g., base-dinit, plasma-openrc, community-gtk-openrc)
+    echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | sed 's/artix-//' | sed 's/-[0-9]\{8\}-x86_64.iso//' | sort -u)
 }
 
 function releases_athenaos() {
