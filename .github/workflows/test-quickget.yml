@@ -129,41 +129,38 @@ jobs:
             TOTAL_SKIPPED=$((TOTAL_SKIPPED + SKIPPED))
 
             if [ "$FAILED" -gt 0 ]; then
-              STATUS="❌"
               HAS_FAILURES=true
+              if [ "$PASSED" -eq 0 ]; then
+                STATUS="❌"
+              else
+                STATUS="⚠️"
+              fi
             else
               STATUS="✅"
             fi
 
-            DISTRO_ROWS="${DISTRO_ROWS}| ${DISTRO} | ${PASSED} | ${FAILED} | ${SKIPPED} | ${STATUS} |
-          "
+            DISTRO_ROWS="${DISTRO_ROWS}$(printf '| %s | %s | %s | %s | %s |\n' "${DISTRO}" "${PASSED}" "${FAILED}" "${SKIPPED}" "${STATUS}")"
           done
 
           # Sort distro rows alphabetically
           DISTRO_ROWS_SORTED=$(echo "$DISTRO_ROWS" | sort)
 
           # Write summary header
-          cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
-          ## Test Results 📊
-
-          | Metric | Count |
-          |--------|-------|
-          EOF
-
+          echo "## Test Results 📊" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
           echo "| ✅ Passed | ${TOTAL_PASSED} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| ❌ Failed | ${TOTAL_FAILED} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| ⏭️ Skipped | ${TOTAL_SKIPPED} |" >> "$GITHUB_STEP_SUMMARY"
 
           # Write per-distro breakdown
-          cat >> "$GITHUB_STEP_SUMMARY" << 'EOF'
-
-          ### Per-distro breakdown
-
-          | Distro | Passed | Failed | Skipped | Status |
-          |--------|--------|--------|---------|--------|
-          EOF
-
-          echo "$DISTRO_ROWS_SORTED" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Per-distro breakdown" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Distro | Passed | Failed | Skipped | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|--------|--------|---------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo -n "$DISTRO_ROWS_SORTED" >> "$GITHUB_STEP_SUMMARY"
 
           # Collect and display failed URLs if any
           if [ "$HAS_FAILURES" = true ]; then
