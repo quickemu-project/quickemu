@@ -775,7 +775,7 @@ function releases_gnomeos() {
 }
 
 function releases_guix() {
-    echo 1.4.0 1.3.0
+    echo 1.5.0 1.4.0
 }
 
 function releases_haiku() {
