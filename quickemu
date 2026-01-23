@@ -625,8 +625,11 @@ function configure_ram() {
 
 function is_firmware_qcow2() {
     # Check for the magic bytes that indicate the firmware is in qcow2 format,
-    # otherwise default to assuming firmware files are in raw format
-    [ "$(head -c 4 "$1")" = "QFI"$'\xfb' ] && echo "true" || echo "false"
+    # otherwise default to assuming firmware files are in raw format.
+    # Use od to read bytes as hex to avoid null byte warnings in command substitution.
+    local magic
+    magic=$(od -An -tx1 -N4 "$1" 2>/dev/null | tr -d ' ')
+    [ "$magic" = "514649fb" ] && echo "true" || echo "false"
 }
 
 function configure_bios() {
