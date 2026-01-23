@@ -655,7 +655,8 @@ function releases_debian() {
     NEW=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     echo -n "${NEW}"
     MAJ=$(echo "${NEW}" | cut -d'.' -f 1)
-    ARCHIVE="$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep folder | grep -v NEVER | cut -d'"' -f 6)"
+    # Get archive versions that have -live directories (live images available)
+    ARCHIVE="$(web_pipe "https://cdimage.debian.org/cdimage/archive/" | grep folder | grep -v NEVER | grep '\-live/' | cut -d'"' -f 6 | sed 's/-live\///')"
     for i in {1..2}; do
         CUR=$((MAJ - i))
         OLD=$(grep ^"${CUR}"  <<< "${ARCHIVE}" | tail -n 1 | tr -d '/')
