@@ -911,11 +911,19 @@ function releases_oraclelinux() {
 
 function releases_parrotsec() {
     #shellcheck disable=SC2046,SC2005
-    echo $(web_pipe "https://deb.parrot.sh/parrot/iso/" | grep -o -E 'href="([[:digit:]]+\.)+[[:digit:]]+/' | sort -nr | head -n 3 | cut -d\" -f 2 | cut -d'/' -f 1)
+    # Only return releases that have ISO files available
+    local RELEASES=""
+    for REL in $(web_pipe "https://deb.parrot.sh/parrot/iso/" | grep -o -E 'href="([[:digit:]]+\.)+[[:digit:]]+/' | sort -Vr | head -n 5 | cut -d\" -f 2 | cut -d'/' -f 1); do
+        if web_pipe "https://download.parrot.sh/parrot/iso/${REL}/" | grep -q '\.iso"'; then
+            RELEASES="${RELEASES} ${REL}"
+        fi
+    done
+    echo ${RELEASES}
 }
 
 function editions_parrotsec() {
-    echo home htb security
+    # htb edition was discontinued after 6.x series
+    echo home security
 }
 
 function releases_pclinuxos() {
