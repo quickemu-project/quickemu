@@ -104,7 +104,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: result-*
-          merge-multiple: true
           path: results
       - name: "Generate summary report 📈"
         run: |
@@ -117,7 +116,7 @@ jobs:
           # Build per-distro table rows
           DISTRO_ROWS=""
 
-          for json_file in results/result.json results/*/result.json 2>/dev/null; do
+          for json_file in results/result-*/result.json; do
             [ -f "$json_file" ] || continue
 
             DISTRO=$(jq -r '.distro' "$json_file")
@@ -173,7 +172,7 @@ jobs:
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
 
-            for failed_file in results/failed.txt results/*/failed.txt 2>/dev/null; do
+            for failed_file in results/result-*/failed.txt; do
               [ -f "$failed_file" ] && cat "$failed_file" >> "$GITHUB_STEP_SUMMARY"
             done
 
