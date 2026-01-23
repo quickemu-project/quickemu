@@ -1625,7 +1625,13 @@ function get_artixlinux() {
 function get_athenaos() {
     local HASH=""
     local URL="https://github.com/Athena-OS/athena/releases/download/${RELEASE}"
-    local ISO="athena-rolling-x86_64.iso"
+    local ISO=""
+    # Newer releases (v23.11+) use "athenaos-rolling" naming, older ones use "athena-rolling"
+    if web_check "${URL}/athenaos-rolling-x86_64.iso"; then
+        ISO="athenaos-rolling-x86_64.iso"
+    else
+        ISO="athena-rolling-x86_64.iso"
+    fi
     HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
