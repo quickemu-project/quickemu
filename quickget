@@ -311,7 +311,7 @@ function create_macos_disk_with_opencore() {
         fi
     fi
     if [ -d "${OPENCORE_DIR}/EFI/OC" ]; then
-        if ! ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/OC" ::/EFI/; then
+        if ! LC_ALL='' ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/OC" ::/EFI/; then
             echo "ERROR! Failed to copy EFI/OC to disk."
             rm -f "${TEMP_DISK}"
             return 1
