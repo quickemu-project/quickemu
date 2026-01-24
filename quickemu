@@ -478,10 +478,15 @@ function configure_cpu() {
             fi
             ;;
         windows|windows-server)
-            if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_passthrough"
-            else
-                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on,migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+            # Base CPU flags that work with all accelerators (KVM, HVF, TCG)
+            CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
+            # KVM-specific flags: migratable and Hyper-V enlightenments
+            if [ "${QEMU_ACCEL}" == "kvm" ]; then
+                if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
+                    CPU+=",migratable=no,hv_passthrough"
+                else
+                    CPU+=",migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+                fi
             fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
             #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
