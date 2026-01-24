@@ -965,7 +965,7 @@ function check_cocoa_gl_es_support() {
 
     # Test QEMU directly for gl=es support - most reliable method
     # This catches both missing OpenGL build support and missing ANGLE libraries
-    if "${QEMU}" -display cocoa,gl=es -M none 2>&1 | grep -qi "OpenGL support was not enabled\|does not accept"; then
+    if "${QEMU}" -display cocoa,gl=es -M none 2>&1 | grep -Eqi "OpenGL support was not enabled|does not accept"; then
         return 1
     fi
 
