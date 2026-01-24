@@ -1781,10 +1781,13 @@ function vm_boot() {
             args+=(-blockdev node-name=rom,driver=file,filename="${EFI_CODE}",read-only=true
                 -blockdev node-name=efivars,driver=file,filename="${EFI_VARS}")
         else
-            # x86 uses traditional pflash drives with secure boot support
+            # x86 uses traditional pflash drives
+            # Only enable secure pflash property when SecureBoot is requested
             # shellcheck disable=SC2054
-            args+=(-global driver=cfi.pflash01,property=secure,value=on
-                -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+            if [ "${secureboot}" == "on" ]; then
+              args+=(-global driver=cfi.pflash01,property=secure,value=on)
+            fi
+            args+=(-drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
                 -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
         fi
     fi
