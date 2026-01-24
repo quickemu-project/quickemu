@@ -1602,10 +1602,12 @@ function get_archcraft() {
     local HASH=""
     local ISO=""
     local URL=""
+    local VERSION_FOLDER=""
     URL="https://sourceforge.net/projects/archcraft/files/${RELEASE}/download"
     URL="$(web_redirect "${URL}" | cut -d? -f1)"
     ISO="$(basename "${URL}")"
-    HASH=$(web_pipe "https://sourceforge.net/projects/archcraft/files/v${RELEASE}/${ISO}.sha256sum" | cut -d' ' -f1)
+    VERSION_FOLDER="$(dirname "${URL}" | xargs basename)"
+    HASH=$(web_pipe "https://sourceforge.net/projects/archcraft/files/${VERSION_FOLDER}/${ISO}.sha256sum" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
