@@ -842,6 +842,44 @@ function is_firmware_qcow2() {
     [ "$magic" = "514649fb" ] && echo "true" || echo "false"
 }
 
+# Derive QEMU share path from binary location
+# Handles Nix, Homebrew, MacPorts, system packages, custom builds
+function get_qemu_share_path() {
+  local qemu_bin="${QEMU}"
+  local qemu_real qemu_prefix share_path
+
+  # Resolve the actual binary path (handles symlinks, Nix store paths)
+  if command -v realpath &>/dev/null; then
+    qemu_real=$(realpath "${qemu_bin}" 2>/dev/null) || qemu_real="${qemu_bin}"
+  else
+    # macOS fallback: follow symlink chain manually
+    qemu_real="${qemu_bin}"
+    while [ -L "${qemu_real}" ]; do
+      local link_target
+      link_target=$(readlink "${qemu_real}")
+      # Handle relative symlinks
+      if [[ "${link_target}" != /* ]]; then
+        qemu_real="$(dirname "${qemu_real}")/${link_target}"
+      else
+        qemu_real="${link_target}"
+      fi
+    done
+  fi
+
+  # /path/to/bin/qemu-system-x86_64 -> /path/to/share
+  qemu_prefix="$(dirname "$(dirname "${qemu_real}")")"
+  share_path="${qemu_prefix}/share"
+
+  # Validate: must contain qemu firmware directory
+  if [ -d "${share_path}/qemu" ]; then
+    echo "${share_path}"
+    return 0
+  fi
+
+  # Fallback for system installations
+  echo "/usr/share"
+}
+
 function configure_bios() {
     # Always Boot macOS using EFI
     if [ "${guest_os}" == "macos" ]; then
@@ -900,13 +938,8 @@ function configure_bios() {
         # OVMF_CODE.secboot.fd is like OVMF_CODE_4M.fd, but will abort if QEMU
         # does not support SMM.
 
-        local SHARE_PATH="/usr/share"
-        if [ "${OS_KERNEL}" == "Darwin" ]; then
-            # Do not assume brew; quickemu could have been installed via Nix
-            if command -v brew &>/dev/null; then
-                SHARE_PATH="$(brew --prefix qemu)/share"
-            fi
-        fi
+        local SHARE_PATH
+        SHARE_PATH=$(get_qemu_share_path)
 
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
         # TODO: Check if macOS should use 'edk2-i386-vars.fd'
