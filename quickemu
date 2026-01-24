@@ -474,7 +474,7 @@ function configure_cpu() {
                 # AMD CPUs with constant_tsc need explicit TSC flags for macOS stability
                 # constant_tsc is AMD's equivalent of Intel's invtsc
                 if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && check_cpu_flag invtsc; then
-                    CPU+=",+tsc,+tsc-deadline,+invtsc"
+                    CPU+=",+tsc,+tsc-deadline"
                 fi
             fi
 
