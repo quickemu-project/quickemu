@@ -1943,13 +1943,21 @@ function get_crunchbang++() {
 }
 
 function get_debian() {
+    local DEBIAN_ARCH="${ARCH}"
     local DEBCURRENT=""
     local HASH=""
-    local ISO="debian-live-${RELEASE}-amd64-${EDITION}.iso"
-    local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/amd64/iso-hybrid"
+    local ISO="debian-live-${RELEASE}-${DEBIAN_ARCH}-${EDITION}.iso"
+    local URL="https://cdimage.debian.org/cdimage/archive/${RELEASE}-live/${DEBIAN_ARCH}/iso-hybrid"
+
+    # Debian only provides netinst images for ARM64
+    if [ "${DEBIAN_ARCH}" == "arm64" ] && [ "${EDITION}" != "netinst" ]; then
+        echo "ERROR! Debian ${EDITION} is not available for ARM64. Use 'netinst' edition."
+        exit 1
+    fi
+
     DEBCURRENT=$(web_pipe "https://cdimage.debian.org/debian-cd/" | grep '\.[0-9]/' | cut -d'>' -f 9 | cut -d'/' -f 1)
     case "${RELEASE}" in
-        "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/amd64/iso-hybrid";;
+        "${DEBCURRENT}") URL="https://cdimage.debian.org/debian-cd/${RELEASE}-live/${DEBIAN_ARCH}/iso-hybrid";;
     esac
     if [ "${EDITION}" == "netinst" ]; then
         URL="${URL/-live/}"
