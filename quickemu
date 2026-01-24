@@ -429,52 +429,56 @@ function configure_cpu() {
             fi
             # A CPU with fma is required for Metal support
             # A CPU with invtsc is required for macOS to boot
-            case ${macos_release} in
-                ventura|sonoma|sequoia|tahoe)
-                    # A CPU with AVX2 support is required for >= macOS Ventura
-                    if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+avx2,+sse4.2"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
-                        echo "       Try macOS Monterey or Big Sur."
-                        exit 1
-                    fi;;
-                catalina|big-sur|monterey)
-                    # A CPU with SSE4.2 support is required for >= macOS Catalina
-                    if check_cpu_flag sse4_2; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.2"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
-                        exit 1
-                    fi;;
-                *)
-                    # A CPU with SSE4.1 support is required for >= macOS Sierra
-                    if check_cpu_flag sse4_1; then
-                        if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                            CPU+=",+sse4.1"
-                        fi
-                    else
-                        echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
-                        exit 1
-                    fi;;
-            esac
+            # Skip CPU feature checks when using TCG emulation (cross-architecture)
+            # as QEMU will emulate the required x86 features in software
+            if [ "${QEMU_ACCEL}" != "tcg" ]; then
+                case ${macos_release} in
+                    ventura|sonoma|sequoia|tahoe)
+                        # A CPU with AVX2 support is required for >= macOS Ventura
+                        if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
+                            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                                CPU+=",+avx2,+sse4.2"
+                            fi
+                        else
+                            echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
+                            echo "       Try macOS Monterey or Big Sur."
+                            exit 1
+                        fi;;
+                    catalina|big-sur|monterey)
+                        # A CPU with SSE4.2 support is required for >= macOS Catalina
+                        if check_cpu_flag sse4_2; then
+                            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                                CPU+=",+sse4.2"
+                            fi
+                        else
+                            echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
+                            exit 1
+                        fi;;
+                    *)
+                        # A CPU with SSE4.1 support is required for >= macOS Sierra
+                        if check_cpu_flag sse4_1; then
+                            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                                CPU+=",+sse4.1"
+                            fi
+                        else
+                            echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
+                            exit 1
+                        fi;;
+                esac
 
-            if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                for FLAG in abm adx aes amd-ssbd apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
-                            eist erms f16c fma fp87 fsgsbase fxsr invpcid invtsc lahf_lm lm \
-                            mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
-                            rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
-                            x2apic xgetbv1 xsave xsaveopt; do
-                    CPU+=$(configure_cpu_flag "${FLAG}")
-                done
-                # AMD CPUs with constant_tsc need explicit TSC flags for macOS stability
-                # constant_tsc is AMD's equivalent of Intel's invtsc
-                if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && check_cpu_flag invtsc; then
-                    CPU+=",+tsc,+tsc-deadline"
+                if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
+                    for FLAG in abm adx aes amd-ssbd apic arat bmi1 bmi2 clflush cmov cx8 cx16 de \
+                                eist erms f16c fma fp87 fsgsbase fxsr invpcid invtsc lahf_lm lm \
+                                mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
+                                rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
+                                x2apic xgetbv1 xsave xsaveopt; do
+                        CPU+=$(configure_cpu_flag "${FLAG}")
+                    done
+                    # AMD CPUs with constant_tsc need explicit TSC flags for macOS stability
+                    # constant_tsc is AMD's equivalent of Intel's invtsc
+                    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && check_cpu_flag invtsc; then
+                        CPU+=",+tsc,+tsc-deadline"
+                    fi
                 fi
             fi
 
