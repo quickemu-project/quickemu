@@ -8,6 +8,13 @@ export LC_ALL=C
 # Detect host OS for checksum tool compatibility
 HOST_OS=$(uname -s)
 
+# Default architecture based on host
+HOST_ARCH=$(uname -m)
+case "${HOST_ARCH}" in
+    aarch64|arm64) ARCH="arm64";;
+    *) ARCH="amd64";;
+esac
+
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
@@ -1623,10 +1630,15 @@ function make_vm_config() {
 
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
+        local ARCH_LINE=""
+        if [ "${ARCH}" == "arm64" ]; then
+            ARCH_LINE="arch=\"aarch64\""
+        fi
         cat << EOF > "${CONF_FILE}"
 #!${QUICKEMU} --vm
 guest_os="${GUEST}"
-disk_img="${VM_PATH}/disk.qcow2"
+${ARCH_LINE:+${ARCH_LINE}
+}disk_img="${VM_PATH}/disk.qcow2"
 ${IMAGE_TYPE}="${VM_PATH}/${IMAGE_FILE}"
 EOF
         echo " - Setting ${CONF_FILE} executable"
@@ -1741,8 +1753,10 @@ EOF
 
 function get_alma() {
     local HASH=""
-    local ISO="AlmaLinux-${RELEASE}-latest-x86_64-${EDITION}.iso"
-    local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/x86_64"
+    local QEMU_ARCH="x86_64"
+    [ "${ARCH}" == "arm64" ] && QEMU_ARCH="aarch64"
+    local ISO="AlmaLinux-${RELEASE}-latest-${QEMU_ARCH}-${EDITION}.iso"
+    local URL="https://repo.almalinux.org/almalinux/${RELEASE}/isos/${QEMU_ARCH}"
     HASH="$(web_pipe "${URL}/CHECKSUM" | grep "(${ISO}" | cut -d' ' -f4)"
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -1750,11 +1764,13 @@ function get_alma() {
 function get_alpine() {
     local HASH=""
     local ISO=""
-    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/x86_64"
+    local QEMU_ARCH="x86_64"
+    [ "${ARCH}" == "arm64" ] && QEMU_ARCH="aarch64"
+    local URL="https://dl-cdn.alpinelinux.org/alpine/${RELEASE}/releases/${QEMU_ARCH}"
     local VERSION=""
-    VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | awk '{print $2}')
-    ISO="alpine-virt-${VERSION}-x86_64.iso"
-    HASH=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | awk '{print $2}')
+    VERSION=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'version:' | head -1 | awk '{print $2}')
+    ISO="alpine-virt-${VERSION}-${QEMU_ARCH}.iso"
+    HASH=$(web_pipe "${URL}/latest-releases.yaml" | awk '/"Xen"/{found=0} {if(found) print} /"Virtual"/{found=1}' | grep 'sha256:' | head -1 | awk '{print $2}')
     echo "${URL}/${ISO} ${HASH}"
 }
 
@@ -2692,8 +2708,7 @@ function get_rockylinux() {
     fi
     local HASH=""
     local ISO="Rocky-${RELEASE}-x86_64-${EDITION}.iso"
-    local URL=""
-    URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
+    local URL="https://dl.rockylinux.org/vault/rocky/${RELEASE}/isos/x86_64"
     HASH=$(web_pipe "${URL}/CHECKSUM" | grep "SHA256" | grep "${ISO})" | cut -d' ' -f4)
     echo "${URL}/${ISO} ${HASH}"
 }
@@ -3748,12 +3763,13 @@ Advanced usage:
   quickget --download ubuntu 22.04
 
 Arguments:
-  --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
-  --open-homepage <os>                     : Open homepage for the OS
-  --show          [os]                     : Show OS information
-  --version                                : Show version
-  --help                                   : Show this help message
+   --arch          <arch>                   : Set architecture (arm64, aarch64, amd64, x86_64)
+   --download      <os> <release> [edition] : Download image; no VM configuration
+   --create-config <os> [path/url] [flags]  : Create VM config for an OS image
+   --open-homepage <os>                     : Open homepage for the OS
+   --show          [os]                     : Show OS information
+   --version                                : Show version
+   --help                                   : Show this help message
 ------------------------------------ Flags -------------------------------------
 --create-config:
   --disable-unattended                     : Force quickget not to set up an unattended installation
@@ -3787,10 +3803,33 @@ fi
 CURL_VERSION=$("${CURL}" --version | head -n 1 | cut -d' ' -f2)
 
 #TODO: Deprecate `list`, `list_csv`, and `list_json` in favor of `--list`, `--list-csv`, and `--list-json`
+
+# Function to process --arch flag
+function parse_arch_flag() {
+    if [ "${1}" == "--arch" ] || [ "${1}" == "-arch" ]; then
+        case "${2}" in
+            arm64|aarch64) ARCH="arm64";;
+            amd64|x86_64) ARCH="amd64";;
+            *) echo "ERROR! Unsupported architecture: ${2}"; exit 1;;
+        esac
+        return 0  # Flag was found
+    fi
+    return 1  # Flag was not found
+}
+
+# Process --arch flag first if present (can be combined with other flags)
+if parse_arch_flag "${1}" "${2}"; then
+    shift 2
+fi
+
 case "${1}" in
     --download|-download)
         OPERATION="download"
         shift
+        # Handle --arch after --download
+        if parse_arch_flag "${1}" "${2}"; then
+            shift 2
+        fi
         ;;
     --create-config|-create-config)
         OPERATION="config"
@@ -3821,6 +3860,10 @@ case "${1}" in
     --url|-url)
         OPERATION="show"
         shift
+        # Handle --arch after --url
+        if parse_arch_flag "${1}" "${2}"; then
+            shift 2
+        fi
         if [ -z "${1}" ]; then
             for OS in $(os_support); do
                 (test_all "${OS}")
@@ -3833,6 +3876,10 @@ case "${1}" in
     --check|-check)
         OPERATION="test"
         shift
+        # Handle --arch after --check
+        if parse_arch_flag "${1}" "${2}"; then
+            shift 2
+        fi
         if [ -z "${1}" ]; then
             for OS in $(os_support); do
                 (test_all "${OS}")
