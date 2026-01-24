@@ -573,7 +573,7 @@ function test_all() {
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
                 # Check architecture support before generating URL
-                if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+                if ! is_arch_supported "${OS}" "${ARCH}"; then
                     test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
                     continue
                 fi
@@ -601,7 +601,7 @@ function test_all() {
             (get_macos)
         elif [ "${OS}" == "ubuntu-server" ]; then
             # Check architecture support before generating URL
-            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+            if ! is_arch_supported "${OS}" "${ARCH}"; then
                 test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
                 continue
             fi
@@ -609,7 +609,7 @@ function test_all() {
             (get_ubuntu-server)
         elif [[ "${OS}" == *ubuntu* ]]; then
             # Ubuntu desktop is amd64 only (no arch function = amd64 default)
-            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+            if ! is_arch_supported "${OS}" "${ARCH}"; then
                 test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
                 continue
             fi
@@ -617,7 +617,7 @@ function test_all() {
             (get_ubuntu)
         else
             # Check architecture support before generating URL
-            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+            if ! is_arch_supported "${OS}" "${ARCH}"; then
                 test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
                 continue
             fi
@@ -1388,7 +1388,10 @@ function arch_debian() {
 }
 
 function arch_fedora() {
-    echo "amd64 arm64"
+    case "${EDITION}" in
+        Server) echo "amd64 arm64";;
+        *) echo "amd64";;
+    esac
 }
 
 function arch_ubuntu-server() {
