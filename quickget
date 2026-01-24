@@ -1356,15 +1356,33 @@ function check_hash() {
         iso="${VM_PATH}/${1}"
     fi
     hash="${2}"
-    # Guess the hash algorithm by the hash length
-    case ${#hash} in
-        32) hash_algo=md5sum;;
-        40) hash_algo=sha1sum;;
-        64) hash_algo=sha256sum;;
-        128) hash_algo=sha512sum;;
-        *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
-            return;;
-    esac
+
+    # Check for algorithm prefix (e.g., "sha256:abc123..." or "b2sum:abc123...")
+    if [[ "${hash}" == *":"* ]]; then
+        local hash_prefix="${hash%%:*}"
+        hash="${hash#*:}"
+        # Normalise algorithm prefix to lowercase
+        hash_prefix="$(echo "${hash_prefix}" | tr '[:upper:]' '[:lower:]')"
+        case "${hash_prefix}" in
+            md5) hash_algo=md5sum;;
+            sha1) hash_algo=sha1sum;;
+            sha256) hash_algo=sha256sum;;
+            sha512) hash_algo=sha512sum;;
+            b2sum|blake2|blake2b) hash_algo=b2sum;;
+            *) echo "WARNING! Unknown hash algorithm '${hash_prefix}', not checking ${iso} hash."
+               return;;
+        esac
+    else
+        # Guess the hash algorithm by the hash length
+        case ${#hash} in
+            32) hash_algo=md5sum;;
+            40) hash_algo=sha1sum;;
+            64) hash_algo=sha256sum;;
+            128) hash_algo=sha512sum;;
+            *) echo "WARNING! Can't guess hash algorithm, not checking ${iso} hash."
+                return;;
+        esac
+    fi
 
     # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
     if [ "${HOST_OS}" = "Darwin" ]; then
@@ -1373,11 +1391,12 @@ function check_hash() {
             sha1sum) hash_algo=gsha1sum;;
             sha256sum) hash_algo=gsha256sum;;
             sha512sum) hash_algo=gsha512sum;;
+            b2sum) hash_algo=gb2sum;;
         esac
     fi
 
     echo -n "Checking ${iso} with ${hash_algo}... "
-    if ! echo "${hash} ${iso}" | ${hash_algo} --check --status; then
+    if ! printf '%s  %s\n' "${hash}" "${iso}" | ${hash_algo} --check --status; then
         echo "ERROR!"
         echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
         exit 1
