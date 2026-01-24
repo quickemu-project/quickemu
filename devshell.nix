@@ -59,8 +59,10 @@ mkShell {
         ''
       }${lib.optionalString stdenv.isDarwin ''
         -e 's|local SHARE_PATH="/usr/share"|local SHARE_PATH="${pkgs.qemu_full}/share"|' \
+        -e '/command -v brew/,/^[[:space:]]*fi$/{ /command -v brew/s/.*/            : # Nix provides QEMU, skip brew check/; /SHARE_PATH.*brew/d; /^[[:space:]]*fi$/d; }' \
         -e 's|ovmfs=("[$][{]SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-x86_64-secure-code.fd","${pkgs.qemu_full}/share/qemu/edk2-i386-vars.fd" "''${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd"|' \
         -e 's|ovmfs=("[$][{]SHARE_PATH}/OVMF/OVMF_CODE_4M.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-x86_64-code.fd","${pkgs.qemu_full}/share/qemu/edk2-i386-vars.fd" "''${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd"|' \
+        -e 's|ovmfs=("/usr/share/AAVMF/AAVMF_CODE.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-aarch64-code.fd","${pkgs.qemu_full}/share/qemu/edk2-arm-vars.fd" "/usr/share/AAVMF/AAVMF_CODE.fd"|' \
       ''} \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
       -e 's,\$(command -v smbd),${pkgs.samba}/bin/smbd,' \

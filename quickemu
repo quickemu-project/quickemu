@@ -439,12 +439,20 @@ function configure_cpu() {
         QEMU_ACCEL="kvm"
     fi
 
-    if [ "${ARCH_VM}" == "aarch64"  ]; then
-        # Support to run aarch64 VMs (best guess; untested)
+    if [ "${ARCH_VM}" == "aarch64" ]; then
+        # ARM64 guest support
         # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
+        # highmem=on allows RAM above 4GB (required for VMs with >3GB RAM)
+        # pflash0/pflash1 reference the blockdev nodes for AAVMF firmware
+        MACHINE_TYPE="virt,highmem=on,pflash0=rom,pflash1=efivars"
         case ${ARCH_HOST} in
-            arm64|aarch64) CPU_MODEL="max"
-                           MACHINE_TYPE="virt,highmem=off";;
+            arm64|aarch64)
+                # Native ARM64 host running ARM64 guest - use hardware acceleration
+                CPU_MODEL="max";;
+            *)
+                # Cross-architecture emulation (e.g., x86_64 host running ARM64 guest)
+                CPU_MODEL="max"
+                QEMU_ACCEL="tcg";;
         esac
     elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
         # If the architecture of the VM is different from the host, disable acceleration
@@ -819,32 +827,46 @@ function configure_bios() {
 
         # https://bugzilla.redhat.com/show_bug.cgi?id=1929357#c5
         # TODO: Check if macOS should use 'edk2-i386-vars.fd'
-        if [ -n "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
-            case ${secureboot} in
-                on) # shellcheck disable=SC2054,SC2140
-                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.ms.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.secboot.fd" \
-                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
-                        "${SHARE_PATH}/qemu/edk2-x86_64-secure-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2/x64/OVMF_CODE.secboot.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.secboot.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.secboot.qcow2"
-                    );;
-                *)  # shellcheck disable=SC2054,SC2140
-                    ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/OVMF/OVMF_CODE.fd","${SHARE_PATH}/OVMF/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/OVMF/x64/OVMF_CODE.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/qemu/ovmf-x86_64-4m-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-4m-vars.bin" \
-                        "${SHARE_PATH}/qemu/edk2-x86_64-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
-                        "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
-                        "${SHARE_PATH}/edk2/x64/OVMF_CODE.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
-                        "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.qcow2"
-                    );;
-            esac
+        # Search for firmware if EFI_CODE is not set or the specified file doesn't exist
+        if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                # AAVMF firmware paths for ARM64 guests
+                # SecureBoot is not commonly supported on ARM64, use standard firmware
+                # shellcheck disable=SC2054,SC2140
+                ovmfs=("/usr/share/AAVMF/AAVMF_CODE.fd","/usr/share/AAVMF/AAVMF_VARS.fd" \
+                    "${SHARE_PATH}/edk2/aarch64/QEMU_CODE.fd","${SHARE_PATH}/edk2/aarch64/QEMU_VARS.fd" \
+                    "${SHARE_PATH}/edk2/aarch64/QEMU_EFI-pflash.raw","${SHARE_PATH}/edk2/aarch64/vars-template-pflash.raw" \
+                    "${SHARE_PATH}/qemu/edk2-aarch64-code.fd","${SHARE_PATH}/qemu/edk2-arm-vars.fd" \
+                    "${SHARE_PATH}/AAVMF/AAVMF_CODE.fd","${SHARE_PATH}/AAVMF/AAVMF_VARS.fd"
+                )
+            else
+                # x86_64 OVMF firmware paths
+                case ${secureboot} in
+                    on) # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.ms.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.secboot.fd" \
+                            "${SHARE_PATH}/OVMF/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-smm-ms-vars.bin" \
+                            "${SHARE_PATH}/qemu/edk2-x86_64-secure-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.secboot.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2/x64/OVMF_CODE.secboot.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.secboot.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.secboot.qcow2"
+                        );;
+                    *)  # shellcheck disable=SC2054,SC2140
+                        ovmfs=("${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd","${SHARE_PATH}/OVMF/OVMF_VARS_4M.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2/ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/OVMF/OVMF_CODE.fd","${SHARE_PATH}/OVMF/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/OVMF/x64/OVMF_CODE.fd","${SHARE_PATH}/OVMF/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/qemu/ovmf-x86_64-4m-code.bin","${SHARE_PATH}/qemu/ovmf-x86_64-4m-vars.bin" \
+                            "${SHARE_PATH}/qemu/edk2-x86_64-code.fd","${SHARE_PATH}/qemu/edk2-x86_64-code.fd" \
+                            "${SHARE_PATH}/edk2-ovmf/x64/OVMF_CODE.fd","${SHARE_PATH}/edk2-ovmf/x64/OVMF_VARS.fd" \
+                            "${SHARE_PATH}/edk2/x64/OVMF_CODE.4m.fd","${SHARE_PATH}/edk2/x64/OVMF_VARS.4m.fd" \
+                            "${SHARE_PATH}/edk2/ovmf/OVMF_CODE_4M.qcow2","${SHARE_PATH}/edk2/ovmf/OVMF_VARS_4M.qcow2"
+                        );;
+                esac
+            fi
             # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
             # when an existing file is found.
             _IFS=$IFS
@@ -1129,10 +1151,15 @@ function configure_display() {
         *bsd) DISPLAY_DEVICE="VGA";;
         linux_old|solaris) DISPLAY_DEVICE="vmware-svga";;
         linux)
-            case ${display} in
-                none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
-                *) DISPLAY_DEVICE="virtio-vga";;
-            esac;;
+            # ARM64 does not have VGA hardware - use virtio-gpu-pci instead of virtio-vga
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                DISPLAY_DEVICE="virtio-gpu-pci"
+            else
+                case ${display} in
+                    none|spice|spice-app) DISPLAY_DEVICE="virtio-gpu";;
+                    *) DISPLAY_DEVICE="virtio-vga";;
+                esac
+            fi;;
         macos)
             # qxl-vga and VGA supports seamless mouse and sane resolutions if only
             # one scanout is used. '-vga none' is added to the QEMU command line
@@ -1184,6 +1211,11 @@ function configure_display() {
 
     # Build the video configuration
     VIDEO="-device ${DISPLAY_DEVICE}"
+
+    # ARM64 needs ramfb for UEFI boot display before virtio-gpu driver loads
+    if [ "${ARCH_VM}" == "aarch64" ]; then
+        VIDEO="-device ramfb ${VIDEO}"
+    fi
 
     # Try and coerce the display resolution for Linux guests only.
     if [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
@@ -1468,11 +1500,23 @@ function vm_boot() {
         # shellcheck disable=SC2054,SC2206,SC2140
         args+=(-name ${VMNAME},process=${VMNAME},debug-threads=on)
     fi
-    # shellcheck disable=SC2054,SC2206,SC2140
-    args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
-        ${CPU} ${SMP}
-        -m ${RAM_VM} ${BALLOON}
-        -pidfile "${VMDIR}/${VMNAME}.pid")
+
+    # Build machine arguments - SMM and vmport are x86-only options
+    if [ "${ARCH_VM}" == "aarch64" ]; then
+        # ARM64 uses 'virt' machine type without x86-specific options
+        # shellcheck disable=SC2054,SC2206,SC2140
+        args+=(-machine ${MACHINE_TYPE},accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+            ${CPU} ${SMP}
+            -m ${RAM_VM} ${BALLOON}
+            -pidfile "${VMDIR}/${VMNAME}.pid")
+    else
+        # x86_64 includes SMM (System Management Mode) and vmport options
+        # shellcheck disable=SC2054,SC2206,SC2140
+        args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+            ${CPU} ${SMP}
+            -m ${RAM_VM} ${BALLOON}
+            -pidfile "${VMDIR}/${VMNAME}.pid")
+    fi
 
     if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ] || [ "${guest_os}" == "reactos" ] || [ "${guest_os}" == "freedos" ]; then
         # shellcheck disable=SC2054
@@ -1646,10 +1690,20 @@ function vm_boot() {
         QCOW2VARS=$(is_firmware_qcow2 "${EFI_VARS}")
         if [ "${QCOW2CODE}" = "true" ]; then EFI_CODE_FORMAT="qcow2"; else EFI_CODE_FORMAT="raw"; fi
         if [ "${QCOW2VARS}" = "true" ]; then EFI_VARS_FORMAT="qcow2"; else EFI_VARS_FORMAT="raw"; fi
-        # shellcheck disable=SC2054
-        args+=(-global driver=cfi.pflash01,property=secure,value=on
-            -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
-            -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64 uses blockdev with named nodes referenced by machine pflash parameters
+            # Do NOT use -global cfi.pflash01 secure property - that's x86 SMM-specific
+            # shellcheck disable=SC2054
+            args+=(-blockdev node-name=rom,driver=file,filename="${EFI_CODE}",read-only=true
+                -blockdev node-name=efivars,driver=file,filename="${EFI_VARS}")
+        else
+            # x86 uses traditional pflash drives with secure boot support
+            # shellcheck disable=SC2054
+            args+=(-global driver=cfi.pflash01,property=secure,value=on
+                -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+                -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+        fi
     fi
 
     if [ -n "${iso}" ] && [ "${guest_os}" == "freedos" ]; then
@@ -1678,14 +1732,35 @@ function vm_boot() {
         args+=(-drive if=floppy,format=raw,file="${floppy}")
     fi
 
-    if [ -n "${iso}" ]; then
+    # ARM64: create virtio-scsi controller if any CD-ROM ISOs are present
+    # (virt machine has no IDE controller)
+    if [ "${ARCH_VM}" == "aarch64" ] && { [ -n "${iso}" ] || [ -n "${fixed_iso}" ]; }; then
         # shellcheck disable=SC2054
-        args+=(-drive media=cdrom,index=0,file="${iso}")
+        args+=(-device virtio-scsi-pci,id=scsi0)
+    fi
+
+    if [ -n "${iso}" ]; then
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64: bootindex=1 ensures UEFI boots from CD-ROM first during installation
+            # shellcheck disable=SC2054
+            args+=(-device scsi-cd,drive=cd0,bus=scsi0.0,bootindex=1
+                -drive id=cd0,if=none,format=raw,media=cdrom,readonly=on,file="${iso}")
+        else
+            # shellcheck disable=SC2054
+            args+=(-drive media=cdrom,index=0,file="${iso}")
+        fi
     fi
 
     if [ -n "${fixed_iso}" ]; then
-        # shellcheck disable=SC2054
-        args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64: attach second ISO to virtio-scsi controller
+            # shellcheck disable=SC2054
+            args+=(-device scsi-cd,drive=cd1,bus=scsi0.0,bootindex=3
+                -drive id=cd1,if=none,format=raw,media=cdrom,readonly=on,file="${fixed_iso}")
+        else
+            # shellcheck disable=SC2054
+            args+=(-drive media=cdrom,index=1,file="${fixed_iso}")
+        fi
     fi
 
     if [ "${guest_os}" == "macos" ]; then
@@ -1744,9 +1819,16 @@ function vm_boot() {
             -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
 
     else
-        # shellcheck disable=SC2054,SC2206
-        args+=(-device virtio-blk-pci,drive=SystemDisk
-            -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64: bootindex=2 ensures disk boots after CD-ROM (bootindex=1) during installation
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device virtio-blk-pci,drive=SystemDisk,bootindex=2
+                -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        else
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device virtio-blk-pci,drive=SystemDisk
+                -drive id=SystemDisk,if=none,format=${disk_format},file="${disk_img}" ${STATUS_QUO})
+        fi
     fi
 
     # https://wiki.qemu.org/Documentation/9psetup
@@ -1765,9 +1847,16 @@ function vm_boot() {
 
     if [ "${tpm}" == "on" ] && [ -S "${VMDIR}/${VMNAME}.swtpm-sock" ]; then
         # shellcheck disable=SC2054
-        args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
-            -tpmdev emulator,id=tpm0,chardev=chrtpm
-            -device tpm-tis,tpmdev=tpm0)
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64 uses tpm-tis-device (system bus) instead of tpm-tis (ISA/LPC bus)
+            args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+                -tpmdev emulator,id=tpm0,chardev=chrtpm
+                -device tpm-tis-device,tpmdev=tpm0)
+        else
+            args+=(-chardev socket,id=chrtpm,path="${VMDIR}/${VMNAME}.swtpm-sock"
+                -tpmdev emulator,id=tpm0,chardev=chrtpm
+                -device tpm-tis,tpmdev=tpm0)
+        fi
     fi
 
     if [ "${monitor}" == "none" ]; then
@@ -2224,8 +2313,9 @@ readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="4.9.9"
 
-# TODO: Make this run the native architecture binary
-ARCH_VM="x86_64"
+# Default architecture is x86_64, can be overridden by config file (arch="aarch64")
+arch="${arch:-x86_64}"
+ARCH_VM="${arch}"
 ARCH_HOST=$(uname -m)
 QEMU=$(command -v qemu-system-${ARCH_VM})
 QEMU_IMG=$(command -v qemu-img)
@@ -2426,6 +2516,16 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # shellcheck source=/dev/null
     source "${VM}"
     PUBLIC="${public_dir:-${PUBLIC}}"
+
+    # Re-detect architecture and QEMU binary after sourcing config
+    # Config file can set arch="aarch64" to override the default
+    ARCH_VM="${arch:-x86_64}"
+    QEMU=$(command -v qemu-system-${ARCH_VM})
+    if [ ! -x "${QEMU}" ]; then
+        echo "ERROR! qemu-system-${ARCH_VM} not found."
+        echo "       Please install QEMU for ${ARCH_VM} architecture."
+        exit 1
+    fi
 
     VMDIR=$(dirname "${disk_img}")          # directory the VM disk and state files are stored
     VMNAME=$(basename "${VM}" .conf)        # name of the VM
