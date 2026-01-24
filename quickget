@@ -3871,6 +3871,7 @@ Arguments:
 -------------------------- For testing & development ---------------------------
   --url           [os] [release] [edition] : Show image URL(s)
   --check         [os] [release] [edition] : Check image URL(s)
+  --check-all-arch [os] [release] [edition]: Check downloads for all architectures (amd64 and arm64)
   --list                                   : List all supported systems
   --list-csv                               : List everything in csv format
   --list-json                              : List everything in json format
@@ -3890,6 +3891,7 @@ fi
 QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
+CHECK_ALL_ARCH="false"
 CURL=$(command -v curl)
 if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
@@ -3984,6 +3986,25 @@ case "${1}" in
             test_all "${1}"
             exit 0
         fi;;
+    --check-all-arch|-check-all-arch)
+        OPERATION="test"
+        CHECK_ALL_ARCH="true"
+        shift
+        if [ -z "${1}" ]; then
+            for CHECK_ARCH in amd64 arm64; do
+                ARCH="${CHECK_ARCH}"
+                for OS in $(os_support); do
+                    (test_all "${OS}")
+                done
+            done
+            exit 0
+        elif [ -z "${2}" ]; then
+            for CHECK_ARCH in amd64 arm64; do
+                ARCH="${CHECK_ARCH}"
+                test_all "${1}"
+            done
+            exit 0
+        fi;;
     --list-csv|-list-csv|list|list_csv) list_csv;;
     --list-json|-list-json|list_json) list_json;;
     --list|-list) list_supported;;
@@ -3997,6 +4018,51 @@ else
 fi
 
 os_supported
+
+# Handle --check-all-arch for specific release/edition
+if [ "${CHECK_ALL_ARCH}" == "true" ] && [ -n "${2}" ]; then
+    RELEASE="${2}"
+    EDITION="${3:-}"
+    for CHECK_ARCH in amd64 arm64; do
+        ARCH="${CHECK_ARCH}"
+        # Check architecture support before testing URL
+        if ! is_arch_supported "${OS}" "${ARCH}"; then
+            if [ -n "${EDITION}" ]; then
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
+            else
+                test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
+            fi
+            continue
+        fi
+        # Validate release
+        case ${OS} in
+            *ubuntu-server*) validate_release releases_ubuntu-server;;
+            *ubuntu*) validate_release releases_ubuntu;;
+            *) validate_release "releases_${OS}";;
+        esac
+        # Generate and check URL
+        if [[ $(type -t "editions_${OS}") == function ]] && [ -n "${EDITION}" ]; then
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+        elif [ "${OS}" == "macos" ]; then
+            (get_macos)
+            continue
+        elif [[ "${OS}" == *"ubuntu-server"* ]]; then
+            (get_ubuntu-server)
+            continue
+        elif [[ "${OS}" == *"ubuntu"* ]]; then
+            (get_ubuntu)
+            continue
+        elif [[ "${OS}" == "windows"* ]]; then
+            test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(Windows not supported in check mode)"
+            continue
+        else
+            URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
+        fi
+        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+        test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
+    done
+    exit 0
+fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2}"
