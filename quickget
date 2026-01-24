@@ -537,6 +537,7 @@ function test_result() {
     local EDITION="${3:-}"
     local URL="${4:-}"
     local RESULT="${5:-}"
+    local REASON="${6:-}"
     if [ -n "${EDITION}" ]; then
         OS="${OS}-${RELEASE}-${EDITION}"
     else
@@ -546,7 +547,11 @@ function test_result() {
     if [ -n "${RESULT}" ]; then
         # Pad the OS string for consistent output
         OS=$(printf "%-35s" "${OS}")
-        echo -e "${RESULT}: ${OS} ${URL}"
+        if [ -n "${REASON}" ]; then
+            echo -e "${RESULT}: ${OS} ${REASON}"
+        else
+            echo -e "${RESULT}: ${OS} ${URL}"
+        fi
     else
         OS=$(printf "%-36s" "${OS}:")
         echo -e "${OS} ${URL}"
@@ -567,6 +572,11 @@ function test_all() {
     for RELEASE in $("releases_${FUNC}"); do
         if [[ $(type -t "editions_${OS}") == function ]]; then
             for EDITION in $(editions_"${OS}"); do
+                # Check architecture support before generating URL
+                if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+                    test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
+                    continue
+                fi
                 validate_release releases_"${OS}"
                 URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
                 if [ "${OPERATION}" == "show" ]; then
@@ -590,12 +600,27 @@ function test_all() {
             validate_release releases_macos
             (get_macos)
         elif [ "${OS}" == "ubuntu-server" ]; then
+            # Check architecture support before generating URL
+            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+                test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
+                continue
+            fi
             validate_release releases_ubuntu-server
             (get_ubuntu-server)
         elif [[ "${OS}" == *ubuntu* ]]; then
+            # Ubuntu desktop is amd64 only (no arch function = amd64 default)
+            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+                test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
+                continue
+            fi
             validate_release releases_ubuntu
             (get_ubuntu)
         else
+            # Check architecture support before generating URL
+            if [ "${OPERATION}" == "test" ] && ! is_arch_supported "${OS}" "${ARCH}"; then
+                test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${ARCH})"
+                continue
+            fi
             validate_release releases_"${OS}"
             URL=$(get_"${OS}" | cut -d' ' -f1 | head -n 1)
             if [ "${OPERATION}" == "show" ]; then
@@ -1343,6 +1368,51 @@ function releases_zorin() {
     echo 18 17 16
 }
 
+# Architecture support functions
+# These declare which architectures each distro supports.
+# Distros without an arch_*() function default to "amd64" only.
+
+function arch_alma() {
+    echo "amd64 arm64"
+}
+
+function arch_alpine() {
+    echo "amd64 arm64"
+}
+
+function arch_debian() {
+    case "${EDITION}" in
+        netinst) echo "amd64 arm64";;
+        *) echo "amd64";;
+    esac
+}
+
+function arch_fedora() {
+    echo "amd64 arm64"
+}
+
+function arch_ubuntu-server() {
+    echo "amd64 arm64"
+}
+
+# Check if a given architecture is supported for an OS
+function is_arch_supported() {
+    local OS="${1}"
+    local CHECK_ARCH="${2}"
+    local SUPPORTED=""
+
+    # Check if arch function exists for this OS
+    if [[ $(type -t "arch_${OS}") == function ]]; then
+        SUPPORTED=$(arch_"${OS}")
+    else
+        # Default: amd64 only
+        SUPPORTED="amd64"
+    fi
+
+    # Check if requested arch is in supported list
+    [[ " ${SUPPORTED} " == *" ${CHECK_ARCH} "* ]]
+}
+
 function editions_zorin() {
     # Lite edition not available for Zorin 18 (Pro-only starting from 18)
     # When RELEASE is unset (e.g. csv_data context), return all editions
@@ -1455,6 +1525,11 @@ function web_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
+        # Check architecture support before testing URL
+        if ! is_arch_supported "${OS}" "${ARCH}"; then
+            test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
+            exit 0
+        fi
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
@@ -1520,6 +1595,11 @@ function zsync_get() {
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}"
         exit 0
     elif [ "${OPERATION}" == "test" ]; then
+        # Check architecture support before testing URL
+        if ! is_arch_supported "${OS}" "${ARCH}"; then
+            test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
+            exit 0
+        fi
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
