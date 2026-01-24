@@ -666,13 +666,21 @@ function configure_bios() {
             MAC_MISSING="Firmware"
         fi
 
+        # Check for OpenCore bootloader
+        # Backwards compatibility: If OpenCore.qcow2 exists, use legacy two-disk boot method
+        # If OpenCore.qcow2 is absent, assume OpenCore is integrated in the main disk
         if [ -e "${VMDIR}/OpenCore.qcow2" ]; then
             MAC_BOOTLOADER="${VMDIR}/OpenCore.qcow2"
+            MAC_BOOT_MODE="legacy"
         elif [ -e "${VMDIR}/ESP.qcow2" ]; then
             # Backwards compatibility for Clover
             MAC_BOOTLOADER="${VMDIR}/ESP.qcow2"
+            MAC_BOOT_MODE="legacy"
         else
-            MAC_MISSING="Bootloader"
+            # New method: OpenCore is integrated in the main disk's EFI partition
+            # No separate bootloader file needed
+            MAC_BOOTLOADER=""
+            MAC_BOOT_MODE="integrated"
         fi
 
         if [ -n "${MAC_MISSING}" ]; then
@@ -680,7 +688,11 @@ function configure_bios() {
             echo "       Use 'quickget' to download the required files."
             exit 1
         fi
-        BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
+        if [ "${MAC_BOOT_MODE}" == "integrated" ]; then
+            BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), OpenCore (integrated), SecureBoot (${secureboot})."
+        else
+            BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
+        fi
     elif [[ "${boot}" == *"efi"* ]]; then
         EFI_VARS="${VMDIR}/OVMF_VARS.fd"
 
@@ -902,7 +914,15 @@ function configure_storage() {
         # Only check disk image size if preallocation is off
         if [ "${preallocation}" == "off" ]; then
             DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
-            if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
+            # For macOS with integrated OpenCore, the disk is pre-created with an EFI
+            # partition containing OpenCore (~500MB). Use a higher threshold (1GB) to
+            # distinguish between "just EFI" and "EFI + installed macOS".
+            if [ "${guest_os}" == "macos" ] && [ "${MAC_BOOT_MODE}" == "integrated" ]; then
+                DISK_MIN_SIZE_CHECK=$((1024 * 1024 * 1024))
+            else
+                DISK_MIN_SIZE_CHECK="${DISK_MIN_SIZE}"
+            fi
+            if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE_CHECK}" ]; then
                 echo "             Looks unused, booting from ${iso}${img}"
                 if [ -z "${iso}" ] && [ -z "${img}" ]; then
                     echo "ERROR! You haven't specified a .iso or .img image to boot from."
@@ -1244,6 +1264,7 @@ function vm_boot() {
     OS_RELEASE="Unknown OS"
     MACHINE_TYPE="${MACHINE_TYPE:-q35}"
     MAC_BOOTLOADER=""
+    MAC_BOOT_MODE=""
     MAC_MISSING=""
     MAC_DISK_DEV="${MAC_DISK_DEV:-ide-hd,bus=ahci.2}"
     NET_DEVICE="${NET_DEVICE:-virtio-net-pci}"
@@ -1519,19 +1540,36 @@ function vm_boot() {
 
     if [ "${guest_os}" == "macos" ]; then
         # shellcheck disable=SC2054
-        args+=(-device ahci,id=ahci
-            -device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
-            -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
+        args+=(-device ahci,id=ahci)
 
-        if [ -n "${img}" ]; then
+        if [ -n "${MAC_BOOTLOADER}" ]; then
+            # Legacy mode: boot from separate OpenCore.qcow2
             # shellcheck disable=SC2054
-            args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
-                -drive id=RecoveryImage,if=none,format=raw,file="${img}")
-        fi
+            args+=(-device ide-hd,bus=ahci.0,drive=BootLoader,bootindex=0
+                -drive id=BootLoader,if=none,format=qcow2,file="${MAC_BOOTLOADER}")
 
-        # shellcheck disable=SC2054,SC2206
-        args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
-            -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+            if [ -n "${img}" ]; then
+                # shellcheck disable=SC2054
+                args+=(-device ide-hd,bus=ahci.1,drive=RecoveryImage
+                    -drive id=RecoveryImage,if=none,format=raw,file="${img}")
+            fi
+
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device ${MAC_DISK_DEV},drive=SystemDisk
+                -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+        else
+            # Integrated mode: OpenCore is in the main disk's EFI partition
+            # Boot directly from the main disk
+            # shellcheck disable=SC2054,SC2206
+            args+=(-device ${MAC_DISK_DEV},drive=SystemDisk,bootindex=0
+                -drive id=SystemDisk,if=none,format=qcow2,file="${disk_img}" ${STATUS_QUO})
+
+            if [ -n "${img}" ]; then
+                # shellcheck disable=SC2054
+                args+=(-device ide-hd,bus=ahci.0,drive=RecoveryImage
+                    -drive id=RecoveryImage,if=none,format=raw,file="${img}")
+            fi
+        fi
     elif [ "${guest_os}" == "kolibrios" ]; then
         # shellcheck disable=SC2054,SC2206
         args+=(-device ahci,id=ahci

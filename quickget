@@ -215,6 +215,192 @@ function require_qemu_img() {
     fi
 }
 
+function require_mtools() {
+    local MFORMAT=""
+    local MCOPY=""
+    local MMD=""
+    MFORMAT=$(command -v mformat)
+    MCOPY=$(command -v mcopy)
+    MMD=$(command -v mmd)
+    if [ ! -x "${MFORMAT}" ] || [ ! -x "${MCOPY}" ] || [ ! -x "${MMD}" ]; then
+        echo "ERROR! mtools not found. Please install mtools (mformat, mcopy, mmd)."
+        exit 1
+    fi
+}
+
+function require_sgdisk() {
+    local SGDISK=""
+    SGDISK=$(command -v sgdisk)
+    if [ ! -x "${SGDISK}" ]; then
+        echo "ERROR! sgdisk not found. Please install gptfdisk (gdisk package)."
+        exit 1
+    fi
+}
+
+# Create a raw disk image with GPT partition table and EFI partition containing OpenCore
+# Usage: create_macos_disk_with_opencore <output_disk> <disk_size> <opencore_dir>
+# The disk will have:
+#   - Partition 1: EFI System Partition (200MB FAT32) containing OpenCore
+#   - Remaining space: unallocated (macOS will create its partitions during install)
+function create_macos_disk_with_opencore() {
+    local DISK_PATH="${1}"
+    local DISK_SIZE="${2}"
+    local OPENCORE_DIR="${3}"
+    local TEMP_DISK=""
+    local EFI_OFFSET_BYTES=""
+    local SGDISK=""
+    local MFORMAT=""
+    local MMD=""
+    local MCOPY=""
+
+    require_sgdisk
+    require_mtools
+    require_qemu_img
+
+    SGDISK=$(command -v sgdisk)
+    MFORMAT=$(command -v mformat)
+    MMD=$(command -v mmd)
+    MCOPY=$(command -v mcopy)
+
+    echo " - Creating macOS disk with integrated OpenCore..."
+
+    # Create a temporary raw disk image
+    TEMP_DISK="${DISK_PATH}.raw"
+
+    # Create the raw disk image
+    if ! ${QEMU_IMG} create -f raw "${TEMP_DISK}" "${DISK_SIZE}" >/dev/null 2>&1; then
+        echo "ERROR! Failed to create raw disk image."
+        rm -f "${TEMP_DISK}"
+        return 1
+    fi
+
+    # Create GPT partition table with EFI partition
+    # Partition 1: EFI System Partition, 200MB starting at sector 2048 (1MiB offset)
+    # Using type EF00 (EFI System)
+    if ! ${SGDISK} --clear \
+                   --new=1:2048:+200M --typecode=1:EF00 --change-name=1:"EFI" \
+                   "${TEMP_DISK}" >/dev/null 2>&1; then
+        echo "ERROR! Failed to create GPT partition table."
+        rm -f "${TEMP_DISK}"
+        return 1
+    fi
+
+    # Calculate EFI partition offset in bytes (sector 2048 * 512 bytes/sector = 1MiB)
+    EFI_OFFSET_BYTES=$((2048 * 512))
+
+    # Format the EFI partition as FAT32 using mtools
+    # The -i option with @@offset allows operating on a partition within an image
+    if ! ${MFORMAT} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -F -v "EFI" :: 2>/dev/null; then
+        echo "ERROR! Failed to format EFI partition."
+        rm -f "${TEMP_DISK}"
+        return 1
+    fi
+
+    # Create the EFI directory structure
+    ${MMD} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" ::/EFI 2>/dev/null
+    # Note: Only create the top-level EFI directory; mcopy -s will create subdirectories
+
+    # Copy OpenCore files to the EFI partition
+    # mcopy -s recursively copies directories including their contents
+    # This preserves .kext bundle structure (directories with Contents/Info.plist)
+    if [ -d "${OPENCORE_DIR}/EFI/BOOT" ]; then
+        if ! ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/BOOT" ::/EFI/; then
+            echo "ERROR! Failed to copy EFI/BOOT to disk."
+            rm -f "${TEMP_DISK}"
+            return 1
+        fi
+    fi
+    if [ -d "${OPENCORE_DIR}/EFI/OC" ]; then
+        if ! ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/OC" ::/EFI/; then
+            echo "ERROR! Failed to copy EFI/OC to disk."
+            rm -f "${TEMP_DISK}"
+            return 1
+        fi
+    fi
+
+    # Convert the raw image to qcow2 format
+    if ! ${QEMU_IMG} convert -f raw -O qcow2 "${TEMP_DISK}" "${DISK_PATH}" >/dev/null 2>&1; then
+        echo "ERROR! Failed to convert disk to qcow2 format."
+        rm -f "${TEMP_DISK}"
+        return 1
+    fi
+
+    # Clean up temporary raw image
+    rm -f "${TEMP_DISK}"
+
+    echo " - macOS disk with integrated OpenCore created successfully."
+    return 0
+}
+
+# Download and extract OpenCore files from OSX-KVM repository
+# Usage: download_opencore <destination_dir>
+function download_opencore() {
+    local DEST_DIR="${1}"
+    local OPENCORE_URL="https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2"
+    local TEMP_QCOW2=""
+    local TEMP_RAW=""
+    local MCOPY=""
+
+    require_qemu_img
+    require_mtools
+
+    MCOPY=$(command -v mcopy)
+    TEMP_QCOW2="${DEST_DIR}/OpenCore_temp.qcow2"
+    TEMP_RAW="${DEST_DIR}/OpenCore_temp.raw"
+
+    echo " - Downloading OpenCore bootloader..."
+    if ! web_get "${OPENCORE_URL}" "${DEST_DIR}" "OpenCore_temp.qcow2"; then
+        echo "ERROR! Failed to download OpenCore."
+        return 1
+    fi
+
+    # Convert qcow2 to raw so we can extract files with mtools
+    echo " - Extracting OpenCore files..."
+    if ! ${QEMU_IMG} convert -f qcow2 -O raw "${TEMP_QCOW2}" "${TEMP_RAW}" >/dev/null 2>&1; then
+        echo "ERROR! Failed to convert OpenCore image."
+        rm -f "${TEMP_QCOW2}"
+        return 1
+    fi
+
+    # Create destination directory (mcopy will create BOOT and OC subdirs)
+    mkdir -p "${DEST_DIR}/EFI"
+
+    # The OpenCore.qcow2 from OSX-KVM is a disk image with an EFI partition
+    # The EFI partition starts at sector 2048 (1MiB offset)
+    local EFI_OFFSET=$((2048 * 512))
+
+    # Extract files using mtools
+    # Note: mcopy -s recursively copies directories, preserving the full structure
+    # including .kext bundles (which are directories containing Contents/Info.plist)
+    # LC_ALL='' prevents mtools from mangling directory names (BOOT -> BOOT_)
+    if ! LC_ALL='' ${MCOPY} -i "${TEMP_RAW}@@${EFI_OFFSET}" -s ::/EFI/BOOT "${DEST_DIR}/EFI/"; then
+        echo "ERROR! Failed to extract EFI/BOOT from OpenCore image."
+        rm -f "${TEMP_QCOW2}" "${TEMP_RAW}"
+        return 1
+    fi
+    if ! LC_ALL='' ${MCOPY} -i "${TEMP_RAW}@@${EFI_OFFSET}" -s ::/EFI/OC "${DEST_DIR}/EFI/"; then
+        echo "ERROR! Failed to extract EFI/OC from OpenCore image."
+        rm -f "${TEMP_QCOW2}" "${TEMP_RAW}"
+        return 1
+    fi
+
+    # Clean up temporary files
+    rm -f "${TEMP_QCOW2}" "${TEMP_RAW}"
+
+    # Verify extraction was successful - check both boot file and a kext plist
+    if [ ! -f "${DEST_DIR}/EFI/BOOT/BOOTx64.efi" ]; then
+        echo "ERROR! Failed to extract OpenCore boot file."
+        return 1
+    fi
+    if [ ! -f "${DEST_DIR}/EFI/OC/Kexts/Lilu.kext/Contents/Info.plist" ]; then
+        echo "ERROR! Failed to extract OpenCore kexts (Lilu.kext/Contents/Info.plist missing)."
+        return 1
+    fi
+
+    echo " - OpenCore files extracted successfully."
+    return 0
+}
+
 function is_valid_language() {
     local I18N=""
     local PASSED_I18N="${1}"
@@ -2054,6 +2240,9 @@ function get_macos() {
     local CHUNKCHECK=""
     local MLB="00000000000000000"
     local OS_TYPE="default"
+    local USE_INTEGRATED_OPENCORE=1
+    local OPENCORE_TEMP_DIR=""
+    local MCOPY=""
 
     case ${RELEASE} in
         lion|10.7)
@@ -2109,6 +2298,13 @@ function get_macos() {
         CHUNKCHECK="$(command -v chunkcheck)"
     fi
 
+    # Check if mtools and sgdisk are available for integrated OpenCore
+    MCOPY=$(command -v mcopy)
+    if [ ! -x "${MCOPY}" ] || [ ! -x "$(command -v sgdisk)" ]; then
+        echo " - NOTE: mtools or sgdisk not found, using legacy OpenCore.qcow2 method."
+        USE_INTEGRATED_OPENCORE=0
+    fi
+
     appleSession=$(curl --disable -v -H "Host: osrecovery.apple.com" \
                            -H "Connection: close" \
                            -A "InternetRecovery/1.0" https://osrecovery.apple.com/ 2>&1 | tr ';' '\n' | awk -F'session=|;' '{print $2}' | grep 1)
@@ -2157,11 +2353,44 @@ function get_macos() {
             rm "${VM_PATH}/RecoveryImage.dmg" "${VM_PATH}/RecoveryImage.chunklist"
             echo " - RecoveryImage.img is ready."
         fi
-        echo "Downloading OpenCore & UEFI firmware"
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+
+        echo "Downloading UEFI firmware"
         web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
         if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
             web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
+        fi
+
+        if [ "${USE_INTEGRATED_OPENCORE}" -eq 1 ]; then
+            # Create disk with integrated OpenCore (new method)
+            echo "Creating disk with integrated OpenCore bootloader"
+
+            # Create temporary directory for OpenCore extraction
+            OPENCORE_TEMP_DIR="${VM_PATH}/.opencore_temp"
+            mkdir -p "${OPENCORE_TEMP_DIR}"
+
+            # Download and extract OpenCore files
+            if download_opencore "${OPENCORE_TEMP_DIR}"; then
+                # Create the main disk with integrated OpenCore EFI partition
+                # Default size is 128G (can be overridden in config)
+                if create_macos_disk_with_opencore "${VM_PATH}/disk.qcow2" "128G" "${OPENCORE_TEMP_DIR}"; then
+                    echo " - Integrated OpenCore disk created successfully."
+                else
+                    echo " - WARNING: Failed to create integrated OpenCore disk, falling back to legacy method."
+                    USE_INTEGRATED_OPENCORE=0
+                fi
+            else
+                echo " - WARNING: Failed to download OpenCore, falling back to legacy method."
+                USE_INTEGRATED_OPENCORE=0
+            fi
+
+            # Clean up temporary directory
+            rm -rf "${OPENCORE_TEMP_DIR}"
+        fi
+
+        if [ "${USE_INTEGRATED_OPENCORE}" -eq 0 ]; then
+            # Legacy method: separate OpenCore.qcow2 file
+            echo "Downloading OpenCore bootloader (legacy method)"
+            web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
         fi
     fi
     make_vm_config RecoveryImage.img
