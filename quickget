@@ -2300,7 +2300,7 @@ function get_macos() {
 
     # Check if mtools and sgdisk are available for integrated OpenCore
     MCOPY=$(command -v mcopy)
-    if [ ! -x "${MCOPY}" ] || [ ! -x "$(command -v sgdisk)" ]; then
+    if [ ! -x "${MCOPY}" ] || [ ! -x "$(command -v mformat)" ] || [ ! -x "$(command -v mmd)" ] || [ ! -x "$(command -v sgdisk)" ]; then
         echo " - NOTE: mtools or sgdisk not found, using legacy OpenCore.qcow2 method."
         USE_INTEGRATED_OPENCORE=0
     fi
