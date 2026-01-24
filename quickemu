@@ -2406,7 +2406,7 @@ readonly VERSION="4.9.9"
 arch="${arch:-x86_64}"
 ARCH_VM="${arch}"
 ARCH_HOST=$(uname -m)
-QEMU=$(command -v qemu-system-${ARCH_VM})
+QEMU=$(command -v "qemu-system-${ARCH_VM}")
 QEMU_IMG=$(command -v qemu-img)
 if [ ! -x "${QEMU}" ] || [ ! -x "${QEMU_IMG}" ]; then
     echo "ERROR! QEMU not found. Please make sure 'qemu-system-${ARCH_VM}' and 'qemu-img' are installed."
@@ -2609,7 +2609,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # Re-detect architecture and QEMU binary after sourcing config
     # Config file can set arch="aarch64" to override the default
     ARCH_VM="${arch:-x86_64}"
-    QEMU=$(command -v qemu-system-${ARCH_VM})
+    QEMU=$(command -v "qemu-system-${ARCH_VM}")
     if [ ! -x "${QEMU}" ]; then
         echo "ERROR! qemu-system-${ARCH_VM} not found."
         echo "       Please install QEMU for ${ARCH_VM} architecture."
