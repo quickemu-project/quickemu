@@ -2068,11 +2068,15 @@ function get_endless() {
 }
 
 function get_fedora() {
+    local FEDORA_ARCH="x86_64"
     local HASH=""
     local ISO=""
     local JSON=""
     local URL=""
     local VARIANT=""
+
+    [ "${ARCH}" == "arm64" ] && FEDORA_ARCH="aarch64"
+
     case ${EDITION} in
         Server|Kinoite|Onyx|Silverblue|Sericea|Workstation|KDE) VARIANT="${EDITION}";;
         *) VARIANT="Spins";;
@@ -2090,12 +2094,10 @@ function get_fedora() {
         RELEASE="${RELEASE/_/ }"
     fi
 
-
-
     # shellcheck disable=SC2086
     # Fedora may promote variants from Spins to Editions, in which case we want to accept either "Spins" or the specific edition name to preserve backwards compatibility
     # For example, Fedora 42 KDE is now an edition, while previous releases are spins
-    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="x86_64" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
+    JSON=$(web_pipe "https://getfedora.org/releases.json" | jq '.[] | select((.variant=="'"${VARIANT}"'" or .variant=="'"${EDITION}"'") and .subvariant=="'"${EDITION}"'" and .arch=="'"${FEDORA_ARCH}"'" and .version=="'"${RELEASE}"'" and (.link | endswith(".iso")))')
     URL=$(echo "${JSON}" | jq -r '.link' | head -n1)
     HASH=$(echo "${JSON}" | jq -r '.sha256' | head -n1)
     echo "${URL} ${HASH}"
@@ -2853,13 +2855,18 @@ function get_tuxedo-os() {
 }
 
 function get_ubuntu-server() {
+    local DATA=""
     local HASH=""
     local ISO=""
     local NAME="live-server"
+    local UBUNTU_ARCH="${ARCH}"
     local URL=""
 
     if [[ "${RELEASE}" == "daily"* ]]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
+    elif [ "${UBUNTU_ARCH}" == "arm64" ]; then
+        # ARM64 ISOs are hosted on cdimage.ubuntu.com
+        URL="https://cdimage.ubuntu.com/releases/${RELEASE}/release"
     else
         URL="https://releases.ubuntu.com/${RELEASE}"
     fi
@@ -2869,11 +2876,11 @@ function get_ubuntu-server() {
     esac
 
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep "${NAME}" | grep "${UBUNTU_ARCH}" | grep iso | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep amd64 | grep iso | tail -n 1 )
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep "${NAME}" | grep "${UBUNTU_ARCH}" | grep iso | tail -n 1 )
         ISO=$(cut -d' ' -f3 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
