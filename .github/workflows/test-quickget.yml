@@ -50,7 +50,7 @@ jobs:
         id: check
         run: |
           mkdir -p results
-          ./quickget --check "${{ matrix.distro }}" | tee results/check.txt
+          ./quickget --check-all-arch "${{ matrix.distro }}" | tee results/check.txt
 
           # Count results (use wc -l to avoid grep exit code issues)
           PASSED=$(grep '^PASS' results/check.txt | wc -l | tr -d ' ')
