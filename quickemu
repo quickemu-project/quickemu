@@ -383,11 +383,22 @@ function configure_cpu() {
                 echo "ERROR! Intel VT-x support is required."
                 exit 1
             fi
-        elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] || [ "${HOST_CPU_VENDOR}" == "HygonGenuine" ]; then
+            # HygonGenuine is Chinese AMD-compatible CPUs (Hygon Dhyana)
             if ! check_cpu_flag svm; then
                 echo "ERROR! AMD SVM support is required."
                 exit 1
             fi
+        elif [ "${ARCH_HOST}" == "aarch64" ] || [ "${ARCH_HOST}" == "arm64" ]; then
+            # ARM hosts running native ARM guests with hardware acceleration (HVF on macOS, KVM on Linux)
+            # ARM processors don't have x86-specific virtualisation flags (VT-x/SVM) to check
+            # Cross-architecture guests (x86 on ARM) use TCG and skip this validation block entirely
+            # No validation needed here - ARM virtualisation support is handled by the hypervisor
+            true
+        else
+            # Unknown CPU vendor - could be future/custom CPUs
+            echo "WARNING! Unknown CPU vendor '${HOST_CPU_VENDOR}' - cannot verify virtualisation support."
+            echo "         If virtualisation fails, check your CPU supports hardware virtualisation and it's enabled in firmware."
         fi
     fi
 
