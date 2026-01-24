@@ -431,8 +431,18 @@ function configure_cpu() {
         # If the architecture of the VM is different from the host, disable acceleration
         # and use TCG (Tiny Code Generator) software emulation. TCG emulates the target
         # architecture in software, allowing cross-architecture virtualization (e.g.,
-        # running x86_64 VMs on ARM hosts). Users can also manually set QEMU_ACCEL="tcg"
-        # in their VM configuration to force software emulation.
+        # running x86_64 VMs on ARM hosts).
+        #
+        # Users can manually force TCG mode by adding this to their VM .conf file:
+        #   QEMU_ACCEL="tcg"
+        # or by exporting it in the shell environment:
+        #   export QEMU_ACCEL="tcg"
+        #   quickemu --vm myvm.conf
+        #
+        # TCG is useful for:
+        # - Cross-architecture virtualization (x86 on ARM, ARM on x86)
+        # - Testing VMs on hosts without hardware virtualization support
+        # - Emulating x86 CPU features in software (e.g., running macOS x86_64 VMs on ARM Macs)
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
         QEMU_ACCEL="tcg"
@@ -457,11 +467,24 @@ function configure_cpu() {
                 echo "ERROR! Intel VT-x support is required."
                 exit 1
             fi
-        elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+        elif [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] || [ "${HOST_CPU_VENDOR}" == "HygonGenuine" ]; then
+            # HygonGenuine is Chinese AMD-compatible CPUs (Hygon Dhyana)
             if ! check_cpu_flag svm; then
                 echo "ERROR! AMD SVM support is required."
                 exit 1
             fi
+        elif [ "${ARCH_HOST}" == "aarch64" ] || [ "${ARCH_HOST}" == "arm64" ]; then
+            # ARM hosts running native ARM guests with hardware acceleration (HVF on macOS, KVM on Linux)
+            # ARM processors don't have x86-specific virtualization flags (VT-x/SVM) to check
+            # Note: We use architecture detection here instead of vendor detection (used for x86)
+            # because ARM CPUs don't have standardized vendor strings like x86 (GenuineIntel/AuthenticAMD).
+            # Cross-architecture guests (x86 on ARM) use TCG and skip this validation block entirely.
+            # No validation needed here - ARM virtualization support is handled by the hypervisor
+            true
+        else
+            # Unknown CPU vendor - could be future/custom CPUs
+            echo "WARNING! Unknown CPU vendor '${HOST_CPU_VENDOR}' on architecture '${ARCH_HOST}' - cannot verify virtualization support."
+            echo "         If virtualization fails, check your CPU supports hardware virtualization and it's enabled in firmware."
         fi
     fi
 
@@ -1205,14 +1228,26 @@ function configure_display() {
         fi
         
         if "${QEMU}" -device help 2>&1 | grep -q "\"${GL_DEVICE}\""; then
+            # GL device variant is available (modern QEMU with dedicated GL devices)
             DISPLAY_DEVICE="${GL_DEVICE}"
             echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
         elif [ "${QEMU_VER_SHORT}" -ge 61 ]; then
+            # QEMU 6.1+ should have GL device variants - try using them even if detection failed
+            # This handles cases where device help output format changed or detection is unreliable
+            # If QEMU was built without GL support, it will fail at startup with clear error message
             DISPLAY_DEVICE="${GL_DEVICE}"
             echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
+        elif "${QEMU}" -device "${DISPLAY_DEVICE},help" 2>&1 | grep -Eq "virgl[[:space:]]*="; then
+            # QEMU < 6.1 with virgl parameter support
+            DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
         else
-            DISPLAY_DEVICE="${DISPLAY_DEVICE},gl=${gl}"
-            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
+            # No GL support available in this QEMU build:
+            # - No dedicated GL device variants (virtio-vga-gl, virtio-gpu-gl-pci) found
+            # - QEMU version < 6.1 (or detection inconclusive)
+            # - No virgl parameter support detected on the base device
+            # This typically means QEMU was built without virglrenderer/OpenGL support
+            echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (not available)"
         fi
     else
         echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl})"
@@ -1223,8 +1258,10 @@ function configure_display() {
 
     # Try and coerce the display resolution for Linux guests only.
     # Check if the device supports xres/yres parameters
-    # Use (,|$) anchor to match device names with or without additional options
-    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|vga-gl|gpu-pci|gpu-gl-pci)|qxl|qxl-vga|bochs-display)(,|$) ]]; then
+    # Use (,|$) anchor to match device names with or without comma-separated parameters
+    # Note: virtio-gpu (without suffix) is used for spice/none displays
+    # Pattern ordered most-specific to least-specific for clarity (vga-gl before vga, etc.)
+    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga-gl|gpu-gl-pci|gpu-pci|vga|gpu)|qxl|qxl-vga|bochs-display)(,|$) ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
     else
@@ -1232,6 +1269,9 @@ function configure_display() {
     fi
 
     # Allocate VRAM to VGA devices
+    # Note: virtio devices (virtio-vga, virtio-gpu-pci, and their -gl variants) use
+    # dynamic memory management and don't require explicit VRAM allocation via parameters.
+    # They use QEMU's default max_hostmem setting (256 MiB) which is sufficient for most use cases.
     case ${DISPLAY_DEVICE} in
         bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
         qxl|qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
