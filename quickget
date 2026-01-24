@@ -1990,6 +1990,7 @@ function get_kolibrios() {
     local HASH=""
     local ISO="latest-iso.7z"
     local URL="http://builds.kolibrios.org/${EDITION}"
+    HASH=$(web_pipe "${URL}/sha256sums.txt" | grep "${ISO}" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
