@@ -3355,7 +3355,10 @@ function create_vm() {
             if [[ ${ISO} = *".gz"* ]]; then
                 gzip -d "${VM_PATH}/${ISO}"
                 ISO="${ISO/.gz/}"
-            fi;;
+            fi
+            # Resize the raw image to provide space for Batocera's partition expansion
+            require_qemu_img
+            ${QEMU_IMG} resize -f raw "${VM_PATH}/${ISO}" 128G;;
         dragonflybsd)
             #  Could be other OS iso files compressed with bzip2 or gzip
             #  but for now we'll keep this to know cases
