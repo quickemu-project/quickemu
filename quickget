@@ -2020,9 +2020,12 @@ function get_lmde() {
 
 function get_maboxlinux() {
     local HASH=""
+    local ISO=""
     local URL=""
     URL="https://sourceforge.net/projects/mabox-linux/files/${RELEASE}/download"
     URL="$(web_redirect "${URL}" | cut -d? -f1)"
+    ISO="$(basename "${URL}")"
+    HASH=$(web_pipe "https://repo.maboxlinux.org/iso/${ISO}.md5" | cut -d' ' -f1)
     echo "${URL} ${HASH}"
 }
 
