@@ -818,7 +818,7 @@ function releases_maboxlinux() {
 }
 
 function releases_macos() {
-    echo mojave catalina big-sur monterey ventura sonoma sequoia
+    echo mojave catalina big-sur monterey ventura sonoma sequoia tahoe
 }
 
 function releases_mageia() {
@@ -2074,15 +2074,20 @@ function get_macos() {
         catalina|10.15)
             BOARD_ID="Mac-00BE6ED71E35EB86";;
         big-sur|11)
-            BOARD_ID="Mac-42FD25EABCABB274";;
+            BOARD_ID="Mac-2BD1B31983FE1663";;
         monterey|12)
-            BOARD_ID="Mac-E43C1C25D4880AD6";;
+            BOARD_ID="Mac-B809C3757DA9BB8D"
+            OS_TYPE="latest";;
         ventura|13)
-            BOARD_ID="Mac-BE088AF8C5EB4FA2";;
+            BOARD_ID="Mac-4B682C642B45593E"
+            OS_TYPE="latest";;
         sonoma|14)
             BOARD_ID="Mac-827FAC58A8FDFA22";;
         sequoia|15)
-            BOARD_ID="Mac-53FDB3D8DB8CA971";;
+            BOARD_ID="Mac-7BA5B2D9E42DDD94";;
+        tahoe|26)
+            BOARD_ID="Mac-CFF7D910A743CAAF"
+            OS_TYPE="latest";;
         *) echo "ERROR! Unknown release: ${RELEASE}"
            releases_macos
            exit 1;;
