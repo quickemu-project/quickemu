@@ -411,6 +411,68 @@ function efi_vars() {
     fi
 }
 
+# Reset CPU flags tracking (call when initialising new CPU string)
+function reset_cpu_flags() {
+  CPU_FLAG_MAP=()
+}
+
+# Add a CPU flag with deduplication and conflict detection
+# Usage: add_cpu_flag "+vmx" or add_cpu_flag ",+vmx"
+function add_cpu_flag() {
+  local flag="${1#,}"  # Strip leading comma if present
+
+  # Skip empty flags
+  [[ -z "${flag}" ]] && return 0
+
+  # Validate flag format: must be [+-]?name or name=value
+  if [[ ! "${flag}" =~ ^[+-]?[a-zA-Z][a-zA-Z0-9._-]*(=.+)?$ ]]; then
+    echo "WARNING: Invalid CPU flag format: '${flag}' - skipping"
+    return 1
+  fi
+
+  # Extract base flag name (without +/- prefix and =value suffix)
+  local prefix=""
+  local base="${flag}"
+  if [[ "${flag}" == [+-]* ]]; then
+    prefix="${flag:0:1}"
+    base="${flag:1}"
+  fi
+  base="${base%%=*}"
+
+  # Check for exact duplicate
+  if [[ -n "${CPU_FLAG_MAP[${flag}]:-}" ]]; then
+    return 0  # Silently skip duplicates
+  fi
+
+  # Check for conflicts (opposite prefix)
+  local opposite=""
+  if [[ "${prefix}" == "+" ]]; then
+    opposite="-${base}"
+  elif [[ "${prefix}" == "-" ]]; then
+    opposite="+${base}"
+  fi
+
+  if [[ -n "${opposite}" ]] && [[ -n "${CPU_FLAG_MAP[${opposite}]:-}" ]]; then
+    echo "WARNING: Conflicting CPU flag '${flag}' ignored (${opposite} already set)"
+    return 1
+  fi
+
+  # Check for value conflicts (e.g., flag=on vs flag=off)
+  if [[ "${flag}" == *=* ]]; then
+    for existing in "${!CPU_FLAG_MAP[@]}"; do
+      if [[ "${existing%%=*}" == "${base}" ]] && [[ "${existing}" == *=* ]]; then
+        echo "WARNING: Conflicting CPU flag '${flag}' ignored (${existing} already set)"
+        return 1
+      fi
+    done
+  fi
+
+  # Add to tracking map and append to CPU string
+  CPU_FLAG_MAP["${flag}"]=1
+  CPU+=",${flag}"
+  return 0
+}
+
 function configure_cpu() {
     HOST_CPU_CORES=$(get_nproc)
     HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
@@ -499,6 +561,7 @@ function configure_cpu() {
     fi
 
     CPU="-cpu ${CPU_MODEL}"
+    reset_cpu_flags
 
     # Make any OS specific adjustments
     if [ "${guest_os}" == "freedos" ] || [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ]; then
@@ -522,6 +585,7 @@ function configure_cpu() {
         batocera|freedos|haiku|solaris) MACHINE_TYPE="pc";;
         kolibrios|reactos)
             CPU="-cpu qemu32"
+            reset_cpu_flags
             MACHINE_TYPE="pc";;
         macos)
             # If the host has an Intel CPU, passes the host CPU model features, model, stepping, exactly to the guest.
@@ -530,9 +594,11 @@ function configure_cpu() {
             if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                 CPU_MODEL="host"
                 CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
+                reset_cpu_flags
             else
                 CPU_MODEL="Haswell-v2"
                 CPU="-cpu ${CPU_MODEL},vendor=GenuineIntel,-pdpe1gb,+avx,+sse,+sse2,+ssse3,vmware-cpuid-freq=on"
+                reset_cpu_flags
             fi
             # A CPU with fma is required for Metal support
             # A CPU with invtsc is required for macOS to boot
@@ -544,7 +610,8 @@ function configure_cpu() {
                         # A CPU with AVX2 support is required for >= macOS Ventura
                         if check_cpu_flag sse4_2 && check_cpu_flag avx2; then
                             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                                CPU+=",+avx2,+sse4.2"
+                                add_cpu_flag "+avx2"
+                                add_cpu_flag "+sse4.2"
                             fi
                         else
                             echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 and AVX2 support."
@@ -555,7 +622,7 @@ function configure_cpu() {
                         # A CPU with SSE4.2 support is required for >= macOS Catalina
                         if check_cpu_flag sse4_2; then
                             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                                CPU+=",+sse4.2"
+                                add_cpu_flag "+sse4.2"
                             fi
                         else
                             echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.2 support."
@@ -565,7 +632,7 @@ function configure_cpu() {
                         # A CPU with SSE4.1 support is required for >= macOS Sierra
                         if check_cpu_flag sse4_1; then
                             if [ "${HOST_CPU_VENDOR}" != "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
-                                CPU+=",+sse4.1"
+                                add_cpu_flag "+sse4.1"
                             fi
                         else
                             echo "ERROR! macOS ${macos_release} requires a CPU with SSE 4.1 support."
@@ -579,12 +646,15 @@ function configure_cpu() {
                                 mca mce mmx movbe mpx msr mtrr nx pae pat pcid pge pse popcnt pse36 \
                                 rdrand rdtscp sep smep syscall tsc tsc_adjust vaes vbmi2 vmx vpclmulqdq \
                                 x2apic xgetbv1 xsave xsaveopt; do
-                        CPU+=$(configure_cpu_flag "${FLAG}")
+                        local cpu_flag
+                        cpu_flag=$(configure_cpu_flag "${FLAG}")
+                        [[ -n "${cpu_flag}" ]] && add_cpu_flag "${cpu_flag#,}"
                     done
                     # AMD CPUs with constant_tsc need explicit TSC flags for macOS stability
                     # constant_tsc is AMD's equivalent of Intel's invtsc
                     if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && check_cpu_flag invtsc; then
-                        CPU+=",+tsc,+tsc-deadline"
+                        add_cpu_flag "+tsc"
+                        add_cpu_flag "+tsc-deadline"
                     fi
                 fi
             fi
@@ -602,12 +672,25 @@ function configure_cpu() {
         windows|windows-server)
             # Base CPU flags that work with all accelerators (KVM, HVF, TCG)
             CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
+            reset_cpu_flags
             # KVM-specific flags: migratable and Hyper-V enlightenments
             if [ "${QEMU_ACCEL}" == "kvm" ]; then
                 if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
-                    CPU+=",migratable=no,hv_passthrough"
+                    add_cpu_flag "migratable=no"
+                    add_cpu_flag "hv_passthrough"
                 else
-                    CPU+=",migratable=no,hv_frequencies${CPU_KVM_UNHALT},hv_reenlightenment,hv_relaxed,hv_spinlocks=8191,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vendor_id=1234567890ab,hv_vpindex"
+                    add_cpu_flag "migratable=no"
+                    add_cpu_flag "hv_frequencies"
+                    [[ -n "${CPU_KVM_UNHALT}" ]] && add_cpu_flag "${CPU_KVM_UNHALT#,}"
+                    add_cpu_flag "hv_reenlightenment"
+                    add_cpu_flag "hv_relaxed"
+                    add_cpu_flag "hv_spinlocks=8191"
+                    add_cpu_flag "hv_stimer"
+                    add_cpu_flag "hv_synic"
+                    add_cpu_flag "hv_time"
+                    add_cpu_flag "hv_vapic"
+                    add_cpu_flag "hv_vendor_id=1234567890ab"
+                    add_cpu_flag "hv_vpindex"
                 fi
             fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
@@ -624,7 +707,7 @@ function configure_cpu() {
     esac
 
     if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
-        CPU+=",topoext"
+        add_cpu_flag "topoext"
     fi
 
     if [ -z "${cpu_cores}" ]; then
@@ -2307,6 +2390,9 @@ VM=""
 VMDIR=""
 VMNAME=""
 VMPATH=""
+
+# CPU flag tracking map for deduplication and conflict detection
+declare -A CPU_FLAG_MAP
 
 # shellcheck disable=SC2155
 readonly LAUNCHER=$(basename "${0}")
