@@ -304,7 +304,7 @@ function create_macos_disk_with_opencore() {
     # mcopy -s recursively copies directories including their contents
     # This preserves .kext bundle structure (directories with Contents/Info.plist)
     if [ -d "${OPENCORE_DIR}/EFI/BOOT" ]; then
-        if ! ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/BOOT" ::/EFI/; then
+        if ! LC_ALL='' ${MCOPY} -i "${TEMP_DISK}@@${EFI_OFFSET_BYTES}" -s "${OPENCORE_DIR}/EFI/BOOT" ::/EFI/; then
             echo "ERROR! Failed to copy EFI/BOOT to disk."
             rm -f "${TEMP_DISK}"
             return 1
