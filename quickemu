@@ -1300,8 +1300,8 @@ function configure_display() {
         VIDEO="-device ramfb ${VIDEO}"
     fi
 
-    # Try and coerce the display resolution for Linux guests only.
-    if [ "${DISPLAY_DEVICE}" != "vmware-svga" ]; then
+    # Set display resolution for devices that support xres/yres parameters
+    if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|vga-gl|gpu|gpu-gl|gpu-pci|gpu-gl-pci)|qxl|qxl-vga|bochs-display)(,|$) ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
     else
