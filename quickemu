@@ -296,6 +296,12 @@ function check_cpu_flag() {
       if lscpu | grep -o "^Flags\b.*: .*\b${HOST_CPU_FLAG}\b" > /dev/null; then
           return 0
       else
+          # AMD CPUs report invtsc as constant_tsc; check for equivalence
+          if [ "${HOST_CPU_FLAG}" == "invtsc" ] && [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ]; then
+              if lscpu | grep -o "^Flags\b.*: .*\bconstant_tsc\b" > /dev/null; then
+                  return 0
+              fi
+          fi
           return 1
       fi
     fi
@@ -465,6 +471,11 @@ function configure_cpu() {
                             x2apic xgetbv1 xsave xsaveopt; do
                     CPU+=$(configure_cpu_flag "${FLAG}")
                 done
+                # AMD CPUs with constant_tsc need explicit TSC flags for macOS stability
+                # constant_tsc is AMD's equivalent of Intel's invtsc
+                if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && check_cpu_flag invtsc; then
+                    CPU+=",+tsc,+tsc-deadline,+invtsc"
+                fi
             fi
 
             # Disable S3 support in the VM to prevent macOS suspending during install
