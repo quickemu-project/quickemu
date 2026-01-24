@@ -10,8 +10,10 @@
   gawk,
   gnugrep,
   gnused,
+  gptfdisk,
   jq,
   mesa-demos,
+  mtools,
   pciutils,
   procps,
   python3,
@@ -37,7 +39,9 @@ let
     gawk
     gnugrep
     gnused
+    gptfdisk
     jq
+    mtools
     pciutils
     procps
     python3
