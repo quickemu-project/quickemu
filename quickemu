@@ -960,6 +960,43 @@ function configure_storage() {
     fi
 }
 
+function check_cocoa_gl_es_support() {
+    [ "${OS_KERNEL}" != "Darwin" ] && return 1
+
+    # Test QEMU directly for gl=es support - most reliable method
+    # This catches both missing OpenGL build support and missing ANGLE libraries
+    if "${QEMU}" -display cocoa,gl=es -M none 2>&1 | grep -qi "OpenGL support was not enabled\|does not accept"; then
+        return 1
+    fi
+
+    # Fallback: check for ANGLE libraries if QEMU test is inconclusive
+    # Resolve QEMU's real path (follows Nix symlinks)
+    local qemu_real qemu_dir qemu_prefix
+    qemu_real=$(realpath "${QEMU}" 2>/dev/null || readlink -f "${QEMU}" 2>/dev/null || echo "${QEMU}")
+    qemu_dir=$(dirname "${qemu_real}")
+    qemu_prefix="${qemu_dir%/bin}"
+
+    local angle_libs=(
+        "${qemu_prefix}/lib/libEGL.dylib"
+        "/opt/homebrew/lib/libEGL.dylib"
+        "/usr/local/lib/libEGL.dylib"
+    )
+
+    # Also check DYLD paths if set (covers additional Nix scenarios)
+    if [ -n "${DYLD_LIBRARY_PATH:-}" ]; then
+        local IFS=':'
+        for path in ${DYLD_LIBRARY_PATH}; do
+            angle_libs+=("${path}/libEGL.dylib")
+        done
+    fi
+
+    for lib in "${angle_libs[@]}"; do
+        [ -f "$lib" ] && return 0
+    done
+
+    return 1
+}
+
 function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
@@ -1014,6 +1051,14 @@ function configure_display() {
 
     # Map Quickemu $display to QEMU -display
     case ${display} in
+        cocoa)
+            if [ "${gl}" == "on" ] && check_cocoa_gl_es_support; then
+                DISPLAY_RENDER="${display},gl=es"
+                gl="es"
+            else
+                DISPLAY_RENDER="${display}"
+                [ "${gl}" == "on" ] && gl="off"
+            fi;;
         gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
         none|spice) DISPLAY_RENDER="none";;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
@@ -1022,11 +1067,16 @@ function configure_display() {
     esac
 
     # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
-    if [ "${gl}" == "on" ] && [ "${DISPLAY_DEVICE}" == "virtio-vga" ]; then
-        if [ "${QEMU_VER_SHORT}" -ge 61 ]; then
-            DISPLAY_DEVICE="${DISPLAY_DEVICE}-gl"
-        else
-            DISPLAY_DEVICE="${DISPLAY_DEVICE},virgl=on"
+    if [ "${gl}" != "off" ] && [[ "${DISPLAY_DEVICE}" =~ ^virtio-(vga|gpu|gpu-pci)$ ]]; then
+        local GL_DEVICE=""
+        case "${DISPLAY_DEVICE}" in
+            virtio-gpu-pci) GL_DEVICE="virtio-gpu-gl-pci";;
+            virtio-gpu)     GL_DEVICE="virtio-gpu-gl";;
+            virtio-vga)     GL_DEVICE="virtio-vga-gl";;
+        esac
+
+        if "${QEMU}" -device help 2>&1 | grep -q "\"${GL_DEVICE}\""; then
+            DISPLAY_DEVICE="${GL_DEVICE}"
         fi
         echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (on)"
     else
@@ -1849,10 +1899,8 @@ function display_param_check() {
         fi
     fi
 
-    # Disable GL for cocoa
     # Enable grab-on-hover for SDL: https://github.com/quickemu-project/quickemu/issues/541
     case "${display}" in
-        cocoa) gl="off";;
         sdl) export SDL_MOUSE_FOCUS_CLICKTHROUGH=1;;
     esac
 }
