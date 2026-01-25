@@ -1650,20 +1650,58 @@ function vm_boot() {
     # SMM (System Management Mode) is an x86-specific CPU mode used for firmware operations
     # and is required for Secure Boot. ARM64 uses different mechanisms for firmware security.
     # vmport emulates VMware's I/O port for guest tools, which is also x86-specific.
-    if [ "${ARCH_VM}" == "aarch64" ]; then
-        # ARM64 uses 'virt' machine type without x86-specific options
-        # shellcheck disable=SC2054,SC2206,SC2140
-        args+=(-machine ${MACHINE_TYPE},accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
-            ${CPU} ${SMP}
-            -m ${RAM_VM} ${BALLOON}
-            -pidfile "${VMDIR}/${VMNAME}.pid")
+    #
+    # TCG-specific optimisations for cross-architecture emulation:
+    # - Use -accel tcg,... to specify tb-size and thread options
+    # - QEMU does not allow both -machine accel= and -accel simultaneously
+    # - For KVM/HVF, continue using -machine accel= (simpler, no extra options needed)
+    if [ "${QEMU_ACCEL}" == "tcg" ]; then
+        local HOST_RAM_GB=0
+        if [ "${OS_KERNEL}" == "Darwin" ]; then
+            HOST_RAM_GB=$(($(sysctl -n hw.memsize) / (1024*1024*1024)))
+        else
+            HOST_RAM_GB=$(awk '/MemTotal/ {printf "%.0f", $2/1024/1024}' /proc/meminfo)
+        fi
+        # Use larger translation cache on hosts with 16GB+ RAM
+        local TCG_TB_SIZE=256
+        if [ "${HOST_RAM_GB}" -ge 16 ]; then
+            TCG_TB_SIZE=512
+        fi
+        # shellcheck disable=SC2054,SC2206
+        args+=(-accel tcg,tb-size=${TCG_TB_SIZE},thread=multi)
+
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64 uses 'virt' machine type without x86-specific options
+            # shellcheck disable=SC2054,SC2206,SC2140
+            args+=(-machine ${MACHINE_TYPE} ${GUEST_TWEAKS}
+                ${CPU} ${SMP}
+                -m ${RAM_VM} ${BALLOON}
+                -pidfile "${VMDIR}/${VMNAME}.pid")
+        else
+            # x86_64 includes SMM (System Management Mode) and vmport options
+            # shellcheck disable=SC2054,SC2206,SC2140
+            args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off ${GUEST_TWEAKS}
+                ${CPU} ${SMP}
+                -m ${RAM_VM} ${BALLOON}
+                -pidfile "${VMDIR}/${VMNAME}.pid")
+        fi
     else
-        # x86_64 includes SMM (System Management Mode) and vmport options
-        # shellcheck disable=SC2054,SC2206,SC2140
-        args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
-            ${CPU} ${SMP}
-            -m ${RAM_VM} ${BALLOON}
-            -pidfile "${VMDIR}/${VMNAME}.pid")
+        # KVM/HVF: use -machine accel= (no extra options needed)
+        if [ "${ARCH_VM}" == "aarch64" ]; then
+            # ARM64 uses 'virt' machine type without x86-specific options
+            # shellcheck disable=SC2054,SC2206,SC2140
+            args+=(-machine ${MACHINE_TYPE},accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+                ${CPU} ${SMP}
+                -m ${RAM_VM} ${BALLOON}
+                -pidfile "${VMDIR}/${VMNAME}.pid")
+        else
+            # x86_64 includes SMM (System Management Mode) and vmport options
+            # shellcheck disable=SC2054,SC2206,SC2140
+            args+=(-machine ${MACHINE_TYPE},smm=${SMM},vmport=off,accel=${QEMU_ACCEL} ${GUEST_TWEAKS}
+                ${CPU} ${SMP}
+                -m ${RAM_VM} ${BALLOON}
+                -pidfile "${VMDIR}/${VMNAME}.pid")
+        fi
     fi
 
     if [ "${guest_os}" == "windows" ] || [ "${guest_os}" == "windows-server" ] || [ "${guest_os}" == "reactos" ] || [ "${guest_os}" == "freedos" ]; then
