@@ -4068,13 +4068,17 @@ if [ "${CHECK_ALL_ARCH}" == "true" ] && [ -n "${2}" ]; then
 fi
 
 # Validate architecture support before attempting download
-if ! is_arch_supported "${OS}" "${ARCH}"; then
-    if [ "${OPERATION}" == "test" ] || [ "${OPERATION}" == "show" ]; then
-        test_result "${OS}" "${2:-}" "${3:-}" "" "SKIP" "(not available for ${ARCH})"
-        exit 0
-    else
-        echo "ERROR! $(pretty_name "${OS}") is not available for ${ARCH} architecture."
-        exit 1
+# Skip for OSes with editions_* functions - they have edition-dependent arch support
+# and will be validated after EDITION is parsed
+if [[ $(type -t "editions_${OS}") != function ]]; then
+    if ! is_arch_supported "${OS}" "${ARCH}"; then
+        if [ "${OPERATION}" == "test" ] || [ "${OPERATION}" == "show" ]; then
+            test_result "${OS}" "${2:-}" "${3:-}" "" "SKIP" "(not available for ${ARCH})"
+            exit 0
+        else
+            echo "ERROR! $(pretty_name "${OS}") is not available for ${ARCH} architecture."
+            exit 1
+        fi
     fi
 fi
 
@@ -4100,6 +4104,11 @@ if [ -n "${2}" ]; then
             show_os_info "${OS}"
             echo -e " - Editions:\t$("editions_${OS}" | fmt -w 80)"
             echo -e "\nERROR! You must specify an edition."
+            exit 1
+        fi
+        # Now that EDITION is known, validate architecture support
+        if ! is_arch_supported "${OS}" "${ARCH}"; then
+            echo "ERROR! $(pretty_name "${OS}") ${EDITION} is not available for ${ARCH} architecture."
             exit 1
         fi
         handle_missing
