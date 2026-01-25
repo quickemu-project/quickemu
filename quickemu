@@ -726,7 +726,7 @@ function configure_cpu() {
             ;;
     esac
 
-    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ]; then
+    if [ "${HOST_CPU_VENDOR}" == "AuthenticAMD" ] && [ "${guest_os}" != "macos" ] && [ "${ARCH_VM}" == "x86_64" ]; then
         add_cpu_flag "topoext"
     fi
 
