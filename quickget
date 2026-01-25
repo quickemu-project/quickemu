@@ -2861,7 +2861,7 @@ function get_rebornos() {
 }
 
 function get_rockylinux() {
-    if [[ "${RELEASE}" =~ ^8. ]] && [[ "${EDITION}" == "dvd" ]]; then
+    if ( [[ "${RELEASE}" =~ ^8. ]] ||  [[ "${RELEASE}" =~ ^10. ]]  ) && [[ "${EDITION}" == "dvd" ]]; then
         EDITION="dvd1"
     fi
     local HASH=""
