@@ -1337,7 +1337,9 @@ function configure_display() {
                 [ "${gl}" == "on" ] && gl="off"
             fi;;
         gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
-        none|spice) DISPLAY_RENDER="none";;
+        none)       DISPLAY_RENDER="none"
+                    gl="off";;  # No display backend means no GL context
+        spice)      DISPLAY_RENDER="none";;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
         spice-app)  DISPLAY_RENDER="${display},gl=${gl}";;
         *)          DISPLAY_RENDER="${display}";;
