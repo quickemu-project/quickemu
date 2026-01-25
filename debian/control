@@ -15,9 +15,11 @@ Architecture: all
 Depends:
  coreutils,
  curl,
+ gdisk,
  genisoimage,
  jq,
  mesa-utils,
+ mtools,
  pciutils,
  procps,
  python3-minimal,

@@ -32,7 +32,7 @@ mkShell {
         xorg.xrandr
         zsync
       ]
-      ++ lib.optionals stdenv.isLinux [
+      ++ lib.optionals stdenv.hostPlatform.isLinux [
         mesa-demos
         usbutils
         xdg-user-dirs
@@ -57,7 +57,7 @@ mkShell {
           -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
           -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
         ''
-      }${lib.optionalString stdenv.isDarwin ''
+      }${lib.optionalString stdenv.hostPlatform.isDarwin ''
         -e 's|ovmfs=("[$][{]SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-x86_64-secure-code.fd","${pkgs.qemu_full}/share/qemu/edk2-i386-vars.fd" "''${SHARE_PATH}/OVMF/OVMF_CODE_4M.secboot.fd"|' \
         -e 's|ovmfs=("[$][{]SHARE_PATH}/OVMF/OVMF_CODE_4M.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-x86_64-code.fd","${pkgs.qemu_full}/share/qemu/edk2-i386-vars.fd" "''${SHARE_PATH}/OVMF/OVMF_CODE_4M.fd"|' \
         -e 's|ovmfs=("/usr/share/AAVMF/AAVMF_CODE.fd"|ovmfs=("${pkgs.qemu_full}/share/qemu/edk2-aarch64-code.fd","${pkgs.qemu_full}/share/qemu/edk2-arm-vars.fd" "/usr/share/AAVMF/AAVMF_CODE.fd"|' \
