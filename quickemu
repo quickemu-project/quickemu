@@ -1266,15 +1266,17 @@ function check_cocoa_gl_es_support() {
 }
 
 function configure_display() {
-    # Determine which audio driver use between Pulseaudio or ALSA
-    local AUDIO_DRIVER="pa"
-    if pidof pipewire >/dev/null 2>&1; then
+    # Determine which audio driver to use: PipeWire, PulseAudio, or ALSA
+    # Socket detection is more reliable than process detection on headless servers
+    local AUDIO_DRIVER="alsa"
+    local pw_socket="${PIPEWIRE_REMOTE:-${XDG_RUNTIME_DIR}/pipewire-0}"
+    local pa_socket="${PULSE_SERVER:-${XDG_RUNTIME_DIR}/pulse/native}"
+
+    if [ "${QEMU_VER_SHORT}" -ge 81 ] && [ -S "${pw_socket}" ]; then
         # QEMU's pipewire audio backend was added in version 8.1
-        if [ "${QEMU_VER_SHORT}" -ge 81 ]; then
-            AUDIO_DRIVER="pipewire"
-        fi
-    elif ! pidof pulseaudio >/dev/null 2>&1; then
-        AUDIO_DRIVER="alsa"
+        AUDIO_DRIVER="pipewire"
+    elif [ -S "${pa_socket}" ]; then
+        AUDIO_DRIVER="pa"
     fi
 
     # Setup the appropriate audio device based on the display output
