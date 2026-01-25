@@ -34,6 +34,7 @@ function os_info() {
         archcraft)        INFO="Archcraft|-|https://archcraft.io/|Yet another minimal Linux distribution, based on Arch Linux.";;
         archlinux)        INFO="Arch Linux|-|https://archlinux.org/|Lightweight and flexible Linux® distribution that tries to Keep It Simple.";;
         artixlinux)       INFO="Artix Linux|-|https://artixlinux.org/|The Art of Linux. Simple. Fast. Systemd-free.";;
+        azurelinux)       INFO="Azure Linux|-|https://github.com/microsoft/azurelinux|Microsoft's internal Linux distribution for cloud infrastructure and edge.";;
         batocera)         INFO="Batocera|-|https://batocera.org/|Retro-gaming distribution with the aim of turning any computer/nano computer into a gaming console during a game or permanently.";;
         bazzite)          INFO="Bazzite|-|https://github.com/ublue-os/bazzite/|Container native gaming and a ready-to-game SteamOS like.";;
         biglinux)         INFO="BigLinux|-|https://www.biglinux.com.br/|Is the right choice if you want to have an easy and enriching experience with Linux. It has been perfected over more than 19 years, following our motto: 'In search of the perfect system'.";;
@@ -641,6 +642,7 @@ function os_support() {
     archcraft \
     archlinux \
     artixlinux \
+    azurelinux \
     batocera \
     bazzite \
     biglinux \
@@ -782,6 +784,10 @@ function editions_artixlinux() {
     #shellcheck disable=SC2046,SC2005
     # Extract edition-init combinations (e.g., base-dinit, plasma-openrc, community-gtk-openrc)
     echo $(web_pipe "https://mirror1.artixlinux.org/iso/" | grep "artix-" | cut -d'"' -f2 | grep -v sig | sed 's/artix-//' | sed 's/-[0-9]\{8\}-x86_64.iso//' | sort -u)
+}
+
+function releases_azurelinux() {
+    echo 3.0
 }
 
 function releases_batocera() {
@@ -1377,6 +1383,10 @@ function arch_alma() {
 }
 
 function arch_alpine() {
+    echo "amd64 arm64"
+}
+
+function arch_azurelinux() {
     echo "amd64 arm64"
 }
 
@@ -1996,6 +2006,14 @@ function get_artixlinux() {
     ISO="artix-${EDITION}-${RELEASE}-x86_64.iso"
     HASH=$(web_pipe "${URL}/sha256sums" | grep "${ISO}")
     echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_azurelinux() {
+    local QEMU_ARCH="x86_64"
+    [ "${ARCH}" == "arm64" ] && QEMU_ARCH="aarch64"
+    local URL="https://aka.ms/azurelinux-${RELEASE}-${QEMU_ARCH}.iso"
+    ISO=$(web_redirect "${URL}")
+    echo "${ISO}"
 }
 
 function get_batocera() {
