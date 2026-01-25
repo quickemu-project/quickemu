@@ -1398,6 +1398,30 @@ function arch_ubuntu-server() {
     echo "amd64 arm64"
 }
 
+function arch_ubuntu() {
+    # Ubuntu Desktop ARM64 only available from 25.10 onwards
+    local MAJOR MINOR
+    # When RELEASE is unset (initial arch check), return all supported architectures
+    # Actual validation happens in get_ubuntu() when release is known
+    if [ -z "${RELEASE}" ]; then
+        echo "amd64 arm64"
+        return
+    fi
+    # Non-numeric releases (daily-live, etc.) default to amd64 only
+    if [[ ! "${RELEASE}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+        echo "amd64"
+        return
+    fi
+    MAJOR="${RELEASE%%.*}"
+    MINOR="${RELEASE##*.}"
+    # 25.10 and later support ARM64
+    if [ "${MAJOR}" -gt 25 ] || { [ "${MAJOR}" -eq 25 ] && [ "${MINOR}" -ge 10 ]; }; then
+        echo "amd64 arm64"
+    else
+        echo "amd64"
+    fi
+}
+
 # Check if a given architecture is supported for an OS
 function is_arch_supported() {
     local OS="${1}"
@@ -2986,10 +3010,22 @@ function get_ubuntu-server() {
 }
 
 function get_ubuntu() {
-    local ISO=""
-    local HASH=""
-    local URL=""
     local DATA=""
+    local HASH=""
+    local ISO=""
+    local UBUNTU_ARCH="${ARCH}"
+    local URL=""
+
+    # Validate architecture support now that RELEASE is known
+    if ! is_arch_supported "${OS}" "${UBUNTU_ARCH}"; then
+        if [ "${OPERATION}" == "test" ] || [ "${OPERATION}" == "show" ]; then
+            test_result "${OS}" "${RELEASE}" "" "" "SKIP" "(not available for ${UBUNTU_ARCH})"
+            exit 0
+        else
+            echo "ERROR! $(pretty_name "${OS}") ${RELEASE} is not available for ${UBUNTU_ARCH} architecture."
+            exit 1
+        fi
+    fi
 
     if [[ "${RELEASE}" == "daily"* ]] && [ "${OS}" == "ubuntustudio" ]; then
         # Ubuntu Studio daily-live images are in the dvd directory
@@ -3005,17 +3041,20 @@ function get_ubuntu() {
     elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
         VM_PATH="${OS}-${RELEASE}"
+    elif [ "${OS}" == "ubuntu" ] && [ "${UBUNTU_ARCH}" == "arm64" ]; then
+        # ARM64 desktop ISOs are hosted on cdimage.ubuntu.com
+        URL="https://cdimage.ubuntu.com/releases/${RELEASE}/release"
     elif [ "${OS}" == "ubuntu" ]; then
         URL="https://releases.ubuntu.com/${RELEASE}"
     else
         URL="https://cdimage.ubuntu.com/${OS}/releases/${RELEASE}/release"
     fi
     if web_check "${URL}/SHA256SUMS"; then
-        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
+        DATA=$(web_pipe "${URL}/SHA256SUMS" | grep 'desktop\|dvd\|install' | grep "${UBUNTU_ARCH}" | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}" | sed '1q;d')
         HASH=$(cut -d' ' -f1 <<<"${DATA}" | sed '1q;d')
     else
-        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep amd64 | grep iso | grep -v "+mac" | tail -n 1 )
+        DATA=$(web_pipe "${URL}/MD5SUMS" | grep 'desktop\|dvd\|install' | grep "${UBUNTU_ARCH}" | grep iso | grep -v "+mac" | tail -n 1 )
         ISO=$(cut -d'*' -f2 <<<"${DATA}")
         HASH=$(cut -d' ' -f1 <<<"${DATA}")
     fi
