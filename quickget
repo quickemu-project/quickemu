@@ -15,6 +15,13 @@ case "${HOST_ARCH}" in
     *) ARCH="amd64";;
 esac
 
+function arch_suffix() {
+    # Return architecture suffix for foreign architectures, empty for native
+    if [ "${ARCH}" != "${NORMALISED_HOST_ARCH}" ]; then
+        echo "-${ARCH}"
+    fi
+}
+
 function cleanup() {
     if [ -n "$(jobs -p)" ]; then
         kill "$(jobs -p)" 2>/dev/null
@@ -165,10 +172,14 @@ function error_specify_release() {
         *ubuntu-server*)
             echo -en " - Releases:\t"
             releases_ubuntu-server
+            echo -en " - Archs:\t"
+            get_supported_archs "${OS}"
             ;;
         *ubuntu*)
             echo -en " - Releases:\t"
             releases_ubuntu
+            echo -en " - Archs:\t"
+            get_supported_archs "${OS}"
             ;;
         *windows*)
             echo -en " - Releases:\t"
@@ -176,6 +187,7 @@ function error_specify_release() {
             echo -en " - Languages:\t"
             "languages_${OS}"
             echo "${I18NS[@]}"
+            # Windows uses multi-arch ISOs, skip architecture display
             ;;
         *)
             echo -en " - Releases:\t"
@@ -184,6 +196,8 @@ function error_specify_release() {
                 echo -en " - Editions:\t"
                 "editions_${OS}" | fmt -w 80
             fi
+            echo -en " - Archs:\t"
+            get_supported_archs "${OS}"
             ;;
     esac
     echo -e "\nERROR! You must specify a release."
@@ -1450,6 +1464,18 @@ function is_arch_supported() {
     [[ " ${SUPPORTED} " == *" ${CHECK_ARCH} "* ]]
 }
 
+# Get supported architectures for an OS
+function get_supported_archs() {
+    local OS="${1}"
+    # Check if arch function exists for this OS
+    if [[ $(type -t "arch_${OS}") == function ]]; then
+        arch_"${OS}"
+    else
+        # Default: amd64 only
+        echo "amd64"
+    fi
+}
+
 function editions_zorin() {
     # Lite edition not available for Zorin 18 (Pro-only starting from 18)
     # When RELEASE is unset (e.g. csv_data context), return all editions
@@ -1622,7 +1648,6 @@ function web_get() {
     if [[ ${OS} != windows && ${OS} != macos && ${OS} != windows-server ]]; then
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION}"
         echo "- URL: ${URL}"
-        echo "- PATH: ${PWD}/${DIR}/${FILE}"
     fi
 
     if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
@@ -1789,8 +1814,12 @@ function make_vm_config() {
     if [ ! -e "${CONF_FILE}" ]; then
         echo "Making ${CONF_FILE}"
         local ARCH_LINE=""
-        if [ "${ARCH}" == "arm64" ]; then
-            ARCH_LINE="arch=\"aarch64\""
+        if [ "${ARCH}" != "${NORMALISED_HOST_ARCH}" ]; then
+            if [ "${ARCH}" == "arm64" ]; then
+                ARCH_LINE="arch=\"aarch64\""
+            else
+                ARCH_LINE="arch=\"x86_64\""
+            fi
         fi
         cat << EOF > "${CONF_FILE}"
 #!${QUICKEMU} --vm
@@ -3096,10 +3125,10 @@ function get_ubuntu() {
         else
             URL="https://cdimage.ubuntu.com/${OS}/jammy/daily-live/current"
         fi
-        VM_PATH="${OS}-jammy-live"
+        VM_PATH="${OS}-jammy-live$(arch_suffix)"
     elif [[ "${RELEASE}" == "daily"* ]] || [ "${RELEASE}" == "dvd" ]; then
         URL="https://cdimage.ubuntu.com/${OS}/${RELEASE}/current"
-        VM_PATH="${OS}-${RELEASE}"
+        VM_PATH="${OS}-${RELEASE}$(arch_suffix)"
     elif [ "${OS}" == "ubuntu" ] && [ "${UBUNTU_ARCH}" == "arm64" ]; then
         # ARM64 desktop ISOs are hosted on cdimage.ubuntu.com
         URL="https://cdimage.ubuntu.com/releases/${RELEASE}/release"
@@ -3993,6 +4022,8 @@ QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
 CHECK_ALL_ARCH="false"
+# Normalised host architecture for foreign arch detection
+NORMALISED_HOST_ARCH="${ARCH}"
 CURL=$(command -v curl)
 if [ ! -x "${CURL}" ]; then
     echo "ERROR! curl not found. Please install curl"
@@ -4182,7 +4213,7 @@ fi
 
 if [ -n "${2}" ]; then
     RELEASE="${2}"
-    VM_PATH="${OS}-${RELEASE}"
+    VM_PATH="${OS}-${RELEASE}$(arch_suffix)"
     # If the OS has an editions_() function, use it.
     if [[ $(type -t "editions_${OS}") == function ]]; then
         validate_release "releases_${OS}"
@@ -4215,7 +4246,7 @@ if [ -n "${2}" ]; then
             fi
         fi
         handle_missing
-        VM_PATH="${OS}-${RELEASE}-${EDITION}"
+        VM_PATH="${OS}-${RELEASE}-${EDITION}$(arch_suffix)"
         create_vm "$("get_${OS}" "${EDITION}")"
     elif [ "${OS}" == "macos" ]; then
         # macOS doesn't use create_vm()
@@ -4238,7 +4269,7 @@ if [ -n "${2}" ]; then
             if ! is_valid_language "${I18N}"; then
                 error_not_supported_lang
             fi
-            VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')"
+            VM_PATH="$(echo "${OS}-${RELEASE}-${I18N// /-}" | tr -d '()')$(arch_suffix)"
         fi
         validate_release "releases_${OS}"
         get_windows
