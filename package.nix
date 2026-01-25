@@ -60,15 +60,16 @@ let
     usbutils
     xdg-user-dirs
   ];
-  versionMatches = builtins.match ''
-    .*
-    readonly[[:blank:]]VERSION="([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"
-    .*
-  '' (builtins.readFile ./quickemu);
+  # Extract version using builtins.split to avoid regex backtracking on large files.
+  # builtins.match with .* patterns on multi-kilobyte files can cause stack overflow.
+  versionParts = builtins.split "readonly VERSION=\"([0-9]+\\.[0-9]+\\.[0-9]+)\"" (
+    builtins.readFile ./quickemu
+  );
+  version = builtins.elemAt (builtins.elemAt versionParts 1) 0;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "quickemu";
-  version = builtins.concatStringsSep "" versionMatches;
+  version = version;
   src = lib.cleanSource ./.;
 
   postPatch = ''
