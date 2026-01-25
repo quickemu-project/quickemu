@@ -900,9 +900,9 @@ function releases_easyos() {
     # get the latest 2 years of releases so that when we hit next year we still have the latest 2 years
     TWO_YEARS=$(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/ | grep -o -E '[[:digit:]]{4}/' | sort -nr | tr -d /  | head -n 2 )
     for YEAR in ${TWO_YEARS} ; do
-        ALL_RELEASES="${ALL_RELEASES} $(web_pipe https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/ | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / | sort -nr)"
+        ALL_RELEASES="${ALL_RELEASES} $(web_pipe "https://distro.ibiblio.org/easyos/amd64/releases/kirkstone/${YEAR}/" | grep -o -E '[[:digit:]]+(\.[[:digit:]])+/' | tr -d / | sort -nr)"
     done
-    echo ${ALL_RELEASES}
+    echo "${ALL_RELEASES}"
 }
 
 
@@ -1127,7 +1127,7 @@ function releases_parrotsec() {
             RELEASES="${RELEASES} ${REL}"
         fi
     done
-    echo ${RELEASES}
+    echo "${RELEASES}"
 }
 
 function editions_parrotsec() {

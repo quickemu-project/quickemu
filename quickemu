@@ -1820,6 +1820,7 @@ function vm_boot() {
             if [ "${secureboot}" == "on" ]; then
               args+=(-global driver=cfi.pflash01,property=secure,value=on)
             fi
+            # shellcheck disable=SC2054
             args+=(-drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
                 -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
         fi
