@@ -2041,7 +2041,8 @@ function get_azurelinux() {
     local QEMU_ARCH="x86_64"
     [ "${ARCH}" == "arm64" ] && QEMU_ARCH="aarch64"
     local URL="https://aka.ms/azurelinux-${RELEASE}-${QEMU_ARCH}.iso"
-    local ISO="$(web_redirect "${URL}")"
+    local ISO
+    ISO="$(web_redirect "${URL}")"
     echo "${ISO}"
 }
 
@@ -2908,7 +2909,7 @@ function get_rebornos() {
 }
 
 function get_rockylinux() {
-    if ( [[ "${RELEASE}" =~ ^8. ]] ||  [[ "${RELEASE}" =~ ^10. ]]  ) && [[ "${EDITION}" == "dvd" ]]; then
+    if { [[ "${RELEASE}" =~ ^8. ]] || [[ "${RELEASE}" =~ ^10. ]]; } && [[ "${EDITION}" == "dvd" ]]; then
         EDITION="dvd1"
     fi
     local HASH=""
