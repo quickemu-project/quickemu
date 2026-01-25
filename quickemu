@@ -2269,6 +2269,8 @@ function display_param_check() {
     # Braille support requires SDL. Override $display if braille was requested.
     if [ -n "${BRAILLE}" ]; then
         display="sdl"
+        # XHCI supports USB 1.1/2.0/3.0; required for full-speed braille devices
+        usb_controller="xhci"
     fi
 
     if [ "${OS_KERNEL}" == "Darwin" ]; then
