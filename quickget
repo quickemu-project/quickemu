@@ -1618,6 +1618,7 @@ function web_get() {
     if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         echo "ERROR! Failed to download ${URL} with curl."
         rm -f "${DIR}/${FILE}"
+        exit 1
     fi
 }
 
