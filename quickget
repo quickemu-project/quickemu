@@ -2012,7 +2012,7 @@ function get_azurelinux() {
     local QEMU_ARCH="x86_64"
     [ "${ARCH}" == "arm64" ] && QEMU_ARCH="aarch64"
     local URL="https://aka.ms/azurelinux-${RELEASE}-${QEMU_ARCH}.iso"
-    ISO=$(web_redirect "${URL}")
+    local ISO="$(web_redirect "${URL}")"
     echo "${ISO}"
 }
 
