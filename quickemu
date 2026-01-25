@@ -1887,8 +1887,9 @@ function vm_boot() {
 
     # Add the disks
     # - https://turlucode.com/qemu-disk-io-performance-comparison-native-or-threads-windows-10-version/
-    # Optimise disk I/O: enable TRIM/discard and zero detection for thin provisioning
-    DRIVE_OPTIMISATIONS="discard=unmap,detect-zeroes=unmap"
+    # Optimise disk I/O: enable TRIM/discard, zero detection for thin provisioning,
+    # writeback caching and threaded async I/O
+    DRIVE_OPTIMISATIONS="discard=unmap,detect-zeroes=unmap,cache=writeback,aio=threads"
 
     if [[ "${boot}" == *"efi"* ]]; then
         QCOW2CODE=$(is_firmware_qcow2 "${EFI_CODE}")
