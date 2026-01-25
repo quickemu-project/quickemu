@@ -4108,8 +4108,13 @@ if [ -n "${2}" ]; then
         fi
         # Now that EDITION is known, validate architecture support
         if ! is_arch_supported "${OS}" "${ARCH}"; then
-            echo "ERROR! $(pretty_name "${OS}") ${EDITION} is not available for ${ARCH} architecture."
-            exit 1
+            if [ "${OPERATION}" == "test" ] || [ "${OPERATION}" == "show" ]; then
+                test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
+                exit 0
+            else
+                echo "ERROR! $(pretty_name "${OS}") ${EDITION} is not available for ${ARCH} architecture."
+                exit 1
+            fi
         fi
         handle_missing
         VM_PATH="${OS}-${RELEASE}-${EDITION}"
