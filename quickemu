@@ -504,7 +504,9 @@ function configure_cpu() {
     if [ "${ARCH_VM}" == "aarch64" ]; then
         # ARM64 guest support
         # https://qemu-project.gitlab.io/qemu/system/arm/virt.html
-        # highmem=on allows RAM above 4GB (required for VMs with >3GB RAM)
+        # highmem=on allows aarch64 guests on the "virt" machine type to access guest RAM
+        # above the 4GB boundary. This is required for VMs configured with >3GB RAM and is
+        # generally more compatible on modern aarch64 systems.
         # pflash0/pflash1 reference the blockdev nodes for AAVMF firmware
         MACHINE_TYPE="virt,highmem=on,pflash0=rom,pflash1=efivars"
         case ${ARCH_HOST} in
@@ -518,15 +520,28 @@ function configure_cpu() {
         esac
     elif [ "${ARCH_VM}" != "${ARCH_HOST}" ]; then
         # If the architecture of the VM is different from the host, disable acceleration
+        # and use TCG (Tiny Code Generator) software emulation. TCG emulates the target
+        # architecture in software, allowing cross-architecture virtualisation (e.g.,
+        # running x86_64 VMs on ARM hosts).
+        #
+        # Users can manually force TCG mode by adding this to their VM .conf file:
+        #   cpu_model="qemu64"
+        #   extra_args="-accel tcg"
+        # or by exporting QEMU_ACCEL in the shell environment:
+        #   export QEMU_ACCEL="tcg"
+        #
+        # TCG is useful for:
+        # - Cross-architecture virtualisation (x86 on ARM, ARM on x86)
+        # - Testing VMs on hosts without hardware virtualisation support
+        # - Emulating CPU features in software (e.g., running macOS x86_64 VMs on ARM Macs)
         CPU_MODEL="qemu64"
         CPU_KVM_UNHALT=""
         QEMU_ACCEL="tcg"
     fi
 
-    # TODO: More robust detection of running in a VM
-    # - macOS check for CPU flag: vmx
-    # - Linux AMD check for CPU flag: svm
-    # - Linux Intel check for CPU flag: vmx
+    # Detect if running inside a VM based on manufacturer detection
+    # Note: Checking CPU flags (vmx/svm) indicates hardware virtualisation SUPPORT,
+    # not whether we're inside a VM. Nested virtualisation may expose these flags.
     case ${MANUFACTURER,,} in
         qemu|virtualbox) CPU_MODEL="qemu64"
                          QEMU_ACCEL="tcg"
@@ -549,8 +564,10 @@ function configure_cpu() {
             fi
         elif [ "${ARCH_HOST}" == "aarch64" ] || [ "${ARCH_HOST}" == "arm64" ]; then
             # ARM hosts running native ARM guests with hardware acceleration (HVF on macOS, KVM on Linux)
-            # ARM processors don't have x86-specific virtualisation flags (VT-x/SVM) to check
-            # Cross-architecture guests (x86 on ARM) use TCG and skip this validation block entirely
+            # ARM processors don't have x86-specific virtualisation flags (VT-x/SVM) to check.
+            # We use architecture detection here instead of vendor detection (used for x86)
+            # because ARM CPUs don't have standardised vendor strings like x86 (GenuineIntel/AuthenticAMD).
+            # Cross-architecture guests (x86 on ARM) use TCG and skip this validation block entirely.
             # No validation needed here - ARM virtualisation support is handled by the hypervisor
             true
         else
@@ -603,7 +620,8 @@ function configure_cpu() {
             # A CPU with fma is required for Metal support
             # A CPU with invtsc is required for macOS to boot
             # Skip CPU feature checks when using TCG emulation (cross-architecture)
-            # as QEMU will emulate the required x86 features in software
+            # as TCG will emulate the required x86 features in software. This enables
+            # running macOS x86_64 VMs on ARM Macs through software emulation.
             if [ "${QEMU_ACCEL}" != "tcg" ]; then
                 case ${macos_release} in
                     ventura|sonoma|sequoia|tahoe)
@@ -1294,6 +1312,10 @@ function configure_display() {
     # Map Quickemu $display to QEMU -display
     case ${display} in
         cocoa)
+            # macOS: prefer OpenGL ES (via ANGLE) for stability and performance
+            # ANGLE provides OpenGL ES on macOS through Metal, which is more stable
+            # than the deprecated native OpenGL implementation
+            # Reference: https://gist.github.com/akihikodaki/87df4149e7ca87f18dc56807ec5a1bc5
             if [ "${gl}" == "on" ] && check_cocoa_gl_es_support; then
                 DISPLAY_RENDER="${display},gl=es"
                 gl="es"
@@ -1309,6 +1331,8 @@ function configure_display() {
     esac
 
     # https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
+    # For GL-enabled displays, check if dedicated GL device variants are available.
+    # Note: virtio-gpu-pci becomes virtio-gpu-gl-pci (not virtio-gpu-pci-gl)
     if [ "${gl}" != "off" ] && [[ "${DISPLAY_DEVICE}" =~ ^virtio-(vga|gpu|gpu-pci)$ ]]; then
         local GL_DEVICE=""
         case "${DISPLAY_DEVICE}" in
@@ -1334,6 +1358,8 @@ function configure_display() {
     fi
 
     # Set display resolution for devices that support xres/yres parameters
+    # Use (,|$) anchor to match device names with or without comma-separated parameters
+    # Pattern ordered most-specific to least-specific for clarity (vga-gl before vga, etc.)
     if [[ "${DISPLAY_DEVICE}" =~ ^(virtio-(vga|vga-gl|gpu|gpu-gl|gpu-pci|gpu-gl-pci)|qxl|qxl-vga|bochs-display)(,|$) ]]; then
         VIDEO="${VIDEO},xres=${X_RES},yres=${Y_RES}"
         echo " @ (${X_RES} x ${Y_RES})"
@@ -1342,6 +1368,9 @@ function configure_display() {
     fi
 
     # Allocate VRAM to VGA devices
+    # Note: virtio devices (virtio-vga, virtio-gpu-pci, and their -gl variants) use
+    # dynamic memory management and don't require explicit VRAM allocation via parameters.
+    # They use QEMU's default max_hostmem setting (256 MiB) which is sufficient for most use cases.
     case ${DISPLAY_DEVICE} in
         bochs-display) VIDEO="${VIDEO},vgamem=67108864";;
         qxl|qxl-vga) VIDEO="${VIDEO},ram_size=65536,vram_size=65536,vgamem_mb=64";;
@@ -1618,6 +1647,9 @@ function vm_boot() {
     fi
 
     # Build machine arguments - SMM and vmport are x86-only options
+    # SMM (System Management Mode) is an x86-specific CPU mode used for firmware operations
+    # and is required for Secure Boot. ARM64 uses different mechanisms for firmware security.
+    # vmport emulates VMware's I/O port for guest tools, which is also x86-specific.
     if [ "${ARCH_VM}" == "aarch64" ]; then
         # ARM64 uses 'virt' machine type without x86-specific options
         # shellcheck disable=SC2054,SC2206,SC2140
