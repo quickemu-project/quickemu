@@ -608,9 +608,10 @@ function configure_cpu() {
             # If the host has an Intel CPU, passes the host CPU model features, model, stepping, exactly to the guest.
             # Disable huge pages (,-pdpe1gb) on macOS to prevent crashes
             # - https://stackoverflow.com/questions/60231203/qemu-qcow2-mmu-gva-to-gpa-crash-in-mac-os-x
+            # vmware-cpuid-freq=on enables VMware TSC frequency reporting for macOS timing
             if [ "${HOST_CPU_VENDOR}" == "GenuineIntel" ] && [ -z "${HYPERVISOR}" ]; then
                 CPU_MODEL="host"
-                CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor"
+                CPU="-cpu ${CPU_MODEL},-pdpe1gb,+hypervisor,vmware-cpuid-freq=on"
                 reset_cpu_flags
             else
                 CPU_MODEL="Haswell-v2"
@@ -678,7 +679,8 @@ function configure_cpu() {
             fi
 
             # Disable S3 support in the VM to prevent macOS suspending during install
-            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
+            # Disable ACPI PCI hotplug to prevent issues with macOS (required for QEMU 6.1+)
+            GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1 -global ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off -device isa-applesmc,osk=$(echo "bheuneqjbexolgurfrjbeqfthneqrqcyrnfrqbagfgrny(p)NccyrPbzchgreVap" | tr 'A-Za-z' 'N-ZA-Mn-za-m')"
 
             # Disable High Precision Timer
             if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
