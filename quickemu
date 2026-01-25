@@ -1269,9 +1269,14 @@ function configure_display() {
     # Determine which audio driver use between Pulseaudio or ALSA
     local AUDIO_DRIVER="pa"
     if pidof pipewire >/dev/null 2>&1; then
-        # QEMU's pipewire audio backend was added in version 8.1
-        if [ "${QEMU_VER_SHORT}" -ge 81 ]; then
-            AUDIO_DRIVER="pipewire"
+        # double-check dbus of pipewire
+        if dbus-send --system --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.NameHasOwner string:org.freedesktop.PipeWire 2>/dev/null | grep -q "boolean true"; then
+            # QEMU's pipewire audio backend was added in version 8.1
+            if [ "${QEMU_VER_SHORT}" -ge 81 ]; then
+                AUDIO_DRIVER="pipewire"
+            fi
+        elif ! pidof pulseaudio >/dev/null 2>&1; then
+            AUDIO_DRIVER="alsa"
         fi
     elif ! pidof pulseaudio >/dev/null 2>&1; then
         AUDIO_DRIVER="alsa"
