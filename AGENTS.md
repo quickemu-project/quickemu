@@ -27,6 +27,8 @@ The devshell patches `quickemu` to use Nix store paths for OVMF and Samba, writi
 
 - Lint scripts: `shellcheck quickemu quickget quickreport chunkcheck`
 - Test quickget URLs: `./quickget --check <os> [release] [edition]`
+- Test ARM64 downloads: `./quickget --arch arm64 --check <os> [release] [edition]`
+- Test all architectures: `./quickget --check-all-arch <os> [release] [edition]`
 - List all supported OSes: `./quickget --list`
 - Run VM: `./quickemu --vm <name>.conf`
 
@@ -53,7 +55,8 @@ Follow the [guide in the wiki](https://github.com/quickemu-project/quickemu/wiki
 1. Entry in `os_info()` case statement
 2. `releases_<os>()` function returning available versions
 3. `editions_<os>()` function if multiple editions exist
-4. Download URL construction logic
+4. `arch_<os>()` function if ARM64 is supported (defaults to amd64 only if omitted)
+5. Download URL construction logic
 
 ## Commit message format
 
@@ -96,10 +99,13 @@ fix(quickget): remove Athena OS (no longer getting updates)
 ## Platform support
 
 - Host: Linux (x86_64, aarch64), macOS (x86_64, aarch64)
+- Guest: x86_64 (default), aarch64 (set `arch="aarch64"` in VM config)
+- ARM64 guests use AAVMF firmware and `virt` machine type
+- Cross-arch emulation uses TCG (no KVM acceleration)
 - OVMF/UEFI firmware: Linux only
 - Bash 4.0+ required (explicit version check at runtime)
 
 ## Key dependencies
 
 Runtime: qemu, cdrtools, curl, jq, spice-gtk, swtpm, samba, zsync
-Linux-specific: OVMF, usbutils, mesa-demos
+Linux-specific: OVMF (x86_64 guests), AAVMF (aarch64 guests), usbutils, mesa-demos
