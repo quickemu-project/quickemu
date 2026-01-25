@@ -1488,19 +1488,59 @@ function check_hash() {
         esac
     fi
 
-    # Use GNU coreutils on macOS/Darwin (prefixed with 'g')
+    # On macOS/Darwin, prefer GNU coreutils (prefixed with 'g') if available,
+    # otherwise fall back to native 'shasum' command
+    local hash_cmd="${hash_algo}"
     if [ "${HOST_OS}" = "Darwin" ]; then
         case ${hash_algo} in
-            md5sum) hash_algo=gmd5sum;;
-            sha1sum) hash_algo=gsha1sum;;
-            sha256sum) hash_algo=gsha256sum;;
-            sha512sum) hash_algo=gsha512sum;;
-            b2sum) hash_algo=gb2sum;;
+            md5sum)
+                if command -v gmd5sum &>/dev/null; then
+                    hash_cmd=gmd5sum
+                else
+                    # MD5 not directly supported by shasum; use native md5 command
+                    hash_cmd="md5 -r"
+                fi;;
+            sha1sum)
+                if command -v gsha1sum &>/dev/null; then
+                    hash_cmd=gsha1sum
+                else
+                    hash_cmd="shasum -a 1"
+                fi;;
+            sha256sum)
+                if command -v gsha256sum &>/dev/null; then
+                    hash_cmd=gsha256sum
+                else
+                    hash_cmd="shasum -a 256"
+                fi;;
+            sha512sum)
+                if command -v gsha512sum &>/dev/null; then
+                    hash_cmd=gsha512sum
+                else
+                    hash_cmd="shasum -a 512"
+                fi;;
+            b2sum)
+                if command -v gb2sum &>/dev/null; then
+                    hash_cmd=gb2sum
+                else
+                    echo "WARNING! b2sum not available on macOS without GNU coreutils, not checking ${iso} hash."
+                    return
+                fi;;
         esac
     fi
 
-    echo -n "Checking ${iso} with ${hash_algo}... "
-    if ! printf '%s  %s\n' "${hash}" "${iso}" | ${hash_algo} --check --status; then
+    echo -n "Checking ${iso} with ${hash_cmd}... "
+    # Handle MD5 on macOS specially (md5 -r outputs "hash filename" format)
+    if [ "${hash_cmd}" = "md5 -r" ]; then
+        local computed_hash
+        computed_hash=$(md5 -r "${iso}" | cut -d' ' -f1)
+        if [ "${computed_hash}" != "${hash}" ]; then
+            echo "ERROR!"
+            echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
+            exit 1
+        else
+            echo "Good!"
+        fi
+    elif ! printf '%s  %s\n' "${hash}" "${iso}" | ${hash_cmd} --check --status; then
         echo "ERROR!"
         echo "${iso} doesn't match ${hash}. Try running 'quickget' again."
         exit 1
