@@ -30,7 +30,6 @@
   zsync,
   OVMF ? null,
   OVMFFull ? null,
-  quickemu,
 }:
 let
   runtimePaths = [
@@ -54,7 +53,7 @@ let
     xrandr
     zsync
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     mesa-demos
     OVMF
     OVMFFull
@@ -67,7 +66,7 @@ let
     .*
   '' (builtins.readFile ./quickemu);
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "quickemu";
   version = builtins.concatStringsSep "" versionMatches;
   src = lib.cleanSource ./.;
@@ -81,6 +80,7 @@ stdenv.mkDerivation rec {
         ''
       } \
       -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
+      -e 's/Icon=.*qemu.svg/Icon=qemu/' \
       -e 's,\$(command -v smbd),${samba}/bin/smbd,' \
       quickemu
   '';
@@ -107,11 +107,12 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru.tests = testers.testVersion { package = quickemu; };
+  passthru.tests = testers.testVersion { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Quickly create and run optimised Windows, macOS and Linux virtual machines";
     homepage = "https://github.com/quickemu-project/quickemu";
+    changelog = "https://github.com/quickemu-project/quickemu/releases/tag/${finalAttrs.version}";
     mainProgram = "quickemu";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [
@@ -119,4 +120,4 @@ stdenv.mkDerivation rec {
       flexiondotorg
     ];
   };
-}
+})

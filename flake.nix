@@ -41,7 +41,7 @@
           let
             # OVMF is only available/needed on Linux
             ovmfArgs =
-              if final.stdenv.isLinux then
+              if final.stdenv.hostPlatform.isLinux then
                 { }
               else
                 {
@@ -60,7 +60,7 @@
         let
           # OVMF is only available/needed on Linux
           ovmfArgs =
-            if pkgs.stdenv.isLinux then
+            if pkgs.stdenv.hostPlatform.isLinux then
               { }
             else
               {
@@ -80,7 +80,7 @@
         let
           # OVMF is only available/needed on Linux
           ovmfArgs =
-            if pkgs.stdenv.isLinux then
+            if pkgs.stdenv.hostPlatform.isLinux then
               { }
             else
               {
