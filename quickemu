@@ -477,7 +477,11 @@ function configure_cpu() {
     HOST_CPU_CORES=$(get_nproc)
     HOST_CPU_MODEL=$(get_cpu_info '^Model name:')
     HOST_CPU_SOCKETS=$(get_cpu_info 'Socket')
-    HOST_CPU_VENDOR=$(get_cpu_info '^Vendor ID')
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
+        HOST_CPU_VENDOR=$(get_cpu_info 'Vendor')
+    else
+        HOST_CPU_VENDOR=$(get_cpu_info '^Vendor ID')
+    fi
 
     if [ "${HOST_CPU_SOCKETS}" = "-" ]; then
         HOST_CPU_SOCKETS=1
