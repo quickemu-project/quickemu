@@ -165,10 +165,12 @@ function kill_vm() {
     if [ -z "${VM_PID}" ]; then
         echo " - ${VMNAME} is not running."
         rm -f "${VMDIR}/${VMNAME}.pid"
+        rm -f "${VMDIR}/${VMNAME}.spice"
     elif [ -n "${VM_PID}" ]; then
         if kill -9 "${VM_PID}" > /dev/null 2>&1; then
             echo " - ${VMNAME} (${VM_PID}) killed."
             rm -f "${VMDIR}/${VMNAME}.pid"
+            rm -f "${VMDIR}/${VMNAME}.spice"
         else
             echo " - ${VMNAME} (${VM_PID}) was not killed."
         fi
@@ -1409,6 +1411,7 @@ function configure_audio() {
 
 function configure_ports() {
     echo -n "" > "${VMDIR}/${VMNAME}.ports"
+    rm -f "${VMDIR}/${VMNAME}.spice"
 
     if [ -z "${ssh_port}" ]; then
         # Find a free port to expose ssh to the guest
@@ -1472,6 +1475,7 @@ function configure_ports() {
                 echo " - SPICE:    Enabled"
             else
                 echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
+                echo "${spice_port}" > "${VMDIR}/${VMNAME}.spice"
                 echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
                 if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
                     echo -n " --spice-shared-dir ${PUBLIC}"
@@ -2115,6 +2119,7 @@ function vm_boot() {
         else
             echo " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
             rm -f "${VMDIR}/${VMNAME}.pid"
+            rm -f "${VMDIR}/${VMNAME}.spice"
             echo && cat "${VMDIR}/${VMNAME}.log"
             exit 1
         fi
@@ -2732,6 +2737,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
             #VM is not running, cleaning up.
             VM_PID=""
             rm -f "${VMDIR}/${VMNAME}.pid"
+            rm -f "${VMDIR}/${VMNAME}.spice"
         fi
     fi
 
@@ -2795,6 +2801,13 @@ else
     echo "${VMNAME}"
     echo " - Process:  Already running ${VM} as ${VMNAME} (${VM_PID})"
     parse_ports_from_file
+    # Auto-detect SPICE if .spice file exists and display is a default GUI type
+    if [ -r "${VMDIR}/${VMNAME}.spice" ]; then
+        if [ "${display}" == "sdl" ] || [ "${display}" == "cocoa" ] || [ "${display}" == "gtk" ]; then
+            display="spice"
+            spice_port=$(cat "${VMDIR}/${VMNAME}.spice")
+        fi
+    fi
     start_viewer
 fi
 
