@@ -16,9 +16,7 @@ mkShell {
         gawk
         gnugrep
         gnused
-        gptfdisk
         jq
-        mtools
         pciutils
         procps
         python3
