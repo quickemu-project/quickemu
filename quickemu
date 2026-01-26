@@ -1297,16 +1297,12 @@ function configure_display() {
                 esac
             fi;;
         macos)
-            # qxl-vga and VGA supports seamless mouse and sane resolutions if only
-            # one scanout is used. '-vga none' is added to the QEMU command line
-            # to avoid having two scanouts.
+            # VGA supports seamless mouse and sane resolutions for macOS guests
             DISPLAY_DEVICE="VGA";;
         windows|windows-server)
-            # virtio-gpu "works" with gtk but is limited to 1024x1024 and exhibits other issues
-            # https://kevinlocke.name/bits/2021/12/10/windows-11-guest-virtio-libvirt/#video
             case ${display} in
-                gtk|none|spice) DISPLAY_DEVICE="qxl-vga";;
-                cocoa|sdl|spice-app)  DISPLAY_DEVICE="virtio-vga";;
+                none|spice) DISPLAY_DEVICE="qxl-vga";;
+                cocoa|gtk|sdl|spice-app) DISPLAY_DEVICE="virtio-vga";;
             esac;;
         *) DISPLAY_DEVICE="qxl-vga";;
     esac
@@ -1386,15 +1382,8 @@ function configure_display() {
         VIDEO="${VIDEO},max_outputs=${max_outputs}"
     fi
 
-    # Run QEMU with '-vga none' to avoid having two scanouts, one for VGA and
-    # another for virtio-vga-gl. This works around a GTK assertion failure and
-    # allows seamless mouse in macOS when using the qxl-vga device.
-    # https://www.collabora.com/news-and-blog/blog/2021/11/26/venus-on-qemu-enabling-new-virtual-vulkan-driver/
-    # https://github.com/quickemu-project/quickemu/issues/222
-    VGA="-vga none"
-
     # Add fullscreen options
-    VIDEO="${VGA} ${VIDEO} ${FULLSCREEN}"
+    VIDEO="${VIDEO} ${FULLSCREEN}"
 }
 
 function configure_audio() {
@@ -1605,7 +1594,6 @@ function vm_boot() {
     SMM="${SMM:-off}"
     local TEMP_PORT=""
     USB_HOST_PASSTHROUGH_CONTROLLER="qemu-xhci"
-    VGA=""
     VIDEO=""
 
     KERNEL_NAME="$(uname -s)"
