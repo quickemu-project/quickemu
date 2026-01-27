@@ -1,6 +1,6 @@
 ---
 author: Martin Wimpress
-date: July 31, 2025
+date: February 2, 2026
 footer: quickget
 header: Quickget User Manual
 section: 1
@@ -123,18 +123,23 @@ may have further information.
 You can also use `quickget` with advanced options :
 
 ``` text
-  --download      <os> <release> [edition] : Download image; no VM configuration
-  --create-config <os> [path/url] [flags]  : Create VM config for an OS image
-  --open-homepage <os>                     : Open homepage for the OS
-  --show          [os]                     : Show OS information
-  --version                                : Show version
-  --help                                   : Show this help message
-  --disable-unattended                     : Force quickget not to set up an unattended installation
-  --url           [os] [release] [edition] : Show image URL(s)
-  --check         [os] [release] [edition] : Check image URL(s)
-  --list                                   : List all supported systems
-  --list-csv                               : List everything in csv format
-  --list-json                              : List everything in json format
+   --arch           <arch>                    : Set architecture (arm64, aarch64, amd64, x86_64)
+   --download       <os> <release> [edition]  : Download image; no VM configuration
+   --create-config  <os> [path/url] [flags]   : Create VM config for an OS image
+   --open-homepage  <os>                      : Open homepage for the OS
+   --show           [os]                      : Show OS information
+   --version                                  : Show version
+   --help                                     : Show this help message
+------------------------------------ Flags -------------------------------------
+--create-config:
+  --disable-unattended                        : Force quickget not to set up an unattended installation
+-------------------------- For testing & development ---------------------------
+   --url            [os] [release] [edition]  : Show image URL(s)
+   --check          [os] [release] [edition]  : Check image URL(s)
+   --check-all-arch [os] [release] [edition]  : Check downloads for all architectures (amd64 and arm64)
+   --list                                     : List all supported systems
+   --list-csv                                 : List everything in csv format
+   --list-json                                : List everything in json format
 ```
 
 Here are some typical uses
@@ -167,7 +172,7 @@ Further information is available from the project
 - `archcraft` (Archcraft)
 - `archlinux` (Arch Linux)
 - `artixlinux` (Artix Linux)
-- `athenaos` (Athena OS)
+- `azurelinux` (Azure Linux)
 - `batocera` (Batocera)
 - `bazzite` (Bazzite)
 - `biglinux` (BigLinux)
@@ -195,7 +200,6 @@ Further information is available from the project
 - `gnomeos` (GNOME OS)
 - `guix` (Guix)
 - `haiku` (Haiku)
-- `holoiso` (HoloISO)
 - `kali` (Kali)
 - `kdeneon` (KDE Neon)
 - `kolibrios` (KolibriOS)
@@ -232,16 +236,14 @@ Further information is available from the project
 - `slint` (Slint)
 - `slitaz` (SliTaz)
 - `solus` (Solus)
+- `sparkylinux` (SparkyLinux)
 - `spirallinux` (SpiralLinux)
 - `tails` (Tails)
 - `tinycore` (Tiny Core Linux)
-- `trisquel` (Trisquel-)
-- `truenas-core` (TrueNAS Core)
-- `truenas-scale` (TrueNAS Scale)
+- `trisquel` (Trisquel)
 - `tuxedo-os` (Tuxedo OS)
 - `vanillaos` (Vanilla OS)
 - `void` (Void Linux)
-- `vxlinux` (VX Linux)
 - `zorin` (Zorin OS)
 
 ### [Custom Linux guests](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines#manually-create-linux-guests)
@@ -286,6 +288,13 @@ for solutions or ask for help there** 🛟
 
 `quickget` automatically downloads a macOS recovery image and creates a
 virtual machine configuration.
+
+Note: Some VPN users may need to [turn off their
+VPN](https://github.com/quickemu-project/quickemu/issues/1391#issuecomment-3506845235)
+in order to download a recovery image. Some other users may find [using
+a
+VPN](https://github.com/quickemu-project/quickemu/issues/1391#issuecomment-2429146013)
+necessary in order to download a recovery image.
 
 ``` shell
 quickget macos big-sur
@@ -361,13 +370,13 @@ The default macOS configuration looks like this:
 
 ``` shell
 guest_os="macos"
-img="macos- big-sur/RecoveryImage.img"
-disk_img="macos- big-sur/disk.qcow2"
-macos_release=" big-sur"
+img="macos-big-sur/RecoveryImage.img"
+disk_img="macos-big-sur/disk.qcow2"
+macos_release="big-sur"
 ```
 
 - `guest_os="macos"` instructs Quickemu to optimise for macOS.
-- `macos_release=" big-sur"` instructs Quickemu to optimise for a
+- `macos_release="big-sur"` instructs Quickemu to optimise for a
   particular macOS release.
   - For example VirtIO Network and Memory Ballooning are available in
     Big Sur and newer, but not previous releases.
