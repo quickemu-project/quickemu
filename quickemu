@@ -166,11 +166,13 @@ function kill_vm() {
         echo " - ${VMNAME} is not running."
         rm -f "${VMDIR}/${VMNAME}.pid"
         rm -f "${VMDIR}/${VMNAME}.spice"
+        rm -f "${VMDIR}/${VMNAME}.sock"
     elif [ -n "${VM_PID}" ]; then
         if kill -9 "${VM_PID}" > /dev/null 2>&1; then
             echo " - ${VMNAME} (${VM_PID}) killed."
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
+            rm -f "${VMDIR}/${VMNAME}.sock"
         else
             echo " - ${VMNAME} (${VM_PID}) was not killed."
         fi
@@ -1324,7 +1326,20 @@ function configure_display() {
         gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
         none)       DISPLAY_RENDER="none"
                     gl="off";;  # No display backend means no GL context
-        spice)      DISPLAY_RENDER="none";;
+        spice)
+            # For local SPICE with GL, use egl-headless to provide the GL context
+            # for VirGL. Don't use gl=on in SPICE itself as it blocks the main loop.
+            if [ -z "${ACCESS}" ] || [ "${ACCESS}" == "local" ]; then
+                if [ "${gl}" == "on" ]; then
+                    DISPLAY_RENDER="egl-headless,rendernode=/dev/dri/renderD128"
+                else
+                    DISPLAY_RENDER="none"
+                fi
+            else
+                # Remote access cannot use GL
+                DISPLAY_RENDER="none"
+                gl="off"
+            fi;;
         sdl)        DISPLAY_RENDER="${display},gl=${gl}";;
         spice-app)  DISPLAY_RENDER="${display},gl=${gl}";;
         *)          DISPLAY_RENDER="${display}";;
@@ -1349,8 +1364,15 @@ function configure_display() {
         echo -n " - Display:  ${display^^}, ${DISPLAY_DEVICE}, GL (${gl}), VirGL (off)"
     fi
 
+    # Disable default VGA for SPICE modes to prevent duplicate scanouts
+    # SPICE creates its own display output; the default VGA would create a second one
+    case ${display} in
+      none|spice|spice-app) VGA="-vga none";;
+      *) VGA="";;
+    esac
+
     # Build the video configuration
-    VIDEO="-device ${DISPLAY_DEVICE}"
+    VIDEO="${VGA:+${VGA} }-device ${DISPLAY_DEVICE}"
 
     # ARM64 needs ramfb for UEFI boot display before virtio-gpu driver loads
     if [ "${ARCH_VM}" == "aarch64" ]; then
@@ -1401,6 +1423,7 @@ function configure_audio() {
 function configure_ports() {
     echo -n "" > "${VMDIR}/${VMNAME}.ports"
     rm -f "${VMDIR}/${VMNAME}.spice"
+    rm -f "${VMDIR}/${VMNAME}.sock"
 
     if [ -z "${ssh_port}" ]; then
         # Find a free port to expose ssh to the guest
@@ -1429,40 +1452,43 @@ function configure_ports() {
 
     if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
         SPICE="disable-ticketing=on"
-        # gl=on can be use with 'spice' too, but only over local connections (not tcp ports)
+
         if [ "${display}" == "spice-app" ]; then
+            # spice-app uses QEMU's built-in viewer with GL support
             SPICE+=",gl=${gl}"
-        fi
-
-        # TODO: Don't use ports so local-only connections can be used with gl=on
-        if [ -z "${spice_port}" ]; then
-            # Find a free port for spice
-            spice_port=$(get_port 5930 9)
-        fi
-
-        # ALLOW REMOTE ACCESS TO SPICE OVER LAN RATHER THAN JUST LOCALHOST
-        if [ -z "${ACCESS}" ]; then
-            SPICE_ADDR="127.0.0.1"
-        else
-            if [ "${ACCESS}" == "remote" ]; then
-                SPICE_ADDR=""
-            elif [ "${ACCESS}" == "local" ]; then
-                SPICE_ADDR="127.0.0.1"
+            echo " - SPICE:    Enabled"
+        elif [ "${display}" == "spice" ]; then
+            # For spice display, use Unix socket for local or TCP for remote
+            if [ -z "${ACCESS}" ] || [ "${ACCESS}" == "local" ]; then
+                # Unix socket mode for local access
+                # GL context is provided by egl-headless display, not SPICE
+                SPICE+=",unix=on,addr=${VMDIR}/${VMNAME}.sock"
+                echo "unix,${VMDIR}/${VMNAME}.sock" >> "${VMDIR}/${VMNAME}.ports"
+                echo "${VMDIR}/${VMNAME}.sock" > "${VMDIR}/${VMNAME}.spice"
+                echo -n " - SPICE:    On host:  spicy --uri=\"spice+unix://${VMDIR}/${VMNAME}.sock\" --title \"${VMNAME}\""
+                if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+                    echo -n " --spice-shared-dir ${PUBLIC}"
+                fi
+                echo "${FULLSCREEN}"
             else
-                SPICE_ADDR="${ACCESS}"
-            fi
-        fi
+                # TCP mode for remote access (no GL support)
+                if [ -z "${spice_port}" ]; then
+                    spice_port=$(get_port 5930 9)
+                fi
 
-        if [ -z "${spice_port}" ]; then
-            echo " - SPICE:    All SPICE ports have been exhausted."
-            if [ "${display}" == "none" ] || [ "${display}" == "spice" ] || [ "${display}" == "spice-app" ]; then
-                echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
-                exit 1
-            fi
-        else
-            if [ "${display}" == "spice-app" ]; then
-                echo " - SPICE:    Enabled"
-            else
+                if [ "${ACCESS}" == "remote" ]; then
+                    SPICE_ADDR=""
+                else
+                    SPICE_ADDR="${ACCESS}"
+                fi
+
+                if [ -z "${spice_port}" ]; then
+                    echo " - SPICE:    All SPICE ports have been exhausted."
+                    echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
+                    exit 1
+                fi
+
+                SPICE+=",port=${spice_port},addr=${SPICE_ADDR}"
                 echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
                 echo "${spice_port}" > "${VMDIR}/${VMNAME}.spice"
                 echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
@@ -1470,8 +1496,37 @@ function configure_ports() {
                     echo -n " --spice-shared-dir ${PUBLIC}"
                 fi
                 echo "${FULLSCREEN}"
-                SPICE="${SPICE},port=${spice_port},addr=${SPICE_ADDR}"
             fi
+        elif [ "${display}" == "none" ]; then
+            # display=none with SPICE for headless VMs - use TCP for remote access
+            if [ -z "${spice_port}" ]; then
+                spice_port=$(get_port 5930 9)
+            fi
+
+            if [ -z "${ACCESS}" ]; then
+                SPICE_ADDR="127.0.0.1"
+            elif [ "${ACCESS}" == "remote" ]; then
+                SPICE_ADDR=""
+            elif [ "${ACCESS}" == "local" ]; then
+                SPICE_ADDR="127.0.0.1"
+            else
+                SPICE_ADDR="${ACCESS}"
+            fi
+
+            if [ -z "${spice_port}" ]; then
+                echo " - SPICE:    All SPICE ports have been exhausted."
+                echo "             ERROR! Requested SPICE display, but no SPICE ports are free."
+                exit 1
+            fi
+
+            SPICE+=",port=${spice_port},addr=${SPICE_ADDR}"
+            echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
+            echo "${spice_port}" > "${VMDIR}/${VMNAME}.spice"
+            echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
+            if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+                echo -n " --spice-shared-dir ${PUBLIC}"
+            fi
+            echo "${FULLSCREEN}"
         fi
     fi
 }
@@ -2108,6 +2163,7 @@ function vm_boot() {
             echo " - Process:  ERROR! Failed to start ${VM} as ${VMNAME}"
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
+            rm -f "${VMDIR}/${VMNAME}.sock"
             echo && cat "${VMDIR}/${VMNAME}.log"
             exit 1
         fi
@@ -2115,37 +2171,84 @@ function vm_boot() {
 }
 
 function start_viewer {
-    errno=0
-    if [ "${viewer}" != "none" ]; then
-        # If output is 'none' then SPICE was requested.
-        if [ "${display}" == "spice" ]; then
-            if [ "${viewer}" == "remote-viewer" ]; then
-                # show via viewer: remote-viewer
-                if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --spice-shared-dir \"${PUBLIC}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --spice-shared-dir "${PUBLIC}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
-                    errno=$?
-                else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" ${FULLSCREEN} \"spice://localhost:${spice_port}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" ${FULLSCREEN} "spice://localhost:${spice_port}" >/dev/null 2>&1 &
-                    errno=$?
-                fi
-            elif [ "${viewer}" == "spicy" ]; then
-                # show via viewer: spicy
-                if [ -n "${PUBLIC}" ]; then
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" --spice-shared-dir \"${PUBLIC}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${spice_port}" --spice-shared-dir "${PUBLIC}" "${FULLSCREEN}" >/dev/null 2>&1 &
-                    errno=$?
-                else
-                    echo " - Viewer:   ${viewer} --title \"${VMNAME}\" --port \"${spice_port}\" \"${FULLSCREEN}\" >/dev/null 2>&1 &"
-                    ${viewer} --title "${VMNAME}" --port "${spice_port}" "${FULLSCREEN}" >/dev/null 2>&1 &
-                    errno=$?
-                fi
+    # Exit early if viewer is disabled or display is not SPICE
+    if [ "${viewer}" == "none" ] || [ "${display}" != "spice" ]; then
+        return
+    fi
+
+    # Build viewer arguments based on connection mode (Unix socket or TCP)
+    local viewer_args=()
+    local viewer_uri=""
+    local errno=0
+
+    # Determine connection mode from .spice file content
+    # - Unix socket mode: file contains a path (with /)
+    # - TCP mode: file contains just a port number
+    local spice_info=""
+    if [ -r "${VMDIR}/${VMNAME}.spice" ]; then
+        spice_info=$(cat "${VMDIR}/${VMNAME}.spice")
+    fi
+
+    if [[ "${spice_info}" == */* ]]; then
+        # Unix socket mode (path contains /)
+        local SPICE_SOCKET="${spice_info}"
+        if [ "${viewer}" == "spicy" ]; then
+            viewer_args+=("--uri=spice+unix://${SPICE_SOCKET}")
+        else
+            viewer_uri="spice+unix://${SPICE_SOCKET}"
+        fi
+    elif [ -n "${spice_info}" ]; then
+        # TCP mode (port number)
+        if [ "${viewer}" == "spicy" ]; then
+            viewer_args+=("--port" "${spice_info}")
+        else
+            viewer_uri="spice://localhost:${spice_info}"
+        fi
+    else
+        # Fallback: no .spice file, use ACCESS variable to determine mode
+        if [ -z "${ACCESS}" ] || [ "${ACCESS}" == "local" ]; then
+            # Unix socket mode
+            local SPICE_SOCKET="${VMDIR}/${VMNAME}.sock"
+            if [ "${viewer}" == "spicy" ]; then
+                viewer_args+=("--uri=spice+unix://${SPICE_SOCKET}")
+            else
+                viewer_uri="spice+unix://${SPICE_SOCKET}"
             fi
-            if [ ${errno} -ne 0 ]; then
-                echo "WARNING! Could not start viewer (${viewer}) Err: ${errno}"
+        else
+            # TCP mode for remote access
+            if [ "${viewer}" == "spicy" ]; then
+                viewer_args+=("--port" "${spice_port}")
+            else
+                viewer_uri="spice://localhost:${spice_port}"
             fi
         fi
+    fi
+
+    # Add common arguments
+    viewer_args+=("--title" "${VMNAME}")
+
+    # Add shared directory if configured (not for macOS guests)
+    if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
+        viewer_args+=("--spice-shared-dir" "${PUBLIC}")
+    fi
+
+    # Add fullscreen if requested
+    if [ -n "${FULLSCREEN}" ]; then
+        viewer_args+=("${FULLSCREEN}")
+    fi
+
+    # Add URI for remote-viewer (spicy uses --uri= in the args already)
+    if [ "${viewer}" == "remote-viewer" ] && [ -n "${viewer_uri}" ]; then
+        viewer_args+=("${viewer_uri}")
+    fi
+
+    # Launch the viewer
+    echo " - Viewer:   ${viewer} ${viewer_args[*]} >/dev/null 2>&1 &"
+    "${viewer}" "${viewer_args[@]}" >/dev/null 2>&1 &
+    errno=$?
+
+    if [ ${errno} -ne 0 ]; then
+        echo "WARNING! Could not start viewer (${viewer}) Err: ${errno}"
     fi
 }
 
@@ -2726,6 +2829,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
             VM_PID=""
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
+            rm -f "${VMDIR}/${VMNAME}.sock"
         fi
     fi
 
