@@ -1299,8 +1299,8 @@ function configure_display() {
                 esac
             fi;;
         macos)
-            # VGA supports seamless mouse and sane resolutions for macOS guests
-            DISPLAY_DEVICE="VGA";;
+            # macOS has native VMware display driver support; aligns with OSX-KVM
+            DISPLAY_DEVICE="vmware-svga";;
         windows|windows-server)
             case ${display} in
                 none|spice) DISPLAY_DEVICE="qxl-vga";;
