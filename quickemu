@@ -2295,7 +2295,7 @@ function usage() {
     echo "  --cpu-pinning                     : Choose which host cores correspond to which guest cores."
     echo "  --delete-disk                     : Delete the disk image and EFI variables"
     echo "  --delete-vm                       : Delete the entire VM and its configuration"
-    echo "  --display                         : Select display backend. 'sdl' (default), 'cocoa', 'gtk', 'none', 'spice' or 'spice-app'"
+    echo "  --display                         : Select display backend. 'gtk' (default), 'sdl', 'cocoa', 'none', 'spice' or 'spice-app'"
     echo "  --fullscreen                      : Starts VM in full screen mode (Ctl+Alt+f to exit)"
     echo "  --ignore-msrs-always              : Configure KVM to always ignore unhandled machine-specific registers"
     echo "  --ignore-tsc-warning              : Skip TSC stability warning for macOS VMs on AMD"
@@ -2336,6 +2336,14 @@ function display_param_check() {
         display="sdl"
         # XHCI supports USB 1.1/2.0/3.0; required for full-speed braille devices
         usb_controller="xhci"
+    fi
+
+    # Fallback to SDL if GTK display is not available
+    if [ "${display}" == "gtk" ]; then
+        if ! "${QEMU}" -display help 2>&1 | grep -q "^gtk$"; then
+            echo " - NOTE: GTK display not available, falling back to SDL"
+            display="sdl"
+        fi
     fi
 
     if [ "${OS_KERNEL}" == "Darwin" ]; then
@@ -2525,7 +2533,7 @@ cpu_cores=""
 disk_format="${disk_format:-qcow2}"
 disk_img="${disk_img:-}"
 disk_size="${disk_size:-16G}"
-display="${display:-sdl}"
+display="${display:-gtk}"
 extra_args="${extra_args:-}"
 fixed_iso=""
 floppy=""
