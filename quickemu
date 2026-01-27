@@ -2111,7 +2111,8 @@ function vm_boot() {
 
     if [ "${serial}" == "none" ]; then
         args+=(-serial none)
-        echo " - Serial:   (off)"
+        # No log output when serial is disabled - it's the default for macOS/Windows
+        # and provides no useful information to the user
     elif [ "${serial}" == "telnet" ]; then
         # Find a free port to expose serial-telnet to the guest
         TEMP_PORT="$(get_port "${serial_telnet_port}" 9)"
@@ -2548,7 +2549,8 @@ spice_port="${spice_port:-}"
 monitor="${monitor:-socket}"
 monitor_telnet_port="${monitor_telnet_port:-4440}"
 monitor_telnet_host="${monitor_telnet_host:-localhost}"
-serial="${serial:-socket}"
+# Serial default is set later based on guest_os (after config is sourced)
+serial="${serial:-}"
 serial_telnet_port="${serial_telnet_port:-6660}"
 serial_telnet_host="${serial_telnet_host:-localhost}"
 # options: ehci (USB2.0), xhci (USB3.0)
@@ -2808,6 +2810,20 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     VMPATH=$(realpath "$(dirname "${VM}")") # path to the top-level VM directory
     SOCKET_MONITOR="${VMDIR}/${VMNAME}-monitor.socket"
     SOCKET_SERIAL="${VMDIR}/${VMNAME}-serial.socket"
+
+    # Set serial default based on guest_os if not explicitly configured.
+    # macOS and Windows guests don't output anything useful to serial by default,
+    # so disable it to reduce clutter. Users can still override with --serial.
+    if [ -z "${serial}" ]; then
+        case "${guest_os}" in
+            macos|windows|windows-server)
+                serial="none"
+                ;;
+            *)
+                serial="socket"
+                ;;
+        esac
+    fi
 
     # if disk_img is not configured, do the right thing.
     if [ -z "${disk_img}" ]; then
