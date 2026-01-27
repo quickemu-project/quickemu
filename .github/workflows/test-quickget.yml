@@ -83,7 +83,7 @@ jobs:
 
           cat result/result.json
       - name: "Upload result artifact 📤"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: result-${{ matrix.distro }}
           path: result/
