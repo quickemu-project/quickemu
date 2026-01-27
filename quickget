@@ -3774,12 +3774,12 @@ Arguments:
 --create-config:
   --disable-unattended                     : Force quickget not to set up an unattended installation
 -------------------------- For testing & development ---------------------------
-  --url           [os] [release] [edition] : Show image URL(s)
-  --check         [os] [release] [edition] : Check image URL(s)
-  --check-all-arch [os] [release] [edition]: Check downloads for all architectures (amd64 and arm64)
-  --list                                   : List all supported systems
-  --list-csv                               : List everything in csv format
-  --list-json                              : List everything in json format
+   --url           [os] [release] [edition] : Show image URL(s)
+   --check         [os] [release] [edition] : Check image URL(s)
+   --check-all-arch [os] [release] [edition]: Check downloads for all architectures (amd64 and arm64)
+   --list                                   : List all supported systems
+   --list-csv                               : List everything in csv format
+   --list-json                              : List everything in json format
 --------------------------------------------------------------------------------
 
 Supported Operating Systems:\n\n' "$(${QUICKEMU} --version)" "${CURL_VERSION}"
