@@ -2400,10 +2400,12 @@ function get_macos() {
         fi
 
         echo "Downloading OpenCore & UEFI firmware"
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OpenCore/OpenCore.qcow2" "${VM_PATH}"
-        web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_CODE.fd" "${VM_PATH}"
+        # Pin to last known-good commit; OVMF_CODE.fd was removed from master on 26 Jan 2026
+        local OSX_KVM_COMMIT="da4b23b5e92c5b939568700034367e8b7649fe90"
+        web_get "https://github.com/kholia/OSX-KVM/raw/${OSX_KVM_COMMIT}/OpenCore/OpenCore.qcow2" "${VM_PATH}"
+        web_get "https://github.com/kholia/OSX-KVM/raw/${OSX_KVM_COMMIT}/OVMF_CODE.fd" "${VM_PATH}"
         if [ ! -e "${VM_PATH}/OVMF_VARS-1920x1080.fd" ]; then
-            web_get "https://github.com/kholia/OSX-KVM/raw/master/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
+            web_get "https://github.com/kholia/OSX-KVM/raw/${OSX_KVM_COMMIT}/OVMF_VARS-1920x1080.fd" "${VM_PATH}"
         fi
     fi
     make_vm_config RecoveryImage.img
