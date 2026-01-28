@@ -259,7 +259,7 @@ These should be handled by dependencies in Trixie and later. For earlier
 versions (and their derivatives):
 
 ``` shell
-sudo apt-get install bash coreutils curl genisoimage grep jq mesa-utils ovmf pciutils procps python3 qemu sed socat spice-client-gtk swtpm-tools unzip usbutils util-linux xdg-user-dirs xrandr zsync 
+sudo apt-get install bash coreutils curl genisoimage grep jq mesa-utils ovmf pciutils procps python3 qemu sed socat spice-client-gtk swtpm-tools unzip usbutils util-linux xdg-user-dirs xrandr zsync
 ```
 
 #### Install requirements on Fedora hosts
