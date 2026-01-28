@@ -399,19 +399,19 @@ may have further information.
 You can also use `quickget` with advanced options :
 
 ``` text
-   --arch          <arch>                   : Set architecture (arm64, aarch64, amd64, x86_64)
-   --download      <os> <release> [edition] : Download image; no VM configuration
-   --create-config <os> [path/url] [flags]  : Create VM config for an OS image
-   --open-homepage <os>                     : Open homepage for the OS
-   --show          [os]                     : Show OS information
-   --version                                : Show version
-   --help                                   : Show this help message
-   --url           [os] [release] [edition] : Show image URL(s)
-   --check         [os] [release] [edition] : Check image URL(s)
-   --check-all-arch [os] [release] [edition]: Check downloads for all architectures (amd64 and arm64)
-   --list                                   : List all supported systems
-   --list-csv                               : List everything in csv format
-   --list-json                              : List everything in json format
+   --arch          <arch>                    : Set architecture (arm64, aarch64, amd64, x86_64)
+   --download      <os> <release> [edition]  : Download image; no VM configuration
+   --create-config <os> [path/url] [flags]   : Create VM config for an OS image
+   --open-homepage <os>                      : Open homepage for the OS
+   --show          [os]                      : Show OS information
+   --version                                 : Show version
+   --help                                    : Show this help message
+   --url           [os] [release] [edition]  : Show image URL(s)
+   --check         [os] [release] [edition]  : Check image URL(s)
+   --check-all-arch [os] [release] [edition] : Check downloads for all architectures (amd64 and arm64)
+   --list                                    : List all supported systems
+   --list-csv                                : List everything in csv format
+   --list-json                               : List everything in json format
 ```
 
 Here are some typical uses
