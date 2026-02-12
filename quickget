@@ -1227,8 +1227,8 @@ function arch_debian() {
 
 function arch_fedora() {
     case "${EDITION}" in
-        Server) echo "amd64 arm64";;
-        *) echo "amd64";;
+        Onyx) echo "amd64";;
+        *) echo "amd64 arm64";;
     esac
 }
 
