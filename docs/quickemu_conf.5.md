@@ -46,6 +46,7 @@ secureboot="off"
 tpm="off"
 usb_devices=()
 viewer="spicy"
+viewer_extra_args=""
 ssh_port=""
 spice_port=""
 public_dir=""
@@ -272,6 +273,18 @@ device selection*) support this feature.
 
 To ensure that this functionality works as expected, make sure that you
 have installed the necessary SPICE Guest Tools on the virtual machine.
+
+Automatic redirection of specific devices can be configured in the
+configuration file by setting the `viewer_extra_args` variable.
+
+For example (in the configuration file):
+
+    viewer_extra_args="--spice-usbredir-redirect-on-connect=-1,0x1234,0x5678,-1,1"
+
+Where `0x1234` and `0x5678` are example USB VID and PID, respectively.
+
+The string format is described at:
+<https://www.spice-space.org/usbredir.html#filter-string-format>.
 
 ##### Enabling SPICE redirection on NixOS
 
