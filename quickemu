@@ -722,7 +722,7 @@ function configure_cpu() {
                 fi
             fi
             # Disable S3 support in the VM to ensure Windows can boot with SecureBoot enabled
-            #  - https://wiki.archlinux.org/title/QEMU#VM_does_not_boot_when_using_a_Secure_Boot_enabled_OVMF
+            #  - https://wiki.archlinux.org/title/QEMU/Troubleshooting#Virtual_machine_not_booting_when_using_a_Secure_Boot_enabled_OVMF
             GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
 
             # Disable High Precision Timer
