@@ -52,7 +52,7 @@ mkShell {
     sed \
       ${
         lib.optionalString (OVMF != null && OVMFFull != null) ''
-          -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
+          -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variablesMs}" |' \
           -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
         ''
       }${lib.optionalString stdenv.hostPlatform.isDarwin ''
