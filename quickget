@@ -1659,7 +1659,7 @@ EOF
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
             bazzite)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
-            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
+            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
