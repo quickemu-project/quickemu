@@ -106,7 +106,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: "Import gpg key 🔑"
-      uses: crazy-max/ghaction-import-gpg@v6
+      uses: crazy-max/ghaction-import-gpg@v7
       with:
         gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
         passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
