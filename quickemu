@@ -1686,8 +1686,8 @@ function start_virtiofsd() {
         VIRTIOFSD_PID=$(fuser "${VIRTIOFSD_SOCKET}" 2>/dev/null | tr -s ' ' '\n' | grep -m1 '[0-9]')
     else
         local candidate
-        candidate=$(pgrep -f "virtiofsd" 2>/dev/null | head -1)
-        if grep -q 'virtiofsd' "/proc/${candidate}/comm" 2>/dev/null; then
+        candidate=$(pgrep -f "virtiofsd.*${VIRTIOFSD_SOCKET}" 2>/dev/null | head -1)
+        if ps -p "${candidate}" -o comm= 2>/dev/null | grep -q 'virtiofsd'; then
             VIRTIOFSD_PID="${candidate}"
         fi
     fi
@@ -1708,8 +1708,8 @@ function stop_virtiofsd() {
 
     if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
         # Guard against PID reuse: only signal the process if it is still
-        # a virtiofsd instance. /proc/<pid>/comm holds the executable name.
-        if grep -q 'virtiofsd' "/proc/${pid}/comm" 2>/dev/null; then
+        # a virtiofsd instance.
+        if ps -p "${pid}" -o comm= 2>/dev/null | grep -q 'virtiofsd'; then
             # Ask virtiofsd to shut down gracefully first; it will close the
             # vhost-user socket and flush any pending I/O before exiting.
             kill -TERM "${pid}" 2>/dev/null
@@ -2176,7 +2176,7 @@ function vm_boot() {
         if [ -n "${VIRTIOFSD_SOCKET}" ]; then
             # Verify QEMU supports vhost-user-fs-pci before using it; older QEMU
             # builds silently lack the device and would abort VM startup.
-            if ! "${QEMU}" -device vhost-user-fs-pci,help 2>&1 | grep -q "vhost-user-fs-pci"; then
+            if ! "${QEMU}" -device help 2>&1 | grep -q '"vhost-user-fs-pci"'; then
                 echo " - WARNING! QEMU does not support vhost-user-fs-pci; falling back to 9p."
                 stop_virtiofsd
                 VIRTIOFSD_SOCKET=""
