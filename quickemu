@@ -167,12 +167,14 @@ function kill_vm() {
         rm -f "${VMDIR}/${VMNAME}.pid"
         rm -f "${VMDIR}/${VMNAME}.spice"
         rm -f "${VMDIR}/${VMNAME}.sock"
+        stop_virtiofsd
     elif [ -n "${VM_PID}" ]; then
         if kill -9 "${VM_PID}" > /dev/null 2>&1; then
             echo " - ${VMNAME} (${VM_PID}) killed."
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
             rm -f "${VMDIR}/${VMNAME}.sock"
+            stop_virtiofsd
         else
             echo " - ${VMNAME} (${VM_PID}) was not killed."
         fi
@@ -1662,7 +1664,42 @@ function start_virtiofsd() {
     cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
     rm -f "${virtiofsd_stderr}"
 
+    echo "${VIRTIOFSD_PID}" > "${VMDIR}/${VMNAME}.virtiofsd-pid"
     echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
+}
+
+function stop_virtiofsd() {
+    local pid_file="${VMDIR}/${VMNAME}.virtiofsd-pid"
+    local pid=""
+
+    if [ -n "${VIRTIOFSD_PID}" ]; then
+        pid="${VIRTIOFSD_PID}"
+    elif [ -r "${pid_file}" ]; then
+        pid=$(cat "${pid_file}")
+    fi
+
+    if [ -z "${pid}" ]; then
+        return
+    fi
+
+    if kill -0 "${pid}" 2>/dev/null; then
+        # Ask virtiofsd to shut down gracefully first; it will close the
+        # vhost-user socket and flush any pending I/O before exiting.
+        kill -TERM "${pid}" 2>/dev/null
+        local i
+        for i in 1 2 3 4 5; do
+            kill -0 "${pid}" 2>/dev/null || break
+            sleep 0.2
+        done
+        # Force-kill only if it is still alive after the grace period.
+        if kill -0 "${pid}" 2>/dev/null; then
+            kill -KILL "${pid}" 2>/dev/null
+        fi
+    fi
+
+    rm -f "${pid_file}" "${VMDIR}/${VMNAME}.virtiofsd-sock"
+    VIRTIOFSD_PID=""
+    VIRTIOFSD_SOCKET=""
 }
 
 function vm_boot() {
@@ -2226,6 +2263,7 @@ function vm_boot() {
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
             rm -f "${VMDIR}/${VMNAME}.sock"
+            stop_virtiofsd
             echo && cat "${VMDIR}/${VMNAME}.log"
             exit 1
         fi
