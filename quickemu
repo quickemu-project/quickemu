@@ -1544,15 +1544,16 @@ function configure_file_sharing() {
             *) echo " - WebDAV:   On guest: dav://localhost:9843/";;
         esac
 
-        # 9P
+        # virtiofs or 9p depending on host capability
         if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-            echo -n " - 9P:       On guest: "
-            if [ "${guest_os}" == "linux" ]; then
-                echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+            if [ "${guest_os}" == "linux" ] && [ -n "${VIRTIOFSD}" ]; then
+                echo " - virtiofs: On guest: sudo mount -t virtiofs ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+            elif [ "${guest_os}" == "linux" ]; then
+                echo " - 9P:       On guest: sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
             elif [ "${guest_os}" == "macos" ]; then
                 # PUBLICSHARE needs to be world writeable for seamless integration with
                 # macOS. Test if it is world writeable, and prompt what to do if not.
-                echo "sudo mount_9p ${PUBLIC_TAG}"
+                echo " - 9P:       On guest: sudo mount_9p ${PUBLIC_TAG}"
                 if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
                     echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
                     echo "             Required for macOS integration 👆"
@@ -1614,6 +1615,37 @@ function configure_cpu_pinning() {
     done
 
     echo " - CPU Pinning: Bind guest cores to host cores (${GUEST_CPUS} -> ${CPU_PINNING})"
+}
+
+function start_virtiofsd() {
+    # Start virtiofsd as a background daemon and record its PID so it can be
+    # cleaned up when the VM exits. The socket path is placed alongside other
+    # VM runtime files in VMDIR.
+    if [ -z "${VIRTIOFSD}" ]; then
+        return
+    fi
+
+    VIRTIOFSD_SOCKET="${VMDIR}/${VMNAME}.virtiofsd-sock"
+    local virtiofsd_args=(
+        --socket-path="${VIRTIOFSD_SOCKET}"
+        --shared-dir="${PUBLIC}"
+        --announce-submounts
+    )
+
+    echo "${VIRTIOFSD} ${virtiofsd_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
+    ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>&1 &
+    VIRTIOFSD_PID=$!
+    sleep 0.25
+
+    if ! kill -0 "${VIRTIOFSD_PID}" 2>/dev/null; then
+        echo " - WARNING! virtiofsd failed to start; falling back to 9p."
+        VIRTIOFSD=""
+        VIRTIOFSD_SOCKET=""
+        VIRTIOFSD_PID=""
+        return
+    fi
+
+    echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
 }
 
 function vm_boot() {
@@ -2053,12 +2085,23 @@ function vm_boot() {
         fi
     fi
 
+    # File sharing: prefer virtiofs (shared memory, lower latency) over 9p when
+    # virtiofsd is available; virtiofsd must already be running at this point.
     # https://wiki.qemu.org/Documentation/9psetup
     # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
     if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
-        # shellcheck disable=SC2054
-        args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-            -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+        if [ -n "${VIRTIOFSD_SOCKET}" ]; then
+            # virtiofs requires a shared-memory backend; the size mirrors the VM RAM.
+            # shellcheck disable=SC2054
+            args+=(-object "memory-backend-file,id=mem,size=${RAM_VM},mem-path=/dev/shm,share=on"
+                -numa node,memdev=mem
+                -chardev "socket,id=char0,path=${VIRTIOFSD_SOCKET}"
+                -device "vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=${PUBLIC_TAG}")
+        else
+            # shellcheck disable=SC2054
+            args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
+                -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+        fi
     fi
 
     if [ -n "${USB_PASSTHROUGH}" ]; then
@@ -2469,6 +2512,16 @@ function fileshare_param_check() {
             PUBLIC_PERMS=$(${STAT}  -c "%A" "${PUBLIC}")
         fi
     fi
+
+    # Prefer virtiofs over 9p when virtiofsd is available and the guest is Linux.
+    # virtiofs uses shared memory rather than a transport protocol, giving much
+    # lower latency and higher throughput than 9p.
+    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ]; then
+        VIRTIOFSD=$(command -v virtiofsd 2>/dev/null || echo "/usr/lib/qemu/virtiofsd")
+        if [ ! -x "${VIRTIOFSD}" ]; then
+            VIRTIOFSD=""
+        fi
+    fi
 }
 
 function parse_ports_from_file {
@@ -2579,6 +2632,9 @@ MONITOR_CMD=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
+VIRTIOFSD=""
+VIRTIOFSD_PID=""
+VIRTIOFSD_SOCKET=""
 SHORTCUT_OPTIONS=""
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
@@ -2903,6 +2959,7 @@ viewer_param_check
 fileshare_param_check
 
 if [ -z "${VM_PID}" ]; then
+    start_virtiofsd
     vm_boot
     start_viewer
     # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
