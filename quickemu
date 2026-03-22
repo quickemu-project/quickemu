@@ -2575,7 +2575,9 @@ function fileshare_param_check() {
     # NOTE: only the standalone virtiofsd (Rust) is supported — the legacy
     # QEMU-bundled C daemon (/usr/lib/qemu/virtiofsd) uses incompatible CLI
     # syntax and requires root, so it is intentionally ignored here.
-    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ]; then
+    # Skip virtiofs during OS installation: the required shared-memory NUMA
+    # backend can confuse installers and cause hangs. 9p is used instead.
+    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ] && [ -z "${iso}" ]; then
         VIRTIOFSD=$(command -v virtiofsd 2>/dev/null)
         if [ ! -x "${VIRTIOFSD}" ]; then
             VIRTIOFSD=""
