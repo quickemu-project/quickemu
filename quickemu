@@ -1626,6 +1626,10 @@ function start_virtiofsd() {
     fi
 
     VIRTIOFSD_SOCKET="${VMDIR}/${VMNAME}.virtiofsd-sock"
+    # Remove any stale socket left by an unclean shutdown. quickemu already
+    # checks the PID file and refuses to start if the VM is running, so a
+    # live virtiofsd cannot be behind this socket at this point.
+    rm -f "${VIRTIOFSD_SOCKET}"
     local virtiofsd_args=(
         --socket-path="${VIRTIOFSD_SOCKET}"
         --shared-dir="${PUBLIC}"
