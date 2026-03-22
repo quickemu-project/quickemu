@@ -1685,8 +1685,10 @@ function start_virtiofsd() {
     if command -v fuser >/dev/null 2>&1; then
         VIRTIOFSD_PID=$(fuser "${VIRTIOFSD_SOCKET}" 2>/dev/null | tr -s ' ' '\n' | grep -m1 '[0-9]')
     else
-        local candidate
-        candidate=$(pgrep -f "virtiofsd.*${VIRTIOFSD_SOCKET}" 2>/dev/null | head -1)
+        local candidate socket_pat
+        # Escape regex metacharacters in the socket path before passing to pgrep -f.
+        socket_pat=$(printf '%s' "${VIRTIOFSD_SOCKET}" | sed 's/[[\.*^$()+?{}|]/\\&/g')
+        candidate=$(pgrep -f "virtiofsd.*${socket_pat}" 2>/dev/null | head -1)
         if ps -p "${candidate}" -o comm= 2>/dev/null | grep -q 'virtiofsd'; then
             VIRTIOFSD_PID="${candidate}"
         fi
