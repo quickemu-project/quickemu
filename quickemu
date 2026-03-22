@@ -1653,10 +1653,15 @@ function start_virtiofsd() {
     virtiofsd_stderr=$(mktemp)
     echo "${VIRTIOFSD} ${virtiofsd_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
     ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>"${virtiofsd_stderr}" &
-    sleep 0.5
 
-    # virtiofsd forks: the shell child we spawned exits once the daemon child
-    # is running. Check the socket rather than the parent PID to detect success.
+    # virtiofsd forks: the shell child exits once the daemon child is running.
+    # Poll for the socket rather than using a fixed sleep to avoid a race.
+    local i
+    for i in $(seq 1 20); do
+        [ -S "${VIRTIOFSD_SOCKET}" ] && break
+        sleep 0.1
+    done
+
     if [ ! -S "${VIRTIOFSD_SOCKET}" ]; then
         if grep -q "Operation not permitted" "${virtiofsd_stderr}" 2>/dev/null; then
             echo " - WARNING! virtiofsd failed to start (insufficient permissions); falling back to 9p."
@@ -1674,14 +1679,25 @@ function start_virtiofsd() {
     cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
     rm -f "${virtiofsd_stderr}"
 
-    # The parent exits after forking the daemon child; find the child by socket.
-    VIRTIOFSD_PID=$(pgrep -f "virtiofsd.*${VIRTIOFSD_SOCKET}" 2>/dev/null | head -1)
+    # Resolve the daemon child's PID via the socket to avoid PID reuse issues.
+    # Prefer fuser (unambiguous socket owner); fall back to pgrep with a comm
+    # check to confirm the process is actually virtiofsd.
+    if command -v fuser >/dev/null 2>&1; then
+        VIRTIOFSD_PID=$(fuser "${VIRTIOFSD_SOCKET}" 2>/dev/null | tr -s ' ' '\n' | grep -m1 '[0-9]')
+    else
+        local candidate
+        candidate=$(pgrep -f "virtiofsd" 2>/dev/null | head -1)
+        if grep -q 'virtiofsd' "/proc/${candidate}/comm" 2>/dev/null; then
+            VIRTIOFSD_PID="${candidate}"
+        fi
+    fi
     echo "${VIRTIOFSD_PID}" > "${VMDIR}/${VMNAME}.virtiofsd-pid"
     echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
 }
 
 function stop_virtiofsd() {
     local pid_file="${VMDIR}/${VMNAME}.virtiofsd-pid"
+    local socket="${VMDIR}/${VMNAME}.virtiofsd-sock"
     local pid=""
 
     if [ -n "${VIRTIOFSD_PID}" ]; then
@@ -1690,26 +1706,26 @@ function stop_virtiofsd() {
         pid=$(cat "${pid_file}")
     fi
 
-    if [ -z "${pid}" ]; then
-        return
-    fi
-
-    if kill -0 "${pid}" 2>/dev/null; then
-        # Ask virtiofsd to shut down gracefully first; it will close the
-        # vhost-user socket and flush any pending I/O before exiting.
-        kill -TERM "${pid}" 2>/dev/null
-        local i
-        for i in 1 2 3 4 5; do
-            kill -0 "${pid}" 2>/dev/null || break
-            sleep 0.2
-        done
-        # Force-kill only if it is still alive after the grace period.
-        if kill -0 "${pid}" 2>/dev/null; then
-            kill -KILL "${pid}" 2>/dev/null
+    if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
+        # Guard against PID reuse: only signal the process if it is still
+        # a virtiofsd instance. /proc/<pid>/comm holds the executable name.
+        if grep -q 'virtiofsd' "/proc/${pid}/comm" 2>/dev/null; then
+            # Ask virtiofsd to shut down gracefully first; it will close the
+            # vhost-user socket and flush any pending I/O before exiting.
+            kill -TERM "${pid}" 2>/dev/null
+            local i
+            for i in 1 2 3 4 5; do
+                kill -0 "${pid}" 2>/dev/null || break
+                sleep 0.2
+            done
+            # Force-kill only if it is still alive after the grace period.
+            if kill -0 "${pid}" 2>/dev/null; then
+                kill -KILL "${pid}" 2>/dev/null
+            fi
         fi
     fi
 
-    rm -f "${pid_file}" "${VMDIR}/${VMNAME}.virtiofsd-sock"
+    rm -f "${pid_file}" "${socket}"
     VIRTIOFSD_PID=""
     VIRTIOFSD_SOCKET=""
 }
@@ -2157,6 +2173,15 @@ function vm_boot() {
     # https://wiki.qemu.org/Documentation/9psetup
     # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
     if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
+        if [ -n "${VIRTIOFSD_SOCKET}" ]; then
+            # Verify QEMU supports vhost-user-fs-pci before using it; older QEMU
+            # builds silently lack the device and would abort VM startup.
+            if ! "${QEMU}" -device vhost-user-fs-pci,help 2>&1 | grep -q "vhost-user-fs-pci"; then
+                echo " - WARNING! QEMU does not support vhost-user-fs-pci; falling back to 9p."
+                stop_virtiofsd
+                VIRTIOFSD_SOCKET=""
+            fi
+        fi
         if [ -n "${VIRTIOFSD_SOCKET}" ]; then
             # virtiofs requires a shared-memory backend; the size mirrors the VM RAM.
             # shellcheck disable=SC2054
