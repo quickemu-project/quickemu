@@ -1632,18 +1632,31 @@ function start_virtiofsd() {
         --announce-submounts
     )
 
+    # Capture virtiofsd stderr separately so we can inspect it without
+    # false-matching stale entries from previous runs in the shared VM log.
+    local virtiofsd_stderr
+    virtiofsd_stderr=$(mktemp)
     echo "${VIRTIOFSD} ${virtiofsd_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
-    ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>&1 &
+    ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>"${virtiofsd_stderr}" &
     VIRTIOFSD_PID=$!
     sleep 0.25
 
     if ! kill -0 "${VIRTIOFSD_PID}" 2>/dev/null; then
-        echo " - WARNING! virtiofsd failed to start; falling back to 9p."
+        if grep -q "Operation not permitted" "${virtiofsd_stderr}" 2>/dev/null; then
+            echo " - WARNING! virtiofsd failed to start (insufficient permissions); falling back to 9p."
+            echo "            Install the standalone virtiofsd package to enable virtiofs support."
+        else
+            echo " - WARNING! virtiofsd failed to start; falling back to 9p."
+        fi
+        cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
+        rm -f "${virtiofsd_stderr}"
         VIRTIOFSD=""
         VIRTIOFSD_SOCKET=""
         VIRTIOFSD_PID=""
         return
     fi
+    cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
+    rm -f "${virtiofsd_stderr}"
 
     echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
 }
@@ -1698,6 +1711,7 @@ function vm_boot() {
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
     echo " - Host:     ${OS_RELEASE} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
+    start_virtiofsd
 
     # Force to lowercase.
     boot=${boot,,}
@@ -2513,11 +2527,14 @@ function fileshare_param_check() {
         fi
     fi
 
-    # Prefer virtiofs over 9p when virtiofsd is available and the guest is Linux.
-    # virtiofs uses shared memory rather than a transport protocol, giving much
-    # lower latency and higher throughput than 9p.
+    # Prefer virtiofs over 9p when the standalone virtiofsd is available and the
+    # guest is Linux. virtiofs uses shared memory rather than a transport protocol,
+    # giving much lower latency and higher throughput than 9p.
+    # NOTE: only the standalone virtiofsd (Rust) is supported — the legacy
+    # QEMU-bundled C daemon (/usr/lib/qemu/virtiofsd) uses incompatible CLI
+    # syntax and requires root, so it is intentionally ignored here.
     if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ]; then
-        VIRTIOFSD=$(command -v virtiofsd 2>/dev/null || echo "/usr/lib/qemu/virtiofsd")
+        VIRTIOFSD=$(command -v virtiofsd 2>/dev/null)
         if [ ! -x "${VIRTIOFSD}" ]; then
             VIRTIOFSD=""
         fi
@@ -2959,7 +2976,6 @@ viewer_param_check
 fileshare_param_check
 
 if [ -z "${VM_PID}" ]; then
-    start_virtiofsd
     vm_boot
     start_viewer
     # If the VM being started is an uninstalled Windows VM then auto-skip the press-any key prompt.
