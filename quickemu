@@ -1627,6 +1627,15 @@ function start_virtiofsd() {
         return
     fi
 
+    # Skip virtiofs when booting from an ISO (installation). By this point in
+    # vm_boot(), quickemu has already cleared $iso when the disk is in use, so
+    # a non-empty $iso reliably means we are booting the installer. The
+    # shared-memory NUMA backend required for virtiofs can cause installer hangs.
+    if [ -n "${iso}" ]; then
+        VIRTIOFSD=""
+        return
+    fi
+
     VIRTIOFSD_SOCKET="${VMDIR}/${VMNAME}.virtiofsd-sock"
     # Remove any stale socket left by an unclean shutdown. quickemu already
     # checks the PID file and refuses to start if the VM is running, so a
@@ -1644,10 +1653,11 @@ function start_virtiofsd() {
     virtiofsd_stderr=$(mktemp)
     echo "${VIRTIOFSD} ${virtiofsd_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
     ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>"${virtiofsd_stderr}" &
-    VIRTIOFSD_PID=$!
-    sleep 0.25
+    sleep 0.5
 
-    if ! kill -0 "${VIRTIOFSD_PID}" 2>/dev/null; then
+    # virtiofsd forks: the shell child we spawned exits once the daemon child
+    # is running. Check the socket rather than the parent PID to detect success.
+    if [ ! -S "${VIRTIOFSD_SOCKET}" ]; then
         if grep -q "Operation not permitted" "${virtiofsd_stderr}" 2>/dev/null; then
             echo " - WARNING! virtiofsd failed to start (insufficient permissions); falling back to 9p."
             echo "            Install the standalone virtiofsd package to enable virtiofs support."
@@ -1664,6 +1674,8 @@ function start_virtiofsd() {
     cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
     rm -f "${virtiofsd_stderr}"
 
+    # The parent exits after forking the daemon child; find the child by socket.
+    VIRTIOFSD_PID=$(pgrep -f "virtiofsd.*${VIRTIOFSD_SOCKET}" 2>/dev/null | head -1)
     echo "${VIRTIOFSD_PID}" > "${VMDIR}/${VMNAME}.virtiofsd-pid"
     echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
 }
@@ -1752,7 +1764,6 @@ function vm_boot() {
 
     echo "Quickemu ${VERSION} using ${QEMU} v${QEMU_VER_LONG}"
     echo " - Host:     ${OS_RELEASE} running ${KERNEL_NAME} ${KERNEL_VER} ${KERNEL_NODE}"
-    start_virtiofsd
 
     # Force to lowercase.
     boot=${boot,,}
@@ -1769,6 +1780,7 @@ function vm_boot() {
     configure_bios
     configure_os_quirks
     configure_storage
+    start_virtiofsd
     configure_display
     configure_audio
     configure_ports
@@ -2575,9 +2587,7 @@ function fileshare_param_check() {
     # NOTE: only the standalone virtiofsd (Rust) is supported — the legacy
     # QEMU-bundled C daemon (/usr/lib/qemu/virtiofsd) uses incompatible CLI
     # syntax and requires root, so it is intentionally ignored here.
-    # Skip virtiofs during OS installation: the required shared-memory NUMA
-    # backend can confuse installers and cause hangs. 9p is used instead.
-    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ] && [ -z "${iso}" ]; then
+    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ]; then
         VIRTIOFSD=$(command -v virtiofsd 2>/dev/null)
         if [ ! -x "${VIRTIOFSD}" ]; then
             VIRTIOFSD=""
