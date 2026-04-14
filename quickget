@@ -3800,7 +3800,8 @@ QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
 CHECK_ALL_ARCH="false"
-CURL_INSECURE="${QUICKGET_INSECURE:-false}"
+CURL_INSECURE="false"
+[[ "${QUICKGET_INSECURE:-}" == "1" || "${QUICKGET_INSECURE:-}" == "true" ]] && CURL_INSECURE="true"
 # Normalised host architecture for foreign arch detection
 NORMALISED_HOST_ARCH="${ARCH}"
 CURL=$(command -v curl)
