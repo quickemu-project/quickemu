@@ -1645,6 +1645,8 @@ function start_virtiofsd() {
         --socket-path="${VIRTIOFSD_SOCKET}"
         --shared-dir="${PUBLIC}"
         --announce-submounts
+        --translate-uid="squash-guest:0:$(id -u):65536"  # any guest UID in 0..65535 becomes current host UID
+        --translate-gid="squash-guest:0:$(id -g):65536"  # any guest GID in 0..65535 becomes current host GID
     )
 
     # Capture virtiofsd stderr separately so we can inspect it without
