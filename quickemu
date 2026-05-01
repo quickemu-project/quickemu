@@ -167,12 +167,14 @@ function kill_vm() {
         rm -f "${VMDIR}/${VMNAME}.pid"
         rm -f "${VMDIR}/${VMNAME}.spice"
         rm -f "${VMDIR}/${VMNAME}.sock"
+        stop_virtiofsd
     elif [ -n "${VM_PID}" ]; then
         if kill -9 "${VM_PID}" > /dev/null 2>&1; then
             echo " - ${VMNAME} (${VM_PID}) killed."
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
             rm -f "${VMDIR}/${VMNAME}.sock"
+            stop_virtiofsd
         else
             echo " - ${VMNAME} (${VM_PID}) was not killed."
         fi
@@ -1544,15 +1546,16 @@ function configure_file_sharing() {
             *) echo " - WebDAV:   On guest: dav://localhost:9843/";;
         esac
 
-        # 9P
+        # virtiofs or 9p depending on host capability
         if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ]; then
-            echo -n " - 9P:       On guest: "
-            if [ "${guest_os}" == "linux" ]; then
-                echo "sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+            if [ "${guest_os}" == "linux" ] && [ -n "${VIRTIOFSD}" ]; then
+                echo " - virtiofs: On guest: sudo mount -t virtiofs ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
+            elif [ "${guest_os}" == "linux" ]; then
+                echo " - 9P:       On guest: sudo mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 ${PUBLIC_TAG} ~/$(basename "${PUBLIC}")"
             elif [ "${guest_os}" == "macos" ]; then
                 # PUBLICSHARE needs to be world writeable for seamless integration with
                 # macOS. Test if it is world writeable, and prompt what to do if not.
-                echo "sudo mount_9p ${PUBLIC_TAG}"
+                echo " - 9P:       On guest: sudo mount_9p ${PUBLIC_TAG}"
                 if [ "${PUBLIC_PERMS}" != "drwxrwxrwx" ]; then
                     echo " - 9P:       On host:  chmod 777 ${PUBLIC}"
                     echo "             Required for macOS integration 👆"
@@ -1614,6 +1617,119 @@ function configure_cpu_pinning() {
     done
 
     echo " - CPU Pinning: Bind guest cores to host cores (${GUEST_CPUS} -> ${CPU_PINNING})"
+}
+
+function start_virtiofsd() {
+    # Start virtiofsd as a background daemon and record its PID so it can be
+    # cleaned up when the VM exits. The socket path is placed alongside other
+    # VM runtime files in VMDIR.
+    if [ -z "${VIRTIOFSD}" ]; then
+        return
+    fi
+
+    # Skip virtiofs when booting from an ISO (installation). By this point in
+    # vm_boot(), quickemu has already cleared $iso when the disk is in use, so
+    # a non-empty $iso reliably means we are booting the installer. The
+    # shared-memory NUMA backend required for virtiofs can cause installer hangs.
+    if [ -n "${iso}" ]; then
+        VIRTIOFSD=""
+        return
+    fi
+
+    VIRTIOFSD_SOCKET="${VMDIR}/${VMNAME}.virtiofsd-sock"
+    # Remove any stale socket left by an unclean shutdown. quickemu already
+    # checks the PID file and refuses to start if the VM is running, so a
+    # live virtiofsd cannot be behind this socket at this point.
+    rm -f "${VIRTIOFSD_SOCKET}"
+    local virtiofsd_args=(
+        --socket-path="${VIRTIOFSD_SOCKET}"
+        --shared-dir="${PUBLIC}"
+        --announce-submounts
+    )
+
+    # Capture virtiofsd stderr separately so we can inspect it without
+    # false-matching stale entries from previous runs in the shared VM log.
+    local virtiofsd_stderr
+    virtiofsd_stderr=$(mktemp)
+    echo "${VIRTIOFSD} ${virtiofsd_args[*]} &" >> "${VMDIR}/${VMNAME}.sh"
+    ${VIRTIOFSD} "${virtiofsd_args[@]}" >> "${VMDIR}/${VMNAME}.log" 2>"${virtiofsd_stderr}" &
+
+    # virtiofsd forks: the shell child exits once the daemon child is running.
+    # Poll for the socket rather than using a fixed sleep to avoid a race.
+    local i
+    for i in $(seq 1 20); do
+        [ -S "${VIRTIOFSD_SOCKET}" ] && break
+        sleep 0.1
+    done
+
+    if [ ! -S "${VIRTIOFSD_SOCKET}" ]; then
+        if grep -q "Operation not permitted" "${virtiofsd_stderr}" 2>/dev/null; then
+            echo " - WARNING! virtiofsd failed to start (insufficient permissions); falling back to 9p."
+            echo "            Install the standalone virtiofsd package to enable virtiofs support."
+        else
+            echo " - WARNING! virtiofsd failed to start; falling back to 9p."
+        fi
+        cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
+        rm -f "${virtiofsd_stderr}"
+        VIRTIOFSD=""
+        VIRTIOFSD_SOCKET=""
+        VIRTIOFSD_PID=""
+        return
+    fi
+    cat "${virtiofsd_stderr}" >> "${VMDIR}/${VMNAME}.log"
+    rm -f "${virtiofsd_stderr}"
+
+    # Resolve the daemon child's PID via the socket to avoid PID reuse issues.
+    # Prefer fuser (unambiguous socket owner); fall back to pgrep with a comm
+    # check to confirm the process is actually virtiofsd.
+    if command -v fuser >/dev/null 2>&1; then
+        VIRTIOFSD_PID=$(fuser "${VIRTIOFSD_SOCKET}" 2>/dev/null | tr -s ' ' '\n' | grep -m1 '[0-9]')
+    else
+        local candidate socket_pat
+        # Escape regex metacharacters in the socket path before passing to pgrep -f.
+        socket_pat=$(printf '%s' "${VIRTIOFSD_SOCKET}" | sed 's/[[\.*^$()+?{}|]/\\&/g')
+        candidate=$(pgrep -f "virtiofsd.*${socket_pat}" 2>/dev/null | head -1)
+        if ps -p "${candidate}" -o comm= 2>/dev/null | grep -q 'virtiofsd'; then
+            VIRTIOFSD_PID="${candidate}"
+        fi
+    fi
+    echo "${VIRTIOFSD_PID}" > "${VMDIR}/${VMNAME}.virtiofsd-pid"
+    echo " - virtiofsd: ${VIRTIOFSD_SOCKET} (${VIRTIOFSD_PID})"
+}
+
+function stop_virtiofsd() {
+    local pid_file="${VMDIR}/${VMNAME}.virtiofsd-pid"
+    local socket="${VMDIR}/${VMNAME}.virtiofsd-sock"
+    local pid=""
+
+    if [ -n "${VIRTIOFSD_PID}" ]; then
+        pid="${VIRTIOFSD_PID}"
+    elif [ -r "${pid_file}" ]; then
+        pid=$(cat "${pid_file}")
+    fi
+
+    if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
+        # Guard against PID reuse: only signal the process if it is still
+        # a virtiofsd instance.
+        if ps -p "${pid}" -o comm= 2>/dev/null | grep -q 'virtiofsd'; then
+            # Ask virtiofsd to shut down gracefully first; it will close the
+            # vhost-user socket and flush any pending I/O before exiting.
+            kill -TERM "${pid}" 2>/dev/null
+            local i
+            for i in 1 2 3 4 5; do
+                kill -0 "${pid}" 2>/dev/null || break
+                sleep 0.2
+            done
+            # Force-kill only if it is still alive after the grace period.
+            if kill -0 "${pid}" 2>/dev/null; then
+                kill -KILL "${pid}" 2>/dev/null
+            fi
+        fi
+    fi
+
+    rm -f "${pid_file}" "${socket}"
+    VIRTIOFSD_PID=""
+    VIRTIOFSD_SOCKET=""
 }
 
 function vm_boot() {
@@ -1682,6 +1798,7 @@ function vm_boot() {
     configure_bios
     configure_os_quirks
     configure_storage
+    start_virtiofsd
     configure_display
     configure_audio
     configure_ports
@@ -2053,12 +2170,32 @@ function vm_boot() {
         fi
     fi
 
+    # File sharing: prefer virtiofs (shared memory, lower latency) over 9p when
+    # virtiofsd is available; virtiofsd must already be running at this point.
     # https://wiki.qemu.org/Documentation/9psetup
     # https://askubuntu.com/questions/772784/9p-libvirt-qemu-share-modes
     if [ "${guest_os}" != "windows" ] || [ "${guest_os}" == "windows-server" ] && [ -n "${PUBLIC}" ]; then
-        # shellcheck disable=SC2054
-        args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
-            -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+        if [ -n "${VIRTIOFSD_SOCKET}" ]; then
+            # Verify QEMU supports vhost-user-fs-pci before using it; older QEMU
+            # builds silently lack the device and would abort VM startup.
+            if ! "${QEMU}" -device help 2>&1 | grep -q '"vhost-user-fs-pci"'; then
+                echo " - WARNING! QEMU does not support vhost-user-fs-pci; falling back to 9p."
+                stop_virtiofsd
+                VIRTIOFSD_SOCKET=""
+            fi
+        fi
+        if [ -n "${VIRTIOFSD_SOCKET}" ]; then
+            # virtiofs requires a shared-memory backend; the size mirrors the VM RAM.
+            # shellcheck disable=SC2054
+            args+=(-object "memory-backend-file,id=mem,size=${RAM_VM},mem-path=/dev/shm,share=on"
+                -numa node,memdev=mem
+                -chardev "socket,id=char0,path=${VIRTIOFSD_SOCKET}"
+                -device "vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=${PUBLIC_TAG}")
+        else
+            # shellcheck disable=SC2054
+            args+=(-fsdev local,id=fsdev0,path="${PUBLIC}",security_model=mapped-xattr
+                -device virtio-9p-pci,fsdev=fsdev0,mount_tag="${PUBLIC_TAG}")
+        fi
     fi
 
     if [ -n "${USB_PASSTHROUGH}" ]; then
@@ -2165,6 +2302,7 @@ function vm_boot() {
             rm -f "${VMDIR}/${VMNAME}.pid"
             rm -f "${VMDIR}/${VMNAME}.spice"
             rm -f "${VMDIR}/${VMNAME}.sock"
+            stop_virtiofsd
             echo && cat "${VMDIR}/${VMNAME}.log"
             exit 1
         fi
@@ -2469,6 +2607,19 @@ function fileshare_param_check() {
             PUBLIC_PERMS=$(${STAT}  -c "%A" "${PUBLIC}")
         fi
     fi
+
+    # Prefer virtiofs over 9p when the standalone virtiofsd is available and the
+    # guest is Linux. virtiofs uses shared memory rather than a transport protocol,
+    # giving much lower latency and higher throughput than 9p.
+    # NOTE: only the standalone virtiofsd (Rust) is supported — the legacy
+    # QEMU-bundled C daemon (/usr/lib/qemu/virtiofsd) uses incompatible CLI
+    # syntax and requires root, so it is intentionally ignored here.
+    if [ -n "${PUBLIC}" ] && [ "${guest_os}" == "linux" ]; then
+        VIRTIOFSD=$(command -v virtiofsd 2>/dev/null)
+        if [ ! -x "${VIRTIOFSD}" ]; then
+            VIRTIOFSD=""
+        fi
+    fi
 }
 
 function parse_ports_from_file {
@@ -2579,6 +2730,9 @@ MONITOR_CMD=""
 PUBLIC=""
 PUBLIC_PERMS=""
 PUBLIC_TAG=""
+VIRTIOFSD=""
+VIRTIOFSD_PID=""
+VIRTIOFSD_SOCKET=""
 SHORTCUT_OPTIONS=""
 SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
