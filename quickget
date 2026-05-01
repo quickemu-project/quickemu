@@ -1413,6 +1413,8 @@ function web_pipe_json() {
 function web_get() {
     local CHECK=""
     local HEADERS=()
+    local INSECURE=()
+    [ "${CURL_INSECURE}" == "true" ] && INSECURE=("--insecure")
     local URL="${1}"
     local DIR="${2}"
     local FILE=""
@@ -1464,7 +1466,7 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" "${INSECURE[@]}" -- "${URL}"; then
         echo "ERROR! Failed to download ${URL} with curl."
         rm -f "${DIR}/${FILE}"
         exit 1
@@ -3766,6 +3768,7 @@ Arguments:
    --arch           <arch>                    : Set architecture (arm64, aarch64, amd64, x86_64)
    --download       <os> <release> [edition]  : Download image; no VM configuration
    --create-config  <os> [path/url] [flags]   : Create VM config for an OS image
+   --insecure                                 : Skip SSL certificate verification (or set QUICKGET_INSECURE=1)
    --open-homepage  <os>                      : Open homepage for the OS
    --show           [os]                      : Show OS information
    --version                                  : Show version
@@ -3797,6 +3800,8 @@ QUICKEMU=$(resolve_quickemu)
 I18NS=()
 OPERATION=""
 CHECK_ALL_ARCH="false"
+CURL_INSECURE="false"
+[[ "${QUICKGET_INSECURE:-}" == "1" || "${QUICKGET_INSECURE:-}" == "true" ]] && CURL_INSECURE="true"
 # Normalised host architecture for foreign arch detection
 NORMALISED_HOST_ARCH="${ARCH}"
 CURL=$(command -v curl)
@@ -3915,6 +3920,10 @@ case "${1}" in
     --list-csv|-list-csv|list|list_csv) list_csv;;
     --list-json|-list-json|list_json) list_json;;
     --list|-list) list_supported;;
+    --insecure|-insecure)
+        CURL_INSECURE="true"
+        shift
+        ;;
     -*) error_not_supported_argument;;
 esac
 
