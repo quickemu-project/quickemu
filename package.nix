@@ -27,7 +27,7 @@
   zsync,
   OVMF ? null,
   OVMFFull ? null,
-  virtiofsd,
+  virtiofsd ? null,
 }:
 let
   runtimePaths = [
