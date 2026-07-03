@@ -12,7 +12,35 @@ function ignore_msrs_always() {
         # Skip if ignore_msrs is already enabled, assumes initramfs has been rebuilt
         if ! grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
             echo "options kvm ignore_msrs=Y" | sudo tee /etc/modprobe.d/kvm-quickemu.conf
-            sudo update-initramfs -k all -u
+
+            # Rebuild initramfs so the new kvm option takes effect
+            flag=0
+            if command -v update-initramfs &>/dev/null; then
+                flag=1
+            elif command -v mkinitcpio &>/dev/null; then
+                flag=2
+            else
+                flag=3
+            fi
+
+            # echo $flag;
+
+            case "$flag" in
+	            1)
+		            sudo update-initramfs -k all -u
+		            ;;
+	            2)
+		            sudo mkinitcpio -P
+                echo "Ran mkinitcpio -P"
+		            ;;
+	            3)
+		            echo "ERROR! User does not have update-initramfs or mkinitcpio installed, please find out respective utility to update/regenrate intiramfs."
+		            echo "Run respective command for 'sudo update-initramfs -k all -u'(debian) or 'sudo mkinitcpio -P'(arch)"
+                exit 1
+                ;;
+            esac
+
+
         fi
     else
         echo "ERROR! /etc/modprobe.d was not found, I don't know how to configure this system."
