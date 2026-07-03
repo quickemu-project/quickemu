@@ -30,8 +30,8 @@ function ignore_msrs_always() {
 		            sudo update-initramfs -k all -u
 		            ;;
 	            2)
-		            sudo mkinitcpio -p linux
-                echo "Ran mkinitcpio -p linux"
+		            sudo mkinitcpio -P
+                echo "Ran mkinitcpio -P"
 		            ;;
 	            3)
 		            echo "ERROR! User does not have update-initramfs or mkinitcpio installed, please find out respective utility to update/regenrate intiramfs."
