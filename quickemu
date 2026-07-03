@@ -13,23 +13,14 @@ function ignore_msrs_always() {
         if ! grep -lq 'ignore_msrs=Y' /etc/modprobe.d/kvm-quickemu.conf >/dev/null 2>&1; then
             echo "options kvm ignore_msrs=Y" | sudo tee /etc/modprobe.d/kvm-quickemu.conf
 
-            # Code to verify if user has update-initramfs(debian exclusive? absent on arch ?) or mkinitcpio(present on arch) utility present
- 
-            flag=0;
-            man update-initramfs &>2
-            a="$(echo $?)"
-            # echo $a
-            if [[  $a -eq 0 ]]; then
-	            flag=1;
+            # Rebuild initramfs so the new kvm option takes effect
+            flag=0
+            if command -v update-initramfs &>/dev/null; then
+                flag=1
+            elif command -v mkinitcpio &>/dev/null; then
+                flag=2
             else
-	            man mkinitcpio &>2
-	            a="$(echo $?)"
-	            # echo $a
-	            if [[ "$a" -eq 0 ]]; then
-		            flag=2;
-	            else
-		            flag=3;
-	            fi
+                flag=3
             fi
 
             # echo $flag;
