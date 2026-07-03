@@ -35,7 +35,7 @@ function ignore_msrs_always() {
 		            ;;
 	            3)
 		            echo "ERROR! User does not have update-initramfs or mkinitcpio installed, please find out respective utility to update/regenrate intiramfs."
-		            echo "Run respective command for 'sudo update-initramfs -k all -u'(debian) or 'sudo mkinitcpio -p linux'(arch)"
+		            echo "Run respective command for 'sudo update-initramfs -k all -u'(debian) or 'sudo mkinitcpio -P'(arch)"
                 exit 1
                 ;;
             esac
