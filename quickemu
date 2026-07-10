@@ -1430,10 +1430,21 @@ function configure_ports() {
         ssh_port=$(get_port 22220 9)
     fi
 
+    if [ -z "${SSH_ACCESS}" ] || [ "${SSH_ACCESS}" == "local" ]; then
+        SSH_ADDR="127.0.0.1"
+        ssh_host="localhost"
+    elif [ "${SSH_ACCESS}" == "remote" ]; then
+        SSH_ADDR=""
+        ssh_host="localhost"
+    else
+        SSH_ADDR="${SSH_ACCESS}"
+        ssh_host="${SSH_ACCESS}"
+    fi
+
     if [ -n "${ssh_port}" ]; then
         echo "ssh,${ssh_port}" >> "${VMDIR}/${VMNAME}.ports"
-        NET="${NET},hostfwd=tcp::${ssh_port}-:22"
-        echo " - ssh:      On host:  ssh user@localhost -p ${ssh_port}"
+        NET="${NET},hostfwd=tcp:${SSH_ADDR}:${ssh_port}-:22"
+        echo " - ssh:      On host:  ssh user@${ssh_host} -p ${ssh_port}"
     else
         echo " - ssh:      All ssh ports have been exhausted."
     fi
@@ -2310,6 +2321,7 @@ function usage() {
     echo "  --viewer <viewer>                 : Choose an alternative viewer. @Options: 'spicy' (default), 'remote-viewer', 'none'"
     echo "  --width <width>                   : Set VM screen width; requires '--height'"
     echo "  --height <height>                 : Set VM screen height; requires '--width'"
+    echo "  --ssh-access                      : Enable remote ssh access support. 'local' (default), 'remote', 'clientipaddress'"
     echo "  --ssh-port <port>                 : Set SSH port manually"
     echo "  --spice-port <port>               : Set SPICE port manually"
     echo "  --public-dir <path>               : Expose share directory. @Options: '' (default: xdg-user-dir PUBLICSHARE), '<directory>', 'none'"
@@ -2584,6 +2596,7 @@ SNAPSHOT_ACTION=""
 SNAPSHOT_TAG=""
 SOCKET_MONITOR=""
 SOCKET_SERIAL=""
+SSH_ACCESS=""
 STATUS_QUO=""
 USB_PASSTHROUGH=""
 VM=""
@@ -2715,6 +2728,10 @@ else
             -height|--height)
                 SHORTCUT_OPTIONS+="--height ${2} "
                 height="${2}"
+                shift 2;;
+            -ssh-access|--ssh-access)
+                SHORTCUT_OPTIONS+="--ssh-access ${2} "
+                SSH_ACCESS="${2}"
                 shift 2;;
             -ssh-port|--ssh-port)
                 SHORTCUT_OPTIONS+="--ssh-port ${2} "
