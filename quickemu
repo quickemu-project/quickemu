@@ -1000,16 +1000,16 @@ function configure_bios() {
                         );;
                 esac
             fi
-            # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
-            # when an existing file is found.
+            # Select the first complete firmware pair, preserving the order of preference above.
             _IFS=$IFS
             IFS=","
             for f in "${ovmfs[@]}"; do
                 # shellcheck disable=SC2086
                 set -- ${f};
-                if [ -e "${1}" ]; then
+                if [ -e "${1}" ] && [ -e "${2}" ]; then
                     EFI_CODE="${1}"
                     EFI_EXTRA_VARS="${2}"
+                    break
                 fi
             done
             IFS=$_IFS
