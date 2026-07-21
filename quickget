@@ -3509,7 +3509,7 @@ function download_windows_workstation() {
     local instanceId="560dc9f3-1aa5-4a2f-b63c-9e18f8d0e175"
     local mdt_js_response=""
 
-    mdt_js_response="$(curl --disable --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://ov-df.microsoft.com/mdt.js?instanceId={$instanceId}&PageId=si&session_id=$session_id")" || {
+    mdt_js_response="$(curl --disable --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://ov-df.microsoft.com/mdt.js?instanceId={$instanceId}&PageId=si&session_id=$session_id")" || {
         handle_curl_error $?
         return $?
     }
