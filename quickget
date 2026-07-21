@@ -3503,6 +3503,30 @@ function download_windows_workstation() {
         return $?
     }
 
+    echo " - Request Microsoft ov-df mdt.js"
+
+    # "instanceId" is always the same value
+    local instanceId="560dc9f3-1aa5-4a2f-b63c-9e18f8d0e175"
+    local mdt_js_response=""
+
+    mdt_js_response="$(curl --disable --silent --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://ov-df.microsoft.com/mdt.js?instanceId={$instanceId}&PageId=si&session_id=$session_id")" || {
+        handle_curl_error $?
+        return $?
+    }
+
+    local w="$(echo "$mdt_js_response" | grep -Eo '[?&]w=[A-F0-9]+' | head -1)"
+    w="${w#*=}"
+
+    local rticks="$(echo "$mdt_js_response" | grep -Eo 'rticks="?\+?[0-9]+' | head -1)"
+    rticks="${rticks##*[=\"+]}"
+
+    local current_time="$(date +%s%3N)"
+
+    curl --disable --silent --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://ov-df.microsoft.com/?session_id={$session_id}&CustomerId={$instanceId}&PageId=si&w={$w}&mdt={$current_time}&rticks={$rticks}" || {
+        handle_curl_error $?
+        return $?
+    }
+
     local profile="606624d44113"
 
     echo -n " - Getting language SKU ID: "
