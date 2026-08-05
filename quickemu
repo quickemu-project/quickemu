@@ -1309,10 +1309,16 @@ function configure_display() {
             # macOS has native VMware display driver support; aligns with OSX-KVM
             DISPLAY_DEVICE="vmware-svga";;
         windows|windows-server)
-            case ${display} in
-                none|spice) DISPLAY_DEVICE="qxl-vga";;
-                cocoa|gtk|sdl|spice-app) DISPLAY_DEVICE="virtio-vga";;
-            esac;;
+            # As ARM64 "virt" machines do not provide legacy VGA/QXL hardware,
+            # use virtio-gpu-pci as this match the Linux ARM64 configuration.
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                DISPLAY_DEVICE="virtio-gpu-pci"
+            else
+                case ${display} in
+                    none|spice) DISPLAY_DEVICE="qxl-vga";;
+                    cocoa|gtk|sdl|spice-app) DISPLAY_DEVICE="virtio-vga";;
+                esac
+            fi;;
         *) DISPLAY_DEVICE="qxl-vga";;
     esac
 
