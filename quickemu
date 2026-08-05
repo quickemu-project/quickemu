@@ -726,10 +726,14 @@ function configure_cpu() {
             GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
 
             # Disable High Precision Timer
-            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
-              MACHINE_TYPE+=",hpet=off"
-            else
-              GUEST_TWEAKS+=" -no-hpet"
+            # ARM64 "virt" machines do not implement this property
+            # as HPET is only available on PC (x86/x86_64) machine types.
+            if [ "${ARCH_VM}" == "x86_64" ]; then
+                if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+                    MACHINE_TYPE+=",hpet=off"
+                else
+                    GUEST_TWEAKS+=" -no-hpet"
+                fi
             fi
             ;;
     esac
