@@ -698,11 +698,14 @@ function configure_cpu() {
             fi
             ;;
         windows|windows-server)
-            # Base CPU flags that work with all accelerators (KVM, HVF, TCG)
-            CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
-            reset_cpu_flags
+            # x86/x86_64 Windows guests require additional CPU feature flags.
+            # ARM64 guests use the generic CPU configuration established earlier.
+            if [ "${ARCH_VM}" == "x86_64" ]; then
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
+                reset_cpu_flags
+            fi
             # KVM-specific flags: migratable and Hyper-V enlightenments
-            if [ "${QEMU_ACCEL}" == "kvm" ]; then
+            if [ "${ARCH_VM}" == "x86_64" ] && [ "${QEMU_ACCEL}" == "kvm" ]; then
                 if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
                     add_cpu_flag "migratable=no"
                     add_cpu_flag "hv_passthrough"
