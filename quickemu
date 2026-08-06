@@ -1185,15 +1185,23 @@ function configure_storage() {
 
         # Only check disk image size if preallocation is off
         if [ "${preallocation}" == "off" ]; then
-            DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
-            if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
-                echo "             Looks unused, booting from ${iso}${img}"
-                if [ -z "${iso}" ] && [ -z "${img}" ]; then
-                    echo "ERROR! You haven't specified a .iso or .img image to boot from."
-                    exit 1
-                fi
-            else
+            # A newly created qcow2 overlay can be physically small while
+            # exposing all data from its backing file. Treat such images as
+            # used instead of relying solely on the overlay file size.
+            if "${QEMU_IMG}" info --output=json "${disk_img}" 2>/dev/null |
+                grep -q '"backing-filename"[[:space:]]*:'; then
                 DISK_USED="yes"
+            else
+                DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
+                if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
+                    echo "             Looks unused, booting from ${iso}${img}"
+                    if [ -z "${iso}" ] && [ -z "${img}" ]; then
+                        echo "ERROR! You haven't specified a .iso or .img image to boot from."
+                        exit 1
+                    fi
+                else
+                    DISK_USED="yes"
+                fi
             fi
         else
             DISK_USED="yes"
