@@ -973,10 +973,10 @@ function configure_bios() {
                 # This firmware is passed with -bios and does not use persistent
                 # pflash variable storage.
                 if [ "${guest_os}" == "windows" ] &&
+                   [ "${secureboot}" != "on" ] &&
                    [ -e "${SHARE_PATH}/edk2/aarch64/QEMU_EFI.fd" ]; then
                     EFI_CODE="${SHARE_PATH}/edk2/aarch64/QEMU_EFI.fd"
                     EFI_MODE="bios"
-                    secureboot="off"
                 else
                     # AAVMF firmware paths for ARM64 guests using persistent pflash.
                     # shellcheck disable=SC2054,SC2140
