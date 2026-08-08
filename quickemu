@@ -515,8 +515,7 @@ function configure_cpu() {
         # highmem=on allows aarch64 guests on the "virt" machine type to access guest RAM
         # above the 4GB boundary. This is required for VMs configured with >3GB RAM and is
         # generally more compatible on modern aarch64 systems.
-        # pflash0/pflash1 reference the blockdev nodes for AAVMF firmware
-        MACHINE_TYPE="virt,highmem=on,pflash0=rom,pflash1=efivars"
+        MACHINE_TYPE="virt,highmem=on"
         case ${ARCH_HOST} in
             arm64|aarch64)
                 # Native ARM64 host running ARM64 guest - use hardware acceleration
@@ -698,11 +697,14 @@ function configure_cpu() {
             fi
             ;;
         windows|windows-server)
-            # Base CPU flags that work with all accelerators (KVM, HVF, TCG)
-            CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
-            reset_cpu_flags
+            # x86/x86_64 Windows guests require additional CPU feature flags.
+            # ARM64 guests use the generic CPU configuration established earlier.
+            if [ "${ARCH_VM}" == "x86_64" ]; then
+                CPU="-cpu ${CPU_MODEL},+hypervisor,+invtsc,l3-cache=on"
+                reset_cpu_flags
+            fi
             # KVM-specific flags: migratable and Hyper-V enlightenments
-            if [ "${QEMU_ACCEL}" == "kvm" ]; then
+            if [ "${ARCH_VM}" == "x86_64" ] && [ "${QEMU_ACCEL}" == "kvm" ]; then
                 if [ "${QEMU_VER_SHORT}" -gt 60 ]; then
                     add_cpu_flag "migratable=no"
                     add_cpu_flag "hv_passthrough"
@@ -726,10 +728,14 @@ function configure_cpu() {
             GUEST_TWEAKS+=" -global ICH9-LPC.disable_s3=1"
 
             # Disable High Precision Timer
-            if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
-              MACHINE_TYPE+=",hpet=off"
-            else
-              GUEST_TWEAKS+=" -no-hpet"
+            # ARM64 "virt" machines do not implement this property
+            # as HPET is only available on PC (x86/x86_64) machine types.
+            if [ "${ARCH_VM}" == "x86_64" ]; then
+                if [ "${QEMU_VER_SHORT}" -ge 70 ]; then
+                    MACHINE_TYPE+=",hpet=off"
+                else
+                    GUEST_TWEAKS+=" -no-hpet"
+                fi
             fi
             ;;
     esac
@@ -963,15 +969,24 @@ function configure_bios() {
         # Search for firmware if EFI_CODE is not set or the specified file doesn't exist
         if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             if [ "${ARCH_VM}" == "aarch64" ]; then
-                # AAVMF firmware paths for ARM64 guests
-                # SecureBoot is not commonly supported on ARM64, use standard firmware
-                # shellcheck disable=SC2054,SC2140
-                ovmfs=("/usr/share/AAVMF/AAVMF_CODE.fd","/usr/share/AAVMF/AAVMF_VARS.fd" \
-                    "${SHARE_PATH}/edk2/aarch64/QEMU_CODE.fd","${SHARE_PATH}/edk2/aarch64/QEMU_VARS.fd" \
-                    "${SHARE_PATH}/edk2/aarch64/QEMU_EFI-pflash.raw","${SHARE_PATH}/edk2/aarch64/vars-template-pflash.raw" \
-                    "${SHARE_PATH}/qemu/edk2-aarch64-code.fd","${SHARE_PATH}/qemu/edk2-arm-vars.fd" \
-                    "${SHARE_PATH}/AAVMF/AAVMF_CODE.fd","${SHARE_PATH}/AAVMF/AAVMF_VARS.fd"
-                )
+                # Prefer Fedora's monolithic EDK2 firmware for Windows ARM64 guests.
+                # This firmware is passed with -bios and does not use persistent
+                # pflash variable storage.
+                if [ "${guest_os}" == "windows" ] &&
+                   [ "${secureboot}" != "on" ] &&
+                   [ -e "${SHARE_PATH}/edk2/aarch64/QEMU_EFI.fd" ]; then
+                    EFI_CODE="${SHARE_PATH}/edk2/aarch64/QEMU_EFI.fd"
+                    EFI_MODE="bios"
+                else
+                    # AAVMF firmware paths for ARM64 guests using persistent pflash.
+                    # shellcheck disable=SC2054,SC2140
+                    ovmfs=("/usr/share/AAVMF/AAVMF_CODE.fd","/usr/share/AAVMF/AAVMF_VARS.fd" \
+                        "${SHARE_PATH}/edk2/aarch64/QEMU_CODE.fd","${SHARE_PATH}/edk2/aarch64/QEMU_VARS.fd" \
+                        "${SHARE_PATH}/edk2/aarch64/QEMU_EFI-pflash.raw","${SHARE_PATH}/edk2/aarch64/vars-template-pflash.raw" \
+                        "${SHARE_PATH}/qemu/edk2-aarch64-code.fd","${SHARE_PATH}/qemu/edk2-arm-vars.fd" \
+                        "${SHARE_PATH}/AAVMF/AAVMF_CODE.fd","${SHARE_PATH}/AAVMF/AAVMF_VARS.fd"
+                    )
+                fi
             else
                 # x86_64 OVMF firmware paths
                 case ${secureboot} in
@@ -1000,19 +1015,22 @@ function configure_bios() {
                         );;
                 esac
             fi
-            # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
-            # when an existing file is found.
-            _IFS=$IFS
-            IFS=","
-            for f in "${ovmfs[@]}"; do
-                # shellcheck disable=SC2086
-                set -- ${f};
-                if [ -e "${1}" ]; then
-                    EFI_CODE="${1}"
-                    EFI_EXTRA_VARS="${2}"
-                fi
-            done
-            IFS=$_IFS
+
+            if [ "${EFI_MODE}" == "pflash" ]; then
+                # Attempt each EFI_CODE file one by one, selecting the corresponding code and vars
+                # when an existing file is found.
+                _IFS=$IFS
+                IFS=","
+                for f in "${ovmfs[@]}"; do
+                    # shellcheck disable=SC2086
+                    set -- ${f};
+                    if [ -e "${1}" ]; then
+                        EFI_CODE="${1}"
+                        EFI_EXTRA_VARS="${2}"
+                    fi
+                done
+                IFS=$_IFS
+            fi
         fi
         if [ -z "${EFI_CODE}" ] || [ ! -e "${EFI_CODE}" ]; then
             if [ "${secureboot}" == "on" ]; then
@@ -1040,7 +1058,8 @@ function configure_bios() {
         fi
 
         # Make sure EFI_VARS references an actual, writeable, file
-        if [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; then
+        if [ "${EFI_MODE}" == "pflash" ] &&
+           { [ ! -f "${EFI_VARS}" ] || [ ! -w "${EFI_VARS}" ]; }; then
             echo " - EFI:      ERROR! ${EFI_VARS} is not a regular file or not writeable."
             echo "             Deleting ${EFI_VARS}. Please re-run quickemu."
             rm -f "${EFI_VARS}"
@@ -1054,7 +1073,11 @@ function configure_bios() {
             EFI_CODE=$(realpath "${EFI_CODE}")
             echo "${EFI_CODE}"
         fi
-        BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), EFI Vars (${EFI_VARS}), SecureBoot (${secureboot})."
+        if [ "${EFI_MODE}" == "bios" ]; then
+            BOOT_STATUS="EFI (${guest_os^}), firmware (${EFI_CODE}), mode (-bios), SecureBoot (off)."
+        else
+            BOOT_STATUS="EFI (${guest_os^}), OVMF (${EFI_CODE}), EFI Vars (${EFI_VARS}), SecureBoot (${secureboot})."
+        fi
     else
         BOOT_STATUS="Legacy BIOS (${guest_os^})"
         boot="legacy"
@@ -1178,15 +1201,23 @@ function configure_storage() {
 
         # Only check disk image size if preallocation is off
         if [ "${preallocation}" == "off" ]; then
-            DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
-            if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
-                echo "             Looks unused, booting from ${iso}${img}"
-                if [ -z "${iso}" ] && [ -z "${img}" ]; then
-                    echo "ERROR! You haven't specified a .iso or .img image to boot from."
-                    exit 1
-                fi
-            else
+            # A newly created qcow2 overlay can be physically small while
+            # exposing all data from its backing file. Treat such images as
+            # used instead of relying solely on the overlay file size.
+            if "${QEMU_IMG}" info --output=json "${disk_img}" 2>/dev/null |
+                grep -q '"backing-filename"[[:space:]]*:'; then
                 DISK_USED="yes"
+            else
+                DISK_CURR_SIZE=$(${STAT} -c%s "${disk_img}")
+                if [ "${DISK_CURR_SIZE}" -le "${DISK_MIN_SIZE}" ]; then
+                    echo "             Looks unused, booting from ${iso}${img}"
+                    if [ -z "${iso}" ] && [ -z "${img}" ]; then
+                        echo "ERROR! You haven't specified a .iso or .img image to boot from."
+                        exit 1
+                    fi
+                else
+                    DISK_USED="yes"
+                fi
             fi
         else
             DISK_USED="yes"
@@ -1302,10 +1333,16 @@ function configure_display() {
             # macOS has native VMware display driver support; aligns with OSX-KVM
             DISPLAY_DEVICE="vmware-svga";;
         windows|windows-server)
-            case ${display} in
-                none|spice) DISPLAY_DEVICE="qxl-vga";;
-                cocoa|gtk|sdl|spice-app) DISPLAY_DEVICE="virtio-vga";;
-            esac;;
+            # As ARM64 "virt" machines do not provide legacy VGA/QXL hardware,
+            # use virtio-gpu-pci as this match the Linux ARM64 configuration.
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                DISPLAY_DEVICE="virtio-gpu-pci"
+            else
+                case ${display} in
+                    none|spice) DISPLAY_DEVICE="qxl-vga";;
+                    cocoa|gtk|sdl|spice-app) DISPLAY_DEVICE="virtio-vga";;
+                esac
+            fi;;
         *) DISPLAY_DEVICE="qxl-vga";;
     esac
 
@@ -1626,6 +1663,7 @@ function vm_boot() {
     DISPLAY_DEVICE=""
     DISPLAY_RENDER=""
     EFI_CODE=""
+    EFI_MODE="pflash"
     EFI_VARS=""
     GUEST_CPU_CORES=""
     GUEST_CPU_LOGICAL_CORES=""
@@ -1704,6 +1742,15 @@ function vm_boot() {
     # - Use -accel tcg,... to specify tb-size and thread options
     # - QEMU does not allow both -machine accel= and -accel simultaneously
     # - For KVM/HVF, continue using -machine accel= (simpler, no extra options needed)
+
+    # ARM64 pflash firmware exposes the code and variable stores as named
+    # blockdev nodes referenced by the virt machine.
+    if [ "${ARCH_VM}" == "aarch64" ] &&
+       [[ "${boot}" == *"efi"* ]] &&
+       [ "${EFI_MODE}" == "pflash" ]; then
+        MACHINE_TYPE+=",pflash0=rom,pflash1=efivars"
+    fi
+
     if [ "${QEMU_ACCEL}" == "tcg" ]; then
         local HOST_RAM_GB=0
         if [ "${OS_KERNEL}" == "Darwin" ]; then
@@ -1925,23 +1972,46 @@ function vm_boot() {
     DRIVE_OPTIMISATIONS="discard=unmap,detect-zeroes=unmap,cache=writeback,aio=threads"
 
     if [[ "${boot}" == *"efi"* ]]; then
-        QCOW2CODE=$(is_firmware_qcow2 "${EFI_CODE}")
-        QCOW2VARS=$(is_firmware_qcow2 "${EFI_VARS}")
-        if [ "${QCOW2CODE}" = "true" ]; then EFI_CODE_FORMAT="qcow2"; else EFI_CODE_FORMAT="raw"; fi
-        if [ "${QCOW2VARS}" = "true" ]; then EFI_VARS_FORMAT="qcow2"; else EFI_VARS_FORMAT="raw"; fi
-
-        if [ "${ARCH_VM}" == "aarch64" ]; then
-            # ARM64 uses blockdev with named nodes referenced by machine pflash parameters
-            # Do NOT use -global cfi.pflash01 secure property - that's x86 SMM-specific
-            # shellcheck disable=SC2054
-            args+=(-blockdev node-name=rom,driver=file,filename="${EFI_CODE}",read-only=true
-                -blockdev node-name=efivars,driver=file,filename="${EFI_VARS}")
+        if [ "${ARCH_VM}" == "aarch64" ] &&
+           [ "${EFI_MODE}" == "bios" ]; then
+            # ARM64 monolithic EDK2 firmware.
+            # QEMU loads this directly without a persistent pflash vars store.
+            args+=(-bios "${EFI_CODE}")
         else
-          # x86 uses traditional pflash drives with secure boot support
-          # shellcheck disable=SC2054
-          args+=(-global driver=cfi.pflash01,property=secure,value=on
-              -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
-              -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}")
+            QCOW2CODE=$(is_firmware_qcow2 "${EFI_CODE}")
+            QCOW2VARS=$(is_firmware_qcow2 "${EFI_VARS}")
+
+            if [ "${QCOW2CODE}" = "true" ]; then
+                EFI_CODE_FORMAT="qcow2"
+            else
+                EFI_CODE_FORMAT="raw"
+            fi
+
+            if [ "${QCOW2VARS}" = "true" ]; then
+                EFI_VARS_FORMAT="qcow2"
+            else
+                EFI_VARS_FORMAT="raw"
+            fi
+
+            if [ "${ARCH_VM}" == "aarch64" ]; then
+                # ARM64 pflash uses named blockdev nodes referenced by
+                # pflash0/pflash1 on the virt machine.
+                # Do not use cfi.pflash01 secure properties; those are
+                # specific to the x86 SMM implementation.
+                # shellcheck disable=SC2054
+                args+=(
+                    -blockdev node-name=rom,driver=file,filename="${EFI_CODE}",read-only=true
+                    -blockdev node-name=efivars,driver=file,filename="${EFI_VARS}"
+                )
+            else
+                # x86 uses traditional pflash drives with Secure Boot support.
+                # shellcheck disable=SC2054
+                args+=(
+                    -global driver=cfi.pflash01,property=secure,value=on
+                    -drive if=pflash,format="${EFI_CODE_FORMAT}",unit=0,file="${EFI_CODE}",readonly=on
+                    -drive if=pflash,format="${EFI_VARS_FORMAT}",unit=1,file="${EFI_VARS}"
+                )
+            fi
         fi
     fi
 
