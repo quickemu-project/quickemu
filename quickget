@@ -88,6 +88,7 @@ function os_info() {
         nixos)            INFO="NixOS|-|https://nixos.org/|Linux distribution based on Nix package manager, tool that takes a unique approach to package management and system configuration.";;
         nwg-shell)        INFO="nwg-shell|nwg:nwg|https://nwg-piotr.github.io/nwg-shell/|Arch Linux ISO with nwg-shell for sway and Hyprland";;
         macos)            INFO="macOS|-|https://www.apple.com/macos/|Work and play on your Mac are even more powerful. Elevate your presence on video calls. Access information in all-new ways. Boost gaming performance. And discover even more ways to personalize your Mac.";;
+        omarchy)          INFO="Omarchy|-|https://omarchy.org/|Beautiful, modern & opinionated Arch-based Linux distribution featuring the Hyprland tiling window manager, created by DHH.";;
         openbsd)          INFO="OpenBSD|-|https://www.openbsd.org/|FREE, multi-platform 4.4BSD-based UNIX-like operating system. Our efforts emphasize portability, standardization, correctness, proactive security and integrated cryptography.";;
         openindiana)      INFO="OpenIndiana|-|https://www.openindiana.org/|Community supported illumos-based operating system.";;
         opensuse)         INFO="openSUSE|-|https://www.opensuse.org/|The makers choice for sysadmins, developers and desktop users.";;
@@ -517,6 +518,7 @@ function os_support() {
     nitrux \
     nixos \
     nwg-shell \
+    omarchy \
     openbsd \
     openindiana \
     opensuse \
@@ -927,6 +929,10 @@ function releases_nwg-shell() {
     echo $(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep 'url=' | grep '64.iso' | cut -d'/' -f12 | cut -d'-' -f3)
 }
 
+function releases_omarchy() {
+    echo 4.0.0
+}
+
 function releases_openbsd() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://mirror.leaseweb.com/pub/OpenBSD/" | grep -e '6\.[8-9]/' -e '[7-9]\.' | cut -d\" -f4 | tr -d '/' | sort -r)
@@ -1227,8 +1233,8 @@ function arch_debian() {
 
 function arch_fedora() {
     case "${EDITION}" in
-        Onyx) echo "amd64";;
-        *) echo "amd64 arm64";;
+        Server) echo "amd64 arm64";;
+        *) echo "amd64";;
     esac
 }
 
@@ -1650,7 +1656,7 @@ EOF
 
         # OS specific tweaks
         case ${OS} in
-            alma|centos-stream|endless|garuda|gentoo|kali|nixos|oraclelinux|popos|rockylinux)
+            alma|centos-stream|endless|garuda|gentoo|kali|nixos|omarchy|oraclelinux|popos|rockylinux)
                 echo "disk_size=\"32G\"" >> "${CONF_FILE}";;
             openindiana)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}"
@@ -1659,7 +1665,7 @@ EOF
                 echo "disk_size=\"8G\"" >> "${CONF_FILE}";;
             bazzite)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}";;
-            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tinycore)
+            dragonflybsd|haiku|openbsd|netbsd|slackware|slax|tails|tinycore)
                 echo "boot=\"legacy\"" >> "${CONF_FILE}";;
             deepin)
                 echo "disk_size=\"64G\"" >> "${CONF_FILE}"
@@ -2503,6 +2509,13 @@ function get_nwg-shell() {
     local ISO="nwg-live-${RELEASE}-x86_64.iso"
     local URL="https://sourceforge.net/projects/nwg-iso/files"
     HASH="$(web_pipe "https://sourceforge.net/projects/nwg-iso/rss?path=/" | grep "${ISO}" | cut -d'>' -f3 | cut -d'<' -f1 | tail -n 1)"
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_omarchy() {
+    local HASH="9224fab3720560f771969a99a499e5f7e0f8e2d6a0681d872d52f05fb5003da4"
+    local ISO="omarchy-${RELEASE}.iso"
+    local URL="https://iso.omarchy.org"
     echo "${URL}/${ISO} ${HASH}"
 }
 
