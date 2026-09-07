@@ -310,7 +310,7 @@ like this:
 
      - USB:      Host pass-through requested:
                   - Sennheiser Communications EPOS GTW 270 on bus 001 device 005 needs permission changes:
-                    sudo chown -v root:user /dev/bus/usb/001/005
+                    sudo chown -v user:root /dev/bus/usb/001/005
                     ERROR! USB permission changes are required 👆
 
 ### TPM
