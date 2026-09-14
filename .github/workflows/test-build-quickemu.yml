@@ -53,7 +53,7 @@ jobs:
       - name: "Checkout 🥡"
         uses: "actions/checkout@v6"
       - name: "Install Nix ❄️"
-        uses: "DeterminateSystems/nix-installer-action@v22"
+        uses: "DeterminateSystems/nix-installer-action@v23"
       - name: "Enable Magic Nix Cache 🪄"
         uses: "DeterminateSystems/magic-nix-cache-action@v14"
       - name: "Build & Test .nix ❄️"
