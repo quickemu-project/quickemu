@@ -15,6 +15,6 @@ jobs:
           fetch-depth: 0
       - uses: DeterminateSystems/nix-installer-action@v22
       - uses: DeterminateSystems/magic-nix-cache-action@v14
-      - uses: DeterminateSystems/update-flake-lock@v28
+      - uses: DeterminateSystems/update-flake-lock@v29
         with:
           pr-title: "chore: update flake.lock"
