@@ -20,7 +20,7 @@ jobs:
     outputs:
       distros: ${{ steps.get-distros.outputs.distros }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: "Extract unique distros 📋"
         id: get-distros
         run: |
@@ -41,7 +41,7 @@ jobs:
       matrix:
         distro: ${{ fromJson(needs.detect-distros.outputs.distros) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: "Install dependencies 📦️"
         run: |
           sudo apt-get -y update
