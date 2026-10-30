@@ -685,6 +685,10 @@ function editions_chimeralinux() {
     echo base gnome
 }
 
+function editions_kdeneon() {
+    echo bigscreen desktop dev ko mobile
+}
+
 function releases_crunchbang++() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
@@ -2223,9 +2227,11 @@ function get_kali() {
 function get_kdeneon() {
     local HASH=""
     local ISO=""
-    local URL="https://files.kde.org/neon/images/${RELEASE}/current"
-    ISO=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f3-)
-    HASH=$(web_pipe "${URL}/neon-${RELEASE}-current.sha256sum" | cut -d' ' -f1)
+    local URL="https://files.kde.org/neon/images/${EDITION}/${RELEASE}/current"
+
+    local CHKSUM_FILE_CONTENT=$(web_pipe "${URL}/neon-${RELEASE}-${EDITION}-current.sha256sum")
+    IFS=' ' read -r HASH ISO <<< "$CHKSUM_FILE_CONTENT"
+
     echo "${URL}/${ISO} ${HASH}"
 }
 
