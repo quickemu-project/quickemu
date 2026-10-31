@@ -1464,7 +1464,17 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    local PIPE_OPTS=()
+    if [ ! -t 1 ]; then
+        local CONTENT_LENGTH
+        CONTENT_LENGTH=$(curl --disable --silent --head --location \
+            --write-out '%{content_length_download}' --output /dev/null \
+            --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}" 2>/dev/null)
+        [ -n "${CONTENT_LENGTH}" ] && echo "content-length: ${CONTENT_LENGTH}"
+        PIPE_OPTS=("--stderr" "-")
+    fi
+
+    if ! curl --disable --progress-bar "${PIPE_OPTS[@]}" --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
         echo "ERROR! Failed to download ${URL} with curl."
         rm -f "${DIR}/${FILE}"
         exit 1
