@@ -1522,7 +1522,7 @@ function configure_ports() {
             SPICE+=",port=${spice_port},addr=${SPICE_ADDR}"
             echo "spice,${spice_port}" >> "${VMDIR}/${VMNAME}.ports"
             echo "${spice_port}" > "${VMDIR}/${VMNAME}.spice"
-            echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\" --port ${spice_port}"
+            echo -n " - SPICE:    On host:  spicy --title \"${VMNAME}\"${SPICE_ADDR:+ --host ${SPICE_ADDR}} --port ${spice_port}"
             if [ "${guest_os}" != "macos" ] && [ -n "${PUBLIC}" ]; then
                 echo -n " --spice-shared-dir ${PUBLIC}"
             fi
