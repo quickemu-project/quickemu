@@ -2599,14 +2599,10 @@ readonly LAUNCHER=$(basename "${0}")
 readonly DISK_MIN_SIZE=$((197632 * 8))
 readonly VERSION="4.9.9"
 
-# Default architecture is x86_64, can be overridden by config file (arch="aarch64")
-arch="${arch:-x86_64}"
-ARCH_VM="${arch}"
 ARCH_HOST=$(uname -m)
-QEMU=$(command -v "qemu-system-${ARCH_VM}")
 QEMU_IMG=$(command -v qemu-img)
-if [ ! -x "${QEMU}" ] || [ ! -x "${QEMU_IMG}" ]; then
-    echo "ERROR! QEMU not found. Please make sure 'qemu-system-${ARCH_VM}' and 'qemu-img' are installed."
+if [ ! -x "${QEMU_IMG}" ]; then
+    echo "ERROR! qemu-img not found. Please make sure qemu-img is installed."
     exit 1
 fi
 
