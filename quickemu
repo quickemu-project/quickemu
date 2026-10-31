@@ -284,7 +284,7 @@ function configure_usb() {
                 echo "             o ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} is accessible."
             else
                 echo "             x ${USB_NAME} on bus ${USB_BUS} device ${USB_DEV} needs permission changes:"
-                echo "               sudo chown -v root:${USER} /dev/bus/usb/${USB_BUS}/${USB_DEV}"
+                echo "               sudo chown -v ${USER}:root /dev/bus/usb/${USB_BUS}/${USB_DEV}"
                 USB_NOT_READY=1
             fi
             USB_PASSTHROUGH="${USB_PASSTHROUGH} -device usb-host,bus=hostpass.0,vendorid=0x${VENDOR_ID},productid=0x${PRODUCT_ID}"
