@@ -1963,6 +1963,10 @@ function get_cyclop() {
     local ISO="cyclop-os-${RELEASE}.iso"
     local URL="https://packages.cyclop-tech.com/iso"
     HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+    if ! [[ "${HASH}" =~ ^[[:xdigit:]]{64}$ ]]; then
+        echo "ERROR! Unable to retrieve a valid SHA-256 checksum for ${ISO}." >&2
+        exit 1
+    fi
     echo "${URL}/${ISO} ${HASH}"
 }
 
