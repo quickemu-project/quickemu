@@ -52,6 +52,7 @@ function os_info() {
         centos-stream)    INFO="CentOS Stream|-|https://www.centos.org/centos-stream/|Continuously delivered distro that tracks just ahead of Red Hat Enterprise Linux (RHEL) development, positioned as a midstream between Fedora Linux and RHEL.";;
         chimeralinux)     INFO="Chimera Linux|anon:chimera root:chimera|https://chimera-linux.org/|Modern, general-purpose non-GNU Linux distribution.";;
         crunchbang++)     INFO="Crunchbangplusplus|-|https://www.crunchbangplusplus.org/|The classic minimal crunchbang feel, now with debian 12 bookworm.";;
+        cyclop)           INFO="Cyclop OS|-|https://cyclop-tech.com/cyclop-os|Ubuntu LTS based GNOME desktop for people and schools coming from Windows.";;
         debian)           INFO="Debian|-|https://www.debian.org/|Complete Free Operating System with perfect level of ease of use and stability.";;
         deepin)           INFO="Deepin|-|https://www.deepin.org/|Beautiful UI design, intimate human-computer interaction, and friendly community environment make you feel at home.";;
         devuan)           INFO="Devuan|-|https://www.devuan.org/|Fork of Debian without systemd that allows users to reclaim control over their system by avoiding unnecessary entanglements and ensuring Init Freedom.";;
@@ -481,6 +482,7 @@ function os_support() {
     centos-stream \
     chimeralinux \
     crunchbang++ \
+    cyclop \
     debian \
     deepin \
     devuan \
@@ -688,6 +690,10 @@ function editions_chimeralinux() {
 function releases_crunchbang++() {
     #shellcheck disable=SC2046,SC2005
     echo $(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | cut -d'-' -f2 | grep '^[0-9]' | sort -gru)
+}
+
+function releases_cyclop() {
+    echo 4.0.2
 }
 
 function releases_debian() {
@@ -1950,6 +1956,14 @@ function get_crunchbang++() {
     local ISO=""
     ISO=$(web_pipe "https://api.github.com/repos/CBPP/cbpp/releases" | grep 'download_url' | grep amd64 | grep "${RELEASE}" | cut -d'"' -f4)
     echo "${ISO} ${HASH}"
+}
+
+function get_cyclop() {
+    local HASH=""
+    local ISO="cyclop-os-${RELEASE}.iso"
+    local URL="https://packages.cyclop-tech.com/iso"
+    HASH="$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)"
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_debian() {
