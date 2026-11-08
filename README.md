@@ -106,9 +106,21 @@ The wiki describes how to get up and running with Quickemu and also covers more 
 
 - [**Installation**](https://github.com/quickemu-project/quickemu/wiki/01-Installation) 💾
 - [**Create Linux virtual machines**](https://github.com/quickemu-project/quickemu/wiki/02-Create-Linux-virtual-machines) 🐧
-- [**Create macOS virtual machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines) 🍏
+- [**Create macOS virtual machines**](https://github.com/quickemu-project/quickemu/wiki/03-Create-macOS-virtual-machines) 🍏 ([host CPU requirements](#macos-host-cpu-requirements))
 - [**Create Windows virtual machines**](https://github.com/quickemu-project/quickemu/wiki/04-Create-Windows-virtual-machines) 🪟
 - [**Advanced quickemu configuration**](https://github.com/quickemu-project/quickemu/wiki/05-Advanced-quickemu-configuration) 🔧
 - [**Advanced quickget features**](https://github.com/quickemu-project/quickemu/wiki/06-Advanced-quickget-features) 🤓
 - [**Alternative frontends**](https://github.com/quickemu-project/quickemu/wiki/07-Alternative-frontends) 🧑‍💻
 - [**References**](https://github.com/quickemu-project/quickemu/wiki/08-References) 📚️
+
+### macOS host CPU requirements
+
+Before downloading an x86-64 macOS guest with `quickget`, check the CPU features that Quickemu requires for hardware acceleration.
+
+| macOS release (`quickget` name) | Required host CPU features |
+| --- | --- |
+| Mojave (`mojave`) | SSE 4.1 (`sse4_1`) |
+| Catalina (`catalina`), Big Sur (`big-sur`), Monterey (`monterey`) | SSE 4.2 (`sse4_2`) |
+| Ventura (`ventura`), Sonoma (`sonoma`), Sequoia (`sequoia`), Tahoe (`tahoe`) | SSE 4.2 (`sse4_2`) and AVX2 (`avx2`) |
+
+On Linux, `LC_ALL=C lscpu | grep '^Flags:'` lists the flags exposed to the host OS. Quickemu skips these host CPU checks when it uses QEMU's software emulation (TCG).
