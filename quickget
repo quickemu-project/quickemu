@@ -111,6 +111,7 @@ function os_info() {
         solus)            INFO="Solus|-|https://getsol.us/|Designed for home computing. Every tweak enables us to deliver a cohesive computing experience.";;
         sparkylinux)      INFO="SparkyLinux|-|https://sparkylinux.org/|Fast, lightweight and fully customizable operating system which offers several versions for different use cases.";;
         spirallinux)      INFO="SpiralLinux|-|https://spirallinux.github.io/|Selection of Linux spins built from Debian GNU/Linux, with a focus on simplicity and out-of-the-box usability across all the major desktop environments.";;
+        systemrescue)     INFO="SystemRescue|-|https://www.system-rescue.org/|Linux system rescue toolkit available as a bootable medium for administrating or repairing your system and data after a crash.";;
         tails)            INFO="Tails|-|https://tails.net/|Portable operating system that protects against surveillance and censorship.";;
         tinycore)         INFO="Tiny Core Linux|-|http://www.tinycorelinux.net/|Highly modular based system with community build extensions.";;
         trisquel)         INFO="Trisquel|-|https://trisquel.info/|Fully free operating system for home users, small enterprises and educational centers.";;
@@ -540,6 +541,7 @@ function os_support() {
     solus \
     sparkylinux \
     spirallinux \
+    systemrescue \
     tails \
     tinycore \
     trisquel \
@@ -1103,6 +1105,10 @@ function releases_spirallinux() {
 
 function editions_spirallinux() {
     echo Plasma XFCE Mate LXQt Gnome Budgie Cinnamon Builder
+}
+
+function releases_systemrescue() {
+    web_pipe "https://www.system-rescue.org/Download/" | grep -oE 'systemrescue-[0-9]+\.[0-9]+(\.[0-9]+)?-amd64\.iso' | sed -E 's/systemrescue-(.*)-amd64\.iso/\1/' | sort -uV | tail -n 1
 }
 
 function releases_tails() {
@@ -2785,6 +2791,14 @@ function get_spirallinux() {
     local URL="https://sourceforge.net/projects/spirallinux/files/12.231005"
     HASH=$(web_pipe 'https://sourceforge.net/projects/spirallinux/rss?path=/' | grep "${ISO}" | grep 'md5' | cut -d'<' -f3 | cut -d'>' -f2)
     echo "${URL}/${ISO}" "${HASH}"
+}
+
+function get_systemrescue() {
+    local HASH=""
+    local ISO="systemrescue-${RELEASE}-amd64.iso"
+    local URL="https://sourceforge.net/projects/systemrescuecd/files/sysresccd-x86/${RELEASE}"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
 }
 
 function get_tails() {
