@@ -1,6 +1,5 @@
 {
   lib,
-  fetchFromGitHub,
   installShellFiles,
   makeWrapper,
   stdenv,
@@ -28,6 +27,7 @@
   zsync,
   OVMF ? null,
   OVMFFull ? null,
+  virtiofsd ? null,
 }:
 let
   runtimePaths = [
@@ -55,6 +55,7 @@ let
     OVMFFull
     usbutils
     xdg-user-dirs
+    virtiofsd
   ];
   # Extract version using builtins.split to avoid regex backtracking on large files.
   # builtins.match with .* patterns on multi-kilobyte files can cause stack overflow.
