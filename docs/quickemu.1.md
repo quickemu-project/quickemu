@@ -84,6 +84,10 @@ You can also pass optional parameters
 **--height \<height\>**
 :   Set VM screen height; requires '--width'
 
+**--ssh-access**
+:   Enable remote ssh access support. 'local' (default), 'remote',
+    'clientipaddress'
+
 **--ssh-port \<port\>**
 :   Set SSH port manually
 
