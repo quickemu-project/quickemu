@@ -1960,7 +1960,7 @@ function vm_boot() {
         args+=(-boot order=d
             -drive if=ide,index=2,media=cdrom,file="${iso}")
         iso=""
-    elif [ -n "${iso}" ] && [ "${guest_os}" == "windows" ] && [ -e "${VMDIR}/unattended.iso" ]; then
+    elif [ -n "${iso}" ] && [[ "${guest_os}" == "windows"* ]] && [ -e "${VMDIR}/unattended.iso" ]; then
         # Attach the unattended configuration to Windows guests when booting from ISO
         # shellcheck disable=SC2054
         args+=(-drive media=cdrom,index=2,file="${VMDIR}/unattended.iso")
