@@ -1323,7 +1323,12 @@ function configure_display() {
                 DISPLAY_RENDER="${display}"
                 [ "${gl}" == "on" ] && gl="off"
             fi;;
-        gtk)        DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}";;
+        gtk)
+            if [ -n "${FULLSCREEN}" ]; then
+                DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl},full-screen=on"
+            else
+                DISPLAY_RENDER="${display},grab-on-hover=on,zoom-to-fit=off,gl=${gl}"
+            fi;;
         none)       DISPLAY_RENDER="none"
                     gl="off";;  # No display backend means no GL context
         spice)
