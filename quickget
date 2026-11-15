@@ -71,6 +71,7 @@ function os_info() {
         guix)             INFO="Guix|-|https://guix.gnu.org/|Distribution of the GNU operating system developed by the GNU Project—which respects the freedom of computer users.";;
         haiku)            INFO="Haiku|-|https://www.haiku-os.org/|Specifically targets personal computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn and yet very powerful.";;
         kali)             INFO="Kali|-|https://www.kali.org/|The most advanced Penetration Testing Distribution.";;
+        kanlinux)         INFO="Kan-Linux|-|https://kan-linux.org/|Concise, source-built, secure and agent-first Linux distribution built from scratch in a single monorepo with a small LiveISO footprint.";;
         kdeneon)          INFO="KDE Neon|-|https://neon.kde.org/|Latest and greatest of KDE community software packaged on a rock-solid base.";;
         kolibrios)        INFO="KolibriOS|-|https://kolibrios.org/en/|Tiny yet incredibly powerful and fast operating system.";;
         kubuntu)          INFO="Kubuntu|-|https://kubuntu.org/|Free, complete, and open-source alternative to Microsoft Windows and Mac OS X which contains everything you need to work, play, or share.";;
@@ -500,6 +501,7 @@ function os_support() {
     guix \
     haiku \
     kali \
+    kanlinux \
     kdeneon \
     kolibrios \
     kubuntu \
@@ -831,6 +833,11 @@ function editions_haiku() {
 
 function releases_kali() {
     echo current kali-weekly
+}
+
+function releases_kanlinux() {
+    #shellcheck disable=SC2046,SC2005
+    echo $(web_pipe "https://api.github.com/repos/kan-linux/kan/releases" | jq -r '.[].tag_name' | sed 's/^v//' | sort -rV)
 }
 
 function releases_kdeneon() {
@@ -2217,6 +2224,15 @@ function get_kali() {
     local URL="https://cdimage.kali.org/${RELEASE}"
     ISO=$(web_pipe "${URL}/?C=M;O=D" | grep -o ">kali-linux-.*-installer-amd64.iso" | head -n 1 | cut -c 2-)
     HASH=$(web_pipe "${URL}/SHA256SUMS" | grep -v torrent | grep "${ISO}" | cut -d' ' -f1)
+    echo "${URL}/${ISO} ${HASH}"
+}
+
+function get_kanlinux() {
+    local HASH=""
+    local ISO=""
+    local URL="https://github.com/kan-linux/kan/releases/download/v${RELEASE}"
+    ISO="kan-linux-${RELEASE}-x86_64.iso"
+    HASH=$(web_pipe "${URL}/${ISO}.sha256" | cut -d' ' -f1)
     echo "${URL}/${ISO} ${HASH}"
 }
 
