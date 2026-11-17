@@ -240,7 +240,7 @@ requirements manually:
 - [swtpm](https://github.com/stefanberger/swtpm)
 - [xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/)
 - [xrandr](https://gitlab.freedesktop.org/xorg/app/xrandr)
-- [zsync](http://zsync.moria.org.uk/)
+- [zsync](http://zsync.moria.org.uk/) (or [zsync2](https://github.com/AppImageCommunity/zsync2))
 - [unzip](http://www.info-zip.org/UnZip.html)
 
 For Ubuntu, Debian, Fedora, Arch and NixOS hosts the native packaging or
@@ -362,7 +362,7 @@ quickemu --vm ubuntu-22.04.conf
 
 ### Ubuntu daily-live images
 
-`quickget` can also download/refresh daily-live images via `zsync` for
+`quickget` can also download/refresh daily-live images via `zsync` (or `zsync2`) for
 Ubuntu developers and testers.
 
 ``` shell
