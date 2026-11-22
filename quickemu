@@ -2806,6 +2806,10 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # Re-detect architecture and QEMU binary after sourcing config
     # Config file can set arch="aarch64" to override the default
     ARCH_VM="${arch:-x86_64}"
+    # QEMU uses i386 for all 32-bit x86 guests, including i586 and i686.
+    case "${ARCH_VM}" in
+        i586|i686|x86) ARCH_VM="i386" ;;
+    esac
     QEMU=$(command -v "qemu-system-${ARCH_VM}")
     if [ ! -x "${QEMU}" ]; then
         echo "ERROR! qemu-system-${ARCH_VM} not found."
