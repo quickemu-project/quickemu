@@ -1237,7 +1237,7 @@ function arch_ubuntu-server() {
 }
 
 function arch_ubuntu() {
-    # Ubuntu Desktop ARM64 only available from 25.10 onwards
+    # Ubuntu Desktop ARM64 is available for 24.04 LTS and from 25.10 onwards
     local MAJOR MINOR
     # When RELEASE is unset (initial arch check), return all supported architectures
     # Actual validation happens in get_ubuntu() when release is known
@@ -1252,8 +1252,8 @@ function arch_ubuntu() {
     fi
     MAJOR="${RELEASE%%.*}"
     MINOR="${RELEASE##*.}"
-    # 25.10 and later support ARM64
-    if [ "${MAJOR}" -gt 25 ] || { [ "${MAJOR}" -eq 25 ] && [ "${MINOR}" -ge 10 ]; }; then
+    # 24.04 LTS and 25.10 or later support ARM64
+    if [ "${RELEASE}" == "24.04" ] || [ "${MAJOR}" -gt 25 ] || { [ "${MAJOR}" -eq 25 ] && [ "${MINOR}" -ge 10 ]; }; then
         echo "amd64 arm64"
     else
         echo "amd64"
