@@ -2465,7 +2465,26 @@ function fileshare_param_check() {
             echo " - WARNING! Public directory: '${PUBLIC}' doesn't exist!"
             PUBLIC=""
         else
-            PUBLIC_TAG="Public-${USER,,}"
+            local tag_user="${USER:-$(id -un 2>/dev/null)}"
+            # Keep mount_tag pure ASCII and free of QEMU -device or shell delimiters
+            tag_user=$(LC_ALL=C tr '[:upper:]' '[:lower:]' <<< "${tag_user}" | LC_ALL=C sed -E 's/[^a-z0-9._@-]+/-/g; s/^-+//; s/-+$//')
+            if [ -z "${tag_user}" ]; then
+                PUBLIC_TAG="Public"
+            else
+                PUBLIC_TAG="Public-${tag_user}"
+                # QEMU virtio-9p-pci enforces a 31-byte mount_tag limit (MAX_TAG_LEN - 1)
+                if (( ${#PUBLIC_TAG} > 31 )); then
+                    tag_user="${tag_user%%@*}"
+                    tag_user="${tag_user%-}"
+                    if [ -z "${tag_user}" ]; then
+                        PUBLIC_TAG="Public"
+                    else
+                        PUBLIC_TAG="Public-${tag_user}"
+                        PUBLIC_TAG="${PUBLIC_TAG:0:31}"
+                        PUBLIC_TAG="${PUBLIC_TAG%[.-]}"
+                    fi
+                fi
+            fi
             PUBLIC_PERMS=$(${STAT}  -c "%A" "${PUBLIC}")
         fi
     fi
