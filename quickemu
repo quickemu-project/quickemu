@@ -870,6 +870,17 @@ function is_firmware_qcow2() {
     [ "$magic" = "514649fb" ] && echo "true" || echo "false"
 }
 
+function is_valid_macos_firmware() {
+    local firmware="${1}" size
+    [ -f "${firmware}" ] && [ -r "${firmware}" ] || return 1
+    [ "$(is_firmware_qcow2 "${firmware}")" = "true" ] && return 0
+
+    size=$(wc -c < "${firmware}") || return 1
+    (( size > 0 && size % 4096 == 0 )) || return 1
+
+    ! head -c 512 < "${firmware}" | LC_ALL=C grep -aiEq '^[[:space:]]*(<!doctype[[:space:]]+html|<html([[:space:]]|>))'
+}
+
 # Derive QEMU share path from binary location
 # Handles Nix, Homebrew, MacPorts, system packages, custom builds
 function get_qemu_share_path() {
@@ -936,6 +947,16 @@ function configure_bios() {
             echo "ERROR! macOS ${MAC_MISSING} was not found."
             echo "       Use 'quickget' to download the required files."
             exit 1
+        fi
+        if [ "${ARCH_VM}" = "x86_64" ]; then
+            local firmware
+            for firmware in "${EFI_CODE}" "${EFI_VARS}"; do
+                if ! is_valid_macos_firmware "${firmware}"; then
+                    echo "ERROR! Invalid macOS EFI firmware: ${firmware}"
+                    echo "       Move this file aside, then run 'quickget' to download a replacement."
+                    exit 1
+                fi
+            done
         fi
         BOOT_STATUS="EFI (macOS), OVMF ($(basename "${EFI_CODE}")), SecureBoot (${secureboot})."
     elif [[ "${boot}" == *"efi"* ]]; then
