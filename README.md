@@ -47,6 +47,7 @@ required to run the virtual machines.
 - **Nearly 1000 operating system editions are supported!**
 - Full SPICE support including host/guest clipboard sharing
 - VirtIO-webdavd file sharing for Linux and Windows guests
+- VirtIO-fs file sharing for Linux guests (*automatically preferred over 9p when `virtiofsd` is installed on the host and a public directory is configured*)
 - VirtIO-9p file sharing for Linux and macOS guests
 - [QEMU Guest Agent
   support](https://wiki.qemu.org/Features/GuestAgent); provides access
