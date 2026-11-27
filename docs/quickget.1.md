@@ -86,7 +86,7 @@ quickemu --vm ubuntu-22.04.conf
 
 ### Ubuntu daily-live images
 
-`quickget` can also download/refresh daily-live images via `zsync` for
+`quickget` can also download/refresh daily-live images via `zsync` (or `zsync2`) for
 Ubuntu developers and testers.
 
 ``` shell

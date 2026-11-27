@@ -308,8 +308,8 @@ function csv_data() {
     local SVG
     local HAS_ZSYNC=0
 
-    # Check if zsync is available
-    if command -v zsync &>/dev/null; then
+    # Check if zsync (or zsync2) is available
+    if [ -n "$(zsync_bin)" ]; then
         HAS_ZSYNC=1
     fi
 
@@ -1501,6 +1501,16 @@ function web_check() {
     curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
 }
 
+# Print the available zsync implementation: classic zsync is preferred,
+# zsync2 is used where only it is packaged (e.g. Arch/Artix via the AUR).
+function zsync_bin() {
+    if command -v zsync &>/dev/null; then
+        echo "zsync"
+    elif command -v zsync2 &>/dev/null; then
+        echo "zsync2"
+    fi
+}
+
 function zsync_get() {
     local CHECK=""
     local DIR="${2}"
@@ -1520,7 +1530,7 @@ function zsync_get() {
         CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
-    elif command -v zsync &>/dev/null; then
+    elif [ -n "$(zsync_bin)" ]; then
         if [ -n "${3}" ]; then
             OUT="${3}"
         else
@@ -1532,8 +1542,18 @@ function zsync_get() {
             exit 1
         fi
         echo "Downloading $(pretty_name "${OS}") ${RELEASE} ${EDITION} from ${URL}"
+        if [ "$(zsync_bin)" == "zsync2" ]; then
+            # zsync2 supports https natively; only seed from an existing partial/old file
+            local SEED=()
+            if [ -e "${DIR}/${OUT}" ]; then
+                SEED=(-i "${DIR}/${OUT}")
+            fi
+            if ! zsync2 "${URL}.zsync" "${SEED[@]}" -o "${DIR}/${OUT}" 2>/dev/null; then
+                echo "ERROR! Failed to download ${URL}.zsync"
+                exit 1
+            fi
         # Only force http for zsync - not earlier because we might fall through here
-        if ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
+        elif ! zsync "${URL/https/http}.zsync" -i "${DIR}/${OUT}" -o "${DIR}/${OUT}" 2>/dev/null; then
             echo "ERROR! Failed to download ${URL/https/http}.zsync"
             exit 1
         fi
