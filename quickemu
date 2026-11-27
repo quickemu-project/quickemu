@@ -1079,10 +1079,8 @@ function configure_os_quirks() {
     case ${guest_os} in
         windows-server) NET_DEVICE="e1000";;
         *bsd|linux*|windows) NET_DEVICE="virtio-net-pci";;
-        freedos) sound_card="sb16"
-                 NET_DEVICE="pcnet";;
-        *solaris) usb_controller="xhci"
-                  sound_card="ac97";;
+        freedos) NET_DEVICE="pcnet";;
+        *solaris) usb_controller="xhci";;
         reactos) NET_DEVICE="e1000"
                  keyboard="ps2";;
         macos)
@@ -1094,23 +1092,18 @@ function configure_os_quirks() {
             #   * VirtIO RNG is supported since Big Sur, but exposed to all guests by default.
             case ${macos_release} in
                 monterey|ventura|sonoma|sequoia|tahoe)
-                    # macOS 12+ (Monterey onwards) supports virtio-sound-pci natively
                     BALLOON="-device virtio-balloon"
                     MAC_DISK_DEV="virtio-blk-pci"
                     NET_DEVICE="virtio-net-pci"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
                     GUEST_TWEAKS+=" -global nec-usb-xhci.msi=off"
-                    sound_card="virtio-sound-pci"
                     usb_controller="xhci";;
                 big-sur)
-                    # Big Sur uses VirtIO but usb-audio/VoodooHDA don't work reliably
-                    # Fall back to ich9-intel-hda which may work with VoodooHDA
                     BALLOON="-device virtio-balloon"
                     MAC_DISK_DEV="virtio-blk-pci"
                     NET_DEVICE="virtio-net-pci"
                     USB_HOST_PASSTHROUGH_CONTROLLER="nec-usb-xhci"
                     GUEST_TWEAKS+=" -global nec-usb-xhci.msi=off"
-                    sound_card="ich9-intel-hda"
                     usb_controller="xhci";;
                 *)
                     # Backwards compatibility if no macos_release is specified.
@@ -2585,12 +2578,15 @@ usb_controller="${usb_controller:-ehci}"
 keyboard="${keyboard:-usb}"
 keyboard_layout="${keyboard_layout:-en-us}"
 mouse="${mouse:-tablet}"
-sound_card="${sound_card:-intel-hda}"
+# Sound card default is set later based on guest_os (after config is sourced)
+sound_card="${sound_card:-}"
 sound_duplex="${sound_duplex:-hda-micro}"
 
 ACCESS=""
 ACTIONS=()
 BRAILLE=""
+CLI_SOUND_CARD=""
+CLI_SOUND_CARD_SET=0
 IGNORE_TSC_WARNING=""
 CPU_PINNING=""
 FULLSCREEN=""
@@ -2796,7 +2792,13 @@ else
                 extra_args+="${2}"
                 shift 2;;
             -sound-card|--sound-card)
+                if [ $# -lt 2 ]; then
+                    echo "ERROR! '${1}' requires a sound card value."
+                    exit 1
+                fi
                 SHORTCUT_OPTIONS+="--sound-card ${2} "
+                CLI_SOUND_CARD="${2}"
+                CLI_SOUND_CARD_SET=1
                 sound_card="${2}"
                 shift 2;;
             -sound-duplex|--sound-duplex)
@@ -2848,6 +2850,43 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
                 ;;
             *)
                 serial="socket"
+                ;;
+        esac
+    fi
+
+    # Re-apply CLI --sound-card override so it takes precedence over .conf
+    if [ "${CLI_SOUND_CARD_SET}" -eq 1 ]; then
+        sound_card="${CLI_SOUND_CARD}"
+    fi
+
+    # Set sound_card default based on guest_os if not explicitly configured.
+    # Users can still override in the VM .conf file or with --sound-card.
+    if [ "${CLI_SOUND_CARD_SET}" -eq 0 ] && [ -z "${sound_card}" ]; then
+        case "${guest_os}" in
+            freedos)
+                sound_card="sb16"
+                ;;
+            *solaris)
+                sound_card="ac97"
+                ;;
+            macos)
+                case "${macos_release}" in
+                    monterey|ventura|sonoma|sequoia|tahoe)
+                        # macOS 12+ (Monterey onwards) supports virtio-sound-pci natively
+                        sound_card="virtio-sound-pci"
+                        ;;
+                    big-sur)
+                        # Big Sur uses VirtIO but usb-audio/VoodooHDA don't work reliably
+                        # Fall back to ich9-intel-hda which may work with VoodooHDA
+                        sound_card="ich9-intel-hda"
+                        ;;
+                    *)
+                        sound_card="intel-hda"
+                        ;;
+                esac
+                ;;
+            *)
+                sound_card="intel-hda"
                 ;;
         esac
     fi
