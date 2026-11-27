@@ -2862,7 +2862,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
     # Set sound_card default based on guest_os if not explicitly configured.
     # Users can still override in the VM .conf file or with --sound-card.
     if [ "${CLI_SOUND_CARD_SET}" -eq 0 ] && [ -z "${sound_card}" ]; then
-        case "${guest_os}" in
+        case "${guest_os,,}" in
             freedos)
                 sound_card="sb16"
                 ;;
@@ -2870,7 +2870,7 @@ if [ -n "${VM}" ] && [ -e "${VM}" ]; then
                 sound_card="ac97"
                 ;;
             macos)
-                case "${macos_release}" in
+                case "${macos_release,,}" in
                     monterey|ventura|sonoma|sequoia|tahoe)
                         # macOS 12+ (Monterey onwards) supports virtio-sound-pci natively
                         sound_card="virtio-sound-pci"
