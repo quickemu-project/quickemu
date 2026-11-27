@@ -1418,7 +1418,7 @@ function web_get() {
     local FILE=""
     local USER_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 
-    if [ -n "${3}" ]; then
+    if [ -n "${3}" ] && [[ "${3}" != --* ]]; then
         FILE="${3}"
     else
         FILE="${URL##*/}"
@@ -1427,15 +1427,24 @@ function web_get() {
     # Process any URL redirections after the file name has been extracted
     URL=$(web_redirect "${URL}")
 
-    # Process any headers
+    # Process any options
     while (( "$#" )); do
-        if [ "${1}" == "--header" ]; then
-            HEADERS+=("${1}" "${2}")
-            shift 2
-        else
-            shift
-        fi
+        case "${1}" in
+            --header)
+                HEADERS+=("${1}" "${2}")
+                shift 2
+                ;;
+            --no-user-agent)
+                # Some hosts (e.g. Anubis bot protection) challenge browser user agents
+                USER_AGENT=""
+                shift
+                ;;
+            *) shift ;;
+        esac
     done
+    if [ -n "${USER_AGENT}" ]; then
+        HEADERS+=(--user-agent "${USER_AGENT}")
+    fi
 
     # Test mode for ISO
     if [ "${OPERATION}" == "show" ]; then
@@ -1447,7 +1456,7 @@ function web_get() {
             test_result "${OS}" "${RELEASE}" "${EDITION}" "" "SKIP" "(not available for ${ARCH})"
             exit 0
         fi
-        CHECK=$(web_check "${URL}" && echo "PASS" || echo "FAIL")
+        CHECK=$(web_check "${URL}" --no-html "${HEADERS[@]}" && echo "PASS" || echo "FAIL")
         test_result "${OS}" "${RELEASE}" "${EDITION}" "${URL}" "${CHECK}"
         exit 0
     elif [ "${OPERATION}" == "download" ]; then
@@ -1464,8 +1473,19 @@ function web_get() {
         echo "- URL: ${URL}"
     fi
 
-    if ! curl --disable --progress-bar --location --output "${DIR}/${FILE}" --continue-at - --user-agent "${USER_AGENT}" "${HEADERS[@]}" -- "${URL}"; then
+    local RESPONSE=""
+    if ! RESPONSE=$(curl --disable --progress-bar --location --output "${DIR}/${FILE}" --write-out '%{http_code} %{content_type}' --continue-at - "${HEADERS[@]}" -- "${URL}"); then
         echo "ERROR! Failed to download ${URL} with curl."
+        rm -f "${DIR}/${FILE}"
+        exit 1
+    fi
+    local HTTP_CODE="${RESPONSE%% *}"
+    local CONTENT_TYPE="${RESPONSE#* }"
+
+    # Binary downloads never return HTML; a text/html response is an error or bot-check page
+    # 416 means the file is already complete (--continue-at); its HTML body is not written
+    if [ "${HTTP_CODE}" != "416" ] && [[ "${CONTENT_TYPE,,}" == text/html* ]]; then
+        echo "ERROR! ${URL} returned an HTML page (${CONTENT_TYPE}) instead of a file."
         rm -f "${DIR}/${FILE}"
         exit 1
     fi
@@ -1487,18 +1507,29 @@ function web_redirect() {
 
 # checks if a URL is reachable
 function web_check() {
+    local CONTENT_TYPE=""
     local HEADERS=()
+    local NO_HTML=""
     local URL="${1}"
-    # Process any headers
+    # Process any headers and options
     while (( "$#" )); do
-        if [ "${1}" == "--header" ]; then
-            HEADERS+=("${1}" "${2}")
-            shift 2
-        else
-            shift
-        fi
+        case "${1}" in
+            --header|--user-agent)
+                HEADERS+=("${1}" "${2}")
+                shift 2
+                ;;
+            --no-html)
+                # Fail on HTML responses (error or bot-check pages) when a file is expected
+                NO_HTML="1"
+                shift
+                ;;
+            *) shift ;;
+        esac
     done
-    curl --disable --silent --location --head --output /dev/null --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}"
+    CONTENT_TYPE=$(curl --disable --silent --location --head --output /dev/null --write-out '%{content_type}' --fail --connect-timeout 30 --max-time 30 --retry 3 "${HEADERS[@]}" "${URL}") || return 1
+    if [ -n "${NO_HTML}" ] && [[ "${CONTENT_TYPE,,}" == text/html* ]]; then
+        return 1
+    fi
 }
 
 function zsync_get() {
@@ -3570,7 +3601,7 @@ function get_windows() {
     fi
 
     echo "Downloading VirtIO drivers..."
-    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+    web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}" --no-user-agent
 
     rm -f "${VM_PATH}/unattended.iso"
     case ${RELEASE} in
@@ -3715,7 +3746,7 @@ function create_config() {
                 echo "Creating unattended Windows installation files. To disable, pass --disable-unattended"
                 echo
                 echo "Downloading VirtIO drivers..."
-                web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}"
+                web_get "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso" "${VM_PATH}" --no-user-agent
                 FIXED_ISO="virtio-win.iso"
                 rm -f "${VM_PATH}/unattended.iso"
                 unattended_windows "${VM_PATH}"
