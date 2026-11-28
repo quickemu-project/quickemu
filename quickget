@@ -1922,8 +1922,10 @@ function get_bunsenlabs() {
 function get_cachyos() {
     local HASH=""
     local URL=""
-    URL="$(web_pipe "https://cachyos.org/download/" | tr '&' '\n' | grep "ISO/${EDITION}" | grep -v 'iso.sha' | grep -v 'iso.sig' | cut -d';' -f2)"
-    HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    URL="$(web_pipe "https://cachyos.org/download/" | grep -oE "https://iso\.cachyos\.org/${EDITION}/[0-9]+/cachyos-${EDITION}-linux-[0-9]+\.iso" | head -n 1)"
+    if [ -n "${URL}" ]; then
+        HASH=$(web_pipe "${URL}.sha256" | cut -d' ' -f1)
+    fi
     echo "${URL} ${HASH}"
 }
 
